@@ -10,7 +10,7 @@ anthropic==0.52.0
 qdrant-client==1.12.1
 
 # Embeddings
-voyageai==0.3.2
+voyageai
 
 # PDF parsing
 pypdf==5.1.0

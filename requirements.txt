@@ -1,0 +1,28 @@
+# API framework
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
+python-multipart==0.0.12
+
+# Anthropic SDK
+anthropic==0.52.0
+
+# Vector database
+qdrant-client==1.12.1
+
+# Embeddings
+voyageai==0.3.2
+
+# PDF parsing
+pypdf==5.1.0
+
+# Config & validation
+pydantic==2.10.4
+pydantic-settings==2.7.0
+python-dotenv==1.0.1
+
+# Async HTTP
+httpx==0.28.1
+
+# Text splitting utilities
+tiktoken==0.8.0
+opencv-python==4.10.0.84

@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
 from app.api.routes import health, analysis, avatar, documents, intervention
+from app.api.routes import auth, payments as payments_router
 
 # Path to the frontend HTML — override via FRONTEND_HTML env var
 FRONTEND_HTML = os.environ.get(
@@ -15,6 +16,9 @@ FRONTEND_HTML = os.environ.get(
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Startup: crear tablas en PostgreSQL
+    from app.database import init_db
+    init_db()
     # Startup: ensure Qdrant collection exists (only when keys are available)
     from app.config import get_settings
     from app.core.qdrant_client import ensure_collection
@@ -46,6 +50,8 @@ app.add_middleware(
 
 # ── Routes ────────────────────────────────────────────────────────────────────
 app.include_router(health.router)
+app.include_router(auth.router)
+app.include_router(payments_router.router)
 app.include_router(analysis.router)
 app.include_router(intervention.router)
 app.include_router(avatar.router)

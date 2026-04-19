@@ -18,8 +18,20 @@ FRONTEND_HTML = os.environ.get(
 async def lifespan(app: FastAPI):
     # Startup: crear tablas en PostgreSQL
     import app.models  # registra User y Payment en Base.metadata
-    from app.database import init_db
+    from app.database import init_db, engine
     init_db()
+    # ── Migrate tokens column to NUMERIC if still INTEGER ────────────────────
+    if engine:
+        try:
+            from sqlalchemy import text
+            with engine.connect() as conn:
+                conn.execute(text(
+                    "ALTER TABLE users ALTER COLUMN tokens TYPE NUMERIC(10,2) "
+                    "USING tokens::NUMERIC(10,2)"
+                ))
+                conn.commit()
+        except Exception:
+            pass  # already NUMERIC or table doesn't exist yet
     # Startup: ensure Qdrant collection exists (only when keys are available)
     from app.config import get_settings
     from app.core.qdrant_client import ensure_collection

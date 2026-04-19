@@ -1,9 +1,10 @@
 import json
 import os
 import tempfile
-from typing import Optional
+from typing import Optional, List
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile, Header, Depends
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.models.anamnesis import AnamnesisInput, AnalysisResponse
@@ -13,9 +14,13 @@ from app.database import get_db
 router = APIRouter(prefix="/analysis", tags=["clinical-analysis"])
 
 
-def deduct_token(authorization: Optional[str], db: Session) -> Optional[int]:
-    """Descuenta 1 token si hay JWT válido. Devuelve tokens restantes o None."""
+import logging as _logging
+_log = _logging.getLogger(__name__)
+
+def deduct_token(authorization: Optional[str], db: Session, amount: float = 1.0) -> Optional[float]:
+    """Descuenta `amount` tokens si hay JWT válido. Devuelve tokens restantes o None."""
     if not authorization or not authorization.startswith("Bearer "):
+        _log.warning("deduct_token: no authorization header — skipping deduction")
         return None
     try:
         from app.api.routes.auth import decode_token
@@ -23,15 +28,18 @@ def deduct_token(authorization: Optional[str], db: Session) -> Optional[int]:
         user_id = decode_token(authorization.split(" ", 1)[1])
         user = db.query(User).filter(User.id == user_id).first()
         if not user:
+            _log.warning("deduct_token: user_id=%s not found in DB", user_id)
             return None
-        if user.tokens <= 0:
+        if float(user.tokens) < amount:
             raise HTTPException(status_code=402, detail="Sin tokens. Recarga para continuar.")
-        user.tokens -= 1
+        user.tokens = float(user.tokens) - amount
         db.commit()
-        return user.tokens
+        _log.info("deduct_token: −%.2f tokens → user %s (remaining: %.2f)", amount, user.email, float(user.tokens))
+        return float(user.tokens)
     except HTTPException:
         raise
-    except Exception:
+    except Exception as exc:
+        _log.exception("deduct_token: unexpected error — %s", exc)
         return None
 
 # Max video size accepted: 200 MB
@@ -132,3 +140,89 @@ async def create_analysis_with_video(
     finally:
         if tmp_path and os.path.exists(tmp_path):
             os.unlink(tmp_path)
+
+
+# ── Chat / Plan refinement ────────────────────────────────────────────────────
+
+class ChatMessage(BaseModel):
+    role: str   # "user" | "assistant"
+    content: str
+
+class ChatRequest(BaseModel):
+    anamnesis: AnamnesisInput
+    original_analysis: str
+    messages: List[ChatMessage]  # full conversation history incl. latest user message
+
+class ChatResponse(BaseModel):
+    reply: str
+    tokens_remaining: Optional[float] = None
+
+
+CHAT_SYSTEM_PROMPT = """Eres la IA Analítica by Teo Mariscal, una inteligencia artificial especializada en conducta canina, \
+creada para ayudar a etólogos y adiestradores a refinar planes de modificación de conducta.
+
+Ya has realizado un Análisis Funcional ABC completo de este caso. Ahora el profesional quiere profundizar, \
+corregir algún dato o pedir alternativas a pasos del plan que no son viables en la situación real del cliente.
+
+Tu misión:
+- Escuchar las aclaraciones o restricciones del profesional.
+- Ajustar o completar el plan de intervención con esa nueva información.
+- Ofrecer alternativas concretas, basadas en evidencia, cuando alguna recomendación original no sea aplicable.
+- Mantener siempre un tono clínico, profesional y directo.
+- No repetir el análisis completo salvo que te lo pidan expresamente; céntrate en la parte que hay que revisar.
+- Si el profesional dice algo como "los perros viven juntos y no pueden separarse", propón protocolos de \
+  convivencia y desensibilización que funcionen en esa restricción, sin volver a recomendar la separación.
+
+Responde en español. Sé conciso y útil."""
+
+
+@router.post("/chat", response_model=ChatResponse)
+def analysis_chat(
+    req: ChatRequest,
+    authorization: Optional[str] = Header(None),
+    db: Session = Depends(get_db),
+):
+    """
+    Refinement chat — 0.25 tokens per exchange.
+
+    Accepts the original anamnesis, the full analysis text, and the
+    accumulated conversation history. Returns the AI's next reply.
+    """
+    tokens_left = deduct_token(authorization, db, amount=0.25)
+
+    from app.core.anthropic_client import get_anthropic_client
+
+    # Build context block with anamnesis + original analysis
+    context = (
+        f"=== FICHA DEL CASO ===\n{req.anamnesis.model_dump_json(indent=2)}\n\n"
+        f"=== ANÁLISIS ABC ORIGINAL ===\n{req.original_analysis}"
+    )
+
+    # Convert conversation history to Anthropic format
+    messages = []
+    # First turn: inject context as a user message followed by an ack so history is clean
+    messages.append({
+        "role": "user",
+        "content": f"Aquí tienes el contexto completo del caso que ya analizaste:\n\n{context}",
+    })
+    messages.append({
+        "role": "assistant",
+        "content": "Entendido. Tengo el caso completo y el análisis previo. ¿En qué parte del plan quieres que trabajemos?",
+    })
+    # Append real conversation
+    for m in req.messages:
+        messages.append({"role": m.role, "content": m.content})
+
+    client = get_anthropic_client()
+    try:
+        response = client.messages.create(
+            model="claude-sonnet-4-5",        # Sonnet 4.5 — fast & high quality for chat
+            max_tokens=1024,
+            system=CHAT_SYSTEM_PROMPT,
+            messages=messages,
+        )
+        reply = response.content[0].text
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error de IA: {e}")
+
+    return ChatResponse(reply=reply, tokens_remaining=tokens_left)

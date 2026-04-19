@@ -17,6 +17,7 @@ FRONTEND_HTML = os.environ.get(
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: crear tablas en PostgreSQL
+    import app.models  # registra User y Payment en Base.metadata
     from app.database import init_db
     init_db()
     # Startup: ensure Qdrant collection exists (only when keys are available)

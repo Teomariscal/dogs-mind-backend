@@ -14,8 +14,20 @@ from app.database import get_db
 router = APIRouter(prefix="/analysis", tags=["clinical-analysis"])
 
 
+import re as _re
 import logging as _logging
 _log = _logging.getLogger(__name__)
+
+
+def _strip_markdown(text: str) -> str:
+    """Remove markdown symbols from AI replies before sending to client."""
+    text = _re.sub(r'\*\*', '', text)                        # **bold**
+    text = _re.sub(r'\*', '', text)                          # *italic*
+    text = _re.sub(r'^#{1,6}\s+', '', text, flags=_re.M)    # ## headings
+    text = _re.sub(r'`', '', text)                           # `code`
+    text = _re.sub(r'^[–—]\s*$', '', text, flags=_re.M)     # lone em-dash lines
+    text = _re.sub(r'\n{3,}', '\n\n', text)                  # max 2 newlines
+    return text.strip()
 
 def deduct_token(authorization: Optional[str], db: Session, amount: float = 1.0) -> Optional[float]:
     """Descuenta `amount` tokens si hay JWT válido. Devuelve tokens restantes o None."""
@@ -223,7 +235,7 @@ def analysis_chat(
             system=CHAT_SYSTEM_PROMPT,
             messages=messages,
         )
-        reply = response.content[0].text
+        reply = _strip_markdown(response.content[0].text)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error de IA: {e}")
 

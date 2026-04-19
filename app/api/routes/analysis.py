@@ -149,7 +149,7 @@ class ChatMessage(BaseModel):
     content: str
 
 class ChatRequest(BaseModel):
-    anamnesis: AnamnesisInput
+    anamnesis: dict  # free-form dict — no strict validation needed for chat context
     original_analysis: str
     messages: List[ChatMessage]  # full conversation history incl. latest user message
 
@@ -194,7 +194,7 @@ def analysis_chat(
 
     # Build context block with anamnesis + original analysis
     context = (
-        f"=== FICHA DEL CASO ===\n{req.anamnesis.model_dump_json(indent=2)}\n\n"
+        f"=== FICHA DEL CASO ===\n{json.dumps(req.anamnesis, ensure_ascii=False, indent=2)}\n\n"
         f"=== ANÁLISIS ABC ORIGINAL ===\n{req.original_analysis}"
     )
 

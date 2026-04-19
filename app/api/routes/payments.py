@@ -11,7 +11,7 @@ from app.api.routes.auth import get_current_user
 
 router = APIRouter(tags=["payments"])
 
-stripe.api_key = os.environ.get("STRIPE_SECRET_KEY", "")
+stripe.api_key = os.environ.get("STRIPE_SECRET_KEY", "").strip()
 WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
 
 APP_URL = os.environ.get("APP_URL", "https://thedogsmindbeta.netlify.app")

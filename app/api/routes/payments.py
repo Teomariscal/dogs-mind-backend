@@ -16,16 +16,16 @@ WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
 
 APP_URL = os.environ.get("APP_URL", "https://thedogsmindbeta.netlify.app")
 
-# Packs disponibles
+# Packs disponibles (1 token ≈ €1 → análisis=3tok, chat=0.25tok, avatar=0.10tok)
 PACKS = {
-    10:  {"tokens": 10,  "amount_cents": 499,  "label": "10 Tokens Dogs Mind"},
-    50:  {"tokens": 50,  "amount_cents": 1999, "label": "50 Tokens Dogs Mind"},
-    200: {"tokens": 200, "amount_cents": 5999, "label": "200 Tokens Dogs Mind"},
+    5:  {"tokens": 5,  "amount_cents": 499,  "label": "5 Tokens Dogs Mind"},
+    20: {"tokens": 20, "amount_cents": 1999, "label": "20 Tokens Dogs Mind"},
+    60: {"tokens": 60, "amount_cents": 5999, "label": "60 Tokens Dogs Mind"},
 }
 
 
 class CheckoutRequest(BaseModel):
-    pack: int  # 10, 50 o 200
+    pack: int  # 5, 20 o 60
 
 
 # ── Crear sesión de pago ───────────────────────────────────────────────────────
@@ -130,3 +130,26 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
 @router.get("/payments/balance")
 def get_balance(current_user: User = Depends(get_current_user)):
     return {"tokens": current_user.tokens, "email": current_user.email}
+
+
+# ── Gestión de roles (solo admin) ────────────────────────────────────────────
+class SetRoleRequest(BaseModel):
+    email: str
+    role: str  # "user" | "collaborator" | "admin"
+
+@router.post("/admin/set-role")
+def set_role(
+    req: SetRoleRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Solo los administradores pueden cambiar roles.")
+    if req.role not in ("user", "collaborator", "admin"):
+        raise HTTPException(status_code=400, detail="Rol inválido. Usa: user, collaborator, admin.")
+    target = db.query(User).filter(User.email == req.email).first()
+    if not target:
+        raise HTTPException(status_code=404, detail=f"Usuario '{req.email}' no encontrado.")
+    target.role = req.role
+    db.commit()
+    return {"ok": True, "email": target.email, "role": target.role}

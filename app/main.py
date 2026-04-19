@@ -20,18 +20,35 @@ async def lifespan(app: FastAPI):
     import app.models  # registra User y Payment en Base.metadata
     from app.database import init_db, engine
     init_db()
-    # ── Migrate tokens column to NUMERIC if still INTEGER ────────────────────
+    # ── DB migrations ─────────────────────────────────────────────────────────
     if engine:
-        try:
-            from sqlalchemy import text
-            with engine.connect() as conn:
-                conn.execute(text(
-                    "ALTER TABLE users ALTER COLUMN tokens TYPE NUMERIC(10,2) "
-                    "USING tokens::NUMERIC(10,2)"
-                ))
-                conn.commit()
-        except Exception:
-            pass  # already NUMERIC or table doesn't exist yet
+        from sqlalchemy import text
+        migrations = [
+            # tokens → NUMERIC
+            "ALTER TABLE users ALTER COLUMN tokens TYPE NUMERIC(10,2) USING tokens::NUMERIC(10,2)",
+            # role column
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(50) NOT NULL DEFAULT 'user'",
+        ]
+        for sql in migrations:
+            try:
+                with engine.connect() as conn:
+                    conn.execute(text(sql))
+                    conn.commit()
+            except Exception:
+                pass  # already applied
+
+        # ── Promote first admin (set via ADMIN_EMAIL env var) ─────────────────
+        admin_email = os.environ.get("ADMIN_EMAIL", "").strip()
+        if admin_email:
+            try:
+                from app.models.user import User
+                with engine.connect() as conn:
+                    conn.execute(text(
+                        "UPDATE users SET role='admin' WHERE email=:email AND role='user'"
+                    ), {"email": admin_email})
+                    conn.commit()
+            except Exception:
+                pass
     # Startup: ensure Qdrant collection exists (only when keys are available)
     from app.config import get_settings
     from app.core.qdrant_client import ensure_collection

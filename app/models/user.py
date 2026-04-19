@@ -12,4 +12,5 @@ class User(Base):
     email          = Column(String(255), unique=True, nullable=False, index=True)
     password_hash  = Column(String(255), nullable=False)
     tokens         = Column(Numeric(10, 2), default=5, nullable=False)  # 5 tokens de regalo
+    role           = Column(String(50), default="user", nullable=False)  # user | collaborator | admin
     created_at     = Column(DateTime, default=datetime.utcnow)

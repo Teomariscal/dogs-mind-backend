@@ -39,24 +39,32 @@ def create_checkout(
     if not pack:
         raise HTTPException(status_code=400, detail="Pack inválido. Elige 10, 50 o 200.")
 
-    session = stripe.checkout.Session.create(
-        mode="payment",
-        line_items=[{
-            "price_data": {
-                "currency": "eur",
-                "unit_amount": pack["amount_cents"],
-                "product_data": {"name": pack["label"]},
+    if not stripe.api_key:
+        raise HTTPException(status_code=500, detail="STRIPE_SECRET_KEY no configurada en el servidor")
+
+    try:
+        session = stripe.checkout.Session.create(
+            mode="payment",
+            line_items=[{
+                "price_data": {
+                    "currency": "eur",
+                    "unit_amount": pack["amount_cents"],
+                    "product_data": {"name": pack["label"]},
+                },
+                "quantity": 1,
+            }],
+            metadata={
+                "user_id": str(current_user.id),
+                "tokens":  str(pack["tokens"]),
             },
-            "quantity": 1,
-        }],
-        metadata={
-            "user_id": str(current_user.id),
-            "tokens":  str(pack["tokens"]),
-        },
-        customer_email=current_user.email,
-        success_url=f"{APP_URL}?payment=success&tokens={pack['tokens']}",
-        cancel_url=f"{APP_URL}?payment=cancelled",
-    )
+            customer_email=current_user.email,
+            success_url=f"{APP_URL}?payment=success&tokens={pack['tokens']}",
+            cancel_url=f"{APP_URL}?payment=cancelled",
+        )
+    except stripe.error.AuthenticationError:
+        raise HTTPException(status_code=500, detail="STRIPE_SECRET_KEY inválida. Revisa la variable en Railway.")
+    except stripe.error.StripeError as e:
+        raise HTTPException(status_code=500, detail=f"Error de Stripe: {str(e)}")
 
     # Registrar pago pendiente
     payment = Payment(

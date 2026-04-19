@@ -20,9 +20,14 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 # ── Schemas ───────────────────────────────────────────────────────────────────
+AMBASSADOR_CODE    = os.environ.get("AMBASSADOR_CODE", "").strip()
+AMBASSADOR_TOKENS  = 15
+DEFAULT_TOKENS     = 5
+
 class RegisterRequest(BaseModel):
     email: EmailStr
     password: str
+    invite_code: str = ""   # optional ambassador code
 
 class LoginRequest(BaseModel):
     email: EmailStr
@@ -32,7 +37,8 @@ class AuthResponse(BaseModel):
     token: str
     user_id: str
     email: str
-    tokens: int
+    tokens: float
+    role: str = "user"
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -81,7 +87,13 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
     if len(req.password) < 6:
         raise HTTPException(status_code=400, detail="La contraseña debe tener al menos 6 caracteres")
 
-    user = User(email=req.email, password_hash=hash_password(req.password))
+    # Check ambassador code
+    is_ambassador = AMBASSADOR_CODE and req.invite_code.strip() == AMBASSADOR_CODE
+    role   = "ambassador" if is_ambassador else "user"
+    tokens = AMBASSADOR_TOKENS if is_ambassador else DEFAULT_TOKENS
+
+    user = User(email=req.email, password_hash=hash_password(req.password),
+                tokens=tokens, role=role)
     db.add(user)
     db.commit()
     db.refresh(user)
@@ -90,7 +102,8 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
         token=create_token(str(user.id)),
         user_id=str(user.id),
         email=user.email,
-        tokens=user.tokens,
+        tokens=float(user.tokens),
+        role=user.role,
     )
 
 
@@ -104,7 +117,8 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
         token=create_token(str(user.id)),
         user_id=str(user.id),
         email=user.email,
-        tokens=user.tokens,
+        tokens=float(user.tokens),
+        role=user.role,
     )
 
 
@@ -113,5 +127,6 @@ def me(current_user: User = Depends(get_current_user)):
     return {
         "user_id": str(current_user.id),
         "email":   current_user.email,
-        "tokens":  current_user.tokens,
+        "tokens":  float(current_user.tokens),
+        "role":    current_user.role,
     }

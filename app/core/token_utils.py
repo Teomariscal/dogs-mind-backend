@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 
 _log = logging.getLogger(__name__)
 
-PRIVILEGED_ROLES = {"admin", "collaborator"}
+PRIVILEGED_ROLES = {"admin", "developer"}  # unlimited tokens, no deduction ever
 
 
 def deduct_token(

@@ -98,18 +98,19 @@ def serve_frontend():
 
 @app.get("/admin", include_in_schema=False)
 def serve_admin():
-    """Simple admin panel for uploading PDFs to the RAG knowledge base."""
+    """Admin panel: RAG documents + user management."""
     from fastapi.responses import HTMLResponse
     html = """<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dogs Mind · Admin RAG</title>
+<title>Dogs Mind · Admin</title>
 <style>
   body { font-family: system-ui, sans-serif; background: #f5f5f0; margin: 0; padding: 40px 20px; color: #2c2a24; }
-  .card { background: #fff; border-radius: 16px; padding: 32px; max-width: 560px; margin: 0 auto; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+  .card { background: #fff; border-radius: 16px; padding: 32px; max-width: 700px; margin: 0 auto 24px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
   h1 { font-size: 22px; margin: 0 0 6px; }
+  h2 { font-size: 16px; margin: 0 0 16px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
   p { color: #888; font-size: 14px; margin: 0 0 24px; }
   #drop-zone { border: 2px dashed #c0b8aa; border-radius: 12px; padding: 40px 20px; text-align: center; cursor: pointer; transition: all .2s; background: #faf8f4; }
   #drop-zone.hover { border-color: #4a6741; background: #edf2eb; }
@@ -127,9 +128,37 @@ def serve_admin():
   .doc-item .name { font-weight: 600; }
   .doc-item .chunks { color: #888; }
   .doc-item button { width: auto; padding: 4px 12px; margin: 0; font-size: 12px; background: #c96e3a; border-radius: 100px; }
+  /* Users table */
+  .u-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .u-table th { text-align: left; padding: 8px 10px; border-bottom: 2px solid #eee; color: #666; font-weight: 600; }
+  .u-table td { padding: 8px 10px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+  .role-badge { display:inline-block; padding: 2px 8px; border-radius: 100px; font-size: 11px; font-weight: 700; }
+  .role-user { background:#f0f0f0; color:#666; }
+  .role-ambassador { background:#fff3cd; color:#856404; }
+  .role-tech { background:#cff4fc; color:#0c5460; }
+  .role-developer { background:#d1ecf1; color:#0c5460; }
+  .role-admin { background:#f8d7da; color:#721c24; }
+  .btn-sm { width:auto; padding:4px 10px; margin:0; font-size:11px; border-radius:100px; }
+  .btn-blue { background:#2a4a8a; }
+  .btn-red { background:#c96e3a; }
+  .row-input { border:1px solid #ddd; border-radius:6px; padding:4px 8px; font-size:12px; width:60px; }
+  #login-section input { width:100%; padding:10px 14px; border:1.5px solid #ddd; border-radius:10px; font-size:14px; margin-bottom:10px; box-sizing:border-box; }
+  #admin-content { display:none; }
 </style>
 </head>
 <body>
+
+<!-- LOGIN -->
+<div class="card" id="login-section">
+  <h1>🐕 Dogs Mind · Admin</h1>
+  <p>Inicia sesión con tu cuenta de administrador</p>
+  <input type="email" id="adm-email" placeholder="Email">
+  <input type="password" id="adm-pass" placeholder="Contraseña">
+  <button onclick="adminLogin()">Entrar</button>
+  <div id="login-err" style="color:#c00;font-size:13px;margin-top:10px;"></div>
+</div>
+
+<div id="admin-content">
 <div class="card">
   <h1>🐕 Dogs Mind · Admin RAG</h1>
   <p>Sube PDFs para alimentar la base de conocimiento conductual</p>
@@ -151,6 +180,18 @@ def serve_admin():
     <h2>📚 Documentos indexados</h2>
     <div id="docs-list"><em style="color:#aaa;font-size:13px;">Cargando...</em></div>
   </div>
+</div>
+
+<!-- USERS CARD -->
+<div class="card">
+  <h2>👥 Gestión de usuarios</h2>
+  <div style="overflow-x:auto;">
+    <table class="u-table">
+      <thead><tr><th>Email</th><th>Rol</th><th>Tokens</th><th>Acciones</th></tr></thead>
+      <tbody id="users-tbody"><tr><td colspan="4" style="color:#aaa;font-size:13px;">Cargando...</td></tr></tbody>
+    </table>
+  </div>
+  <button onclick="loadUsers()" style="width:auto;padding:8px 20px;margin-top:16px;font-size:13px;">🔄 Actualizar lista</button>
 </div>
 
 <script>
@@ -238,8 +279,72 @@ async function deleteDoc(filename) {
   loadDocs();
 }
 
+// ── ADMIN AUTH ───────────────────────────────────────────────────────────────
+var _jwt = '';
+async function adminLogin() {
+  var email = document.getElementById('adm-email').value.trim();
+  var pass  = document.getElementById('adm-pass').value;
+  var err   = document.getElementById('login-err');
+  err.textContent = '';
+  var res = await fetch('/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, password: pass}) });
+  var data = await res.json();
+  if (!res.ok) { err.textContent = data.detail || 'Error'; return; }
+  if (data.role !== 'admin') { err.textContent = 'No tienes permisos de administrador.'; return; }
+  _jwt = data.token;
+  document.getElementById('login-section').style.display = 'none';
+  document.getElementById('admin-content').style.display = 'block';
+  loadDocs();
+  loadUsers();
+}
+
+function ah() { return { 'Content-Type':'application/json', 'Authorization':'Bearer ' + _jwt }; }
+
+// ── USERS ────────────────────────────────────────────────────────────────────
+async function loadUsers() {
+  var res = await fetch('/admin/users', { headers: ah() });
+  var data = await res.json();
+  var rows = (data.users || []).map(function(u) {
+    return '<tr>' +
+      '<td>' + u.email + '</td>' +
+      '<td><span class="role-badge role-' + u.role + '">' + u.role + '</span></td>' +
+      '<td>' + parseFloat(u.tokens).toFixed(2) + '</td>' +
+      '<td style="white-space:nowrap;">' +
+        '<select id="sel-' + btoa(u.email) + '" style="border:1px solid #ddd;border-radius:6px;padding:3px 6px;font-size:12px;margin-right:4px;">' +
+          ['user','ambassador','tech','developer','admin'].map(function(r){ return '<option value="'+r+'"'+(r===u.role?' selected':'')+'>'+r+'</option>'; }).join('') +
+        '</select>' +
+        '<button class="btn-sm btn-blue" onclick="setRole(\''+u.email+'\')">Rol</button>' +
+        '&nbsp;<input class="row-input" id="tok-'+btoa(u.email)+'" type="number" placeholder="tok" min="0.25" step="0.25">' +
+        '<button class="btn-sm btn-blue" onclick="addTok(\''+u.email+'\')" style="margin-left:4px;">+Tok</button>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+  document.getElementById('users-tbody').innerHTML = rows || '<tr><td colspan="4" style="color:#aaa;">Sin usuarios</td></tr>';
+}
+
+async function setRole(email) {
+  var key = btoa(email);
+  var role = document.getElementById('sel-' + key).value;
+  var res = await fetch('/admin/set-role', { method:'POST', headers:ah(), body: JSON.stringify({email, role}) });
+  var data = await res.json();
+  if (!res.ok) { alert(data.detail); return; }
+  alert('✅ ' + email + ' → ' + role + ' (' + parseFloat(data.tokens).toFixed(2) + ' tok)');
+  loadUsers();
+}
+
+async function addTok(email) {
+  var key = btoa(email);
+  var amount = parseFloat(document.getElementById('tok-' + key).value);
+  if (!amount || amount <= 0) { alert('Introduce una cantidad válida'); return; }
+  var res = await fetch('/admin/add-tokens', { method:'POST', headers:ah(), body: JSON.stringify({email, amount}) });
+  var data = await res.json();
+  if (!res.ok) { alert(data.detail); return; }
+  alert('✅ +' + amount + ' tok → ' + email + ' (total: ' + parseFloat(data.tokens).toFixed(2) + ')');
+  loadUsers();
+}
+
 loadDocs();
 </script>
+</div><!-- /admin-content -->
 </body>
 </html>"""
     return HTMLResponse(html)

@@ -12,6 +12,10 @@ class AvatarChatRequest(BaseModel):
         description="Full conversation history. Last message must be role=user.",
         min_length=1,
     )
+    avatar_id: str = Field(
+        default="niaz",
+        description="Avatar key: niaz | mario | leo | katja | ale | borja",
+    )
 
 
 class AvatarChatResponse(BaseModel):

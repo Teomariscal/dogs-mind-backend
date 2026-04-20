@@ -1,14 +1,13 @@
 """
 Avatar AI service — Claude Haiku 4.5.
 
-Simple conversational assistant. No RAG. Receives the full conversation
-history and returns the next assistant turn. The client is responsible for
-maintaining and sending the full history on each request.
+Each avatar has its own personality system prompt.
+The client maintains and sends the full conversation history on each request.
 """
 
 from app.config import get_settings
 from app.core.anthropic_client import get_anthropic_client
-from app.core.prompts.avatar import AVATAR_SYSTEM_PROMPT
+from app.core.prompts.avatar import AVATAR_PROMPTS, AVATAR_SYSTEM_PROMPT
 from app.models.avatar import AvatarChatRequest, AvatarChatResponse
 
 
@@ -16,12 +15,15 @@ def chat(request: AvatarChatRequest) -> AvatarChatResponse:
     settings = get_settings()
     client = get_anthropic_client()
 
+    # Select the system prompt for the requested avatar
+    system_prompt = AVATAR_PROMPTS.get(request.avatar_id, AVATAR_SYSTEM_PROMPT)
+
     messages = [{"role": m.role, "content": m.content} for m in request.messages]
 
     response = client.messages.create(
         model=settings.avatar_model,
-        max_tokens=1024,
-        system=AVATAR_SYSTEM_PROMPT,
+        max_tokens=600,
+        system=system_prompt,
         messages=messages,
     )
 

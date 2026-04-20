@@ -106,10 +106,12 @@ app.include_router(documents.router)
 
 @app.get("/", include_in_schema=False)
 def serve_frontend():
-    """Serve the Dogs Mind single-page app."""
+    """Serve the Dogs Mind single-page app or redirect to Netlify."""
+    from fastapi.responses import RedirectResponse
     if os.path.isfile(FRONTEND_HTML):
         return FileResponse(FRONTEND_HTML, media_type="text/html")
-    return {"error": f"Frontend not found at {FRONTEND_HTML}. Set FRONTEND_HTML env var."}
+    # Frontend is hosted on Netlify — redirect there
+    return RedirectResponse(url="https://thedogsmindbeta.netlify.app", status_code=302)
 
 
 @app.get("/admin", include_in_schema=False)

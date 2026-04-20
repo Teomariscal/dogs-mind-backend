@@ -1,0 +1,9 @@
+frontend/
+tests/
+*.md
+.git/
+__pycache__/
+*.pyc
+*.pyo
+.env
+.DS_Store

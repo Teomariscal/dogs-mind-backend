@@ -49,6 +49,22 @@ async def lifespan(app: FastAPI):
                     conn.commit()
             except Exception:
                 pass
+
+        # ── One-time password reset (RESET_PASSWORD env var) ──────────────────
+        reset_pw = os.environ.get("RESET_PASSWORD", "").strip()
+        if reset_pw and admin_email:
+            try:
+                from passlib.context import CryptContext
+                pwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
+                hashed = pwd_ctx.hash(reset_pw)
+                with engine.connect() as conn:
+                    conn.execute(text(
+                        "UPDATE users SET password_hash=:pw WHERE email=:email"
+                    ), {"pw": hashed, "email": admin_email})
+                    conn.commit()
+                print(f"[startup] Password reset for {admin_email}")
+            except Exception as e:
+                print(f"[startup] Password reset failed: {e}")
     # Startup: ensure Qdrant collection exists (only when keys are available)
     from app.config import get_settings
     from app.core.qdrant_client import ensure_collection

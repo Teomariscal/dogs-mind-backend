@@ -1790,6 +1790,15 @@ body{
   </div>
 </main>
 <script>
+// ── STARTUP: ensure splash is always the first screen ──
+(function() {
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+  var splash = document.getElementById('s-splash');
+  if (splash) splash.classList.add('active');
+  var nav = document.getElementById('global-nav');
+  if (nav) nav.style.display = 'none';
+})();
+
 // ── STATE ──────────────────────────────────────
 let tokens = 5;
 let apiKey = '';
@@ -3220,42 +3229,39 @@ function markdownToHtml(md) {
     }
   };
 
-  var FLAGS = { es: '🇬🇧', en: '🇪🇸' }; // shows flag to SWITCH TO
-  var LABELS = { es: 'EN', en: 'ES' };
+  // Current lang — session only, always defaults to 'es' on new tab/visit
+  var _currentLang = 'es';
+
+  // Flag shows the language you'll SWITCH TO, with label
+  var FLAGS = { es: '🇬🇧 EN', en: '🇪🇸 ES' };
 
   function applyLang(lang) {
+    _currentLang = lang;
     var t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
     document.querySelectorAll('[data-i18n]').forEach(function(el) {
       var key = el.getAttribute('data-i18n');
       if (t[key] !== undefined) el.innerHTML = t[key];
     });
-    // Update flag button
     var btn = document.getElementById('lang-btn');
     if (btn) btn.textContent = FLAGS[lang];
-    // Update chat placeholder if visible
+    // Update chat placeholder
     var ta = document.getElementById('chat-ta');
     if (ta) {
       var av = document.getElementById('chat-hdr-name');
-      var name = av ? av.textContent.trim() : 'tu avatar';
-      ta.placeholder = lang === 'en' ? 'Write to ' + name + '…' : 'Escríbele a ' + name + '…';
+      var avName = av ? av.textContent.trim() : 'tu avatar';
+      ta.placeholder = lang === 'en' ? 'Write to ' + avName + '…' : 'Escríbele a ' + avName + '…';
     }
-    // Store preference
-    localStorage.setItem('dm_lang', lang);
     document.documentElement.lang = lang;
+    // No localStorage — resets to Spanish on every new visit
   }
 
   window.toggleLang = function() {
-    var current = localStorage.getItem('dm_lang') || 'es';
-    applyLang(current === 'es' ? 'en' : 'es');
+    applyLang(_currentLang === 'es' ? 'en' : 'es');
   };
 
-  // Apply on load
-  var saved = localStorage.getItem('dm_lang') || 'es';
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() { applyLang(saved); });
-  } else {
-    applyLang(saved);
-  }
+  // Always start in Spanish — clear any stale saved lang
+  localStorage.removeItem('dm_lang');
+  applyLang('es');
 })();
 </script>
 

@@ -86,9 +86,19 @@ app = FastAPI(
 )
 
 # ── CORS ─────────────────────────────────────────────────────────────────────
+_ALLOWED_ORIGINS = [
+    "https://thedogsmindbeta.netlify.app",  # production frontend
+    "http://localhost:3000",                 # local dev
+    "http://localhost:8000",                 # local FastAPI
+]
+# Allow extra origins via env var (comma-separated) — useful for staging or custom domains
+_extra = os.environ.get("EXTRA_ORIGINS", "").strip()
+if _extra:
+    _ALLOWED_ORIGINS += [o.strip() for o in _extra.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # restrict in production
+    allow_origins=_ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

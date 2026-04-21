@@ -611,7 +611,8 @@ body{
   <div class="notch"></div>
   <div class="status-bar">
     <span>9:41</span>
-    <span style="display:flex;gap:4px;align-items:center">
+    <span style="display:flex;gap:6px;align-items:center">
+      <button id="lang-btn" onclick="toggleLang()" style="background:none;border:none;cursor:pointer;font-size:14px;padding:0;line-height:1;">🇬🇧</button>
       <span>▪▪▪</span><span>WiFi</span><span>🔋</span>
     </span>
   </div>
@@ -622,12 +623,12 @@ body{
       
     </div>
     <div class="splash-content">
-      <div class="splash-title">Canine Behavior<br>Consultancy</div>
+      <div class="splash-title" data-i18n="splash_title">Canine Behavior<br>Consultancy</div>
       <div class="splash-by">by Teo Mariscal</div>
-      <div class="splash-sub">Expert functional analysis to understand<br>and improve your dog's behavior</div>
-      <button class="btn-green" onclick="goTo('s-login')">Get Started</button>
-      <button class="btn-text" onclick="goTo('s-home')">Log In</button>
-      <button class="btn-outline" onclick="startTour()" style="margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;">▶&nbsp;Take a Tour</button>
+      <div class="splash-sub" data-i18n="splash_sub">Expert functional analysis to understand<br>and improve your dog's behavior</div>
+      <button class="btn-green" onclick="goTo('s-login')" data-i18n="get_started">Get Started</button>
+      <button class="btn-text" onclick="goTo('s-home')" data-i18n="log_in">Log In</button>
+      <button class="btn-outline" onclick="startTour()" style="margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;">▶&nbsp;<span data-i18n="take_tour">Take a Tour</span></button>
     </div>
   </div>
 
@@ -652,14 +653,14 @@ body{
       <!-- Hero -->
       <div class="hero-banner">
         <div class="hero-overlay">
-          <div class="hero-title">Start a new behavioral analysis</div>
-          <button class="btn-hero" onclick="goTo('s-anamnesis')">Begin Consultation</button>
+          <div class="hero-title" data-i18n="hero_title">Start a new behavioral analysis</div>
+          <button class="btn-hero" onclick="goTo('s-anamnesis')" data-i18n="begin_consultation">Begin Consultation</button>
         </div>
       </div>
 
       <!-- My Dogs -->
       <div class="section">
-        <div class="section-title">My Dogs</div>
+        <div class="section-title" data-i18n="my_dogs">My Dogs</div>
         <div class="dogs-row">
           <div class="dog-item">
             <div class="dog-circle" style="background:none;padding:0;overflow:hidden">
@@ -682,8 +683,8 @@ body{
       <div class="cards-row">
         <div class="action-card" onclick="goTo('s-records')" style="cursor:pointer;">
           <div class="card-icon">📋</div>
-          <div class="card-title">Behavioral Records</div>
-          <div class="card-sub">View previous cases and reports</div>
+          <div class="card-title" data-i18n="behavioral_records">Behavioral Records</div>
+          <div class="card-sub" data-i18n="behavioral_records_sub">View previous cases and reports</div>
         </div>
 
         <div class="avatar-card" onclick="goTo('s-avatars')">
@@ -692,13 +693,13 @@ body{
             <div class="avatar-badge" id="home-av-badge">Niaz</div>
           </div>
           <div class="card-title" style="font-size:12px">The Dogs Aigents</div>
-          <div class="card-sub">Tu Aigent personal</div>
+          <div class="card-sub" data-i18n="aigent_sub">Tu Aigent personal</div>
         </div>
 
         <div class="teo-card">
           <div class="teo-card-title">Analysis by Teo Mariscal</div>
-          <button class="teo-btn primary" onclick="goTo('s-anamnesis')">New Analysis</button>
-          <button class="teo-btn secondary" onclick="goTo('s-abc')">Continue Case</button>
+          <button class="teo-btn primary" onclick="goTo('s-anamnesis')" data-i18n="new_analysis">Nuevo Análisis</button>
+          <button class="teo-btn secondary" onclick="goTo('s-abc')" data-i18n="continue_case">Continuar caso</button>
           <div class="teo-sub">Expert human review and functional analysis</div>
         </div>
       </div>
@@ -706,7 +707,7 @@ body{
       <!-- Insights -->
       <div class="insight-row">
         <div class="insight-icon">💡</div>
-        <div class="insight-text">Tip of the day: Consistent positive reinforcement is key to long-term behavioral change. Reward desired actions immediately.</div>
+        <div class="insight-text" data-i18n="tip_of_day">Consejo del día: El refuerzo positivo consistente es clave para el cambio conductual a largo plazo. Recompensa las acciones deseadas de inmediato.</div>
         <div class="token-ring" onclick="goTo('s-tokens')" style="cursor:pointer;" title="Ver mis tokens">
           <div class="token-inner">
             <div class="token-num" id="tok-home">5</div>
@@ -715,7 +716,7 @@ body{
         </div>
       </div>
 
-      <button class="btn-new-consult" onclick="goTo('s-anamnesis')">New Consultation</button>
+      <button class="btn-new-consult" onclick="goTo('s-anamnesis')" data-i18n="new_consultation">Nueva Consulta</button>
     </div>
   </div>
 
@@ -1765,10 +1766,10 @@ body{
   <!-- ══ GLOBAL BOTTOM NAV ══ -->
   <div id="global-nav">
     <div style="display:flex;width:100%;">
-      <button id="n-home"     class="n-btn" onclick="goTo('s-home')"    ><div class="n-ico">🏠</div>Home</button>
-      <button id="n-trainer"  class="n-btn" onclick="goTo('s-chat')"    ><div class="n-ico">💬</div>Trainer</button>
-      <button id="n-progress" class="n-btn" onclick="goTo('s-tracking')"><div class="n-ico">📈</div>Progress</button>
-      <button id="n-teo"      class="n-btn" onclick="goTo('s-profile')" ><div class="n-ico">👤</div>Teo</button>
+      <button id="n-home"     class="n-btn" onclick="goTo('s-home')"    ><div class="n-ico">🏠</div><span data-i18n="nav_home">Inicio</span></button>
+      <button id="n-trainer"  class="n-btn" onclick="goTo('s-chat')"    ><div class="n-ico">💬</div><span data-i18n="nav_trainer">Trainer</span></button>
+      <button id="n-progress" class="n-btn" onclick="goTo('s-tracking')"><div class="n-ico">📈</div><span data-i18n="nav_progress">Progreso</span></button>
+      <button id="n-teo"      class="n-btn" onclick="goTo('s-profile')" ><div class="n-ico">👤</div><span data-i18n="nav_teo">Teo</span></button>
     </div>
   </div>
 
@@ -3169,6 +3170,93 @@ function markdownToHtml(md) {
   closePara();
   return out.join('\n');
 }
+</script>
+
+<!-- ── i18n — LANGUAGE SWITCHER ── -->
+<script>
+(function() {
+  var TRANSLATIONS = {
+    es: {
+      splash_title:           'Canine Behavior<br>Consultancy',
+      splash_sub:             'Análisis funcional experto para entender<br>y mejorar el comportamiento de tu perro',
+      get_started:            'Comenzar',
+      log_in:                 'Iniciar sesión',
+      take_tour:              'Ver el tour',
+      hero_title:             'Inicia un nuevo análisis conductual',
+      begin_consultation:     'Comenzar consulta',
+      my_dogs:                'Mis perros',
+      behavioral_records:     'Registros de conducta',
+      behavioral_records_sub: 'Ver casos y reportes anteriores',
+      aigent_sub:             'Tu Aigent personal',
+      new_analysis:           'Nuevo Análisis',
+      continue_case:          'Continuar caso',
+      tip_of_day:             'Consejo del día: El refuerzo positivo consistente es clave para el cambio conductual a largo plazo. Recompensa las acciones deseadas de inmediato.',
+      new_consultation:       'Nueva Consulta',
+      nav_home:               'Inicio',
+      nav_trainer:            'Trainer',
+      nav_progress:           'Progreso',
+      nav_teo:                'Teo',
+    },
+    en: {
+      splash_title:           'Canine Behavior<br>Consultancy',
+      splash_sub:             'Expert functional analysis to understand<br>and improve your dog\'s behavior',
+      get_started:            'Get Started',
+      log_in:                 'Log In',
+      take_tour:              'Take a Tour',
+      hero_title:             'Start a new behavioral analysis',
+      begin_consultation:     'Begin Consultation',
+      my_dogs:                'My Dogs',
+      behavioral_records:     'Behavioral Records',
+      behavioral_records_sub: 'View previous cases and reports',
+      aigent_sub:             'Your personal Aigent',
+      new_analysis:           'New Analysis',
+      continue_case:          'Continue Case',
+      tip_of_day:             'Tip of the day: Consistent positive reinforcement is key to long-term behavioral change. Reward desired actions immediately.',
+      new_consultation:       'New Consultation',
+      nav_home:               'Home',
+      nav_trainer:            'Trainer',
+      nav_progress:           'Progress',
+      nav_teo:                'Teo',
+    }
+  };
+
+  var FLAGS = { es: '🇬🇧', en: '🇪🇸' }; // shows flag to SWITCH TO
+  var LABELS = { es: 'EN', en: 'ES' };
+
+  function applyLang(lang) {
+    var t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+      var key = el.getAttribute('data-i18n');
+      if (t[key] !== undefined) el.innerHTML = t[key];
+    });
+    // Update flag button
+    var btn = document.getElementById('lang-btn');
+    if (btn) btn.textContent = FLAGS[lang];
+    // Update chat placeholder if visible
+    var ta = document.getElementById('chat-ta');
+    if (ta) {
+      var av = document.getElementById('chat-hdr-name');
+      var name = av ? av.textContent.trim() : 'tu avatar';
+      ta.placeholder = lang === 'en' ? 'Write to ' + name + '…' : 'Escríbele a ' + name + '…';
+    }
+    // Store preference
+    localStorage.setItem('dm_lang', lang);
+    document.documentElement.lang = lang;
+  }
+
+  window.toggleLang = function() {
+    var current = localStorage.getItem('dm_lang') || 'es';
+    applyLang(current === 'es' ? 'en' : 'es');
+  };
+
+  // Apply on load
+  var saved = localStorage.getItem('dm_lang') || 'es';
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { applyLang(saved); });
+  } else {
+    applyLang(saved);
+  }
+})();
 </script>
 
 <!-- ── SERVICE WORKER REGISTRATION ── -->

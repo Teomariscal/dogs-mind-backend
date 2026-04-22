@@ -356,9 +356,9 @@ async function loadUsers() {
         '<select id="sel-' + btoa(u.email) + '" style="border:1px solid #ddd;border-radius:6px;padding:3px 6px;font-size:12px;margin-right:4px;">' +
           ['user','ambassador','tech','developer','admin'].map(function(r){ return '<option value="'+r+'"'+(r===u.role?' selected':'')+'>'+r+'</option>'; }).join('') +
         '</select>' +
-        '<button class="btn-sm btn-blue" onclick="setRole(\''+u.email+'\')">Rol</button>' +
+        '<button class="btn-sm btn-blue" onclick="setRole(&#39;'+u.email+'&#39;)">Rol</button>' +
         '&nbsp;<input class="row-input" id="tok-'+btoa(u.email)+'" type="number" placeholder="tok" min="0.25" step="0.25">' +
-        '<button class="btn-sm btn-blue" onclick="addTok(\''+u.email+'\')" style="margin-left:4px;">+Tok</button>' +
+        '<button class="btn-sm btn-blue" onclick="addTok(&#39;'+u.email+'&#39;)" style="margin-left:4px;">+Tok</button>' +
       '</td>' +
     '</tr>';
   }).join('');

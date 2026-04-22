@@ -180,9 +180,9 @@ def serve_admin():
 <div class="card" id="login-section">
   <h1>🐕 Dogs Mind · Admin</h1>
   <p>Inicia sesión con tu cuenta de administrador</p>
-  <input type="email" id="adm-email" placeholder="Email">
-  <input type="password" id="adm-pass" placeholder="Contraseña">
-  <button onclick="adminLogin()">Entrar</button>
+  <input type="email" id="adm-email" placeholder="Email" onkeydown="if(event.key==='Enter')adminLogin()">
+  <input type="password" id="adm-pass" placeholder="Contraseña" onkeydown="if(event.key==='Enter')adminLogin()">
+  <button id="login-btn" type="button" onclick="adminLogin()">Entrar</button>
   <div id="login-err" style="color:#c00;font-size:13px;margin-top:10px;"></div>
 </div>
 
@@ -313,16 +313,32 @@ async function adminLogin() {
   var email = document.getElementById('adm-email').value.trim();
   var pass  = document.getElementById('adm-pass').value;
   var err   = document.getElementById('login-err');
+  var btn   = document.getElementById('login-btn');
   err.textContent = '';
-  var res = await fetch('/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, password: pass}) });
-  var data = await res.json();
-  if (!res.ok) { err.textContent = data.detail || 'Error'; return; }
-  if (data.role !== 'admin') { err.textContent = 'No tienes permisos de administrador.'; return; }
-  _jwt = data.token;
-  document.getElementById('login-section').style.display = 'none';
-  document.getElementById('admin-content').style.display = 'block';
-  loadDocs();
-  loadUsers();
+  err.style.color = '#c00';
+  if (!email || !pass) { err.textContent = 'Rellena email y contraseña.'; return; }
+  btn.disabled = true;
+  btn.textContent = 'Verificando…';
+  try {
+    var res = await fetch('/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, password: pass })
+    });
+    var data = await res.json();
+    if (!res.ok) { err.textContent = data.detail || 'Error ' + res.status; return; }
+    if (data.role !== 'admin') { err.textContent = 'Sin permisos de administrador (rol: ' + data.role + ')'; return; }
+    _jwt = data.token;
+    document.getElementById('login-section').style.display = 'none';
+    document.getElementById('admin-content').style.display = 'block';
+    loadDocs();
+    loadUsers();
+  } catch(e) {
+    err.textContent = 'Error de red: ' + e.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Entrar';
+  }
 }
 
 function ah() { return { 'Content-Type':'application/json', 'Authorization':'Bearer ' + _jwt }; }
@@ -370,7 +386,7 @@ async function addTok(email) {
   loadUsers();
 }
 
-loadDocs();
+// Auto-load docs only after login — removed from here to avoid unauthenticated calls
 </script>
 </div><!-- /admin-content -->
 </body>

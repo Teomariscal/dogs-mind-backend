@@ -111,7 +111,20 @@ def run_clinical_analysis(
         else ""
     )
 
-    user_text = f"""Please produce a Functional Behavioral Analysis for the following case.{video_note}
+    lang = (anamnesis.lang or "es").lower()
+    if lang == "en":
+        lang_instruction = (
+            "\nCRITICAL LANGUAGE INSTRUCTION: Write the ENTIRE analysis in ENGLISH. "
+            "Every heading, bullet point, label and sentence must be in English. "
+            "Do NOT use Spanish at any point in the output.\n"
+        )
+    else:
+        lang_instruction = (
+            "\nINSTRUCCIÓN DE IDIOMA: Escribe el análisis completo en ESPAÑOL. "
+            "Todos los encabezados, puntos y frases deben estar en español.\n"
+        )
+
+    user_text = f"""Please produce a Functional Behavioral Analysis for the following case.{video_note}{lang_instruction}
 
 {rag_block}
 

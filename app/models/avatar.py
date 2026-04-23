@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, Field
 
 
@@ -15,6 +16,10 @@ class AvatarChatRequest(BaseModel):
     avatar_id: str = Field(
         default="niaz",
         description="Avatar key: niaz | mario | leo | katja | ale | borja",
+    )
+    lang: Optional[str] = Field(
+        default="es",
+        description="UI language: 'es' or 'en'. Avatar responds in this language by default.",
     )
 
 

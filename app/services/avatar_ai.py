@@ -18,6 +18,21 @@ def chat(request: AvatarChatRequest) -> AvatarChatResponse:
     # Select the system prompt for the requested avatar
     system_prompt = AVATAR_PROMPTS.get(request.avatar_id, AVATAR_SYSTEM_PROMPT)
 
+    # Append a hard language instruction based on the UI language
+    lang = (request.lang or "es").lower()
+    if lang == "en":
+        system_prompt += (
+            "\n\nCRITICAL: The user interface is in English. "
+            "You MUST respond in English by default. "
+            "Only switch to another language if the user explicitly writes in that language."
+        )
+    else:
+        system_prompt += (
+            "\n\nIMPORTANTE: La interfaz está en español. "
+            "Responde en español por defecto. "
+            "Solo cambia de idioma si el usuario escribe explícitamente en otro idioma."
+        )
+
     messages = [{"role": m.role, "content": m.content} for m in request.messages]
 
     response = client.messages.create(

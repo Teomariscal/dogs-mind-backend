@@ -56,6 +56,9 @@ class AnamnesisInput(BaseModel):
     previous_attempts: Optional[str] = Field(None, description="What has the owner tried so far?")
     owner_theory: Optional[str] = Field(None, description="Owner's hypothesis about the cause")
 
+    # UI language — controls the language of the AI analysis output
+    lang: Optional[str] = Field("es", description="Response language: 'es' (Spanish) or 'en' (English)")
+
 
 class RetrievedChunk(BaseModel):
     chunk_id: str

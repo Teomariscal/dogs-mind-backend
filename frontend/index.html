@@ -27,8 +27,12 @@
 <!-- Fonts: async load to avoid render blocking -->
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"></noscript>
-<!-- ── Plausible Analytics ── -->
-<script defer data-domain="thedogsmindbeta.netlify.app" src="https://plausible.io/js/script.js"></script>
+<!-- Privacy-friendly analytics by Plausible -->
+<script async src="https://plausible.io/js/pa-_uMr0EkQI9WtZ555JvUAA.js"></script>
+<script>
+  window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+  plausible.init()
+</script>
 <style>
 :root {
   --cream:   #f0ece3;
@@ -604,79 +608,567 @@ body{
       50% { opacity:0.2; }
     }
 
-/* ══════════════════════════════════════
-   S-TOUR-INTRO — Onboarding carousel
-══════════════════════════════════════ */
-#s-tour-intro { background:#1a1a18; overflow:hidden; position:relative; }
+/* ═══════════════════════════════════════════════════
+   SCREEN 11 — TOUR INTRO (cinematic vibrant carousel)
+═══════════════════════════════════════════════════ */
+#s-tour-intro {
+  background:
+    radial-gradient(ellipse 760px 520px at 50% -8%, rgba(255,210,150,0.16), transparent 65%),
+    linear-gradient(180deg, #1a1f17 0%, #0f150d 55%, #0a0e08 100%);
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+}
 .ti-track {
-  display:flex; height:100%;
-  transition:transform .42s cubic-bezier(.25,.46,.45,.94);
-  will-change:transform;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  transition: transform 0.42s cubic-bezier(.25,.46,.45,.94);
+  will-change: transform;
 }
 .ti-slide {
-  flex:0 0 100%; width:100%; height:100%;
-  display:flex; flex-direction:column;
-  overflow:hidden; position:relative;
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
 }
-/* dots */
-.ti-dots {
-  position:absolute; bottom:88px; left:0; right:0;
-  display:flex; justify-content:center; gap:7px; z-index:30;
+.ti-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
-.ti-dot {
-  width:6px; height:6px; border-radius:50%;
-  background:rgba(255,255,255,0.28); cursor:pointer;
-  transition:all .25s;
+.ti-bg-fade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, rgba(10,14,8,0.75) 0%, rgba(10,14,8,0.92) 100%);
+  pointer-events: none;
 }
-.ti-dot.on { width:22px; border-radius:3px; background:#B8955A; }
-/* bottom bar */
+.ti-bg-fade-soft {
+  background: linear-gradient(180deg, rgba(10,14,8,0.55) 0%, rgba(10,14,8,0.95) 55%, rgba(10,14,8,1) 100%);
+}
+
+/* Skip */
+.ti-skip {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top, 0px) + 6px);
+  right: 16px;
+  z-index: 40;
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,250,240,0.14);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12px;
+  color: rgba(255,250,240,0.78);
+  cursor: pointer;
+  font-family: 'Jost', sans-serif;
+  backdrop-filter: blur(6px);
+}
+
+/* Content */
+.ti-content {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 28px 22px 130px;
+}
+.ti-content-letter { justify-content: center; }
+.ti-content-bottom { justify-content: flex-end; }
+.ti-content-cta {
+  align-items: center;
+  justify-content: flex-end;
+  text-align: center;
+  padding-top: 64px;
+  padding-bottom: 200px;
+}
+
+/* Slide 0 — letter */
+.ti-logo-mark { margin-bottom: 22px; }
+.ti-logo-text {
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin: 0 0 6px;
+}
+.ti-logo-rule {
+  display: block;
+  width: 32px;
+  height: 1.5px;
+  background: var(--amber);
+  border-radius: 1px;
+}
+.ti-letter-line {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px;
+  font-style: italic;
+  color: rgba(255,250,240,0.92);
+  line-height: 1.7;
+  margin: 0 0 16px;
+}
+.ti-letter-line em {
+  color: var(--amber);
+  font-style: italic;
+  font-weight: 600;
+}
+.ti-signature {
+  margin-top: 22px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.ti-sig-photo {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 22%;
+  border: 2px solid var(--amber);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+.ti-sig-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fffaf0;
+  margin: 0 0 2px;
+}
+.ti-sig-date {
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  color: var(--amber);
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+/* Slides 1-3 — section */
+.ti-section-eyebrow {
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin: 0 0 8px;
+}
+.ti-section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px;
+  font-weight: 600;
+  color: #fffaf0;
+  line-height: 1.18;
+  letter-spacing: -0.005em;
+  margin: 0 0 10px;
+}
+.ti-section-body {
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: rgba(255,250,240,0.66);
+  line-height: 1.65;
+  margin: 0 0 12px;
+}
+.ti-section-body em {
+  color: rgba(255,225,180,0.92);
+  font-style: italic;
+  font-weight: 500;
+}
+.ti-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+}
+.ti-chip {
+  background: rgba(255,250,240,0.08);
+  border: 1px solid rgba(255,250,240,0.10);
+  border-radius: 999px;
+  padding: 5px 11px;
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(255,250,240,0.72);
+}
+
+/* Mockup container */
+.ti-mockup {
+  background: rgba(255,250,240,0.05);
+  border: 1px solid rgba(255,250,240,0.10);
+  border-radius: 18px;
+  backdrop-filter: blur(8px);
+  padding: 14px 16px;
+  margin-bottom: 22px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+}
+
+/* Pipeline */
+.ti-pipeline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.ti-pipeline-step {
+  flex: 1;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.ti-pipeline-icon { color: rgba(255,250,240,0.78); }
+.ti-pipeline-name {
+  font-family: 'Jost', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin: 2px 0 0;
+}
+.ti-pipeline-sub {
+  font-family: 'Jost', sans-serif;
+  font-size: 9px;
+  color: rgba(255,250,240,0.45);
+  margin: 1px 0 0;
+}
+.ti-pipeline-arrow {
+  color: rgba(255,250,240,0.20);
+  font-size: 16px;
+  padding: 0 4px;
+}
+.ti-pipeline-abc {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0;
+}
+.ti-pipeline-dot {
+  color: rgba(255,255,255,0.3);
+  font-size: 9px;
+  margin: 0 2px;
+}
+.ti-mockup-divider {
+  height: 1px;
+  background: rgba(255,250,240,0.08);
+  margin: 0 -4px 12px;
+}
+.ti-mockup-quote {
+  background: rgba(74,103,65,0.22);
+  border-left: 3px solid var(--green);
+  border-radius: 0 8px 8px 0;
+  padding: 9px 11px;
+}
+.ti-mockup-quote-eyebrow {
+  font-family: 'Jost', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--amber);
+  margin: 0 0 3px;
+}
+.ti-mockup-quote-text {
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  color: rgba(255,250,240,0.78);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Avatars row */
+.ti-avatars-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 4px;
+}
+.ti-avatar-mini {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex: 1;
+}
+.ti-avatar-mini img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 22%;
+  border: 2px solid rgba(255,250,240,0.18);
+  background: rgba(45,55,40,0.6);
+}
+.ti-avatar-mini-active img { border-color: var(--amber); }
+.ti-avatar-mini span {
+  font-family: 'Jost', sans-serif;
+  font-size: 9px;
+  font-weight: 500;
+  color: rgba(255,250,240,0.45);
+}
+.ti-avatar-mini-active span { color: var(--amber); font-weight: 600; }
+
+.ti-chat-bubble {
+  background: rgba(255,250,240,0.07);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.ti-chat-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.ti-chat-meta img {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 22%;
+}
+.ti-chat-name {
+  font-family: 'Jost', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--amber);
+}
+.ti-chat-cost {
+  font-family: 'Jost', sans-serif;
+  font-size: 9px;
+  color: rgba(255,250,240,0.30);
+  margin-left: auto;
+}
+.ti-chat-text {
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  color: rgba(255,250,240,0.80);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Features grid (slide 3) */
+.ti-features-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+.ti-feature {
+  background: rgba(255,250,240,0.05);
+  border: 1px solid rgba(255,250,240,0.06);
+  border-radius: 10px;
+  padding: 11px 12px;
+}
+.ti-feature-active {
+  background: rgba(74,103,65,0.22);
+  border-color: rgba(74,103,65,0.32);
+}
+.ti-feature-icon { color: var(--amber); margin-bottom: 4px; }
+.ti-feature-title {
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fffaf0;
+  margin: 0 0 2px;
+}
+.ti-feature-sub {
+  font-family: 'Jost', sans-serif;
+  font-size: 10px;
+  color: rgba(255,250,240,0.45);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Slide 4 — CTA */
+.ti-badge {
+  background: rgba(200,169,110,0.16);
+  border: 1px solid rgba(200,169,110,0.40);
+  border-radius: 999px;
+  padding: 6px 18px;
+  margin-bottom: 22px;
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  color: var(--amber);
+  font-weight: 700;
+  letter-spacing: 0.10em;
+}
+.ti-cta-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 34px;
+  font-weight: 500;
+  color: #fffaf0;
+  line-height: 1.15;
+  margin: 0 0 10px;
+  letter-spacing: -0.005em;
+}
+.ti-cta-sub {
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  color: rgba(255,250,240,0.62);
+  line-height: 1.6;
+  margin: 0 0 26px;
+  max-width: 320px;
+}
+.ti-cta-sub em {
+  color: var(--amber);
+  font-style: italic;
+  font-weight: 500;
+}
+.ti-cta-stats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  width: 100%;
+  background: rgba(255,250,240,0.05);
+  border: 1px solid rgba(255,250,240,0.08);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.ti-cta-stats li {
+  flex: 1;
+  padding: 14px 8px;
+  text-align: center;
+  border-left: 1px solid rgba(255,250,240,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ti-cta-stats li:first-child { border-left: none; }
+.ti-cta-stat-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--amber);
+  line-height: 1;
+}
+.ti-cta-stat-lbl {
+  font-family: 'Jost', sans-serif;
+  font-size: 10px;
+  color: rgba(255,250,240,0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+/* Bottom bar (slide 4) */
 .ti-bar {
-  position:absolute; bottom:0; left:0; right:0;
-  padding:16px 20px 28px;
-  display:flex; gap:10px; z-index:30;
-  background:linear-gradient(0deg,rgba(0,0,0,0.55) 0%,transparent 100%);
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  z-index: 30;
+  padding: 16px 20px max(28px, env(safe-area-inset-bottom, 28px));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: linear-gradient(0deg, rgba(0,0,0,0.55) 0%, transparent 100%);
+}
+.ti-bar-row {
+  display: flex;
+  gap: 10px;
 }
 .ti-btn-primary {
-  flex:1; padding:14px 10px; border:none; border-radius:100px;
-  background:#4a6741; color:#fff;
-  font-family:var(--ff-sans); font-size:14px; font-weight:600;
-  cursor:pointer; text-align:center;
+  flex: 1;
+  padding: 16px 12px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #5e8154 0%, #4a6741 60%, #3d5636 100%);
+  color: #fffaf0;
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.18) inset,
+    0 -2px 0 rgba(0,0,0,0.28) inset,
+    0 8px 22px rgba(74,103,65,0.42);
 }
+.ti-btn-primary-full { width: 100%; }
 .ti-btn-outline {
-  flex:1; padding:14px 10px; border:1.5px solid rgba(255,255,255,0.45); border-radius:100px;
-  background:transparent; color:#fff;
-  font-family:var(--ff-sans); font-size:14px; font-weight:500;
-  cursor:pointer; text-align:center;
+  flex: 1;
+  padding: 13px 10px;
+  border: 1.5px solid rgba(255,250,240,0.40);
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255,250,240,0.92);
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
 }
-.ti-btn-ghost {
-  width:100%; padding:12px; border:none; background:transparent;
-  color:rgba(255,255,255,0.55); font-family:var(--ff-sans); font-size:13px;
-  cursor:pointer; text-align:center;
+.ti-btn-outline-soft {
+  border-color: rgba(255,250,240,0.18);
+  color: rgba(255,250,240,0.55);
 }
-/* next arrow */
+
+/* Dots */
+.ti-dots {
+  position: absolute;
+  bottom: 100px;
+  left: 0; right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  z-index: 30;
+}
+.ti-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,250,240,0.30);
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.ti-dot.on { width: 22px; border-radius: 3px; background: var(--amber); }
+
+/* Next arrow */
 .ti-next {
-  position:absolute; bottom:100px; right:20px; z-index:30;
-  width:46px; height:46px; border-radius:50%;
-  background:rgba(255,255,255,0.15); backdrop-filter:blur(6px);
-  border:1.5px solid rgba(255,255,255,0.3);
-  color:#fff; font-size:18px; cursor:pointer;
-  display:flex; align-items:center; justify-content:center;
-  transition:background .2s;
+  position: absolute;
+  bottom: 116px;
+  right: 20px;
+  z-index: 30;
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  background: rgba(255,250,240,0.10);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(255,250,240,0.24);
+  color: #fffaf0;
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s, transform 0.12s;
 }
-.ti-next:hover { background:rgba(255,255,255,0.25); }
-/* skip */
-.ti-skip {
-  position:absolute; top:14px; right:16px; z-index:40;
-  background:rgba(0,0,0,0.28); backdrop-filter:blur(6px);
-  border:none; border-radius:100px; padding:6px 14px;
-  font-size:12px; color:rgba(255,255,255,0.7);
-  cursor:pointer; font-family:var(--ff-sans);
-}
-/* mini mockup frame */
-.ti-mockup {
-  background:rgba(255,255,255,0.08); backdrop-filter:blur(4px);
-  border:1px solid rgba(255,255,255,0.14); border-radius:18px;
-  overflow:hidden;
+.ti-next:hover { background: rgba(255,250,240,0.18); }
+.ti-next:active { transform: scale(0.95); }
+
+/* Take-the-tour link in login */
+.login-take-tour {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid rgba(74,103,65,0.32);
+  color: var(--green);
+  font-family: 'Jost', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 999px;
+  margin-top: 12px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
 }
 </style>
 </head>
@@ -712,7 +1204,7 @@ body{
   </div>
 
   <!-- ══ S-TOUR-INTRO: Onboarding carousel ══ -->
-  <div id="s-tour-intro" class="screen">
+    <div id="s-tour-intro" class="screen">
 
     <!-- Skip -->
     <button class="ti-skip" onclick="goTo('s-splash')">Saltar ✕</button>
@@ -722,273 +1214,183 @@ body{
          ontouchstart="tiTouchStart(event)"
          ontouchend="tiTouchEnd(event)">
 
-      <!-- ── SLIDE 0: Carta de Teo ─────────────────────── -->
+      <!-- ── SLIDE 0: Carta de Teo ── -->
       <div class="ti-slide">
-        <!-- photo bg -->
-        <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-05.jpg"
-             style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 20%;opacity:0.38;">
-        <div style="position:absolute;inset:0;background:linear-gradient(160deg,rgba(18,18,14,0.72) 0%,rgba(18,18,14,0.88) 100%);"></div>
-
-        <!-- content -->
-        <div style="position:relative;z-index:2;flex:1;display:flex;flex-direction:column;justify-content:center;padding:28px 28px 120px;">
-          <!-- logo mark -->
-          <div style="margin-bottom:24px;">
-            <div style="font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#B8955A;margin-bottom:6px;">The Dogs Mind</div>
-            <div style="width:32px;height:1.5px;background:#B8955A;border-radius:1px;"></div>
+        <img class="ti-bg" src="tour-img-05.webp" alt="" style="object-position:center 20%;opacity:0.42;">
+        <div class="ti-bg-fade"></div>
+        <div class="ti-content ti-content-letter">
+          <div class="ti-logo-mark">
+            <p class="ti-logo-text">The Dogs Mind</p>
+            <span class="ti-logo-rule"></span>
           </div>
-
-          <!-- letter -->
-          <div style="font-family:var(--ff-serif);font-size:17px;color:rgba(255,255,255,0.92);line-height:1.75;font-style:italic;">
-            The Dogs Mind es producto de más de 25 años de experiencia en el campo de la modificación de conducta en más de 15 países donde yo y el resto del equipo que ha construido esta magnífica herramienta han desarrollado su actividad profesional.
-          </div>
-          <div style="font-family:var(--ff-serif);font-size:17px;color:rgba(255,255,255,0.92);line-height:1.75;font-style:italic;margin-top:18px;">
-            Por menos de un 1% de lo que vale una consulta tienes a tu alcance el mejor equipo de profesionales del mundo para analizar y dar soluciones al problema de comportamiento de tu perro.
-          </div>
-          <div style="font-family:var(--ff-serif);font-size:17px;color:rgba(255,255,255,0.92);line-height:1.75;font-style:italic;margin-top:18px;">
-            Te invito a que conozcas The Dogs Mind.
-          </div>
-
-          <!-- signature -->
-          <div style="margin-top:28px;display:flex;align-items:center;gap:14px;">
-            <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-02.webp"
-                 style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid #B8955A;">
+          <p class="ti-letter-line">The Dogs Mind es producto de más de <em>25 años de experiencia</em> en el campo de la modificación de conducta en más de 15 países donde yo y el resto del equipo que ha construido esta magnífica herramienta han desarrollado su actividad profesional.</p>
+          <p class="ti-letter-line">Por menos de un <em>1%</em> de lo que vale una consulta tienes a tu alcance el mejor equipo de profesionales del mundo para analizar y dar soluciones al problema de comportamiento de tu perro.</p>
+          <p class="ti-letter-line">Te invito a que conozcas The Dogs Mind.</p>
+          <div class="ti-signature">
+            <img class="ti-sig-photo" src="teo-nav.webp" alt="Teo Mariscal">
             <div>
-              <div style="font-family:var(--ff-serif);font-size:15px;color:#fff;font-weight:600;">Teo Mariscal</div>
-              <div style="font-size:11px;color:#B8955A;margin-top:1px;letter-spacing:.04em;">Abril 2026</div>
+              <p class="ti-sig-name">Teo Mariscal</p>
+              <p class="ti-sig-date">Abril 2026</p>
             </div>
           </div>
         </div>
-      </div><!-- /slide 0 -->
+      </div>
 
-      <!-- ── SLIDE 1: Análisis clínico + Plan de tratamiento ── -->
+      <!-- ── SLIDE 1: Análisis clínico + Plan ── -->
       <div class="ti-slide">
-        <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-14.jpg"
-             style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;opacity:0.28;">
-        <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,18,14,0.55) 0%,rgba(18,18,14,0.95) 55%,rgba(18,18,14,1) 100%);"></div>
-
-        <div style="position:relative;z-index:2;flex:1;display:flex;flex-direction:column;padding:20px 20px 130px;justify-content:flex-end;">
-
-          <!-- clinical pipeline mockup -->
-          <div class="ti-mockup" style="margin-bottom:22px;padding:14px 16px;">
-            <!-- pipeline steps -->
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-              <div style="text-align:center;flex:1;">
-                <div style="font-size:18px;margin-bottom:3px;">📋</div>
-                <div style="font-size:9px;font-weight:700;color:#B8955A;letter-spacing:.06em;text-transform:uppercase;">Anamnesis</div>
-                <div style="font-size:9px;color:rgba(255,255,255,0.45);margin-top:1px;">Formulario clínico</div>
-              </div>
-              <div style="color:rgba(255,255,255,0.2);font-size:16px;padding:0 4px;">›</div>
-              <div style="text-align:center;flex:1;">
-                <div style="font-size:11px;font-weight:700;margin-bottom:3px;">
-                  <span style="color:#b83030;">A</span><span style="color:rgba(255,255,255,0.3);font-size:9px;">·</span><span style="color:#c8962a;">B</span><span style="color:rgba(255,255,255,0.3);font-size:9px;">·</span><span style="color:#2858a8;">C</span>
+        <img class="ti-bg" src="tour-img-14.webp" alt="" style="object-position:center 30%;opacity:0.30;">
+        <div class="ti-bg-fade ti-bg-fade-soft"></div>
+        <div class="ti-content ti-content-bottom">
+          <div class="ti-mockup">
+            <div class="ti-pipeline">
+              <div class="ti-pipeline-step">
+                <div class="ti-pipeline-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                 </div>
-                <div style="font-size:9px;font-weight:700;color:#B8955A;letter-spacing:.06em;text-transform:uppercase;">Análisis IA</div>
-                <div style="font-size:9px;color:rgba(255,255,255,0.45);margin-top:1px;">Hipótesis funcional</div>
+                <p class="ti-pipeline-name">Anamnesis</p>
+                <p class="ti-pipeline-sub">Formulario clínico</p>
               </div>
-              <div style="color:rgba(255,255,255,0.2);font-size:16px;padding:0 4px;">›</div>
-              <div style="text-align:center;flex:1;">
-                <div style="font-size:18px;margin-bottom:3px;">🗂️</div>
-                <div style="font-size:9px;font-weight:700;color:#B8955A;letter-spacing:.06em;text-transform:uppercase;">Plan LIMA</div>
-                <div style="font-size:9px;color:rgba(255,255,255,0.45);margin-top:1px;">Por fases</div>
+              <span class="ti-pipeline-arrow">›</span>
+              <div class="ti-pipeline-step">
+                <p class="ti-pipeline-abc"><span style="color:#dc4848">A</span><span class="ti-pipeline-dot">·</span><span style="color:#e0b554">B</span><span class="ti-pipeline-dot">·</span><span style="color:#5a85d6">C</span></p>
+                <p class="ti-pipeline-name">Análisis IA</p>
+                <p class="ti-pipeline-sub">Hipótesis funcional</p>
+              </div>
+              <span class="ti-pipeline-arrow">›</span>
+              <div class="ti-pipeline-step">
+                <div class="ti-pipeline-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/></svg>
+                </div>
+                <p class="ti-pipeline-name">Plan LIMA</p>
+                <p class="ti-pipeline-sub">Por fases</p>
               </div>
             </div>
-            <!-- divider -->
-            <div style="height:1px;background:rgba(255,255,255,0.08);margin:0 -4px 12px;"></div>
-            <!-- example hypothesis -->
-            <div style="background:rgba(74,103,65,0.28);border-left:3px solid #4a6741;border-radius:0 8px 8px 0;padding:9px 11px;">
-              <div style="font-size:10px;font-weight:600;color:#B8955A;margin-bottom:3px;">Hipótesis funcional</div>
-              <div style="font-size:11px;color:rgba(255,255,255,0.78);line-height:1.5;">Conducta mantenida por refuerzo negativo — eliminación del estímulo aversivo como consecuencia.</div>
+            <div class="ti-mockup-divider"></div>
+            <div class="ti-mockup-quote">
+              <p class="ti-mockup-quote-eyebrow">Hipótesis funcional</p>
+              <p class="ti-mockup-quote-text">Conducta mantenida por refuerzo negativo — eliminación del estímulo aversivo como consecuencia.</p>
             </div>
           </div>
-
-          <div style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#B8955A;margin-bottom:8px;">01 — Clínica conductual</div>
-          <div style="font-family:var(--ff-serif);font-size:25px;color:#fff;line-height:1.2;margin-bottom:11px;">Análisis clínico y plan de tratamiento</div>
-          <div style="font-size:13px;color:rgba(255,255,255,0.62);line-height:1.65;">
-            Describe el caso, obtén un análisis funcional ABC riguroso y un plan de intervención por fases basado en el protocolo LIMA — la misma metodología que usa Teo en consulta presencial.
-          </div>
-          <div style="display:flex;gap:7px;margin-top:13px;flex-wrap:wrap;">
-            <span style="background:rgba(255,255,255,0.09);border-radius:100px;padding:4px 11px;font-size:11px;color:rgba(255,255,255,0.65);">Applied Animal Behaviour</span>
-            <span style="background:rgba(255,255,255,0.09);border-radius:100px;padding:4px 11px;font-size:11px;color:rgba(255,255,255,0.65);">Protocolo LIMA</span>
-            <span style="background:rgba(255,255,255,0.09);border-radius:100px;padding:4px 11px;font-size:11px;color:rgba(255,255,255,0.65);">1 token por análisis</span>
+          <p class="ti-section-eyebrow">01 — Clínica conductual</p>
+          <h2 class="ti-section-title">Análisis clínico y plan de tratamiento</h2>
+          <p class="ti-section-body">Describe el caso, obtén un análisis funcional ABC riguroso y un plan de intervención por fases basado en el protocolo <em>LIMA</em> — la misma metodología que usa Teo en consulta presencial.</p>
+          <div class="ti-chips">
+            <span class="ti-chip">Applied Animal Behaviour</span>
+            <span class="ti-chip">Protocolo LIMA</span>
+            <span class="ti-chip">3 tokens / análisis</span>
           </div>
         </div>
-      </div><!-- /slide 1 -->
+      </div>
 
-      <!-- ── SLIDE 2: Dogs Aigents ──────────────────────── -->
+      <!-- ── SLIDE 2: Dogs Aigents ── -->
       <div class="ti-slide">
-        <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-01.webp"
-             style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;opacity:0.25;">
-        <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,18,14,0.62) 0%,rgba(18,18,14,0.97) 52%,rgba(18,18,14,1) 100%);"></div>
-
-        <div style="position:relative;z-index:2;flex:1;display:flex;flex-direction:column;padding:20px 20px 130px;justify-content:flex-end;">
-
-          <!-- avatars + chat mockup -->
-          <div class="ti-mockup" style="margin-bottom:22px;padding:14px 14px 12px;">
-            <!-- 6 avatars -->
-            <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
-              <div style="text-align:center;">
-                <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-17.webp"
-                     style="width:42px;height:42px;border-radius:50%;object-fit:cover;object-position:top;border:2px solid #B8955A;">
-                <div style="font-size:9px;color:#B8955A;margin-top:3px;font-weight:600;">Niaz</div>
-              </div>
-              <div style="text-align:center;">
-                <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-18.webp"
-                     style="width:42px;height:42px;border-radius:50%;object-fit:cover;object-position:top;border:2px solid rgba(255,255,255,0.18);">
-                <div style="font-size:9px;color:rgba(255,255,255,0.45);margin-top:3px;">Leo</div>
-              </div>
-              <div style="text-align:center;">
-                <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-19.webp"
-                     style="width:42px;height:42px;border-radius:50%;object-fit:cover;object-position:top;border:2px solid rgba(255,255,255,0.18);">
-                <div style="font-size:9px;color:rgba(255,255,255,0.45);margin-top:3px;">Mario</div>
-              </div>
-              <div style="text-align:center;">
-                <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-20.jpg"
-                     style="width:42px;height:42px;border-radius:50%;object-fit:cover;object-position:top;border:2px solid rgba(255,255,255,0.18);">
-                <div style="font-size:9px;color:rgba(255,255,255,0.45);margin-top:3px;">Katja</div>
-              </div>
-              <div style="text-align:center;">
-                <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-21.webp"
-                     style="width:42px;height:42px;border-radius:50%;object-fit:cover;object-position:top;border:2px solid rgba(255,255,255,0.18);">
-                <div style="font-size:9px;color:rgba(255,255,255,0.45);margin-top:3px;">Ale</div>
-              </div>
-              <div style="text-align:center;">
-                <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-22.webp"
-                     style="width:42px;height:42px;border-radius:50%;object-fit:cover;object-position:top;border:2px solid rgba(255,255,255,0.18);">
-                <div style="font-size:9px;color:rgba(255,255,255,0.45);margin-top:3px;">Borja</div>
-              </div>
+        <img class="ti-bg" src="tour-img-01.webp" alt="" style="object-position:center 40%;opacity:0.28;">
+        <div class="ti-bg-fade ti-bg-fade-soft"></div>
+        <div class="ti-content ti-content-bottom">
+          <div class="ti-mockup">
+            <div class="ti-avatars-row">
+              <div class="ti-avatar-mini ti-avatar-mini-active"><img src="aig-niaz-pixar.webp" alt=""><span>Niaz</span></div>
+              <div class="ti-avatar-mini"><img src="aig-leo-pixar.webp" alt=""><span>Leo</span></div>
+              <div class="ti-avatar-mini"><img src="aig-mario-pixar.webp" alt=""><span>Mario</span></div>
+              <div class="ti-avatar-mini"><img src="aig-katja-pixar.webp" alt=""><span>Katja</span></div>
+              <div class="ti-avatar-mini"><img src="aig-ale-pixar.webp" alt=""><span>Ale</span></div>
+              <div class="ti-avatar-mini"><img src="aig-borja-pixar.webp" alt=""><span>Borja</span></div>
             </div>
-            <!-- chat bubble example -->
-            <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:10px 12px;">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-                <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-17.webp"
-                     style="width:18px;height:18px;border-radius:50%;object-fit:cover;object-position:top;">
-                <span style="font-size:10px;font-weight:600;color:#B8955A;">Niaz</span>
-                <span style="font-size:9px;color:rgba(255,255,255,0.3);margin-left:auto;">−0.1 tok</span>
+            <div class="ti-chat-bubble">
+              <div class="ti-chat-meta">
+                <img src="aig-niaz-pixar.webp" alt="">
+                <span class="ti-chat-name">Niaz</span>
+                <span class="ti-chat-cost">−0.1 tok</span>
               </div>
-              <div style="font-size:11px;color:rgba(255,255,255,0.8);line-height:1.5;">¿Hoteles pet-friendly en Barcelona? Te tengo 5 opciones increíbles 🐾</div>
+              <p class="ti-chat-text">¿Hoteles pet-friendly en Barcelona? Te tengo 5 opciones increíbles.</p>
             </div>
           </div>
-
-          <div style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#B8955A;margin-bottom:8px;">02 — Dogs Aigents</div>
-          <div style="font-family:var(--ff-serif);font-size:25px;color:#fff;line-height:1.2;margin-bottom:11px;">Ese amigo que sabe de perros</div>
-          <div style="font-size:13px;color:rgba(255,255,255,0.62);line-height:1.65;">
-            No son para análisis clínico — son para las preguntas de cada día. Elige el que más va contigo: cada uno tiene su propia personalidad y especialidad. Como tener un experto de guardia que además te cae bien.
-          </div>
-          <div style="display:flex;gap:7px;margin-top:13px;flex-wrap:wrap;">
-            <span style="background:rgba(255,255,255,0.09);border-radius:100px;padding:4px 11px;font-size:11px;color:rgba(255,255,255,0.65);">Dudas rápidas</span>
-            <span style="background:rgba(255,255,255,0.09);border-radius:100px;padding:4px 11px;font-size:11px;color:rgba(255,255,255,0.65);">Apenas usan tokens</span>
-            <span style="background:rgba(255,255,255,0.09);border-radius:100px;padding:4px 11px;font-size:11px;color:rgba(255,255,255,0.65);">6 personalidades</span>
+          <p class="ti-section-eyebrow">02 — Dogs Aigents</p>
+          <h2 class="ti-section-title">Ese amigo que sabe de perros</h2>
+          <p class="ti-section-body">No son para análisis clínico — son para las preguntas de cada día. Elige el que más va contigo: cada uno tiene su propia personalidad y especialidad. Como tener un experto de guardia que además te cae bien.</p>
+          <div class="ti-chips">
+            <span class="ti-chip">Dudas rápidas</span>
+            <span class="ti-chip">Apenas usan tokens</span>
+            <span class="ti-chip">7 personalidades</span>
           </div>
         </div>
-      </div><!-- /slide 2 -->
+      </div>
 
-      <!-- ── SLIDE 3: Datos y otras funciones ───────────── -->
+      <!-- ── SLIDE 3: Datos y otras funciones ── -->
       <div class="ti-slide">
-        <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-03.webp"
-             style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;opacity:0.25;">
-        <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,18,14,0.6) 0%,rgba(18,18,14,0.97) 52%,rgba(18,18,14,1) 100%);"></div>
-
-        <div style="position:relative;z-index:2;flex:1;display:flex;flex-direction:column;padding:20px 20px 130px;justify-content:flex-end;">
-
-          <!-- features grid mockup -->
-          <div class="ti-mockup" style="margin-bottom:22px;padding:14px;">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">
-              <div style="background:rgba(74,103,65,0.22);border-radius:10px;padding:11px 12px;">
-                <div style="font-size:18px;margin-bottom:5px;">📈</div>
-                <div style="font-size:11px;font-weight:600;color:#fff;margin-bottom:2px;">Seguimiento</div>
-                <div style="font-size:10px;color:rgba(255,255,255,0.45);line-height:1.4;">Registra la evolución del comportamiento en el tiempo</div>
+        <img class="ti-bg" src="tour-img-03.webp" alt="" style="object-position:center 30%;opacity:0.25;">
+        <div class="ti-bg-fade ti-bg-fade-soft"></div>
+        <div class="ti-content ti-content-bottom">
+          <div class="ti-mockup">
+            <div class="ti-features-grid">
+              <div class="ti-feature ti-feature-active">
+                <div class="ti-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg></div>
+                <p class="ti-feature-title">Seguimiento</p>
+                <p class="ti-feature-sub">Registra la evolución del comportamiento en el tiempo</p>
               </div>
-              <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:11px 12px;">
-                <div style="font-size:18px;margin-bottom:5px;">📋</div>
-                <div style="font-size:11px;font-weight:600;color:#fff;margin-bottom:2px;">Historial clínico</div>
-                <div style="font-size:10px;color:rgba(255,255,255,0.45);line-height:1.4;">Todos tus análisis y planes guardados</div>
+              <div class="ti-feature">
+                <div class="ti-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                <p class="ti-feature-title">Historial clínico</p>
+                <p class="ti-feature-sub">Todos tus análisis y planes guardados</p>
               </div>
-              <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:11px 12px;">
-                <div style="font-size:18px;margin-bottom:5px;">🐕</div>
-                <div style="font-size:11px;font-weight:600;color:#fff;margin-bottom:2px;">Varios perros</div>
-                <div style="font-size:10px;color:rgba(255,255,255,0.45);line-height:1.4;">Gestiona casos de toda tu familia</div>
+              <div class="ti-feature">
+                <div class="ti-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M10 5.172C10 3.782 8.423 2.679 6.5 3c-2 .336-3.5 2.112-3.5 4M14 5.172C14 3.782 15.577 2.679 17.5 3c2 .336 3.5 2.112 3.5 4M3 11c0 4.418 4.03 8 9 8s9-3.582 9-8"/></svg></div>
+                <p class="ti-feature-title">Varios perros</p>
+                <p class="ti-feature-sub">Gestiona casos de toda tu familia</p>
               </div>
-              <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:11px 12px;">
-                <div style="font-size:18px;margin-bottom:5px;">🟡</div>
-                <div style="font-size:11px;font-weight:600;color:#fff;margin-bottom:2px;">Tokens</div>
-                <div style="font-size:10px;color:rgba(255,255,255,0.45);line-height:1.4;">Recarga solo lo que necesites. Sin suscripción.</div>
+              <div class="ti-feature">
+                <div class="ti-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.5"/></svg></div>
+                <p class="ti-feature-title">Tokens</p>
+                <p class="ti-feature-sub">Recarga solo lo que necesites. Sin suscripción.</p>
               </div>
             </div>
           </div>
-
-          <div style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#B8955A;margin-bottom:8px;">03 — Tu historial, tus perros</div>
-          <div style="font-family:var(--ff-serif);font-size:25px;color:#fff;line-height:1.2;margin-bottom:11px;">Todo bajo control, sin complicaciones</div>
-          <div style="font-size:13px;color:rgba(255,255,255,0.62);line-height:1.65;">
-            Registros clínicos, seguimiento del progreso, gestión de varios perros y tokens a demanda. Sin cuotas mensuales — pagas exactamente lo que usas.
-          </div>
-          <div style="display:flex;gap:7px;margin-top:13px;flex-wrap:wrap;">
-            <span style="background:rgba(255,255,255,0.09);border-radius:100px;padding:4px 11px;font-size:11px;color:rgba(255,255,255,0.65);">Sin suscripción</span>
-            <span style="background:rgba(255,255,255,0.09);border-radius:100px;padding:4px 11px;font-size:11px;color:rgba(255,255,255,0.65);">Multi-perro</span>
-            <span style="background:rgba(255,255,255,0.09);border-radius:100px;padding:4px 11px;font-size:11px;color:rgba(255,255,255,0.65);">Historial completo</span>
+          <p class="ti-section-eyebrow">03 — Tu historial, tus perros</p>
+          <h2 class="ti-section-title">Todo bajo control, sin complicaciones</h2>
+          <p class="ti-section-body">Registros clínicos, seguimiento del progreso, gestión de varios perros y tokens a demanda. <em>Sin cuotas mensuales</em> — pagas exactamente lo que usas.</p>
+          <div class="ti-chips">
+            <span class="ti-chip">Sin suscripción</span>
+            <span class="ti-chip">Multi-perro</span>
+            <span class="ti-chip">Historial completo</span>
           </div>
         </div>
-      </div><!-- /slide 3 -->
+      </div>
 
-      <!-- ── SLIDE 4: CTA ───────────────────────────────── -->
+      <!-- ── SLIDE 4: CTA ── -->
       <div class="ti-slide">
-        <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-00.webp"
-             style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;opacity:0.35;">
-        <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,18,14,0.5) 0%,rgba(18,18,14,0.92) 60%,rgba(18,18,14,1) 100%);"></div>
-
-        <div style="position:relative;z-index:2;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:24px 24px 148px;text-align:center;">
-          <!-- badge -->
-          <div style="background:rgba(184,149,90,0.15);border:1px solid rgba(184,149,90,0.35);border-radius:100px;padding:6px 18px;margin-bottom:20px;">
-            <span style="font-size:11px;color:#B8955A;font-weight:600;letter-spacing:.08em;">5 TOKENS GRATIS AL REGISTRARTE</span>
-          </div>
-
-          <div style="font-family:var(--ff-serif);font-size:32px;color:#fff;line-height:1.15;margin-bottom:10px;font-weight:400;">
-            Tu perro merece<br>la mejor ayuda
-          </div>
-          <div style="font-size:14px;color:rgba(255,255,255,0.6);line-height:1.6;margin-bottom:28px;max-width:300px;">
-            Por menos de un 1% del coste de una consulta presencial tienes acceso al mejor equipo del mundo.
-          </div>
-
-          <!-- stats -->
-          <div style="display:flex;gap:0;margin-bottom:32px;background:rgba(255,255,255,0.06);border-radius:16px;overflow:hidden;width:100%;">
-            <div style="flex:1;padding:14px 8px;text-align:center;border-right:1px solid rgba(255,255,255,0.08);">
-              <div style="font-family:var(--ff-serif);font-size:22px;color:#B8955A;font-weight:600;">25+</div>
-              <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:2px;text-transform:uppercase;letter-spacing:.05em;">Años exp.</div>
-            </div>
-            <div style="flex:1;padding:14px 8px;text-align:center;border-right:1px solid rgba(255,255,255,0.08);">
-              <div style="font-family:var(--ff-serif);font-size:22px;color:#B8955A;font-weight:600;">15+</div>
-              <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:2px;text-transform:uppercase;letter-spacing:.05em;">Países</div>
-            </div>
-            <div style="flex:1;padding:14px 8px;text-align:center;">
-              <div style="font-family:var(--ff-serif);font-size:22px;color:#B8955A;font-weight:600;">6</div>
-              <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:2px;text-transform:uppercase;letter-spacing:.05em;">Aigents</div>
-            </div>
+        <img class="ti-bg" src="tour-img-00.webp" alt="" style="object-position:center 30%;opacity:0.40;">
+        <div class="ti-bg-fade"></div>
+        <div class="ti-content ti-content-cta">
+          <div class="ti-badge">3 TOKENS GRATIS AL REGISTRARTE</div>
+          <h1 class="ti-cta-title">Tu perro merece<br>la mejor ayuda</h1>
+          <p class="ti-cta-sub">Por menos de un <em>1%</em> del coste de una consulta presencial tienes acceso al mejor equipo del mundo.</p>
+          <ul class="ti-cta-stats">
+            <li><span class="ti-cta-stat-num">25+</span><span class="ti-cta-stat-lbl">Años exp.</span></li>
+            <li><span class="ti-cta-stat-num">15+</span><span class="ti-cta-stat-lbl">Países</span></li>
+            <li><span class="ti-cta-stat-num">7</span><span class="ti-cta-stat-lbl">Aigents</span></li>
+          </ul>
+        </div>
+        <div class="ti-bar">
+          <button onclick="goTo('s-login')" class="ti-btn-primary ti-btn-primary-full">Crear cuenta gratis → 3 tokens</button>
+          <div class="ti-bar-row">
+            <button onclick="goTo('s-home')" class="ti-btn-outline">Ya tengo cuenta</button>
+            <button onclick="goTo('s-home')" class="ti-btn-outline ti-btn-outline-soft">Ver la app →</button>
           </div>
         </div>
-
-        <!-- CTA buttons overlaid on bottom bar area -->
-        <div style="position:absolute;bottom:0;left:0;right:0;padding:16px 20px 32px;z-index:30;">
-          <button onclick="goTo('s-login')" class="ti-btn-primary" style="width:100%;margin-bottom:10px;font-size:15px;padding:16px;">
-            Crear cuenta gratis → 5 tokens
-          </button>
-          <div style="display:flex;gap:10px;">
-            <button onclick="goTo('s-home')" class="ti-btn-outline" style="flex:1;">Ya tengo cuenta</button>
-            <button onclick="endTourIntro()" class="ti-btn-outline" style="flex:1;border-color:rgba(255,255,255,0.2);color:rgba(255,255,255,0.55);">Ver la app →</button>
-          </div>
-        </div>
-      </div><!-- /slide 4 -->
+      </div>
 
     </div><!-- /ti-track -->
 
     <!-- Progress dots -->
     <div class="ti-dots" id="ti-dots">
-      <div class="ti-dot on"  onclick="tiGo(0)"></div>
-      <div class="ti-dot"     onclick="tiGo(1)"></div>
-      <div class="ti-dot"     onclick="tiGo(2)"></div>
-      <div class="ti-dot"     onclick="tiGo(3)"></div>
-      <div class="ti-dot"     onclick="tiGo(4)"></div>
+      <div class="ti-dot on" onclick="tiGo(0)"></div>
+      <div class="ti-dot"    onclick="tiGo(1)"></div>
+      <div class="ti-dot"    onclick="tiGo(2)"></div>
+      <div class="ti-dot"    onclick="tiGo(3)"></div>
+      <div class="ti-dot"    onclick="tiGo(4)"></div>
     </div>
 
-    <!-- Next arrow (hidden on slide 4) -->
+    <!-- Next arrow -->
     <button class="ti-next" id="ti-next" onclick="tiNext()">›</button>
 
   </div><!-- /s-tour-intro -->
@@ -2258,7 +2660,7 @@ function goTo(id) {
   if (id === 's-tokens') updateTokensScreen();
   if (id === 's-home') fetchBalance();
   // Global nav show/hide
-  var noNav = ['s-splash','s-login','s-refine'];
+  var noNav = ['s-splash','s-login','s-refine','s-tour-intro'];
   var nav = document.getElementById('global-nav');
   if (nav) nav.style.display = noNav.indexOf(id) >= 0 ? 'none' : 'flex';
   // Active nav button

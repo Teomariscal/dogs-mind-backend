@@ -1543,6 +1543,815 @@ body{
 }
 
 
+/* ═══════════════════════════════════════════════════
+   AIGENTS INTRO — cinematic vibrant, hero fused to bg
+═══════════════════════════════════════════════════ */
+#s-aigents-intro {
+  background:
+    /* warm amber bloom from above — anchors the hero */
+    radial-gradient(ellipse 760px 520px at 50% -8%, rgba(255,210,150,0.18), transparent 65%),
+    /* soft green ambient on right */
+    radial-gradient(ellipse 440px 620px at 100% 38%, rgba(74,103,65,0.10), transparent 70%),
+    /* base cinematic dark */
+    linear-gradient(180deg, #1a1f17 0%, #0f150d 55%, #0a0e08 100%);
+  color: rgba(255,250,240,0.95);
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-bottom: max(110px, calc(96px + env(safe-area-inset-bottom, 0px)));
+}
+
+/* Outer halo — subtle pulse of amber light from above */
+.aig-halo {
+  position: absolute;
+  top: -120px; left: 50%;
+  transform: translateX(-50%);
+  width: 520px; height: 380px;
+  background: radial-gradient(ellipse at center, rgba(255,200,130,0.22), transparent 65%);
+  filter: blur(8px);
+  pointer-events: none;
+  z-index: 0;
+  animation: aig-halo-breathe 9s ease-in-out infinite;
+}
+@keyframes aig-halo-breathe {
+  0%, 100% { opacity: 0.85; transform: translateX(-50%) scale(1); }
+  50%      { opacity: 1;    transform: translateX(-50%) scale(1.05); }
+}
+
+/* ── HEADER ── */
+.aig-header {
+  position: relative;
+  z-index: 4;
+  padding: max(48px, calc(24px + env(safe-area-inset-top, 0px))) 24px 14px;
+  flex-shrink: 0;
+}
+
+.aig-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,250,240,0.06);
+  border: 1px solid rgba(255,250,240,0.10);
+  border-radius: 999px;
+  padding: 7px 14px 7px 11px;
+  color: rgba(255,250,240,0.78);
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  margin-bottom: 22px;
+  transition: background 0.15s, border-color 0.15s;
+}
+.aig-back:hover { background: rgba(255,250,240,0.10); border-color: rgba(255,250,240,0.18); }
+
+.aig-eyebrow {
+  font-family: 'Jost', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--amber);
+  opacity: 0.92;
+  margin-bottom: 8px;
+}
+
+.aig-title {
+  position: relative;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 44px;
+  font-weight: 600;
+  color: rgba(255,250,240,0.97);
+  line-height: 1;
+  letter-spacing: -0.005em;
+  margin: 0 0 12px;
+  /* span around "Aigents" so Mario can peek behind it */
+}
+
+/* The peeking face — sits BEHIND the letters of "Aigents" */
+.aig-title .aig-peek-anchor {
+  position: relative;
+  display: inline-block;
+}
+.aig-peek {
+  position: absolute;
+  /* nudge so face emerges between t and s of "Aigents" */
+  right: 11%;
+  top: -32px;
+  width: 70px;
+  height: 70px;
+  background-image: url('peek-mario.webp');
+  background-size: cover;
+  background-position: 50% 24%;
+  border-radius: 50%;
+  z-index: -1;
+  pointer-events: none;
+  filter:
+    drop-shadow(0 6px 10px rgba(0,0,0,0.6))
+    drop-shadow(-1px -1px 0 rgba(255,210,150,0.22))
+    drop-shadow(2px 2px 0 rgba(0,0,0,0.35));
+  transform-origin: 50% 100%;
+  /* Loop teatral: se asoma → mira a un lado → se esconde → vuelve */
+  animation: aig-peek-show 7.5s ease-in-out infinite;
+}
+@keyframes aig-peek-show {
+  /* hidden behind letters */
+  0%   { transform: translateY(22px) rotate(-2deg) scale(0.92); }
+  /* sube a asomarse */
+  12%  { transform: translateY(0)    rotate(-4deg) scale(1);    }
+  /* mira a la izquierda con la cabeza ladeada */
+  28%  { transform: translateY(-2px) rotate(-7deg) scale(1.02); }
+  /* recentra */
+  44%  { transform: translateY(-1px) rotate( 0deg) scale(1);    }
+  /* mira a la derecha */
+  58%  { transform: translateY(-3px) rotate( 7deg) scale(1.02); }
+  /* asiente */
+  72%  { transform: translateY( 1px) rotate( 2deg) scale(1);    }
+  /* se esconde otra vez */
+  88%  { transform: translateY(18px) rotate(-1deg) scale(0.94); }
+  100% { transform: translateY(22px) rotate(-2deg) scale(0.92); }
+}
+
+.aig-lede {
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  color: rgba(255,250,240,0.62);
+  line-height: 1.55;
+  max-width: 340px;
+  margin: 0;
+}
+
+/* ── HERO: foto del grupo fundida con el fondo ── */
+.aig-hero {
+  position: relative;
+  margin: 18px 0 8px;
+  padding: 0;
+  width: 100%;
+  aspect-ratio: 16 / 11;
+  flex-shrink: 0;
+  z-index: 2;
+}
+
+.aig-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  /* mask: fade muy orgánico, sin rectángulo visible */
+  -webkit-mask-image:
+    radial-gradient(ellipse 78% 82% at 50% 50%,
+      #000 12%,
+      rgba(0,0,0,0.95) 38%,
+      rgba(0,0,0,0.55) 62%,
+      rgba(0,0,0,0.18) 82%,
+      rgba(0,0,0,0) 100%);
+          mask-image:
+    radial-gradient(ellipse 78% 82% at 50% 50%,
+      #000 12%,
+      rgba(0,0,0,0.95) 38%,
+      rgba(0,0,0,0.55) 62%,
+      rgba(0,0,0,0.18) 82%,
+      rgba(0,0,0,0) 100%);
+  filter: contrast(1.04) saturate(1.05) brightness(1.02);
+  animation: aig-hero-breathe 14s ease-in-out infinite;
+  transform-origin: 52% 60%;
+}
+@keyframes aig-hero-breathe {
+  0%, 100% { transform: scale(1.000); }
+  50%      { transform: scale(1.020); }
+}
+
+/* Inner glow capa amber para integrar mejor */
+.aig-hero-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 100%, rgba(0,0,0,0.45), transparent 70%),
+    radial-gradient(ellipse 50% 50% at 50% 0%, rgba(255,210,150,0.10), transparent 65%);
+}
+
+/* Dust motes flotantes */
+.aig-hero-dust {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.aig-hero-dust span {
+  position: absolute;
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: rgba(255,230,180,0.85);
+  filter: blur(0.5px);
+  bottom: -10px;
+  animation: aig-dust-drift 14s linear infinite;
+}
+.aig-hero-dust span:nth-child(1) { left:  8%; animation-delay:  0s; }
+.aig-hero-dust span:nth-child(2) { left: 22%; animation-delay:  2s; }
+.aig-hero-dust span:nth-child(3) { left: 36%; animation-delay:  4.5s; }
+.aig-hero-dust span:nth-child(4) { left: 50%; animation-delay:  7s; }
+.aig-hero-dust span:nth-child(5) { left: 62%; animation-delay:  9.5s; }
+.aig-hero-dust span:nth-child(6) { left: 74%; animation-delay: 12s; }
+.aig-hero-dust span:nth-child(7) { left: 86%; animation-delay:  3.5s; }
+.aig-hero-dust span:nth-child(8) { left: 94%; animation-delay:  6s; }
+@keyframes aig-dust-drift {
+  0%   { transform: translateY(0)     translateX(0);   opacity: 0; }
+  15%  { opacity: 0.55; }
+  85%  { opacity: 0.5;  }
+  100% { transform: translateY(-110%) translateX(22px); opacity: 0; }
+}
+
+/* ── CUERPO ── */
+.aig-body {
+  position: relative;
+  z-index: 3;
+  padding: 4px 24px 16px;
+  flex-shrink: 0;
+}
+
+.aig-intro-line {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-weight: 400;
+  font-style: italic;
+  color: rgba(255,250,240,0.88);
+  line-height: 1.45;
+  text-align: center;
+  margin: 0 0 22px;
+  letter-spacing: 0.005em;
+}
+.aig-intro-line em {
+  color: var(--amber);
+  font-style: italic;
+}
+.aig-intro-line .aig-warn {
+  font-style: normal;
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(232,164,138,0.92);
+  display: inline-block;
+  padding: 2px 9px;
+  border: 1px solid rgba(232,164,138,0.32);
+  border-radius: 999px;
+  background: rgba(232,164,138,0.08);
+  margin: 0 2px;
+  vertical-align: 1px;
+}
+
+.aig-list-plain {
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.aig-list-plain li {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  align-items: start;
+  gap: 12px;
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: rgba(255,250,240,0.72);
+  line-height: 1.55;
+}
+.aig-bullet-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: 50% 18%;
+  background: rgba(45,55,40,0.6);
+  border: 1px solid rgba(200,169,110,0.30);
+  box-shadow:
+    0 4px 10px rgba(0,0,0,0.45),
+    0 0 0 1px rgba(255,250,240,0.04) inset;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.aig-list-plain strong {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--amber);
+  letter-spacing: 0.005em;
+  margin-right: 4px;
+}
+
+.aig-closing {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 19px;
+  font-weight: 500;
+  font-style: italic;
+  color: rgba(255,245,220,0.92);
+  line-height: 1.4;
+  text-align: center;
+  margin: 4px 8px 0;
+}
+.aig-closing em {
+  color: var(--amber);
+  font-style: italic;
+  font-weight: 600;
+}
+
+/* ── CTA fijo abajo ── */
+.aig-cta-wrap {
+  position: sticky;
+  bottom: 0;
+  left: 0; right: 0;
+  z-index: 5;
+  padding: 14px 20px max(20px, env(safe-area-inset-bottom, 20px));
+  background: linear-gradient(180deg, rgba(10,14,8,0) 0%, rgba(10,14,8,0.85) 35%, rgba(10,14,8,0.97) 100%);
+  flex-shrink: 0;
+}
+
+.aig-cta {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 17px 22px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #5e8154 0%, #4a6741 60%, #3d5636 100%);
+  color: #fffaf0;
+  font-family: 'Jost', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.20) inset,
+    0 -2px 0 rgba(0,0,0,0.28) inset,
+    0 10px 28px rgba(74,103,65,0.45);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.aig-cta:hover {
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.22) inset,
+    0 -2px 0 rgba(0,0,0,0.30) inset,
+    0 12px 34px rgba(74,103,65,0.55);
+}
+.aig-cta:active {
+  transform: translateY(1px);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.10) inset,
+    0 0 0 rgba(0,0,0,0) inset,
+    0 4px 12px rgba(74,103,65,0.30);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aig-hero-img, .aig-hero-dust span, .aig-halo, .aig-peek { animation: none; }
+}
+
+.intro-top {
+  padding: 44px 24px 8px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 4;
+}
+
+.intro-eyebrow {
+  font-family: 'Jost', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 6px;
+  opacity: 0.9;
+}
+
+.intro-headline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 30px;
+  font-weight: 600;
+  color: rgba(255,250,240,0.96);
+  line-height: 1.08;
+  margin-bottom: 8px;
+  letter-spacing: -0.005em;
+}
+
+.intro-body {
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: rgba(255,250,240,0.55);
+  line-height: 1.6;
+  max-width: 320px;
+  margin-bottom: 0;
+}
+
+/* Stage: la sala donde los Aigents conviven */
+.aigents-stage {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  min-height: 560px;
+}
+
+/* Back wall — pared cálida con horizonte alto */
+.room-wall {
+  position: absolute;
+  inset: 0 0 30% 0;
+  background:
+    linear-gradient(180deg, #3a2c1f 0%, #2a2014 60%, #1d160e 100%);
+  pointer-events: none;
+}
+
+/* Floor — suelo cálido con sombra suave (no rayas) */
+.room-floor {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 30%;
+  background:
+    /* glow de pies frontales */
+    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255,210,140,0.10), transparent 70%),
+    linear-gradient(180deg, #2a1d12 0%, #1a120a 100%);
+  pointer-events: none;
+}
+.room-floor::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,210,140,0.22) 50%, transparent);
+  filter: blur(0.5px);
+}
+
+/* Light bloom from upper-left (key light) */
+.room-keylight {
+  position: absolute;
+  top: -10%; left: -8%;
+  width: 280px; height: 220px;
+  background: radial-gradient(ellipse at center, rgba(255,210,140,0.25) 0%, transparent 65%);
+  pointer-events: none;
+  animation: window-flicker 7s ease-in-out infinite;
+}
+
+/* Floating dust motes catching the key light */
+.room-dust {
+  position: absolute;
+  top: 8%; left: 6%;
+  width: 130px; height: 240px;
+  pointer-events: none;
+  opacity: 0.45;
+}
+.room-dust span {
+  position: absolute;
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: rgba(255,230,180,0.85);
+  filter: blur(0.5px);
+  animation: dust-drift 9s linear infinite;
+}
+.room-dust span:nth-child(1) { left: 10%; bottom: 0;  animation-delay: 0s; }
+.room-dust span:nth-child(2) { left: 40%; bottom: 0;  animation-delay: 2s; }
+.room-dust span:nth-child(3) { left: 70%; bottom: 0;  animation-delay: 4s; }
+.room-dust span:nth-child(4) { left: 25%; bottom: 0;  animation-delay: 6s; }
+.room-dust span:nth-child(5) { left: 85%; bottom: 0;  animation-delay: 8s; }
+
+/* CHARACTER WRAPPER — wraps the cutout so we can layer shadow + img */
+.char {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+  transform-origin: bottom center;
+  will-change: transform, filter;
+}
+
+/* The image itself: color-graded + rim light + drop shadow that follows alpha */
+.char img,
+.char > svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: bottom center;
+  /* unified cinematic look: warm ambient + slight fall-off + contact shadow */
+  filter:
+    /* contact shadow on floor */
+    drop-shadow(0 24px 10px rgba(0,0,0,0.55))
+    /* depth shadow */
+    drop-shadow(0 6px 18px rgba(0,0,0,0.45))
+    /* warm rim light from upper-left key */
+    drop-shadow(-2px -2px 0 rgba(255,210,150,0.18))
+    /* color grade: warmer, slightly desaturated for unity */
+    brightness(0.95) contrast(1.06) saturate(0.94) sepia(0.06);
+}
+
+/* Floor contact shadow — pega los pies al suelo */
+.char::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -2px;
+  width: 78%;
+  height: 18px;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 50%, transparent 78%);
+  filter: blur(4px);
+  transform: translateX(-50%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* TIGHT CLUSTER composition — overlap is what makes them feel like a group */
+
+/* Niaz — protagonista, centro-frente. Ligeramente girada hacia su izquierda */
+.char-niaz  {
+  left: 50%; bottom: 4%;
+  width: 175px; height: 230px;
+  transform: translateX(-50%) perspective(800px) rotateY(-4deg);
+  z-index: 9;
+  animation: breathe 5.0s ease-in-out infinite; animation-delay: 0.2s;
+}
+
+/* Ale — frente-derecha, MIRANDO HACIA NIAZ (rotateY positivo gira hacia el centro) */
+.char-ale   {
+  right: 6%; bottom: 5%;
+  width: 145px; height: 195px;
+  transform: perspective(800px) rotateY(8deg);
+  z-index: 7;
+  animation: breathe-slow 5.4s ease-in-out infinite; animation-delay: 0.7s;
+}
+
+/* Leo — frente-izquierda, MIRANDO HACIA NIAZ (rotateY negativo) */
+.char-leo   {
+  left: 6%; bottom: 5%;
+  width: 145px; height: 195px;
+  transform: perspective(800px) rotateY(-8deg);
+  z-index: 7;
+  animation: head-bob 5.2s ease-in-out infinite; animation-delay: 1.0s;
+}
+
+/* MID-BACK — Borja asoma por la izquierda, semi oculto tras Leo */
+.char-borja {
+  left: 22%; bottom: 22%;
+  width: 105px; height: 145px;
+  transform: perspective(800px) rotateY(-12deg);
+  z-index: 5;
+  opacity: 0.95;
+  animation: sway 5.8s ease-in-out infinite; animation-delay: 0.3s;
+}
+.char-borja img { filter:
+    drop-shadow(0 18px 8px rgba(0,0,0,0.5))
+    drop-shadow(0 4px 12px rgba(0,0,0,0.4))
+    brightness(0.85) contrast(1.05) saturate(0.9) sepia(0.10);
+}
+
+/* MID-BACK — Katja asoma por la derecha */
+.char-katja {
+  right: 24%; bottom: 23%;
+  width: 100px; height: 140px;
+  transform: perspective(800px) rotateY(14deg);
+  z-index: 5;
+  opacity: 0.95;
+  animation: idle-shift 6.0s ease-in-out infinite; animation-delay: 1.4s;
+}
+.char-katja img { filter:
+    drop-shadow(0 18px 8px rgba(0,0,0,0.5))
+    drop-shadow(0 4px 12px rgba(0,0,0,0.4))
+    brightness(0.85) contrast(1.05) saturate(0.9) sepia(0.10);
+}
+
+/* FAR-BACK — Mario en el medio, atrás. Más pequeño y atmosférico */
+.char-mario {
+  left: 42%; bottom: 32%;
+  width: 78px; height: 108px;
+  transform: translateX(-50%) perspective(800px) rotateY(-2deg);
+  z-index: 3;
+  opacity: 0.78;
+  animation: head-bob 5.6s ease-in-out infinite; animation-delay: 0.5s;
+}
+.char-mario img { filter:
+    drop-shadow(0 14px 8px rgba(0,0,0,0.5))
+    drop-shadow(0 4px 10px rgba(0,0,0,0.4))
+    brightness(0.82) contrast(1.04) saturate(0.88) sepia(0.10);
+}
+.char-mario img.unused-old { filter:
+    drop-shadow(0 12px 6px rgba(0,0,0,0.45))
+    blur(0.4px)
+    brightness(0.7) contrast(1.0) saturate(0.85) sepia(0.12);
+}
+
+/* FAR-BACK — Cecilia (silueta) en el fondo derecho */
+.char-cecilia {
+  right: 12%; bottom: 33%;
+  width: 88px; height: 120px;
+  transform: perspective(800px) rotateY(8deg);
+  z-index: 3;
+  opacity: 0.85;
+  animation: sway 5.4s ease-in-out infinite; animation-delay: 0.4s;
+}
+.char-cecilia > svg {
+  filter:
+    drop-shadow(0 0 14px rgba(255,210,150,0.35))
+    drop-shadow(0 12px 8px rgba(0,0,0,0.5));
+}
+
+/* Hide name labels in the intro — esto es atmosphere, no directorio */
+.aigents-stage .slot-name { display: none; }
+
+/* ── HERO IMAGE de Los Aigents — escena Pixar fija con micro-movimiento ── */
+.aigents-hero {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #1a120a;
+  flex-shrink: 0;
+  /* sin marco, full-bleed dentro del frame del phone */
+}
+
+.aigents-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  /* "Respiración" sutil — Ken Burns muy lento, casi imperceptible.
+     Da sensación de escena viva sin distraer. */
+  animation: hero-breathe 12s ease-in-out infinite;
+  transform-origin: 52% 60%;
+}
+
+@keyframes hero-breathe {
+  0%, 100% { transform: scale(1.000); filter: brightness(1.00); }
+  50%      { transform: scale(1.022); filter: brightness(1.03); }
+}
+
+/* Dust motes flotando encima — vida ambiental */
+.aigents-hero-dust {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.aigents-hero-dust span {
+  position: absolute;
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: rgba(255, 230, 180, 0.85);
+  filter: blur(0.6px);
+  animation: hero-dust-drift 14s linear infinite;
+  bottom: -10px;
+}
+.aigents-hero-dust span:nth-child(1) { left:  6%; animation-delay:  0s;   }
+.aigents-hero-dust span:nth-child(2) { left: 18%; animation-delay:  2.5s; }
+.aigents-hero-dust span:nth-child(3) { left: 32%; animation-delay:  5s;   }
+.aigents-hero-dust span:nth-child(4) { left: 44%; animation-delay:  7.5s; }
+.aigents-hero-dust span:nth-child(5) { left: 58%; animation-delay: 10s;   }
+.aigents-hero-dust span:nth-child(6) { left: 72%; animation-delay: 12.5s; }
+.aigents-hero-dust span:nth-child(7) { left: 84%; animation-delay:  4s;   }
+.aigents-hero-dust span:nth-child(8) { left: 92%; animation-delay:  9s;   }
+
+@keyframes hero-dust-drift {
+  0%   { transform: translateY(0)     translateX(0);   opacity: 0; }
+  15%  { opacity: 0.6; }
+  85%  { opacity: 0.55; }
+  100% { transform: translateY(-110%) translateX(28px); opacity: 0; }
+}
+
+/* Vignette muy sutil para integrar con el fondo de la app */
+.aigents-hero-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.10) 0%, transparent 18%, transparent 82%, rgba(0,0,0,0.20) 100%),
+    radial-gradient(ellipse 90% 75% at 50% 50%, transparent 60%, rgba(0,0,0,0.18) 100%);
+}
+
+/* ── Bloque de copy debajo del hero ── */
+.intro-body-block {
+  padding: 24px 24px 12px;
+  flex-shrink: 0;
+}
+
+.intro-paragraph {
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(255, 250, 240, 0.78);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+.intro-paragraph em {
+  font-style: italic;
+  color: rgba(255, 230, 200, 0.92);
+  font-weight: 500;
+}
+
+.intro-aigents-list {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.intro-aigents-list li {
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: rgba(255, 250, 240, 0.72);
+  line-height: 1.55;
+  padding-left: 14px;
+  position: relative;
+}
+.intro-aigents-list li::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 9px;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--amber);
+  opacity: 0.85;
+}
+.intro-aigents-list strong {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: rgba(255, 245, 220, 0.96);
+  letter-spacing: 0.01em;
+}
+
+.intro-closing {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px;
+  font-weight: 500;
+  color: rgba(255, 245, 220, 0.92);
+  line-height: 1.4;
+  font-style: italic;
+  text-align: center;
+  padding: 8px 8px 4px;
+}
+.intro-closing em {
+  color: var(--amber);
+  font-style: italic;
+}
+
+/* Reduce motion respect — apaga animaciones si el usuario las tiene desactivadas */
+@media (prefers-reduced-motion: reduce) {
+  .aigents-hero-img,
+  .aigents-hero-dust span { animation: none; }
+}
+
+/* Bottom CTA on intro */
+.intro-cta {
+  flex-shrink: 0;
+  padding: 20px 24px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-intro-primary {
+  width: 100%;
+  padding: 17px;
+  border: none;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #5c7f52 0%, #4a6741 60%, #3d5636 100%);
+  color: white;
+  font-family: 'Jost', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.18) inset, 0 -2px 0 rgba(0,0,0,0.25) inset, 0 8px 24px rgba(74,103,65,0.40);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.btn-intro-primary:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.1) inset, 0 0 0 rgba(0,0,0,0) inset, 0 3px 10px rgba(74,103,65,0.30);
+}
+
+.btn-intro-ghost {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 20px;
+  background: transparent;
+  color: rgba(255,255,255,0.65);
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-intro-ghost:hover { background: rgba(255,255,255,0.07); }
+
+/* ─────────────────────────────────────────────────────────
+   SCREEN 5 — AVATARS (with 3D depth)
+──────────────────────────────────────────────────────────── */
+
 </style>
 </head>
 <body>
@@ -1828,7 +2637,7 @@ body{
           <div class="card-sub" data-i18n="behavioral_records_sub">View previous cases and reports</div>
         </div>
 
-        <div class="avatar-card" onclick="goTo('s-avatars')">
+        <div class="avatar-card" onclick="goTo('s-aigents-intro')">
           <div class="avatar-img">
             <img id="home-av-img" src="" style="width:100%;height:100%;object-fit:cover;object-position:top;border-radius:50%;">
             <div class="avatar-badge" id="home-av-badge">Niaz</div>
@@ -2321,6 +3130,57 @@ body{
 
 
   <!-- ══ S-AVATARS ══ -->
+  <div id="s-aigents-intro" class="screen">
+
+    <!-- Soft amber halo from the top to anchor the hero -->
+    <div class="aig-halo" aria-hidden="true"></div>
+
+    <!-- Header: back + eyebrow + serif title (Mario asomado entre la t y la s) -->
+    <header class="aig-header">
+      <button class="aig-back" onclick="goTo('s-home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="15 18 9 12 15 6"/></svg>
+        Volver
+      </button>
+      <p class="aig-eyebrow">Dogs Mind · AI Specialists</p>
+      <h1 class="aig-title">Los <span class="aig-peek-anchor">Aigents<span class="aig-peek" aria-hidden="true"></span></span></h1>
+      <p class="aig-lede">Te acompañarán y ayudarán a solucionar muchas dudas del día a día con tu perro.</p>
+    </header>
+
+    <!-- Hero: foto del grupo fundida con el fondo (mask radial, sin rectángulo) -->
+    <figure class="aig-hero">
+      <img class="aig-hero-img" src="aigents-final.webp" alt="Los Aigents — Niaz, Ale, Leo, Katja, Mario, Borja y Cecilia con Maximus" loading="eager">
+      <div class="aig-hero-glow" aria-hidden="true"></div>
+      <div class="aig-hero-dust" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+      </div>
+    </figure>
+
+    <!-- Cuerpo: texto íntegro, plano, sin cajas -->
+    <section class="aig-body">
+      <p class="aig-intro-line">Cada uno tiene una personalidad muy concreta y una especialidad. <em>No los uses para problemas de conducta;</em> pero sí para muchas otras cosas.</p>
+
+      <ul class="aig-list-plain">
+        <li><img class="aig-bullet-avatar" src="aig-cecilia-pixar.webp" alt=""><div><strong>Cecilia</strong> es la perfecta profesora para aprender o entender conceptos de psicología del aprendizaje y también sabe de muchos animales diferentes.</div></li>
+        <li><img class="aig-bullet-avatar" src="aig-niaz-pixar.webp" alt=""><div><strong>Niaz</strong> <em>Money is not a problem.</em> Es tu mejor asesora en experiencias de lujo para perros. Llega tarde siempre y su TDAH le juega alguna mala pasada, pero si consigues que se centre sacas platino de sus conversaciones.</div></li>
+        <li><img class="aig-bullet-avatar" src="aig-mario-pixar.webp" alt=""><div><strong>Mario</strong> te va a decir dónde conseguir los mejores chollos o cómo salir de fiesta con tu perro e incluso cómo ligar con perro.</div></li>
+        <li><img class="aig-bullet-avatar" src="aig-ale-pixar.webp" alt=""><div><strong>Ale</strong> te va a llevar a muchos viajes, alojamientos donde admiten perros, rutas por el campo y también cómo entrenar muchos trucos.</div></li>
+        <li><img class="aig-bullet-avatar" src="aig-borja-pixar.webp" alt=""><div><strong>Borja</strong> es el pijo Cayetano español por excelencia.</div></li>
+        <li><img class="aig-bullet-avatar" src="aig-leo-pixar.webp" alt=""><div><strong>Leo</strong> es un ex ejecutivo reciclado en Boho y espiritualidad.</div></li>
+      </ul>
+
+      <p class="aig-closing">Entra en cada uno y descubre todo lo que te pueden aportar tus nuevos <em>Ai-Amigos</em>.</p>
+    </section>
+
+    <!-- Sticky CTA -->
+    <div class="aig-cta-wrap">
+      <button class="aig-cta" onclick="goTo('s-avatars')">
+        Elige tu avatar
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </div>
+  </div><!-- /s-aigents-intro -->
+
   <div id="s-avatars" class="screen av-screen">
     <div style="padding:14px 20px 0;display:flex;align-items:center;gap:12px;flex-shrink:0;">
       <div class="back-round" onclick="goTo('s-home')">←</div>

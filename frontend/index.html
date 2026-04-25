@@ -2377,7 +2377,7 @@ body{
       <div class="splash-by">by Teo Mariscal</div>
       <div class="splash-sub" data-i18n="splash_sub">Expert functional analysis to understand<br>and improve your dog's behavior</div>
       <button class="btn-green" onclick="goTo('s-login')" data-i18n="get_started">Get Started</button>
-      <button class="btn-text" onclick="goTo('s-home')" data-i18n="log_in">Log In</button>
+      <button class="btn-text" onclick="goTo('s-login'); var r=document.getElementById('register-section'); var l=document.getElementById('login-section'); if(r) r.style.display='none'; if(l) l.style.display='block';" data-i18n="log_in">Log In</button>
       <button class="btn-outline" onclick="openTourIntro()" style="margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;">▶&nbsp;<span data-i18n="take_tour">Ver el tour</span></button>
       <div style="margin-top:20px;">
         <a onclick="goTo('s-privacy')" style="font-size:11px;color:rgba(255,255,255,0.45);cursor:pointer;text-decoration:underline;letter-spacing:.04em;">Política de Privacidad</a>

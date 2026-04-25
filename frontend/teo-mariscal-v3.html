@@ -100,42 +100,7 @@ body{
 #global-nav{display:none;position:absolute;bottom:0;left:0;right:0;z-index:50;border-top:1px solid rgba(44,42,36,0.1);background:#faf8f4;padding:8px 8px 12px;}
 #s-refine.active ~ #global-nav, #s-refine.active + #global-nav { display:none !important; }
 
-/* ══════════════════════════════════════
-   S1 — SPLASH
-══════════════════════════════════════ */
-#s-splash{position:relative;background:var(--cream);}
-.splash-img{
-  width:100%;height:520px;flex-shrink:0;
-  background:
-    linear-gradient(180deg, rgba(240,236,227,0) 0%, rgba(240,236,227,0) 45%, rgba(240,236,227,0.9) 74%, var(--cream) 90%),
-    url('https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-00.webp');
-  background-size:cover;background-position:center 30%;
-  position:relative;
-}
-.splash-img-label{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  background:rgba(255,255,255,0.7);backdrop-filter:blur(4px);
-  border:1.5px dashed var(--sand);border-radius:12px;
-  padding:12px 20px;text-align:center;
-  font-size:12px;color:var(--sand2);font-family:var(--ff-sans);
-  white-space:nowrap;
-}
-.splash-content{
-  position:absolute;bottom:0;left:0;right:0;
-  padding:0 28px 40px;text-align:center;
-}
-.splash-title{
-  font-family:var(--ff-serif);font-size:42px;font-weight:400;
-  color:var(--text);line-height:1.1;margin-bottom:6px;
-}
-.splash-by{
-  font-family:var(--ff-serif);font-size:18px;font-style:italic;
-  color:var(--text2);margin-bottom:10px;
-}
-.splash-sub{
-  font-size:13px;color:var(--text2);line-height:1.6;
-  margin-bottom:28px;
-}
+/* OLD SPLASH CSS REMOVED — ahora está al final del bloque <style> en versión vibrant */
 .btn-green{
   width:100%;padding:16px;border:none;border-radius:100px;
   background:var(--green);color:#fff;

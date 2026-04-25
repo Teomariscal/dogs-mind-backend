@@ -2352,6 +2352,202 @@ body{
    SCREEN 5 — AVATARS (with 3D depth)
 ──────────────────────────────────────────────────────────── */
 
+#s-splash {
+  min-height: 0;
+  position: relative;
+  justify-content: flex-end;
+  /* Respeta el home-indicator del iPhone real (env safe-area) y deja
+     un colchón mínimo de 32px en navegadores que no lo soportan. */
+  padding-bottom: max(32px, env(safe-area-inset-bottom, 32px));
+  overflow: hidden;
+}
+
+.splash-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.splash-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(20,28,18,0.0) 0%,
+    rgba(20,28,18,0.25) 35%,
+    rgba(20,28,18,0.72) 65%,
+    rgba(15,22,13,0.92) 100%
+  );
+  z-index: 1;
+}
+
+.splash-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 32px 8px;
+  width: 100%;
+}
+
+.splash-eyebrow {
+  font-family: 'Jost', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 10px;
+}
+
+.splash-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 46px;
+  font-weight: 600;
+  color: white;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+}
+
+.splash-by {
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-style: italic;
+  color: rgba(255,255,255,0.65);
+  letter-spacing: 0.04em;
+  margin-bottom: 16px;
+}
+
+.splash-tagline {
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.78);
+  line-height: 1.6;
+  max-width: 300px;
+  margin-bottom: 32px;
+}
+
+.splash-cta-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.splash-ghost-link {
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  color: rgba(255,255,255,0.72);
+  text-align: center;
+  cursor: pointer;
+  padding: 6px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(255,255,255,0.3);
+  background: none;
+  border: none;
+}
+
+.splash-tour-link {
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+  text-align: center;
+  cursor: pointer;
+  padding: 6px;
+  background: none;
+  border: none;
+  letter-spacing: 0.05em;
+}
+
+.splash-privacy {
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  text-align: center;
+  cursor: pointer;
+  padding: 8px;
+  background: none;
+  border: none;
+  letter-spacing: 0.03em;
+}
+
+/* ─────────────────────────────────────────────────────────
+   SCREEN 2 — LOGIN / REGISTER
+──────────────────────────────────────────────────────────── */
+/* ── PREMIUM DARK LOGIN — "entrando en un mundo de tech + animales" ── */
+#s-login {
+  position: relative;
+  background:
+    /* aurora cálida superior (sensación de amanecer/portal) */
+    radial-gradient(ellipse 700px 450px at 50% -10%, rgba(255,210,140,0.16), transparent 60%),
+    /* halo verde profundo lateral */
+    radial-gradient(ellipse 400px 600px at 0% 30%, rgba(74,103,65,0.12), transparent 65%),
+    /* base oscura */
+    linear-gradient(180deg, #1a1f17 0%, #0f150d 55%, #0a0e08 100%);
+  padding-bottom: max(48px, env(safe-area-inset-bottom, 48px));
+  color: rgba(255,250,240,0.92);
+  overflow: hidden;
+}
+
+/* Capa de partículas/embers flotando — vida ambiental */
+#s-login::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, rgba(255,210,150,0.7) 0%, transparent 70%),
+    radial-gradient(circle, rgba(200,169,110,0.5) 0%, transparent 70%),
+    radial-gradient(circle, rgba(255,235,180,0.6) 0%, transparent 70%),
+    radial-gradient(circle, rgba(180,200,160,0.4) 0%, transparent 70%);
+  background-size: 3px 3px, 2px 2px, 4px 4px, 2px 2px;
+  background-position: 12% 18%, 78% 32%, 30% 60%, 88% 78%;
+  background-repeat: no-repeat;
+  opacity: 0.85;
+  animation: login-embers 10s ease-in-out infinite;
+}
+
+/* Glow line en la parte superior — sutil "portal" tech */
+#s-login::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200,169,110,0.55) 50%, transparent);
+  filter: blur(0.5px);
+  pointer-events: none;
+  animation: login-portal-glow 5s ease-in-out infinite;
+}
+
+@keyframes login-embers {
+  0%, 100% { opacity: 0.7; transform: translateY(0); }
+  50%      { opacity: 1.0; transform: translateY(-4px); }
+}
+@keyframes login-portal-glow {
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 0.85; }
+}
+
+.login-top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 60%, transparent 100%);
+  z-index: 50;
+  padding: 18px 20px 24px;
+  pointer-events: none; /* solo el botón es clicable */
+}
+.login-top-bar > * { pointer-events: auto; }
 </style>
 </head>
 <body>
@@ -2369,19 +2565,23 @@ body{
 
   <!-- ══ S1: SPLASH ══ -->
   <div id="s-splash" class="screen active">
-    <div class="splash-img">
-      
+    <div class="splash-bg">
+      <img src="http://localhost:8788/assets/images/img-00.webp"
+           onerror="this.src='https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-00.webp'"
+           style="width:100%;height:100%;object-fit:cover;object-position:42% 28%;display:block;position:absolute;top:0;left:0;" alt="">
     </div>
+    <div class="splash-overlay"></div>
     <div class="splash-content">
-      <div class="splash-title" data-i18n="splash_title">Canine Behavior<br>Consultancy</div>
-      <div class="splash-by">by Teo Mariscal</div>
-      <div class="splash-sub" data-i18n="splash_sub">Expert functional analysis to understand<br>and improve your dog's behavior</div>
-      <button class="btn-green" onclick="goTo('s-login')" data-i18n="get_started">Get Started</button>
-      <button class="btn-text" onclick="goTo('s-login'); var r=document.getElementById('register-section'); var l=document.getElementById('login-section'); if(r) r.style.display='none'; if(l) l.style.display='block';" data-i18n="log_in">Log In</button>
-      <button class="btn-outline" onclick="openTourIntro()" style="margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;">▶&nbsp;<span data-i18n="take_tour">Ver el tour</span></button>
-      <div style="margin-top:20px;">
-        <a onclick="goTo('s-privacy')" style="font-size:11px;color:rgba(255,255,255,0.45);cursor:pointer;text-decoration:underline;letter-spacing:.04em;">Política de Privacidad</a>
+      <p class="splash-eyebrow">The Dogs Mind</p>
+      <h1 class="splash-title" data-i18n="splash_title">Canine Behavior<br>Consultancy</h1>
+      <p class="splash-by">by Teo Mariscal</p>
+      <p class="splash-tagline" data-i18n="splash_sub">Análisis funcional experto para entender y mejorar el comportamiento de tu perro</p>
+      <div class="splash-cta-wrap">
+        <button class="btn-primary" onclick="goTo('s-login')" data-i18n="get_started">Comenzar</button>
+        <button class="splash-ghost-link" onclick="goTo('s-home')" data-i18n="log_in">Iniciar sesión</button>
+        <button class="splash-tour-link" onclick="openTourIntro()"><span data-i18n="take_tour">Ver el tour</span></button>
       </div>
+      <button class="splash-privacy" onclick="goTo('s-privacy')">Política de Privacidad</button>
     </div>
   </div>
 

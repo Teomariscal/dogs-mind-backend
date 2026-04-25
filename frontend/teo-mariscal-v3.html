@@ -1170,6 +1170,379 @@ body{
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
 }
+/* ═══════════════════════════════════════════════════
+   SCREEN 10 — CV / SOBRE TEO (cinematic vibrant)
+═══════════════════════════════════════════════════ */
+#s-profile {
+  background:
+    radial-gradient(ellipse 760px 520px at 50% -8%, rgba(255,210,150,0.18), transparent 65%),
+    radial-gradient(ellipse 440px 620px at 100% 38%, rgba(74,103,65,0.10), transparent 70%),
+    linear-gradient(180deg, #1a1f17 0%, #0f150d 55%, #0a0e08 100%);
+  color: rgba(255,250,240,0.95);
+  padding-bottom: 0;
+}
+#s-profile .bottom-nav {
+  background: rgba(10,14,8,0.92);
+  border-top: 1px solid rgba(255,250,240,0.08);
+  backdrop-filter: blur(10px);
+}
+#s-profile .nav-item { color: rgba(255,250,240,0.55); }
+#s-profile .nav-item.active { color: var(--amber); }
+/* CTA wrap deja espacio para la nav abajo */
+#s-profile .cv-cta-wrap { bottom: var(--nav-height, 78px); }
+
+.cv-halo {
+  position: absolute;
+  top: -120px; left: 50%;
+  transform: translateX(-50%);
+  width: 540px; height: 380px;
+  background: radial-gradient(ellipse at center, rgba(255,200,130,0.20), transparent 65%);
+  filter: blur(8px);
+  pointer-events: none;
+  z-index: 0;
+  animation: cv-halo-breathe 9s ease-in-out infinite;
+}
+@keyframes cv-halo-breathe {
+  0%, 100% { opacity: 0.85; transform: translateX(-50%) scale(1); }
+  50%      { opacity: 1;    transform: translateX(-50%) scale(1.05); }
+}
+
+/* Hero */
+.cv-hero {
+  position: relative;
+  width: 100%;
+  height: 420px;
+  flex-shrink: 0;
+  overflow: hidden;
+  z-index: 2;
+}
+.cv-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 32%;
+  filter: contrast(1.04) saturate(1.04) brightness(0.96);
+  animation: cv-hero-breathe 16s ease-in-out infinite;
+  transform-origin: 50% 35%;
+}
+@keyframes cv-hero-breathe {
+  0%, 100% { transform: scale(1);     }
+  50%      { transform: scale(1.025); }
+}
+.cv-hero-fade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg,
+      rgba(10,14,8,0.35) 0%,
+      rgba(10,14,8,0.05) 25%,
+      rgba(10,14,8,0.20) 55%,
+      rgba(10,14,8,0.92) 92%,
+      rgba(10,14,8,1) 100%);
+  pointer-events: none;
+}
+
+.cv-back {
+  position: absolute;
+  top: max(20px, env(safe-area-inset-top, 0px) + 8px);
+  left: 16px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,250,240,0.16);
+  border-radius: 999px;
+  padding: 7px 14px 7px 11px;
+  color: rgba(255,250,240,0.92);
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: background 0.15s, border-color 0.15s;
+}
+.cv-back:hover { background: rgba(0,0,0,0.6); border-color: rgba(255,250,240,0.28); }
+
+.cv-hero-meta {
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  bottom: 22px;
+  z-index: 2;
+}
+.cv-eyebrow {
+  font-family: 'Jost', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--amber);
+  opacity: 0.92;
+  margin-bottom: 6px;
+}
+.cv-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 38px;
+  font-weight: 600;
+  color: #fffaf0;
+  line-height: 1;
+  letter-spacing: -0.005em;
+  margin: 0 0 8px;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+}
+.cv-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  font-style: italic;
+  color: rgba(255,250,240,0.82);
+  line-height: 1.4;
+  margin: 0;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+}
+
+/* Stats */
+.cv-stats {
+  list-style: none;
+  margin: -8px 0 0;
+  padding: 18px 12px 22px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  position: relative;
+  z-index: 3;
+  border-bottom: 1px solid rgba(255,250,240,0.06);
+}
+.cv-stats li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px;
+  border-left: 1px solid rgba(255,250,240,0.06);
+  text-align: center;
+}
+.cv-stats li:first-child { border-left: none; }
+.cv-stat-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--amber);
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+}
+.cv-stat-num svg { stroke: var(--amber); opacity: 0.9; }
+.cv-stat-label {
+  font-family: 'Jost', sans-serif;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: rgba(255,250,240,0.55);
+  margin-top: 2px;
+}
+
+/* Sections */
+.cv-section {
+  position: relative;
+  z-index: 3;
+  padding: 22px 22px 0;
+}
+.cv-section-eyebrow {
+  font-family: 'Jost', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--amber);
+  opacity: 0.88;
+  margin: 0 0 12px;
+}
+
+/* Bio */
+.cv-bio {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: rgba(255,250,240,0.88);
+  line-height: 1.65;
+  margin: 0 0 12px;
+  letter-spacing: 0.005em;
+}
+.cv-bio em {
+  color: rgba(255,225,180,0.96);
+  font-style: italic;
+  font-weight: 500;
+}
+.cv-bio-soft { color: rgba(255,250,240,0.66); margin-bottom: 0; }
+
+/* Chips */
+.cv-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.cv-chip {
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255,250,240,0.85);
+  background: rgba(255,250,240,0.05);
+  border: 1px solid rgba(200,169,110,0.22);
+  border-radius: 999px;
+  padding: 6px 12px;
+  letter-spacing: 0.01em;
+  backdrop-filter: blur(4px);
+}
+
+/* Cards */
+.cv-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.cv-card {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='5'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.05 0'/></filter><rect width='180' height='180' filter='url(%23n)' opacity='0.6'/></svg>"),
+    linear-gradient(160deg, rgba(255,250,240,0.05) 0%, rgba(255,250,240,0.025) 100%);
+  border: 1px solid rgba(255,250,240,0.08);
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+}
+.cv-card-medal {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(160deg, rgba(200,169,110,0.20) 0%, rgba(200,169,110,0.06) 100%);
+  border: 1px solid rgba(200,169,110,0.32);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--amber);
+}
+.cv-card-text {
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(255,250,240,0.82);
+  line-height: 1.45;
+}
+.cv-card-text strong {
+  color: rgba(255,250,240,0.98);
+  font-weight: 600;
+}
+
+/* Timeline */
+.cv-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 16px;
+  position: relative;
+}
+.cv-timeline::before {
+  content: '';
+  position: absolute;
+  left: 4px; top: 6px; bottom: 6px;
+  width: 1px;
+  background: linear-gradient(180deg, rgba(200,169,110,0.45), rgba(200,169,110,0.10));
+}
+.cv-timeline li {
+  position: relative;
+  padding: 4px 0 16px;
+  display: flex;
+  gap: 14px;
+}
+.cv-timeline li:last-child { padding-bottom: 0; }
+.cv-tl-dot {
+  position: absolute;
+  left: -16px;
+  top: 8px;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow:
+    0 0 0 3px rgba(200,169,110,0.18),
+    0 0 8px rgba(200,169,110,0.45);
+}
+.cv-tl-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px;
+  font-weight: 600;
+  color: rgba(255,250,240,0.96);
+  margin: 0 0 3px;
+  letter-spacing: 0.005em;
+}
+.cv-tl-meta {
+  font-family: 'Jost', sans-serif;
+  font-size: 12px;
+  font-weight: 300;
+  color: rgba(255,250,240,0.58);
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* Sticky CTA */
+.cv-cta-wrap {
+  position: sticky;
+  bottom: 0;
+  left: 0; right: 0;
+  z-index: 5;
+  padding: 16px 22px max(20px, env(safe-area-inset-bottom, 20px));
+  background: linear-gradient(180deg, rgba(10,14,8,0) 0%, rgba(10,14,8,0.85) 35%, rgba(10,14,8,0.97) 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.cv-cta {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 17px 22px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #5e8154 0%, #4a6741 60%, #3d5636 100%);
+  color: #fffaf0;
+  font-family: 'Jost', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.20) inset,
+    0 -2px 0 rgba(0,0,0,0.28) inset,
+    0 10px 28px rgba(74,103,65,0.45);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.cv-cta:active { transform: translateY(1px); }
+.cv-link {
+  font-family: 'Jost', sans-serif;
+  font-size: 12px;
+  color: rgba(200,169,110,0.78);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+.cv-link:hover { color: var(--amber); }
+
+@media (prefers-reduced-motion: reduce) {
+  .cv-halo, .cv-hero-img { animation: none; }
+}
+
+
 </style>
 </head>
 <body>
@@ -1492,154 +1865,180 @@ body{
 
 
   <!-- ══ S-PROFILE: TEO MARISCAL ══ -->
-  <div id="s-profile" class="screen" style="background:var(--cream);">
-    <div style="flex:1;overflow-y:auto;">
+    <div id="s-profile" class="screen">
 
-      <!-- Hero foto + gradiente -->
-      <div style="position:relative;height:320px;flex-shrink:0;overflow:hidden;background:#1a1a1a;">
-        <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-05.jpg" style="width:100%;height:100%;object-fit:cover;object-position:center 40%;opacity:0.88;">
-        <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0.05) 30%,rgba(26,26,26,0.88) 80%,#1a1a1a 100%);"></div>
-        <!-- Back button -->
-        <div class="back-round" onclick="goTo('s-home')" style="position:absolute;top:16px;left:16px;background:rgba(255,255,255,0.18);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.25);color:#fff;">←</div>
-        <!-- Nombre sobre la foto -->
-        <div style="position:absolute;bottom:20px;left:20px;right:20px;">
-          <div style="font-family:var(--ff-serif);font-size:28px;font-weight:600;color:#fff;line-height:1.1;letter-spacing:-0.01em;">Teo Mariscal</div>
-          <div style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:5px;font-style:italic;font-family:var(--ff-serif);">Animal Behaviorist · Fundador de Fundación Bocalán desde 2002</div>
-        </div>
+    <!-- Halo amber arriba -->
+    <div class="cv-halo" aria-hidden="true"></div>
+
+    <!-- Hero: foto fundida + back -->
+    <header class="cv-hero">
+      <button class="cv-back" onclick="goTo('s-home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="15 18 9 12 15 6"/></svg>
+        Volver
+      </button>
+      <img class="cv-hero-img" src="teo-hero.webp" alt="Teo Mariscal — Animal Behaviorist">
+      <div class="cv-hero-fade" aria-hidden="true"></div>
+      <div class="cv-hero-meta">
+        <p class="cv-eyebrow">Dogs Mind · Founder</p>
+        <h1 class="cv-name">Teo Mariscal</h1>
+        <p class="cv-title">Animal Behaviorist · Fundador de Fundación Bocalán desde 2002</p>
       </div>
+    </header>
 
-      <!-- Stats row -->
-      <div style="display:flex;background:#1a1a1a;padding:0 0 20px;">
-        <div style="flex:1;text-align:center;padding:14px 8px 0;">
-          <div style="font-family:var(--ff-serif);font-size:22px;font-weight:600;color:#B8955A;">25+</div>
-          <div style="font-size:10px;color:rgba(255,255,255,0.55);margin-top:2px;letter-spacing:.04em;text-transform:uppercase;">Años exp.</div>
-        </div>
-        <div style="flex:1;text-align:center;padding:14px 8px 0;border-left:1px solid rgba(255,255,255,0.1);">
-          <div style="font-family:var(--ff-serif);font-size:22px;font-weight:600;color:#B8955A;">14</div>
-          <div style="font-size:10px;color:rgba(255,255,255,0.55);margin-top:2px;letter-spacing:.04em;text-transform:uppercase;">Países</div>
-        </div>
-        <div style="flex:1;text-align:center;padding:14px 8px 0;border-left:1px solid rgba(255,255,255,0.1);">
-          <div style="font-family:var(--ff-serif);font-size:22px;font-weight:600;color:#B8955A;"></div>
-          <div style="font-size:10px;color:rgba(255,255,255,0.55);margin-top:2px;letter-spacing:.04em;text-transform:uppercase;">Ponente Intl.</div>
-        </div>
-        <div style="flex:1;text-align:center;padding:14px 8px 0;border-left:1px solid rgba(255,255,255,0.1);">
-          <div style="font-family:var(--ff-serif);font-size:22px;font-weight:600;color:#B8955A;">2002</div>
-          <div style="font-size:10px;color:rgba(255,255,255,0.55);margin-top:2px;letter-spacing:.04em;text-transform:uppercase;">Fundación</div>
-        </div>
+    <!-- Stats row -->
+    <ul class="cv-stats" aria-label="Trayectoria">
+      <li><span class="cv-stat-num">25+</span><span class="cv-stat-label">Años exp.</span></li>
+      <li><span class="cv-stat-num">14</span><span class="cv-stat-label">Países</span></li>
+      <li><span class="cv-stat-num"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span class="cv-stat-label">Ponente Intl.</span></li>
+      <li><span class="cv-stat-num">2002</span><span class="cv-stat-label">Fundación</span></li>
+    </ul>
+
+    <!-- Bio -->
+    <section class="cv-section">
+      <p class="cv-section-eyebrow">Sobre Teo</p>
+      <p class="cv-bio">
+        Figura de referencia mundial en etología canina y modificación de conducta. Con más de 25 años de experiencia, ha desarrollado metodologías únicas basadas en <em>ciencia, respeto y conexión emocional</em>.
+      </p>
+      <p class="cv-bio cv-bio-soft">
+        Fundador de Fundación Bocalán desde 2002, con presencia en más de 14 países. Asesor de unidades de policía y ejército en múltiples países, profesor universitario y autor de referencia en el sector.
+      </p>
+    </section>
+
+    <!-- Especialidades chips -->
+    <section class="cv-section">
+      <p class="cv-section-eyebrow">Especialidades</p>
+      <div class="cv-chips">
+        <span class="cv-chip">Comportamiento Animal</span>
+        <span class="cv-chip">Modificación de Conducta</span>
+        <span class="cv-chip">Unidades Caninas Policía y Ejército</span>
+        <span class="cv-chip">Perros de Asistencia</span>
+        <span class="cv-chip">Terapia Asistida con Animales</span>
+        <span class="cv-chip">Educación Asistida con Animales</span>
+        <span class="cv-chip">Formación de Profesionales</span>
+        <span class="cv-chip">Criador desde 1994</span>
+        <span class="cv-chip">Formación Universitaria</span>
+        <span class="cv-chip">Deporte Canino</span>
+        <span class="cv-chip">Coach Entrepreneurs</span>
       </div>
+    </section>
 
-      <!-- Bio -->
-      <div style="padding:20px 20px 0;">
-        <div style="font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Sobre Teo</div>
-        <div style="font-family:var(--ff-serif);font-size:15px;color:var(--text);line-height:1.7;">
-          Figura de referencia mundial en etología canina y modificación de conducta. Con más de 25 años de experiencia, ha desarrollado metodologías únicas basadas en ciencia, respeto y conexión emocional.
-        </div>
-        <div style="font-family:var(--ff-serif);font-size:15px;color:var(--text2);line-height:1.7;margin-top:10px;">
-          Fundador de Fundación Bocalán desde 2002, con presencia en más de 14 países. Asesor de unidades de policía y ejército en múltiples países, profesor universitario y autor de referencia en el sector.
-        </div>
-      </div>
+    <!-- Acreditaciones -->
+    <section class="cv-section">
+      <p class="cv-section-eyebrow">Acreditaciones</p>
+      <ul class="cv-cards">
+        <li class="cv-card">
+          <span class="cv-card-medal" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="9" r="6"/><polyline points="9 14 8 22 12 19 16 22 15 14"/></svg>
+          </span>
+          <span class="cv-card-text">Instructor Formador de la <strong>Real Sociedad Canina de España</strong></span>
+        </li>
+        <li class="cv-card">
+          <span class="cv-card-medal" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </span>
+          <span class="cv-card-text">Instructor de K9 Patrol Dogs — <strong>Harris County Sheriff's Academy</strong>, Texas</span>
+        </li>
+        <li class="cv-card">
+          <span class="cv-card-medal" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </span>
+          <span class="cv-card-text">Instructor de <strong>Unidades de Perros de Asistencia</strong> desde el 2002</span>
+        </li>
+        <li class="cv-card">
+          <span class="cv-card-medal" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </span>
+          <span class="cv-card-text"><strong>International Mondioring</strong> Decoy Level III</span>
+        </li>
+      </ul>
+    </section>
 
-      <!-- Especialidades -->
-      <div style="padding:20px 20px 0;">
-        <div style="font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:12px;">Especialidades</div>
-        <div style="display:flex;flex-wrap:wrap;gap:7px;">
-          <span style="background:var(--green-bg);color:var(--green3);border-radius:100px;padding:5px 12px;font-size:11px;font-weight:500;">Comportamiento Animal</span>
-          <span style="background:var(--green-bg);color:var(--green3);border-radius:100px;padding:5px 12px;font-size:11px;font-weight:500;">Modificación de Conducta</span>
-          <span style="background:var(--green-bg);color:var(--green3);border-radius:100px;padding:5px 12px;font-size:11px;font-weight:500;">Unidades Caninas Policía y Ejército</span>
-          <span style="background:var(--green-bg);color:var(--green3);border-radius:100px;padding:5px 12px;font-size:11px;font-weight:500;">Perros de Asistencia</span>
-          <span style="background:var(--green-bg);color:var(--green3);border-radius:100px;padding:5px 12px;font-size:11px;font-weight:500;">Terapia Asistida con Animales</span>
-          <span style="background:var(--green-bg);color:var(--green3);border-radius:100px;padding:5px 12px;font-size:11px;font-weight:500;">Educación Asistida con Animales</span>
-          <span style="background:var(--green-bg);color:var(--green3);border-radius:100px;padding:5px 12px;font-size:11px;font-weight:500;">Formación de Profesionales</span>
-          <span style="background:var(--green-bg);color:var(--green3);border-radius:100px;padding:5px 12px;font-size:11px;font-weight:500;">Criador desde 1994</span>
-          <span style="background:var(--green-bg);color:var(--green3);border-radius:100px;padding:5px 12px;font-size:11px;font-weight:500;">Formación Universitaria</span>
-          <span style="background:var(--green-bg);color:var(--green3);border-radius:100px;padding:5px 12px;font-size:11px;font-weight:500;">Deporte Canino</span>
-          <span style="background:var(--green-bg);color:var(--green3);border-radius:100px;padding:5px 12px;font-size:11px;font-weight:500;">Coach Entrepreneurs</span>
-        </div>
-      </div>
-
-      
-      <!-- Acreditaciones -->
-      <div style="padding:20px 20px 0;">
-        <div style="display:flex;flex-direction:column;gap:9px;">
-          <div style="background:var(--white);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;">
-            <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-06.png" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;" />
-            <div style="font-size:13px;color:var(--text);font-weight:500;line-height:1.45;">Instructor Formador de la Real Sociedad Canina de España</div>
+    <!-- Trayectoria timeline -->
+    <section class="cv-section">
+      <p class="cv-section-eyebrow">Trayectoria</p>
+      <ol class="cv-timeline">
+        <li>
+          <span class="cv-tl-dot"></span>
+          <div>
+            <p class="cv-tl-title">Fund. Bocalán</p>
+            <p class="cv-tl-meta">Fundador y Director · 2002 – Actualidad · España</p>
           </div>
-          <div style="background:var(--white);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;">
-            <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-07.png" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;" />
-            <div style="font-size:13px;color:var(--text);font-weight:500;line-height:1.45;">Instructor de K9 Patrol Dogs — Harris County Sheriff&#39;s Academy, Texas</div>
+        </li>
+        <li>
+          <span class="cv-tl-dot"></span>
+          <div>
+            <p class="cv-tl-title">Docencia Universitaria</p>
+            <p class="cv-tl-meta">UAM Madrid · U. Mayor Chile · U. Chile · USFQ Ecuador</p>
           </div>
-          <div style="background:var(--white);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;">
-            <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-08.png" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;" />
-            <div style="font-size:13px;color:var(--text);font-weight:500;line-height:1.45;">Instructor de Unidades de Perros de Asistencia desde el 2002</div>
+        </li>
+        <li>
+          <span class="cv-tl-dot"></span>
+          <div>
+            <p class="cv-tl-title">Asesor K9 Internacional</p>
+            <p class="cv-tl-meta">Policía Nacional España · Colombia · Carabineros Chile · Harris County TX</p>
           </div>
-          <div style="background:var(--white);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;">
-            <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-09.png" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;" />
-            <div style="font-size:13px;color:var(--text);font-weight:500;line-height:1.45;">International Mondioring Decoy Level III</div>
+        </li>
+        <li>
+          <span class="cv-tl-dot"></span>
+          <div>
+            <p class="cv-tl-title">Bocalán Japan</p>
+            <p class="cv-tl-meta">Osaka, Japón · +9 años de actividad</p>
           </div>
-        </div>
-      </div>
-
-      <!-- Trayectoria clave -->
-      <div style="padding:20px 20px 0;">
-        <div style="font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:12px;">Trayectoria</div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-
-          <div style="display:flex;gap:12px;align-items:flex-start;">
-            <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-10.png" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;" />
-            <div>
-              <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.3;">Fund. Bocalán</div>
-              <div style="font-size:11.5px;color:var(--text3);margin-top:2px;">Fundador y Director · 2002 – Actualidad · España</div>
-            </div>
+        </li>
+        <li>
+          <span class="cv-tl-dot"></span>
+          <div>
+            <p class="cv-tl-title">Junta ADI Europe &amp; AAI International</p>
+            <p class="cv-tl-meta">Miembro de junta directiva · 2009 – 2019</p>
           </div>
+        </li>
+      </ol>
+    </section>
 
-          <div style="display:flex;gap:12px;align-items:flex-start;">
-            <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-08.png" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;" />
-            <div>
-              <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.3;">Docencia Universitaria</div>
-              <div style="font-size:11.5px;color:var(--text3);margin-top:2px;">UAM Madrid · U. Mayor Chile · U. Chile · USFQ Ecuador</div>
-            </div>
-          </div>
+    <!-- Sticky CTA -->
+    <div class="cv-cta-wrap">
+      <button class="cv-cta" onclick="goTo('s-anamnesis')">
+        Consultar a Teo
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+      <a class="cv-link" href="https://fundacionbocalan.com" target="_blank" rel="noopener">fundacionbocalan.com</a>
+    </div>
 
-          <div style="display:flex;gap:12px;align-items:flex-start;">
-            <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-11.png" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;" />
-            <div>
-              <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.3;">Asesor K9 Internacional</div>
-              <div style="font-size:11.5px;color:var(--text3);margin-top:2px;">Policía Nacional España · Colombia · Carabineros Chile · Harris County TX</div>
-            </div>
-          </div>
+    <!-- Bottom nav -->
+    <nav class="bottom-nav nav-elevated">
+      <button class="nav-item" onclick="goTo('s-home')">
+        <span class="nav-icon nav-icon-home" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V20a2 2 0 0 1-2 2h-4v-7h-6v7H5a2 2 0 0 1-2-2z"/></svg>
+        </span>
+        <span class="nav-label">Inicio</span>
+      </button>
+      <button class="nav-item" onclick="goTo('s-anamnesis')">
+        <span class="nav-icon nav-icon-consultas" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+        </span>
+        <span class="nav-label">Consultas</span>
+      </button>
+      <button class="nav-item" onclick="goTo('s-avatars')">
+        <span class="nav-icon nav-icon-aigents" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="11" r="2.5"/><path d="M3 20v-1.5a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4V20"/><path d="M15 20v-1a3 3 0 0 1 3-3h1a3 3 0 0 1 3 3v1"/></svg>
+        </span>
+        <span class="nav-label">Aigents</span>
+      </button>
+      <button class="nav-item" onclick="goTo('s-tokens')">
+        <span class="nav-icon nav-icon-tokens" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.5"/><path d="M12 8v8M8.5 12h7"/></svg>
+        </span>
+        <span class="nav-label">Tokens</span>
+      </button>
+      <button class="nav-item nav-item-teo active" onclick="goTo('s-profile')">
+        <span class="nav-icon nav-icon-teo" aria-hidden="true">
+          <img src="teo-nav.webp" alt="" onerror="this.src='teo-photo.webp'">
+        </span>
+        <span class="nav-label">Teo</span>
+      </button>
+    </nav>
 
-          <div style="display:flex;gap:12px;align-items:flex-start;">
-            <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-12.png" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;" />
-            <div>
-              <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.3;">Bocalán Japan</div>
-              <div style="font-size:11.5px;color:var(--text3);margin-top:2px;">Osaka, Japón · +9 años de actividad</div>
-            </div>
-          </div>
-
-          <div style="display:flex;gap:12px;align-items:flex-start;">
-            <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-13.png" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;" />
-            <div>
-              <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.3;">Junta ADI Europe & AAI International</div>
-              <div style="font-size:11.5px;color:var(--text3);margin-top:2px;">Miembro de junta directiva · 2009–2019</div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- CTA -->
-      <div style="padding:24px 20px 32px;">
-        <button onclick="goTo('s-anamnesis')" style="width:100%;background:var(--green);color:#fff;border:none;border-radius:100px;padding:16px;font-family:var(--ff-sans);font-size:15px;font-weight:600;cursor:pointer;letter-spacing:.02em;">
-          Consultar a Teo →
-        </button>
-        <div style="text-align:center;margin-top:10px;">
-          <a href="https://fundacionbocalan.com" style="font-size:11.5px;color:var(--text3);text-decoration:none;">🌐 fundacionbocalan.com</a>
-        </div>
-      </div>
-
-    </div><!-- /scroll -->
-  </div><!-- /s-profile -->
+  </div><!-- /s-cv -->
 
   <!-- ══ S-TOKENS: Token wallet & recharge ══ -->
   <div id="s-tokens" class="screen" style="background:var(--cream);overflow-y:auto;">

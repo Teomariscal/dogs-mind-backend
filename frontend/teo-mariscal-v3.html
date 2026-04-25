@@ -2433,28 +2433,48 @@ body{
 
 .splash-ghost-link {
   font-family: 'Jost', sans-serif;
-  font-size: 14px;
-  color: rgba(255,255,255,0.72);
+  font-size: 17px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.92);
   text-align: center;
   cursor: pointer;
-  padding: 6px;
+  padding: 12px;
   text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: rgba(255,255,255,0.3);
+  text-underline-offset: 4px;
+  text-decoration-color: rgba(255,255,255,0.45);
   background: none;
   border: none;
 }
 
 .splash-tour-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  align-self: center;
   font-family: 'Jost', sans-serif;
   font-size: 13px;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255,255,255,0.85);
   text-align: center;
   cursor: pointer;
-  padding: 6px;
-  background: none;
-  border: none;
-  letter-spacing: 0.05em;
+  padding: 10px 22px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(6px);
+  width: auto;
+  max-width: 220px;
+  margin: 6px auto 0;
+}
+.splash-tour-link:hover {
+  background: rgba(255,255,255,0.14);
+  border-color: rgba(255,255,255,0.35);
+}
+.splash-tour-link::before {
+  content: '▶';
+  font-size: 10px;
+  opacity: 0.85;
 }
 
 .splash-privacy {

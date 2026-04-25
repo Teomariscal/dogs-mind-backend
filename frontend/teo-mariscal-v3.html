@@ -2397,6 +2397,32 @@ body{
   margin-bottom: 32px;
 }
 
+.splash-cta-wrap .btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #5e8154 0%, #4a6741 60%, #3d5636 100%);
+  color: #fffaf0;
+  border: none;
+  border-radius: 999px;
+  padding: 16px 24px;
+  font-family: var(--ff-sans);
+  font-weight: 500;
+  font-size: 15px;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.20) inset,
+    0 -2px 0 rgba(0,0,0,0.28) inset,
+    0 8px 22px rgba(74,103,65,0.42);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.splash-cta-wrap .btn-primary:active {
+  transform: translateY(1px);
+}
+
 .splash-cta-wrap {
   width: 100%;
   display: flex;

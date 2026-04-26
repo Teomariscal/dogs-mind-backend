@@ -2400,6 +2400,39 @@ body{
 /* ════════════════════════════════════════════════
    S-HOME — vibrant cinematic override (no HTML change)
 ════════════════════════════════════════════════ */
+/* Compactar para que TODO quepa sin scroll */
+#s-home .home-topbar {
+  padding-top: max(14px, env(safe-area-inset-top, 14px)) !important;
+  padding-bottom: 8px !important;
+}
+#s-home .hero-banner {
+  height: 200px !important;
+  margin: 0 16px 14px !important;
+}
+#s-home .hero-banner img,
+#s-home .hero-banner > img {
+  object-position: center 28% !important;
+}
+#s-home .section-title {
+  margin: 8px 16px 8px !important;
+  font-size: 18px !important;
+}
+#s-home .dogs-row {
+  margin-bottom: 12px !important;
+}
+#s-home .action-card,
+#s-home .avatar-card,
+#s-home .teo-card {
+  padding: 10px 12px !important;
+}
+#s-home .insight-row {
+  margin: 12px 16px !important;
+  padding: 12px 14px !important;
+}
+#s-home .btn-new-consult {
+  margin: 8px 16px 12px !important;
+  padding: 14px !important;
+}
 #s-home {
   background:
     radial-gradient(ellipse 760px 520px at 50% -8%, rgba(255,210,150,0.18), transparent 65%),

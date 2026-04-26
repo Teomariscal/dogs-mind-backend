@@ -4254,7 +4254,7 @@ body{
     <div style="padding:0 20px 20px;">
 
       <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:20px;">
-        <p style="font-size:13.5px;color:var(--text2);line-height:1.75;text-align:center;">
+        <p style="font-size:13.5px;color:var(--text2);line-height:1.75;text-align:center;" data-i18n="form_welcome_intro">
           Bienvenido a <strong style="color:var(--text)">The Dogs Mind</strong>. Puedes elegir dos modelos de suscripción:
           <strong style="color:var(--green)">Particular</strong> (hasta 2 perros) o
           <strong style="color:var(--green)">Profesional</strong> (hasta 20 perros).<br><br>
@@ -4268,7 +4268,7 @@ body{
 
         <!-- Tipo de usuario -->
         <div>
-          <label style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Tipo de usuario</label>
+          <label style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;" data-i18n="form_user_type">Tipo de usuario</label>
           <select class="sel" id="reg-type" onchange="toggleProfessional(this.value)" style="width:100%;">
             <option value="pet">🐾 Pet Owner — Particular (hasta 2 perros)</option>
             <option value="pro">💼 Professional — Profesional (hasta 20 perros)</option>
@@ -4277,47 +4277,47 @@ body{
 
         <!-- Nombre y apellidos -->
         <div>
-          <label style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Nombre y apellidos</label>
-          <input class="inp" type="text" placeholder="Tu nombre completo..." id="reg-name">
+          <label style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;" data-i18n="form_full_name">Nombre y apellidos</label>
+          <input class="inp" type="text" placeholder="Tu nombre completo..." data-i18n-placeholder="form_full_name_ph" id="reg-name">
         </div>
 
         <!-- Perro 1 -->
         <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:14px;">
-          <div style="font-size:12px;font-weight:600;color:var(--green3);margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+          <div style="font-size:12px;font-weight:600;color:var(--green3);margin-bottom:10px;display:flex;align-items:center;gap:6px;" data-i18n="form_dog1_header">
             🐕 Perro 1
           </div>
           <div style="display:flex;flex-direction:column;gap:10px;">
             <div>
-              <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px;">Nombre del perro</label>
-              <input class="inp" type="text" placeholder="Ej: Buddy, Luna..." id="reg-dog1-name" style="padding:9px 12px;">
+              <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px;" data-i18n="form_dog_name">Nombre del perro</label>
+              <input class="inp" type="text" placeholder="Ej: Buddy, Luna..." data-i18n-placeholder="form_dog1_name_ph" id="reg-dog1-name" style="padding:9px 12px;">
             </div>
             <div>
-              <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px;">Raza / Mestizo</label>
-              <input class="inp" type="text" placeholder="Ej: Border Collie, Mestizo..." id="reg-dog1-breed" style="padding:9px 12px;">
+              <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px;" data-i18n="form_dog_breed">Raza / Mestizo</label>
+              <input class="inp" type="text" placeholder="Ej: Border Collie, Mestizo..." data-i18n-placeholder="form_dog1_breed_ph" id="reg-dog1-breed" style="padding:9px 12px;">
             </div>
           </div>
         </div>
 
         <!-- Perro 2 -->
         <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:14px;" id="dog2-block">
-          <div style="font-size:12px;font-weight:600;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+          <div style="font-size:12px;font-weight:600;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;gap:6px;" data-i18n="form_dog2_header">
             🐕 Perro 2 <span style="font-size:10px;font-weight:400;color:var(--text3)">(opcional)</span>
           </div>
           <div style="display:flex;flex-direction:column;gap:10px;">
             <div>
-              <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px;">Nombre del perro</label>
-              <input class="inp" type="text" placeholder="Ej: Max, Laika..." id="reg-dog2-name" style="padding:9px 12px;">
+              <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px;" data-i18n="form_dog_name">Nombre del perro</label>
+              <input class="inp" type="text" placeholder="Ej: Max, Laika..." data-i18n-placeholder="form_dog2_name_ph" id="reg-dog2-name" style="padding:9px 12px;">
             </div>
             <div>
-              <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px;">Raza / Mestizo</label>
-              <input class="inp" type="text" placeholder="Ej: Springer Spaniel, Mestizo..." id="reg-dog2-breed" style="padding:9px 12px;">
+              <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px;" data-i18n="form_dog_breed">Raza / Mestizo</label>
+              <input class="inp" type="text" placeholder="Ej: Springer Spaniel, Mestizo..." data-i18n-placeholder="form_dog2_breed_ph" id="reg-dog2-breed" style="padding:9px 12px;">
             </div>
           </div>
         </div>
 
         <!-- País -->
         <div>
-          <label style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">País de residencia</label>
+          <label style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;" data-i18n="form_country">País de residencia</label>
           <select class="sel" id="reg-country" style="width:100%;">
             <option value="">Selecciona tu país...</option>
             <option>España</option>
@@ -4336,26 +4336,26 @@ body{
 
         <!-- Email -->
         <div>
-          <label style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Email</label>
-          <input class="inp" type="email" placeholder="tu@email.com" id="reg-email">
+          <label style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;" data-i18n="form_email">Email</label>
+          <input class="inp" type="email" placeholder="tu@email.com" data-i18n-placeholder="form_email_ph" id="reg-email">
         </div>
 
         <!-- Teléfono -->
         <div>
-          <label style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Teléfono</label>
-          <input class="inp" type="tel" placeholder="+34 600 000 000" id="reg-phone">
+          <label style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;" data-i18n="form_phone">Teléfono</label>
+          <input class="inp" type="tel" placeholder="+34 600 000 000" data-i18n-placeholder="form_phone_ph" id="reg-phone">
         </div>
 
         <!-- Password -->
         <div>
-          <label style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Contraseña</label>
-          <input class="inp" type="password" placeholder="Mínimo 6 caracteres" id="reg-password">
+          <label style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;" data-i18n="form_password">Contraseña</label>
+          <input class="inp" type="password" placeholder="Mínimo 6 caracteres" data-i18n-placeholder="form_password_ph" id="reg-password">
         </div>
 
         <!-- Invite code (optional) -->
         <div>
-          <label style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Código de invitación <span style="color:var(--grey);font-size:10px;text-transform:none;">(opcional)</span></label>
-          <input class="inp" type="text" placeholder="Si tienes un código, introdúcelo aquí" id="reg-invite" autocomplete="off">
+          <label style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;" data-i18n="form_invite_label">Código de invitación <span style="color:var(--grey);font-size:10px;text-transform:none;">(opcional)</span></label>
+          <input class="inp" type="text" placeholder="Si tienes un código, introdúcelo aquí" data-i18n-placeholder="form_invite_ph" id="reg-invite" autocomplete="off">
         </div>
 
         <!-- Token gift banner -->
@@ -4368,24 +4368,24 @@ body{
         </div>
 
         <!-- Submit -->
-        <button class="btn-green" onclick="registerUser()" style="margin-top:4px;font-size:16px;padding:16px;">
+        <button class="btn-green" onclick="registerUser()" style="margin-top:4px;font-size:16px;padding:16px;" data-i18n="form_submit">
           Crear mi cuenta →
         </button>
         <div style="text-align:center;margin-top:10px;">
-          <span style="font-size:11px;color:var(--text3);">Al registrarte aceptas nuestra </span><a onclick="goTo('s-privacy')" style="font-size:11px;color:var(--green);cursor:pointer;text-decoration:underline;">Política de Privacidad</a>
+          <span style="font-size:11px;color:var(--text3);" data-i18n="form_terms_pre">Al registrarte aceptas nuestra </span><a onclick="goTo('s-privacy')" style="font-size:11px;color:var(--green);cursor:pointer;text-decoration:underline;" data-i18n="form_terms_link">Política de Privacidad</a>
         </div>
 
         <!-- Already have account -->
         <div style="text-align:center;padding-bottom:24px;">
-          <span style="font-size:13px;color:var(--text3);">¿Ya tienes cuenta? </span>
-          <span style="font-size:13px;color:var(--green2);cursor:pointer;font-weight:500;" onclick="showLoginForm()">Iniciar sesión</span>
+          <span style="font-size:13px;color:var(--text3);" data-i18n="form_already_account">¿Ya tienes cuenta? </span>
+          <span style="font-size:13px;color:var(--green2);cursor:pointer;font-weight:500;" onclick="showLoginForm()" data-i18n="form_sign_in">Iniciar sesión</span>
         </div>
 
         <!-- Login form (oculto por defecto) -->
         <div id="login-form" style="display:none;flex-direction:column;gap:14px;border-top:1px solid var(--border);padding-top:20px;margin-top:4px;">
           <div style="font-size:16px;font-weight:700;color:var(--text);" data-i18n="login_sign_in_title">Iniciar sesión</div>
-          <input class="inp" type="email" placeholder="tu@email.com" id="login-email">
-          <input class="inp" type="password" placeholder="Contraseña" id="login-password">
+          <input class="inp" type="email" placeholder="tu@email.com" data-i18n-placeholder="form_email_ph" id="login-email">
+          <input class="inp" type="password" placeholder="Contraseña" data-i18n-placeholder="form_password_login_ph" id="login-password">
           <button class="btn-green" onclick="loginUser()" style="font-size:16px;padding:16px;" data-i18n="login_enter_btn">Entrar →</button>
           <div style="text-align:center;">
             <span style="font-size:13px;color:var(--green2);cursor:pointer;" onclick="hideLoginForm()" data-i18n="login_back_create">← Crear cuenta nueva</span>
@@ -6568,6 +6568,34 @@ function endTourIntro() {
       loading_msg:      'Estás utilizando una herramienta de análisis de conducta animal muy potente y va a tomar algo de tiempo. Relax que esto puede tardar unos minutos, <strong>no cierres la app</strong>.',
       ask_cecilia_text: '¿Es muy técnico el lenguaje? Si necesitas ayuda, pregunta a Cecilia.',
       ask_cecilia_btn:  '💬 Chat con Cecilia',
+      // Registration form
+      form_welcome_intro:    'Bienvenido a <strong style="color:var(--text)">The Dogs Mind</strong>. Puedes elegir dos modelos de suscripción: <strong style="color:var(--green)">Particular</strong> (hasta 2 perros) o <strong style="color:var(--green)">Profesional</strong> (hasta 20 perros).<br><br>Te invitamos a que descubras gratuitamente el funcionamiento de esta app, que irá creciendo y mejorando contigo. Tienes <strong style="color:var(--text)">5 tokens de regalo</strong>. Al finalizar deberás ir recargando tus tokens.',
+      form_user_type:        'Tipo de usuario',
+      form_full_name:        'Nombre y apellidos',
+      form_full_name_ph:     'Tu nombre completo...',
+      form_dog1_header:      '🐕 Perro 1',
+      form_dog2_header:      '🐕 Perro 2 <span style="font-size:10px;font-weight:400;color:var(--text3)">(opcional)</span>',
+      form_dog_name:         'Nombre del perro',
+      form_dog_breed:        'Raza / Mestizo',
+      form_dog1_name_ph:     'Ej: Buddy, Luna...',
+      form_dog1_breed_ph:    'Ej: Border Collie, Mestizo...',
+      form_dog2_name_ph:     'Ej: Max, Laika...',
+      form_dog2_breed_ph:    'Ej: Springer Spaniel, Mestizo...',
+      form_country:          'País de residencia',
+      form_email:            'Email',
+      form_email_ph:         'tu@email.com',
+      form_phone:            'Teléfono',
+      form_phone_ph:         '+34 600 000 000',
+      form_password:         'Contraseña',
+      form_password_ph:      'Mínimo 6 caracteres',
+      form_password_login_ph:'Contraseña',
+      form_invite_label:     'Código de invitación <span style="color:var(--grey);font-size:10px;text-transform:none;">(opcional)</span>',
+      form_invite_ph:        'Si tienes un código, introdúcelo aquí',
+      form_submit:           'Crear mi cuenta →',
+      form_terms_pre:        'Al registrarte aceptas nuestra ',
+      form_terms_link:       'Política de Privacidad',
+      form_already_account:  '¿Ya tienes cuenta? ',
+      form_sign_in:          'Iniciar sesión',
       // Tokens extras
       tokens_note:           'Cada análisis completo consume <strong style="color:var(--dark);">3 tokens</strong>.<br>Los tokens no caducan.',
       tokens_pack5_desc:     'Resuelve tu problema inicial',
@@ -6873,6 +6901,34 @@ function endTourIntro() {
       loading_msg:      'You are using a very powerful behavioral analysis tool and it will take some time. Relax — this may take a few minutes, <strong>do not close the app</strong>.',
       ask_cecilia_text: 'Is the language too technical? If you need help, ask Cecilia.',
       ask_cecilia_btn:  '💬 Chat with Cecilia',
+      // Registration form
+      form_welcome_intro:    'Welcome to <strong style="color:var(--text)">The Dogs Mind</strong>. You can choose between two subscription plans: <strong style="color:var(--green)">Pet Owner</strong> (up to 2 dogs) or <strong style="color:var(--green)">Professional</strong> (up to 20 dogs).<br><br>We invite you to discover for free how this app works — it will keep growing and improving with you. You have <strong style="color:var(--text)">5 free welcome tokens</strong>. After that you can top up whenever you need.',
+      form_user_type:        'User type',
+      form_full_name:        'Full name',
+      form_full_name_ph:     'Your full name...',
+      form_dog1_header:      '🐕 Dog 1',
+      form_dog2_header:      '🐕 Dog 2 <span style="font-size:10px;font-weight:400;color:var(--text3)">(optional)</span>',
+      form_dog_name:         'Dog name',
+      form_dog_breed:        'Breed / Mixed',
+      form_dog1_name_ph:     'e.g. Buddy, Luna...',
+      form_dog1_breed_ph:    'e.g. Border Collie, Mixed...',
+      form_dog2_name_ph:     'e.g. Max, Laika...',
+      form_dog2_breed_ph:    'e.g. Springer Spaniel, Mixed...',
+      form_country:          'Country of residence',
+      form_email:            'Email',
+      form_email_ph:         'you@email.com',
+      form_phone:            'Phone',
+      form_phone_ph:         '+1 555 000 0000',
+      form_password:         'Password',
+      form_password_ph:      'At least 6 characters',
+      form_password_login_ph:'Password',
+      form_invite_label:     'Invitation code <span style="color:var(--grey);font-size:10px;text-transform:none;">(optional)</span>',
+      form_invite_ph:        'If you have a code, enter it here',
+      form_submit:           'Create my account →',
+      form_terms_pre:        'By registering you accept our ',
+      form_terms_link:       'Privacy Policy',
+      form_already_account:  'Already have an account? ',
+      form_sign_in:          'Sign in',
       // Tokens extras
       tokens_note:           'Each full analysis uses <strong style="color:var(--dark);">3 tokens</strong>.<br>Tokens never expire.',
       tokens_pack5_desc:     'Solves your initial problem',
@@ -6910,6 +6966,12 @@ function endTourIntro() {
     document.querySelectorAll('[data-i18n]').forEach(function(el) {
       var key = el.getAttribute('data-i18n');
       if (t[key] !== undefined) el.innerHTML = t[key];
+    });
+
+    // Translate placeholder attributes
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+      var key = el.getAttribute('data-i18n-placeholder');
+      if (t[key] !== undefined) el.setAttribute('placeholder', t[key]);
     });
 
     // Chat textarea placeholder

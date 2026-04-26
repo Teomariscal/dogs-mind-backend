@@ -1,7 +1,7 @@
 // Dogs Mind Service Worker — v1
 // Strategy: cache-first for static assets, network-first for API
 
-const CACHE_NAME = 'dogs-mind-v10';
+const CACHE_NAME = 'dogs-mind-v11';
 
 // Assets to pre-cache on install
 const PRECACHE_ASSETS = [

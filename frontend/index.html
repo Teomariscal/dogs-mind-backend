@@ -2397,6 +2397,110 @@ body{
   margin-bottom: 32px;
 }
 
+/* ════════════════════════════════════════════════
+   S-HOME — vibrant cinematic override (no HTML change)
+════════════════════════════════════════════════ */
+#s-home {
+  background:
+    radial-gradient(ellipse 760px 520px at 50% -8%, rgba(255,210,150,0.16), transparent 65%),
+    radial-gradient(ellipse 440px 620px at 100% 38%, rgba(74,103,65,0.10), transparent 70%),
+    linear-gradient(180deg, #1a1f17 0%, #0f150d 55%, #0a0e08 100%) !important;
+  color: rgba(255,250,240,0.95);
+}
+#s-home .home-greeting,
+#s-home .hero-title,
+#s-home .section-title,
+#s-home .card-title,
+#s-home .teo-card-title,
+#s-home .action-card .card-title {
+  color: rgba(255,250,240,0.95) !important;
+}
+#s-home .home-greeting-sub,
+#s-home .card-sub,
+#s-home .teo-sub,
+#s-home .insight-text {
+  color: rgba(255,250,240,0.66) !important;
+}
+#s-home .section-title {
+  color: var(--amber) !important;
+  letter-spacing: 0.08em;
+}
+#s-home .action-card,
+#s-home .avatar-card,
+#s-home .teo-card {
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='5'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.05 0'/></filter><rect width='180' height='180' filter='url(%23n)' opacity='0.6'/></svg>"),
+    linear-gradient(160deg, rgba(255,250,240,0.05) 0%, rgba(255,250,240,0.025) 100%) !important;
+  border: 1px solid rgba(255,250,240,0.08) !important;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.35) !important;
+  backdrop-filter: blur(6px);
+}
+#s-home .action-card:hover,
+#s-home .avatar-card:hover,
+#s-home .teo-card:hover {
+  border-color: rgba(200,169,110,0.30) !important;
+}
+#s-home .hero-banner,
+#s-home .hero-card {
+  border-radius: 18px;
+  overflow: hidden;
+}
+#s-home .hero-overlay {
+  background: linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,0.6) 75%, rgba(0,0,0,0.85) 100%) !important;
+}
+#s-home .btn-hero {
+  background: linear-gradient(180deg, #5e8154 0%, #4a6741 60%, #3d5636 100%) !important;
+  color: #fffaf0 !important;
+  border: none !important;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.20) inset,
+    0 -2px 0 rgba(0,0,0,0.28) inset,
+    0 6px 16px rgba(74,103,65,0.40) !important;
+}
+#s-home .insight-row {
+  background:
+    linear-gradient(160deg, rgba(255,250,240,0.05), rgba(255,250,240,0.02)) !important;
+  border: 1px solid rgba(200,169,110,0.18) !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.30) !important;
+}
+#s-home .insight-icon {
+  background: rgba(200,169,110,0.14) !important;
+  color: var(--amber) !important;
+}
+#s-home .token-ring {
+  border-color: var(--amber) !important;
+  color: var(--amber) !important;
+}
+#s-home .teo-btn.primary {
+  background: linear-gradient(180deg, #5e8154 0%, #4a6741 60%, #3d5636 100%) !important;
+  color: #fffaf0 !important;
+}
+#s-home .teo-btn.secondary {
+  background: rgba(255,250,240,0.06) !important;
+  color: rgba(255,250,240,0.85) !important;
+  border: 1px solid rgba(200,169,110,0.32) !important;
+}
+#s-home .btn-new-consult {
+  background: linear-gradient(180deg, #5e8154 0%, #4a6741 60%, #3d5636 100%) !important;
+  color: #fffaf0 !important;
+  border: none !important;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.20) inset,
+    0 -2px 0 rgba(0,0,0,0.28) inset,
+    0 8px 22px rgba(74,103,65,0.42) !important;
+}
+#s-home .home-topbar {
+  background: rgba(10,14,8,0.55);
+  border-bottom: 1px solid rgba(255,250,240,0.06);
+}
+#s-home .dog-avatar-ring,
+#s-home .dog-avatar-wrap img {
+  border-color: var(--amber) !important;
+}
+#s-home .lang-switcher button {
+  filter: grayscale(0.2);
+}
+
 .splash-cta-wrap .btn-primary {
   display: flex;
   align-items: center;

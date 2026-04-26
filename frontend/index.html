@@ -2403,30 +2403,31 @@ body{
 .pomerania-paracaidas {
   position: absolute;
   top: 0;
-  right: 12%;
-  width: 90px;
+  right: 14%;
+  width: 70px;
   height: auto;
   z-index: 80;
   pointer-events: none;
   opacity: 0;
   transform: translateY(-30vh);
   animation:
-    pomerania-fall 12.5s linear infinite,
-    pomerania-swing 1.6s ease-in-out infinite;
+    pomerania-fall 14s linear infinite,
+    pomerania-swing 2s ease-in-out infinite;
   filter: drop-shadow(0 6px 14px rgba(0,0,0,0.30));
   will-change: transform, opacity;
 }
 @keyframes pomerania-fall {
-  0%   { top: -150px; opacity: 0; }
+  0%   { top: -130px; opacity: 0; }
   3%   { opacity: 1; }
-  20%  { top: 100%;   opacity: 1; }
-  22%  { top: 100%;   opacity: 0; }
-  100% { top: 100%;   opacity: 0; }
+  /* 4s caída visible (≈ 4/14 = 28.5%) */
+  28.5% { top: 100%; opacity: 1; }
+  30%  { top: 100%; opacity: 0; }
+  100% { top: 100%; opacity: 0; }
 }
 @keyframes pomerania-swing {
-  0%   { transform: translateX(-12px) rotate(-6deg); }
-  50%  { transform: translateX( 12px) rotate( 6deg); }
-  100% { transform: translateX(-12px) rotate(-6deg); }
+  0%   { transform: translateX(-14px) rotate(-7deg); }
+  50%  { transform: translateX( 14px) rotate( 7deg); }
+  100% { transform: translateX(-14px) rotate(-7deg); }
 }
 @media (prefers-reduced-motion: reduce) {
   .pomerania-paracaidas { display: none; }

@@ -4068,11 +4068,11 @@ body{
     <header class="aig-header">
       <button class="aig-back" onclick="goTo('s-home')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="15 18 9 12 15 6"/></svg>
-        Volver
+        <span data-i18n="aig_back">Volver</span>
       </button>
-      <p class="aig-eyebrow">Dogs Mind · AI Specialists</p>
-      <h1 class="aig-title">Los <span class="aig-peek-anchor">Aigents<span class="aig-peek" aria-hidden="true"></span></span></h1>
-      <p class="aig-lede">Te acompañarán y ayudarán a solucionar muchas dudas del día a día con tu perro.</p>
+      <p class="aig-eyebrow" data-i18n="aig_eyebrow">Dogs Mind · AI Specialists</p>
+      <h1 class="aig-title" data-i18n="aig_title">Los <span class="aig-peek-anchor">Aigents<span class="aig-peek" aria-hidden="true"></span></span></h1>
+      <p class="aig-lede" data-i18n="aig_lede">Te acompañarán y ayudarán a solucionar muchas dudas del día a día con tu perro.</p>
     </header>
 
     <!-- Hero: foto del grupo fundida con el fondo (mask radial, sin rectángulo) -->
@@ -4087,24 +4087,24 @@ body{
 
     <!-- Cuerpo: texto íntegro, plano, sin cajas -->
     <section class="aig-body">
-      <p class="aig-intro-line">Cada uno tiene una personalidad muy concreta y una especialidad. <em>No los uses para problemas de conducta;</em> pero sí para muchas otras cosas.</p>
+      <p class="aig-intro-line" data-i18n="aig_intro">Cada uno tiene una personalidad muy concreta y una especialidad. <em>No los uses para problemas de conducta;</em> pero sí para muchas otras cosas.</p>
 
       <ul class="aig-list-plain">
-        <li><img class="aig-bullet-avatar" src="aig-cecilia-pixar.webp" alt=""><div><strong>Cecilia</strong> es la perfecta profesora para aprender o entender conceptos de psicología del aprendizaje y también sabe de muchos animales diferentes.</div></li>
-        <li><img class="aig-bullet-avatar" src="aig-niaz-pixar.webp" alt=""><div><strong>Niaz</strong> <em>Money is not a problem.</em> Es tu mejor asesora en experiencias de lujo para perros. Llega tarde siempre y su TDAH le juega alguna mala pasada, pero si consigues que se centre sacas platino de sus conversaciones.</div></li>
-        <li><img class="aig-bullet-avatar" src="aig-mario-pixar.webp" alt=""><div><strong>Mario</strong> te va a decir dónde conseguir los mejores chollos o cómo salir de fiesta con tu perro e incluso cómo ligar con perro.</div></li>
-        <li><img class="aig-bullet-avatar" src="aig-ale-pixar.webp" alt=""><div><strong>Ale</strong> te va a llevar a muchos viajes, alojamientos donde admiten perros, rutas por el campo y también cómo entrenar muchos trucos.</div></li>
-        <li><img class="aig-bullet-avatar" src="aig-borja-pixar.webp" alt=""><div><strong>Borja</strong> es el pijo Cayetano español por excelencia.</div></li>
-        <li><img class="aig-bullet-avatar" src="aig-leo-pixar.webp" alt=""><div><strong>Leo</strong> es un ex ejecutivo reciclado en Boho y espiritualidad.</div></li>
+        <li><img class="aig-bullet-avatar" src="aig-cecilia-pixar.webp" alt=""><div data-i18n="aig_bullet_cecilia"><strong>Cecilia</strong> es la perfecta profesora para aprender o entender conceptos de psicología del aprendizaje y también sabe de muchos animales diferentes.</div></li>
+        <li><img class="aig-bullet-avatar" src="aig-niaz-pixar.webp" alt=""><div data-i18n="aig_bullet_niaz"><strong>Niaz</strong> <em>Money is not a problem.</em> Es tu mejor asesora en experiencias de lujo para perros. Llega tarde siempre y su TDAH le juega alguna mala pasada, pero si consigues que se centre sacas platino de sus conversaciones.</div></li>
+        <li><img class="aig-bullet-avatar" src="aig-mario-pixar.webp" alt=""><div data-i18n="aig_bullet_mario"><strong>Mario</strong> te va a decir dónde conseguir los mejores chollos o cómo salir de fiesta con tu perro e incluso cómo ligar con perro.</div></li>
+        <li><img class="aig-bullet-avatar" src="aig-ale-pixar.webp" alt=""><div data-i18n="aig_bullet_ale"><strong>Ale</strong> te va a llevar a muchos viajes, alojamientos donde admiten perros, rutas por el campo y también cómo entrenar muchos trucos.</div></li>
+        <li><img class="aig-bullet-avatar" src="aig-borja-pixar.webp" alt=""><div data-i18n="aig_bullet_borja"><strong>Borja</strong> es el pijo Cayetano español por excelencia.</div></li>
+        <li><img class="aig-bullet-avatar" src="aig-leo-pixar.webp" alt=""><div data-i18n="aig_bullet_leo"><strong>Leo</strong> es un ex ejecutivo reciclado en Boho y espiritualidad.</div></li>
       </ul>
 
-      <p class="aig-closing">Entra en cada uno y descubre todo lo que te pueden aportar tus nuevos <em>Ai-Amigos</em>.</p>
+      <p class="aig-closing" data-i18n="aig_closing">Entra en cada uno y descubre todo lo que te pueden aportar tus nuevos <em>Ai-Amigos</em>.</p>
     </section>
 
     <!-- Sticky CTA -->
     <div class="aig-cta-wrap">
       <button class="aig-cta" onclick="goTo('s-avatars')">
-        Elige tu avatar
+        <span data-i18n="aig_cta">Elige tu avatar</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </button>
     </div>
@@ -6208,6 +6208,20 @@ function endTourIntro() {
 (function() {
   var TRANSLATIONS = {
     es: {
+      // Aigents intro
+      aig_back:               'Volver',
+      aig_eyebrow:            'Dogs Mind · AI Specialists',
+      aig_title:              'Los <span class="aig-peek-anchor">Aigents<span class="aig-peek" aria-hidden="true"></span></span>',
+      aig_lede:               'Te acompañarán y ayudarán a solucionar muchas dudas del día a día con tu perro.',
+      aig_intro:              'Cada uno tiene una personalidad muy concreta y una especialidad. <em>No los uses para problemas de conducta;</em> pero sí para muchas otras cosas.',
+      aig_bullet_cecilia:     '<strong>Cecilia</strong> es la perfecta profesora para aprender o entender conceptos de psicología del aprendizaje y también sabe de muchos animales diferentes.',
+      aig_bullet_niaz:        '<strong>Niaz</strong> <em>Money is not a problem.</em> Es tu mejor asesora en experiencias de lujo para perros. Llega tarde siempre y su TDAH le juega alguna mala pasada, pero si consigues que se centre sacas platino de sus conversaciones.',
+      aig_bullet_mario:       '<strong>Mario</strong> te va a decir dónde conseguir los mejores chollos o cómo salir de fiesta con tu perro e incluso cómo ligar con perro.',
+      aig_bullet_ale:         '<strong>Ale</strong> te va a llevar a muchos viajes, alojamientos donde admiten perros, rutas por el campo y también cómo entrenar muchos trucos.',
+      aig_bullet_borja:       '<strong>Borja</strong> es el pijo Cayetano español por excelencia.',
+      aig_bullet_leo:         '<strong>Leo</strong> es un ex ejecutivo reciclado en Boho y espiritualidad.',
+      aig_closing:            'Entra en cada uno y descubre todo lo que te pueden aportar tus nuevos <em>Ai-Amigos</em>.',
+      aig_cta:                'Elige tu avatar',
       // Splash
       splash_title:           'Canine Behavior<br>Consultancy',
       splash_sub:             'Análisis funcional experto para entender<br>y mejorar el comportamiento de tu perro',
@@ -6305,6 +6319,20 @@ function endTourIntro() {
       refine_sub:   'by Teo Mariscal · Refinamiento del plan',
     },
     en: {
+      // Aigents intro
+      aig_back:               'Back',
+      aig_eyebrow:            'Dogs Mind · AI Specialists',
+      aig_title:              'The <span class="aig-peek-anchor">Aigents<span class="aig-peek" aria-hidden="true"></span></span>',
+      aig_lede:               'They will accompany you and help you resolve many everyday questions about your dog.',
+      aig_intro:              'Each one has a very specific personality and specialty. <em>Do not use them for behavioral problems;</em> but for many other things.',
+      aig_bullet_cecilia:     '<strong>Cecilia</strong> is the perfect teacher to learn or understand learning psychology concepts and also knows about many different animals.',
+      aig_bullet_niaz:        '<strong>Niaz</strong> <em>Money is not a problem.</em> She is your best advisor for luxury dog experiences. She is always late and her ADHD plays tricks on her, but if you get her to focus you get platinum out of her conversations.',
+      aig_bullet_mario:       '<strong>Mario</strong> will tell you where to get the best deals or how to go partying with your dog and even how to flirt with one.',
+      aig_bullet_ale:         '<strong>Ale</strong> will take you on many trips, dog-friendly accommodations, country routes, and also how to train many tricks.',
+      aig_bullet_borja:       '<strong>Borja</strong> is the quintessential Spanish posh "Cayetano".',
+      aig_bullet_leo:         '<strong>Leo</strong> is a former executive turned Boho and spirituality.',
+      aig_closing:            'Enter each one and discover everything your new <em>Ai-Friends</em> can bring you.',
+      aig_cta:                'Choose your avatar',
       // Splash
       splash_title:           'Canine Behavior<br>Consultancy',
       splash_sub:             "Expert functional analysis to understand<br>and improve your dog's behavior",

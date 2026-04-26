@@ -2418,13 +2418,30 @@ body{
   color: rgba(255,250,240,0.92) !important;
 }
 #s-tokens [style*="background:#fff"],
-#s-tokens [style*="background: #fff"] {
+#s-tokens [style*="background: #fff"],
+#s-tokens [style*="background: rgb(255, 255, 255)"],
+#s-tokens [onclick^="recargar(5)"],
+#s-tokens [onclick^="recargar(60)"] {
   background:
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='5'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.05 0'/></filter><rect width='180' height='180' filter='url(%23n)' opacity='0.6'/></svg>"),
     linear-gradient(160deg, rgba(255,250,240,0.06) 0%, rgba(255,250,240,0.025) 100%) !important;
   border-color: rgba(255,250,240,0.10) !important;
   color: rgba(255,250,240,0.92) !important;
   backdrop-filter: blur(6px);
+}
+/* Hover de las pricing cards — borde amber en vez de green */
+#s-tokens [onclick^="recargar(5)"]:hover,
+#s-tokens [onclick^="recargar(60)"]:hover {
+  border-color: rgba(200,169,110,0.55) !important;
+}
+/* Asegura que los hijos texto sean claros */
+#s-tokens [onclick^="recargar"] [style*="color:var(--dark)"],
+#s-tokens [onclick^="recargar"] [style*="color: var(--dark)"] {
+  color: rgba(255,250,240,0.95) !important;
+}
+#s-tokens [onclick^="recargar"] [style*="color:var(--grey)"],
+#s-tokens [onclick^="recargar"] [style*="color: var(--grey)"] {
+  color: rgba(255,250,240,0.66) !important;
 }
 #s-tokens [style*="rgba(0,0,0,0.08)"],
 #s-tokens [style*="rgba(0,0,0,0.06)"] {

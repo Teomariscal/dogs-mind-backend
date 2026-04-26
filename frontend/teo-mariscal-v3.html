@@ -2398,6 +2398,90 @@ body{
 }
 
 /* ════════════════════════════════════════════════
+   S-CHAT — vibrant cinematic override
+════════════════════════════════════════════════ */
+#s-chat {
+  background:
+    radial-gradient(ellipse 760px 520px at 50% -8%, rgba(255,210,150,0.16), transparent 65%),
+    radial-gradient(ellipse 440px 620px at 100% 38%, rgba(74,103,65,0.10), transparent 70%),
+    linear-gradient(180deg, #324028 0%, #283322 55%, #1f2a1c 100%) !important;
+  color: rgba(255,250,240,0.95);
+}
+#s-chat .chat-hdr {
+  background: rgba(10,14,8,0.55) !important;
+  border-bottom: 1px solid rgba(255,250,240,0.08) !important;
+  backdrop-filter: blur(10px);
+}
+#s-chat .chat-hdr-name { color: rgba(255,250,240,0.96) !important; }
+#s-chat .chat-hdr-status { color: var(--amber) !important; }
+#s-chat .online-dot { background: var(--amber) !important; }
+#s-chat .tok-badge {
+  background: rgba(200,169,110,0.14) !important;
+  border: 1px solid rgba(200,169,110,0.32) !important;
+  color: var(--amber) !important;
+}
+#s-chat .back-round {
+  background: rgba(255,250,240,0.10) !important;
+  border-color: rgba(255,250,240,0.18) !important;
+  color: rgba(255,250,240,0.92) !important;
+}
+#s-chat .niaz-pic,
+#s-chat .chat-hdr img {
+  border-color: rgba(200,169,110,0.55) !important;
+}
+#s-chat .msgs {
+  background: transparent !important;
+}
+#s-chat .msg.niaz .bbl,
+#s-chat .msg:not(.me) .bbl {
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='6'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.05 0'/></filter><rect width='180' height='180' filter='url(%23n)' opacity='0.6'/></svg>"),
+    linear-gradient(160deg, rgba(255,250,240,0.06) 0%, rgba(255,250,240,0.025) 100%) !important;
+  border: 1px solid rgba(255,250,240,0.10) !important;
+  color: rgba(255,250,240,0.88) !important;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+}
+#s-chat .msg.me .bbl {
+  background: linear-gradient(180deg, #5e8154 0%, #4a6741 60%, #3d5636 100%) !important;
+  color: #fffaf0 !important;
+  border: none !important;
+  box-shadow: 0 6px 16px rgba(74,103,65,0.40);
+}
+#s-chat .msg-t { color: rgba(255,250,240,0.45) !important; }
+#s-chat .chat-bar {
+  background: linear-gradient(180deg, rgba(10,14,8,0) 0%, rgba(10,14,8,0.85) 35%, rgba(10,14,8,0.97) 100%) !important;
+  border-top: none !important;
+}
+#s-chat .chat-bar {
+  padding: 12px 16px max(20px, env(safe-area-inset-bottom, 20px)) !important;
+  gap: 10px;
+}
+#s-chat .chat-ta {
+  background: rgba(255,250,240,0.06) !important;
+  border: 1px solid rgba(255,250,240,0.12) !important;
+  color: rgba(255,250,240,0.92) !important;
+  border-radius: 22px !important;
+  min-height: 48px;
+  padding: 12px 18px !important;
+  font-size: 14px !important;
+  line-height: 1.45;
+}
+#s-chat .chat-ta::placeholder { color: rgba(255,250,240,0.40) !important; }
+#s-chat .chat-ta:focus {
+  border-color: rgba(200,169,110,0.55) !important;
+  background: rgba(255,250,240,0.09) !important;
+}
+#s-chat .send {
+  background: linear-gradient(180deg, #5e8154 0%, #4a6741 60%, #3d5636 100%) !important;
+  color: #fffaf0 !important;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.20) inset,
+    0 -2px 0 rgba(0,0,0,0.28) inset,
+    0 6px 16px rgba(74,103,65,0.45) !important;
+}
+
+/* ════════════════════════════════════════════════
    S-AVATARS — vibrant cinematic override
 ════════════════════════════════════════════════ */
 .av-screen {

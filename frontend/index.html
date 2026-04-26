@@ -2398,6 +2398,64 @@ body{
 }
 
 /* ════════════════════════════════════════════════
+   S-AVATARS — vibrant cinematic override
+════════════════════════════════════════════════ */
+.av-screen {
+  background:
+    radial-gradient(ellipse 760px 520px at 50% -8%, rgba(255,210,150,0.18), transparent 65%),
+    radial-gradient(ellipse 440px 620px at 100% 38%, rgba(74,103,65,0.12), transparent 70%),
+    linear-gradient(180deg, #324028 0%, #283322 55%, #1f2a1c 100%) !important;
+  color: rgba(255,250,240,0.95);
+}
+#s-avatars [data-i18n="avatars_title"],
+.av-screen [style*="ff-serif"][style*="22px"] {
+  color: rgba(255,250,240,0.96) !important;
+}
+#s-avatars [data-i18n="avatars_sub"],
+.av-screen [style*="text3"] {
+  color: rgba(255,250,240,0.66) !important;
+}
+.av-screen .back-round {
+  background: rgba(255,250,240,0.10) !important;
+  border-color: rgba(255,250,240,0.18) !important;
+  color: rgba(255,250,240,0.92) !important;
+}
+.av-card {
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='5'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.05 0'/></filter><rect width='180' height='180' filter='url(%23n)' opacity='0.6'/></svg>"),
+    linear-gradient(160deg, rgba(255,250,240,0.05) 0%, rgba(255,250,240,0.025) 100%) !important;
+  border: 1px solid rgba(255,250,240,0.08) !important;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.35) !important;
+  backdrop-filter: blur(6px);
+}
+.av-card:hover { border-color: rgba(200,169,110,0.32) !important; }
+.av-card.selected {
+  border-color: rgba(200,169,110,0.55) !important;
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='5'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.06 0'/></filter><rect width='180' height='180' filter='url(%23n)' opacity='0.6'/></svg>"),
+    linear-gradient(160deg, rgba(200,169,110,0.16) 0%, rgba(200,169,110,0.06) 100%) !important;
+  box-shadow:
+    0 1px 0 rgba(255,250,240,0.10) inset,
+    0 0 0 1px rgba(200,169,110,0.25),
+    0 14px 32px rgba(0,0,0,0.50) !important;
+}
+.av-photo {
+  border: 2px solid rgba(200,169,110,0.55) !important;
+}
+.av-card.selected .av-photo {
+  border-color: rgba(200,169,110,0.85) !important;
+  box-shadow: 0 0 0 2px rgba(200,169,110,0.32), 0 6px 16px rgba(0,0,0,0.50) !important;
+}
+.av-name { color: rgba(255,250,240,0.95) !important; }
+.av-role { color: var(--amber) !important; }
+.av-desc { color: rgba(255,250,240,0.66) !important; }
+.av-check {
+  background: linear-gradient(180deg, #c8a96e 0%, #a98b54 100%) !important;
+  color: #1a1f17 !important;
+  box-shadow: 0 4px 10px rgba(200,169,110,0.35), 0 0 0 1px rgba(200,169,110,0.30) inset !important;
+}
+
+/* ════════════════════════════════════════════════
    S-HOME — vibrant cinematic override (no HTML change)
 ════════════════════════════════════════════════ */
 /* Compactar para que TODO quepa sin scroll */

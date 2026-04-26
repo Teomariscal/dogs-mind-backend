@@ -4355,6 +4355,12 @@ body{
         <input id="inp-video" type="file" accept="video/mp4,video/quicktime,video/x-msvideo,video/x-matroska,video/webm,.mp4,.mov,.avi,.mkv,.webm" style="display:none;" onchange="handleVideoSelect(this)" />
       </div>
 
+      <!-- Cambio o evento importante antes del problema -->
+      <div style="margin-bottom:12px;">
+        <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;">Antes de que comenzase el problema, ¿recuerdas algún cambio o evento importante que resaltar?</div>
+        <textarea id="inp-evento-previo" placeholder="Contesta brevemente (mudanza, llegada de un bebé, fallecimiento, viaje, cambio de horario, etc.)" rows="3" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;resize:vertical;"></textarea>
+      </div>
+
       <!-- submit -->
       <button id="btn-analyze" onclick="analyzeWithAI()" style="background:var(--green2);color:#fff;border:none;border-radius:100px;padding:14px 24px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;margin-top:8px;" data-i18n="analyze_btn">Analizar con IA →</button>
 
@@ -5514,6 +5520,7 @@ async function analyzeWithAI() {
   var problemDesc = getVal('inp-problem', 'No especificado');
   var sinceCuando = getVal('inp-since',   'No especificado');
   var history     = getVal('inp-history', '') || null;
+  var eventoPrevio = getVal('inp-evento-previo', '') || null;
 
   // Toggles
   var chronicDisease  = isActive('dolencia-si');
@@ -5594,6 +5601,7 @@ async function analyzeWithAI() {
         aggression_distance_cm: aggrDist,
         previous_attempts:      history,
         owner_theory:           ownerTheory,
+        prior_event:            eventoPrevio,
         lang:                   (window.getCurrentLang ? window.getCurrentLang() : 'es')
     };
     window._lastAnamnesisData = anamnesisPayload;

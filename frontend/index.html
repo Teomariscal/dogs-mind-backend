@@ -2398,6 +2398,47 @@ body{
 }
 
 /* ════════════════════════════════════════════════
+   S-TOKENS — vibrant cinematic override
+════════════════════════════════════════════════ */
+#s-tokens {
+  --cream: transparent;
+  --dark: rgba(255,250,240,0.95);
+  --grey: rgba(255,250,240,0.55);
+  --text: rgba(255,250,240,0.95);
+  --text2: rgba(255,250,240,0.78);
+  background:
+    radial-gradient(ellipse 760px 520px at 50% -8%, rgba(255,210,150,0.16), transparent 65%),
+    radial-gradient(ellipse 440px 620px at 100% 38%, rgba(74,103,65,0.10), transparent 70%),
+    linear-gradient(180deg, #324028 0%, #283322 55%, #1f2a1c 100%) !important;
+  color: rgba(255,250,240,0.95) !important;
+}
+#s-tokens button[onclick="goTo('s-home')"] {
+  background: rgba(255,250,240,0.08) !important;
+  border-color: rgba(255,250,240,0.18) !important;
+  color: rgba(255,250,240,0.92) !important;
+}
+#s-tokens [style*="background:#fff"],
+#s-tokens [style*="background: #fff"] {
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='5'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.05 0'/></filter><rect width='180' height='180' filter='url(%23n)' opacity='0.6'/></svg>"),
+    linear-gradient(160deg, rgba(255,250,240,0.06) 0%, rgba(255,250,240,0.025) 100%) !important;
+  border-color: rgba(255,250,240,0.10) !important;
+  color: rgba(255,250,240,0.92) !important;
+  backdrop-filter: blur(6px);
+}
+#s-tokens [style*="rgba(0,0,0,0.08)"],
+#s-tokens [style*="rgba(0,0,0,0.06)"] {
+  border-color: rgba(255,250,240,0.10) !important;
+}
+#s-tokens [style*="background:#f5f5ef"] {
+  background: rgba(200,169,110,0.14) !important;
+}
+/* donut */
+#s-tokens svg circle:first-of-type { stroke: rgba(255,250,240,0.10) !important; }
+#tokens-arc { stroke: var(--amber) !important; }
+#tokens-big { color: var(--amber) !important; }
+
+/* ════════════════════════════════════════════════
    POMERANIA PARACAIDISTA (gag animado en s-anamnesis)
 ════════════════════════════════════════════════ */
 .pomerania-paracaidas {
@@ -3585,28 +3626,26 @@ body{
           <div style="width:40px;height:40px;background:#f5f5ef;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;">🟡</div>
           <div>
             <div style="font-size:15px;font-weight:700;color:var(--dark);">5 tokens</div>
-            <div style="font-size:12px;color:var(--grey);" data-i18n="tokens_pack5_desc">1 consulta completa + extras</div>
+            <div style="font-size:12px;color:var(--grey);" data-i18n="tokens_pack5_desc">Resuelve tu problema inicial</div>
           </div>
         </div>
         <div style="text-align:right;">
-          <div style="font-size:17px;font-weight:800;color:var(--dark);">€4,99</div>
-          <div style="font-size:11px;color:var(--grey);">€1,00 / token</div>
+          <div style="font-size:17px;font-weight:800;color:var(--dark);">4,99 €</div>
         </div>
       </div>
 
       <!-- pack 20 — destacado -->
       <div onclick="recargar(20)" style="display:flex;align-items:center;justify-content:space-between;background:var(--green);border:1.5px solid var(--green);border-radius:14px;padding:16px;margin-bottom:10px;cursor:pointer;position:relative;overflow:hidden;">
-        <div style="position:absolute;top:8px;right:12px;background:#fff;color:var(--green);font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;letter-spacing:.05em;" data-i18n="tokens_popular">MÁS POPULAR</div>
+        <div style="position:absolute;top:8px;right:12px;background:#fff;color:var(--green);font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;letter-spacing:.05em;" data-i18n="tokens_popular">ELECCIÓN PREFERIDA</div>
         <div style="display:flex;align-items:center;gap:12px;">
           <div style="width:40px;height:40px;background:rgba(255,255,255,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;">🟢</div>
           <div>
             <div style="font-size:15px;font-weight:700;color:#fff;">20 tokens</div>
-            <div style="font-size:12px;color:rgba(255,255,255,0.75);" data-i18n="tokens_pack20_desc">Para profesionales</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.85);" data-i18n="tokens_pack20_desc">El acompañamiento natural de un proceso de cambio</div>
           </div>
         </div>
         <div style="text-align:right;">
-          <div style="font-size:17px;font-weight:800;color:#fff;">€19,99</div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.75);">€1,00 / token</div>
+          <div style="font-size:17px;font-weight:800;color:#fff;">16 €</div>
         </div>
       </div>
 
@@ -3616,12 +3655,11 @@ body{
           <div style="width:40px;height:40px;background:#f5f5ef;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;">🔵</div>
           <div>
             <div style="font-size:15px;font-weight:700;color:var(--dark);">60 tokens</div>
-            <div style="font-size:12px;color:var(--grey);" data-i18n="tokens_pack60_desc">Clínicas y equipos</div>
+            <div style="font-size:12px;color:var(--grey);" data-i18n="tokens_pack60_desc">Para educadores, etólogos y veterinarios en activo</div>
           </div>
         </div>
         <div style="text-align:right;">
-          <div style="font-size:17px;font-weight:800;color:var(--dark);">€59,99</div>
-          <div style="font-size:11px;color:var(--grey);">€1,00 / token</div>
+          <div style="font-size:17px;font-weight:800;color:var(--dark);">42 €</div>
         </div>
       </div>
 

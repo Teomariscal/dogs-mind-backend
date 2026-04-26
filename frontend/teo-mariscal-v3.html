@@ -4033,7 +4033,7 @@ body{
       </div>
       <div class="chat-hdr-info">
         <div class="chat-hdr-name" id="chat-hdr-name">Niaz</div>
-        <div class="chat-hdr-status" id="chat-hdr-status"><div class="online-dot"></div>Educadora personal · Online</div>
+        <div class="chat-hdr-status" id="chat-hdr-status"><div class="online-dot"></div><span data-i18n="chat_status_default">Educadora personal · Online</span></div>
       </div>
       <div class="tok-badge" id="tok-chat">5 tok.</div>
       <div class="back-round" onclick="goTo('s-home')">←</div>
@@ -4043,8 +4043,8 @@ body{
       <div class="msg niaz">
         <div class="msg-av" style="background:none;padding:0;overflow:hidden"><img loading="lazy" id="intro-av-img" src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-17.webp" style="width:100%;height:100%;object-fit:cover;object-position:top;border-radius:50%"></div>
         <div>
-          <div class="bbl">¡Hola! Soy Niaz. He leído el análisis de tu perro y ya tengo MIL ideas. Mi cerebro va a mil por hora — prepárate, porque no voy a darte respuestas aburridas. ¿Por dónde quieres empezar?</div>
-          <div class="msg-t">Ahora</div>
+          <div class="bbl" data-i18n="chat_intro_default">¡Hola! Soy Niaz. He leído el análisis de tu perro y ya tengo MIL ideas. Mi cerebro va a mil por hora — prepárate, porque no voy a darte respuestas aburridas. ¿Por dónde quieres empezar?</div>
+          <div class="msg-t" data-i18n="chat_now">Ahora</div>
         </div>
       </div>
     </div>
@@ -5014,16 +5014,21 @@ function confirmAvatar() {
   const hdrStatus = document.getElementById('chat-hdr-status');
   if (hdrImg) hdrImg.src = av.img;
   if (hdrName) hdrName.textContent = av.name;
-  if (hdrStatus) hdrStatus.innerHTML = '<div class="online-dot"></div>' + av.role;
+  // i18n: traducir role e intro según idioma actual
+  var _lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+  var _t = (window.TRANSLATIONS && window.TRANSLATIONS[_lang]) || {};
+  var _role = _t['chat_role_' + key] || av.role;
+  var _intro = _t['chat_intro_' + key] || av.intro;
+  if (hdrStatus) hdrStatus.innerHTML = '<div class="online-dot"></div>' + _role;
   // Reset chat messages with new avatar intro
   const msgs = document.getElementById('msgs');
   if (msgs) {
     msgs.innerHTML = '';
-    addMsgWithImg('av', av.intro, av.img);
+    addMsgWithImg('av', _intro, av.img);
   }
-  _avatarHistory = [{ role: 'assistant', content: av.intro }];
+  _avatarHistory = [{ role: 'assistant', content: _intro }];
   var ta = document.getElementById('chat-ta');
-  if (ta) ta.placeholder = 'Escríbele a ' + av.name + '…';
+  if (ta) ta.placeholder = (_lang === 'en' ? 'Write to ' : 'Escríbele a ') + av.name + '…';
   goTo('s-chat');
 }
 
@@ -6208,6 +6213,22 @@ function endTourIntro() {
 (function() {
   var TRANSLATIONS = {
     es: {
+      // Chat
+      chat_now:                'Ahora',
+      chat_status_default:     'Educadora personal · Online',
+      chat_intro_default:      '¡Hola! Soy Niaz. He leído el análisis de tu perro y ya tengo MIL ideas. Mi cerebro va a mil por hora — prepárate, porque no voy a darte respuestas aburridas. ¿Por dónde quieres empezar?',
+      chat_role_niaz:          'TDAH · Yoga · Energía infinita',
+      chat_intro_niaz:         '¡Ah! Perdona, venía de una clase... o de dos, ya no sé. Soy Niaz. ¿En qué te puedo ayudar?',
+      chat_role_leo:           'Hippie de Ibiza · Tranquilo',
+      chat_intro_leo:          'Hola... Soy Leo. Tómate tu tiempo. ¿En qué puedo ayudarte?',
+      chat_role_katja:         'Holandesa · Directa y precisa',
+      chat_intro_katja:        'Hola. Soy Katja. Cuéntame lo que necesitas, sin dejarte nada.',
+      chat_role_ale:           'Veterinaria · Hippie auténtica',
+      chat_intro_ale:          'Hola, soy Ale. Cuéntame, ¿en qué te puedo ayudar?',
+      chat_role_borja:         'Pijo madrileño · El encantador',
+      chat_intro_borja:        'Hola, soy Borja. A ver, cuéntame. ¿En qué puedo ayudarte?',
+      chat_role_mario:         'El más joven · Con swag',
+      chat_intro_mario:        'Qué tal. Soy Mario. Cuéntame, ¿en qué te puedo echar un cable?',
       // Tour intro
       ti_skip:                 'Saltar ✕',
       ti_letter_1:             'The Dogs Mind es producto de más de <em>25 años de experiencia</em> en el campo de la modificación de conducta en más de 15 países donde yo y el resto del equipo que ha construido esta magnífica herramienta han desarrollado su actividad profesional.',
@@ -6369,6 +6390,22 @@ function endTourIntro() {
       refine_sub:   'by Teo Mariscal · Refinamiento del plan',
     },
     en: {
+      // Chat
+      chat_now:                'Now',
+      chat_status_default:     'Personal trainer · Online',
+      chat_intro_default:      'Hi! I\'m Niaz. I\'ve read your dog\'s analysis and I already have THOUSANDS of ideas. My brain runs at a thousand miles an hour — get ready, because I\'m not going to give you boring answers. Where do you want to start?',
+      chat_role_niaz:          'ADHD · Yoga · Infinite energy',
+      chat_intro_niaz:         'Oh! Sorry, I just came from a class... or two, I don\'t know anymore. I\'m Niaz. How can I help?',
+      chat_role_leo:           'Ibiza Hippie · Calm',
+      chat_intro_leo:          'Hi... I\'m Leo. Take your time. How can I help you?',
+      chat_role_katja:         'Dutch · Direct and precise',
+      chat_intro_katja:        'Hello. I\'m Katja. Tell me what you need, don\'t hold back.',
+      chat_role_ale:           'Vet · Authentic hippie',
+      chat_intro_ale:          'Hi, I\'m Ale. Tell me, how can I help you?',
+      chat_role_borja:         'Madrid posh · The charmer',
+      chat_intro_borja:        'Hi, I\'m Borja. So, tell me. How can I help you?',
+      chat_role_mario:         'The youngest · With swag',
+      chat_intro_mario:        'What\'s up. I\'m Mario. Tell me, how can I lend you a hand?',
       // Tour intro
       ti_skip:                 'Skip ✕',
       ti_letter_1:             'The Dogs Mind is the product of more than <em>25 years of experience</em> in behavior modification across over 15 countries where I and the rest of the team that built this magnificent tool have practiced.',
@@ -6571,6 +6608,7 @@ function endTourIntro() {
   window.setLang = function(lang) { applyLang(lang); };
   window.toggleLang = function() { applyLang(_currentLang === 'es' ? 'en' : 'es'); };
   window.getCurrentLang = function() { return _currentLang; };
+  window.TRANSLATIONS = TRANSLATIONS;
 
   applyLang(_currentLang);
 })();

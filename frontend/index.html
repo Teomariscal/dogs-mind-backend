@@ -4370,11 +4370,11 @@ body{
 
       <!-- analisis basado en -->
       <div>
-        <div style="font-size:10px;font-weight:700;color:var(--grey);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px;">An&aacute;lisis basado en</div>
+        <div style="font-size:10px;font-weight:700;color:var(--grey);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px;" data-i18n="anam_basedon">An&aacute;lisis basado en</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;">
           <span style="font-size:11px;border:1.5px solid var(--green2);color:var(--green2);border-radius:100px;padding:4px 12px;">Applied Animal Behaviour Science</span>
           <span style="font-size:11px;border:1.5px solid var(--green2);color:var(--green2);border-radius:100px;padding:4px 12px;">Journal of Veterinary Behavior</span>
-          <span style="font-size:11px;border:1.5px solid var(--green2);color:var(--green2);border-radius:100px;padding:4px 12px;">Casos Teo Mariscal</span>
+          <span style="font-size:11px;border:1.5px solid var(--green2);color:var(--green2);border-radius:100px;padding:4px 12px;" data-i18n="anam_basedon_3">Casos Teo Mariscal</span>
           <span style="font-size:11px;border:1.5px solid var(--green2);color:var(--green2);border-radius:100px;padding:4px 12px;">Skinner &middot; Pavlov &middot; Pryor</span>
         </div>
       </div>
@@ -4382,7 +4382,7 @@ body{
       
       <!-- video consultation -->
       <div id="video-section">
-        <div style="font-size:10px;font-weight:700;color:var(--grey);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px;">&#x1F3A5; Consulta en video</div>
+        <div style="font-size:10px;font-weight:700;color:var(--grey);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px;" data-i18n="anam_video_label">&#x1F3A5; Consulta en video</div>
 
         <!-- video thumbnail placeholder -->
         <div style="position:relative;border-radius:14px;overflow:hidden;background:#1a1a1a;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;margin-bottom:10px;border:2px dashed rgba(255,255,255,0.15);" id="video-thumb-wrap">
@@ -4424,40 +4424,40 @@ body{
         <div style="display:flex;align-items:flex-start;gap:6px;background:rgba(184,149,90,0.08);border:1px solid rgba(184,149,90,0.25);border-radius:10px;padding:8px 10px;margin-bottom:10px;">
           <span style="font-size:13px;flex-shrink:0;margin-top:1px;">&#x26A1;</span>
           <div>
-            <div style="font-size:11px;font-weight:600;color:#8a6a20;margin-bottom:2px;">An&aacute;lisis de video usa m&aacute;s tokens</div>
-            <div style="font-size:10px;color:var(--grey);line-height:1.45;">El an&aacute;lisis por video requiere procesar muchos m&aacute;s datos que texto. Cada minuto de video consume aproximadamente <strong>10 tokens</strong>. Val&oacute;ra si te compensa seg&uacute;n el caso.</div>
+            <div style="font-size:11px;font-weight:600;color:#8a6a20;margin-bottom:2px;" data-i18n="anam_video_warn_t">An&aacute;lisis de video usa m&aacute;s tokens</div>
+            <div style="font-size:10px;color:var(--grey);line-height:1.45;" data-i18n="anam_video_warn_b">El an&aacute;lisis por video requiere procesar muchos m&aacute;s datos que texto. Cada minuto de video consume aproximadamente <strong>10 tokens</strong>. Val&oacute;ra si te compensa seg&uacute;n el caso.</div>
           </div>
         </div>
 
         <!-- add video button -->
         <button id="btn-add-video" onclick="checkVideoTokens()" style="width:100%;padding:11px 16px;border-radius:100px;border:1.5px solid var(--green2);background:transparent;color:var(--green2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;">
-          <span>&#x1F3A5;</span> A&ntilde;adir video a la anamnesis
+          <span>&#x1F3A5;</span> <span data-i18n="anam_video_add">A&ntilde;adir video a la anamnesis</span>
         </button>
       </div>
       <!-- fin video consultation -->
 
       <!-- el perro -->
       <div>
-        <div style="font-size:10px;font-weight:700;color:var(--green2);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;">&#x1F415; El perro</div>
+        <div style="font-size:10px;font-weight:700;color:var(--green2);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;" data-i18n="anam_sec_dog">&#x1F415; El perro</div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
           <div>
-            <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;">Nombre</div>
+            <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_name">Nombre</div>
             <input id="inp-dog-name" type="text" placeholder="Nombre del perro" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
           </div>
           <div>
-            <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;">Edad</div>
+            <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_age">Edad</div>
             <input id="inp-dog-age" type="text" placeholder="Ej: 3 a&ntilde;os" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
           </div>
         </div>
 
         <div style="margin-bottom:12px;">
-          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;">Tipolog&iacute;a racial</div>
+          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_breed">Tipolog&iacute;a racial</div>
           <input id="inp-breed" type="text" placeholder="Raza o raza a la que se parece m&aacute;s..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
         </div>
 
         <div style="margin-bottom:12px;">
-          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;">&iquest;Tiene alguna dolencia cr&oacute;nica?</div>
+          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_chronic">&iquest;Tiene alguna dolencia cr&oacute;nica?</div>
           <div style="display:flex;gap:8px;">
             <button id="dolencia-no" onclick="anam_toggle('dolencia-no','dolencia-si')" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
             <button id="dolencia-si" onclick="anam_toggle_cond('dolencia-si','dolencia-no','inp-dolencia-wrap')" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
@@ -4468,7 +4468,7 @@ body{
         </div>
 
         <div style="margin-bottom:12px;">
-          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;">&iquest;Vive dentro o fuera de casa?</div>
+          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_living">&iquest;Vive dentro o fuera de casa?</div>
           <div style="display:flex;gap:8px;">
             <button id="vive-dentro" onclick="anam_toggle3('vive-dentro','vive-fuera','vive-ambos')" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Dentro</button>
             <button id="vive-fuera" onclick="anam_toggle3('vive-fuera','vive-dentro','vive-ambos')" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Fuera</button>
@@ -4477,7 +4477,7 @@ body{
         </div>
 
         <div style="margin-bottom:12px;">
-          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;">&iquest;Entorno donde vive?</div>
+          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_environment">&iquest;Entorno donde vive?</div>
           <div style="display:flex;gap:8px;">
             <button id="entorno-campo" onclick="anam_toggle3('entorno-campo','entorno-periferia','entorno-ciudad')" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Campo</button>
             <button id="entorno-periferia" onclick="anam_toggle3('entorno-periferia','entorno-campo','entorno-ciudad')" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Periferia</button>
@@ -4486,7 +4486,7 @@ body{
         </div>
 
         <div style="margin-bottom:12px;">
-          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;">Paseos diarios</div>
+          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_walks">Paseos diarios</div>
           <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
             <div style="display:flex;gap:8px;">
               <button id="paseos-no" onclick="anam_toggle_cond('paseos-no','paseos-si','paseos-count-wrap')" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
@@ -4502,18 +4502,18 @@ body{
         </div>
 
         <div>
-          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;">&iquest;Con cu&aacute;ntos meses sali&oacute; de la camada?</div>
+          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_weaning">&iquest;Con cu&aacute;ntos meses sali&oacute; de la camada?</div>
           <input id="inp-weaning" type="text" placeholder="Ej: 2 meses, 8 semanas..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
         </div>
       </div>
 
       <!-- entorno familiar -->
       <div>
-        <div style="font-size:10px;font-weight:700;color:var(--green2);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;">&#x1F3E0; Entorno familiar</div>
+        <div style="font-size:10px;font-weight:700;color:var(--green2);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;" data-i18n="anam_sec_family">&#x1F3E0; Entorno familiar</div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px;align-items:start;">
           <div>
-            <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;">Miembros de la familia</div>
+            <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_members">Miembros de la familia</div>
             <div style="border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;background:#fff;display:flex;align-items:center;padding:8px 12px;gap:8px;">
               <span style="flex:1;font-size:13px;color:#aaa;">N&ordm; personas</span>
               <div style="display:flex;align-items:center;gap:6px;">
@@ -4524,7 +4524,7 @@ body{
             </div>
           </div>
           <div>
-            <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;">&iquest;Hay ni&ntilde;os?</div>
+            <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_kids">&iquest;Hay ni&ntilde;os?</div>
             <div style="display:flex;gap:8px;">
               <button id="ninios-no" onclick="anam_toggle('ninios-no','ninios-si')" style="padding:8px 16px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
               <button id="ninios-si" onclick="anam_toggle('ninios-si','ninios-no')" style="padding:8px 16px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
@@ -4533,7 +4533,7 @@ body{
         </div>
 
         <div>
-          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;">&iquest;Convive con otros perros?</div>
+          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_otherdogs">&iquest;Convive con otros perros?</div>
           <div style="display:flex;gap:8px;">
             <button id="convive-no" onclick="anam_toggle('convive-no','convive-si')" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
             <button id="convive-si" onclick="anam_toggle_cond('convive-si','convive-no','inp-convive-wrap')" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
@@ -4546,40 +4546,40 @@ body{
 
       <!-- conducta problema -->
       <div>
-        <div style="font-size:10px;font-weight:700;color:#E8A020;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;">&#9888;&#65039; La conducta problema</div>
+        <div style="font-size:10px;font-weight:700;color:#E8A020;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;" data-i18n="anam_sec_problem">&#9888;&#65039; La conducta problema</div>
 
         <div style="margin-bottom:12px;">
-          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;">Describe la conducta problema</div>
+          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_describe">Describe la conducta problema</div>
           <textarea id="inp-problem" placeholder="Describe con detalle el comportamiento que preocupa..." style="width:100%;min-height:90px;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;resize:none;"></textarea>
         </div>
 
         <div style="margin-bottom:12px;">
-          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;">&iquest;Desde cu&aacute;ndo ocurre?</div>
+          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_since">&iquest;Desde cu&aacute;ndo ocurre?</div>
           <input id="inp-since" type="text" placeholder="Ej: hace 6 meses, desde cachorro..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
         </div>
 
         <div style="margin-bottom:12px;">
-          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;">&iquest;D&oacute;nde ocurre?</div>
+          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_where">&iquest;D&oacute;nde ocurre?</div>
           <input id="inp-where" type="text" placeholder="Ej: en casa, en la calle, en el parque..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
         </div>
 
         <div style="margin-bottom:12px;">
-          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;">&iquest;Qui&eacute;n est&aacute; presente?</div>
+          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_who">&iquest;Qui&eacute;n est&aacute; presente?</div>
           <input id="inp-who" type="text" placeholder="Ej: toda la familia, solo yo, extraños..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
         </div>
 
         <div style="margin-bottom:12px;">
-          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;">&iquest;Con qu&eacute; frecuencia ocurre?</div>
+          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_freq">&iquest;Con qu&eacute; frecuencia ocurre?</div>
           <div style="display:flex;flex-wrap:wrap;gap:8px;" id="frecuencia-group">
-            <button onclick="anam_select(this)" style="padding:7px 14px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;">A diario</button>
-            <button onclick="anam_select(this)" style="padding:7px 14px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;">Varias veces a la semana</button>
-            <button onclick="anam_select(this)" style="padding:7px 14px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;">Ocasionalmente</button>
-            <button onclick="anam_select(this)" style="padding:7px 14px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;">Raramente</button>
+            <button onclick="anam_select(this)" style="padding:7px 14px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;" data-i18n="anam_freq_daily">A diario</button>
+            <button onclick="anam_select(this)" style="padding:7px 14px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;" data-i18n="anam_freq_weekly">Varias veces a la semana</button>
+            <button onclick="anam_select(this)" style="padding:7px 14px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;" data-i18n="anam_freq_occasion">Ocasionalmente</button>
+            <button onclick="anam_select(this)" style="padding:7px 14px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;" data-i18n="anam_freq_rare">Raramente</button>
           </div>
         </div>
 
         <div style="margin-bottom:12px;">
-          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;">&iquest;Implica agresi&oacute;n?</div>
+          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_aggr">&iquest;Implica agresi&oacute;n?</div>
           <div style="display:flex;gap:8px;">
             <button id="agresion-no" onclick="anam_toggle_cond('agresion-no','agresion-si','agresion-dist-wrap')" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
             <button id="agresion-si" onclick="anam_toggle_cond('agresion-si','agresion-no','agresion-dist-wrap')" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
@@ -4590,19 +4590,19 @@ body{
         </div>
 
         <div style="margin-bottom:12px;">
-          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;">&iquest;Qu&eacute; has intentado hasta ahora? (opcional)</div>
+          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_history">&iquest;Qu&eacute; has intentado hasta ahora? (opcional)</div>
           <textarea id="inp-history" placeholder="Ej: castigo, ignorar, acudir al veterinario..." style="width:100%;min-height:70px;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;resize:none;"></textarea>
         </div>
 
         <div>
-          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;">&iquest;Cu&aacute;l crees t&uacute; que es la causa? (opcional)</div>
+          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_theory">&iquest;Cu&aacute;l crees t&uacute; que es la causa? (opcional)</div>
           <textarea id="inp-theory" placeholder="Tu hipótesis sobre por qué ocurre este comportamiento..." style="width:100%;min-height:70px;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;resize:none;"></textarea>
         </div>
       </div>
 
       <!-- Video upload (optional) -->
       <div style="margin-top:16px;margin-bottom:4px;">
-        <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;">📹 Adjuntar vídeo del comportamiento (opcional)</div>
+        <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_attach_video">📹 Adjuntar vídeo del comportamiento (opcional)</div>
 
         <div id="video-drop-zone"
              onclick="document.getElementById('inp-video').click()"
@@ -4612,8 +4612,8 @@ body{
              style="border:2px dashed rgba(0,0,0,0.15);border-radius:14px;padding:18px 16px;text-align:center;cursor:pointer;background:#fafaf8;transition:border-color 0.2s;">
           <div id="video-drop-label" style="font-size:13px;color:var(--grey);line-height:1.5;">
             <span style="font-size:22px;display:block;margin-bottom:6px;">🎬</span>
-            Pulsa o arrastra un vídeo aquí<br>
-            <span style="font-size:11px;opacity:0.7;">MP4, MOV, AVI · Máx 200 MB</span>
+            <span data-i18n="anam_drop_text">Pulsa o arrastra un vídeo aquí</span><br>
+            <span style="font-size:11px;opacity:0.7;" data-i18n="anam_drop_formats">MP4, MOV, AVI · Máx 200 MB</span>
           </div>
           <div id="video-preview-wrap" style="display:none;">
             <video id="video-preview-el" controls style="width:100%;border-radius:10px;max-height:200px;background:#000;"></video>
@@ -4629,7 +4629,7 @@ body{
 
       <!-- Cambio o evento importante antes del problema -->
       <div style="margin-bottom:12px;">
-        <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;">Antes de que comenzase el problema, ¿recuerdas algún cambio o evento importante que resaltar?</div>
+        <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_prior_event">Antes de que comenzase el problema, ¿recuerdas algún cambio o evento importante que resaltar?</div>
         <textarea id="inp-evento-previo" placeholder="Contesta brevemente (mudanza, llegada de un bebé, fallecimiento, viaje, cambio de horario, etc.)" rows="3" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;resize:vertical;"></textarea>
       </div>
 
@@ -4644,10 +4644,10 @@ body{
       <div style="background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 32px;width:100%;box-sizing:border-box;">
         <div style="width:36px;height:4px;background:rgba(0,0,0,0.12);border-radius:2px;margin:0 auto 20px;"></div>
         <div style="font-size:20px;margin-bottom:8px;text-align:center;">&#x26A1;</div>
-        <div style="font-size:16px;font-weight:700;color:var(--dark);text-align:center;margin-bottom:6px;">Tokens insuficientes</div>
-        <div style="font-size:13px;color:var(--grey);text-align:center;margin-bottom:20px;line-height:1.5;">Necesitas al menos <strong>10 tokens</strong> para adjuntar un video. Actualmente tienes <strong id="modal-token-count">0</strong> tokens.</div>
-        <button onclick="goTo('s-splash')" style="width:100%;padding:13px;background:var(--green2);color:#fff;border:none;border-radius:100px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px;">&#x1F4B3; Recargar tokens</button>
-        <button onclick="closeVideoModal()" style="width:100%;padding:13px;background:transparent;color:var(--dark);border:1.5px solid rgba(0,0,0,0.15);border-radius:100px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Continuar sin video</button>
+        <div style="font-size:16px;font-weight:700;color:var(--dark);text-align:center;margin-bottom:6px;" data-i18n="anam_modal_title">Tokens insuficientes</div>
+        <div style="font-size:13px;color:var(--grey);text-align:center;margin-bottom:20px;line-height:1.5;" data-i18n="anam_modal_text">Necesitas al menos <strong>10 tokens</strong> para adjuntar un video. Actualmente tienes <strong id="modal-token-count">0</strong> tokens.</div>
+        <button onclick="goTo('s-splash')" style="width:100%;padding:13px;background:var(--green2);color:#fff;border:none;border-radius:100px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px;" data-i18n="anam_modal_btn_recharge">&#x1F4B3; Recargar tokens</button>
+        <button onclick="closeVideoModal()" style="width:100%;padding:13px;background:transparent;color:var(--dark);border:1.5px solid rgba(0,0,0,0.15);border-radius:100px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;" data-i18n="anam_modal_btn_skip">Continuar sin video</button>
       </div>
     </div>
     <!-- fin token warning modal -->
@@ -6213,6 +6213,47 @@ function endTourIntro() {
 (function() {
   var TRANSLATIONS = {
     es: {
+      // Anamnesis
+      anam_basedon:            'Análisis basado en',
+      anam_basedon_3:          'Casos Teo Mariscal',
+      anam_video_label:        '🎥 Consulta en video',
+      anam_video_warn_t:       'Análisis de video usa más tokens',
+      anam_video_warn_b:       'El análisis por video requiere procesar muchos más datos que texto. Cada minuto de video consume aproximadamente <strong>10 tokens</strong>. Valóra si te compensa según el caso.',
+      anam_video_add:          'Añadir video a la anamnesis',
+      anam_sec_dog:            '🐕 El perro',
+      anam_sec_family:         '🏠 Entorno familiar',
+      anam_sec_problem:        '⚠️ La conducta problema',
+      anam_lbl_name:           'Nombre',
+      anam_lbl_age:            'Edad',
+      anam_lbl_breed:          'Tipología racial',
+      anam_lbl_chronic:        '¿Tiene alguna dolencia crónica?',
+      anam_lbl_living:         '¿Vive dentro o fuera de casa?',
+      anam_lbl_environment:    '¿Entorno donde vive?',
+      anam_lbl_walks:          'Paseos diarios',
+      anam_lbl_weaning:        '¿Con cuántos meses salió de la camada?',
+      anam_lbl_members:        'Miembros de la familia',
+      anam_lbl_kids:           '¿Hay niños?',
+      anam_lbl_otherdogs:      '¿Convive con otros perros?',
+      anam_lbl_describe:       'Describe la conducta problema',
+      anam_lbl_since:          '¿Desde cuándo ocurre?',
+      anam_lbl_where:          '¿Dónde ocurre?',
+      anam_lbl_who:            '¿Quién está presente?',
+      anam_lbl_freq:           '¿Con qué frecuencia ocurre?',
+      anam_lbl_aggr:           '¿Implica agresión?',
+      anam_lbl_history:        '¿Qué has intentado hasta ahora? (opcional)',
+      anam_lbl_theory:         '¿Cuál crees tú que es la causa? (opcional)',
+      anam_lbl_attach_video:   '📹 Adjuntar vídeo del comportamiento (opcional)',
+      anam_lbl_prior_event:    'Antes de que comenzase el problema, ¿recuerdas algún cambio o evento importante que resaltar?',
+      anam_freq_daily:         'A diario',
+      anam_freq_weekly:        'Varias veces a la semana',
+      anam_freq_occasion:      'Ocasionalmente',
+      anam_freq_rare:          'Raramente',
+      anam_drop_text:          'Pulsa o arrastra un vídeo aquí',
+      anam_drop_formats:       'MP4, MOV, AVI · Máx 200 MB',
+      anam_modal_title:        'Tokens insuficientes',
+      anam_modal_text:         'Necesitas al menos <strong>10 tokens</strong> para adjuntar un video. Actualmente tienes <strong id="modal-token-count">0</strong> tokens.',
+      anam_modal_btn_recharge: '💳 Recargar tokens',
+      anam_modal_btn_skip:     'Continuar sin video',
       // Privacy Policy
       pp_title:                'Política de Privacidad',
       pp_subtitle:             'Dogs Mind · Última actualización: abril 2026',
@@ -6468,6 +6509,47 @@ function endTourIntro() {
       refine_sub:   'by Teo Mariscal · Refinamiento del plan',
     },
     en: {
+      // Anamnesis
+      anam_basedon:            'Analysis based on',
+      anam_basedon_3:          'Teo Mariscal Cases',
+      anam_video_label:        '🎥 Video consultation',
+      anam_video_warn_t:       'Video analysis uses more tokens',
+      anam_video_warn_b:       'Video analysis requires processing far more data than text. Each minute of video consumes approximately <strong>10 tokens</strong>. Decide if it\'s worth it for your case.',
+      anam_video_add:          'Add video to the anamnesis',
+      anam_sec_dog:            '🐕 The dog',
+      anam_sec_family:         '🏠 Family environment',
+      anam_sec_problem:        '⚠️ The problem behavior',
+      anam_lbl_name:           'Name',
+      anam_lbl_age:            'Age',
+      anam_lbl_breed:          'Breed',
+      anam_lbl_chronic:        'Any chronic condition?',
+      anam_lbl_living:         'Lives indoors or outdoors?',
+      anam_lbl_environment:    'Type of environment?',
+      anam_lbl_walks:          'Daily walks',
+      anam_lbl_weaning:        'At what age did they leave the litter?',
+      anam_lbl_members:        'Household members',
+      anam_lbl_kids:           'Any kids?',
+      anam_lbl_otherdogs:      'Lives with other dogs?',
+      anam_lbl_describe:       'Describe the problem behavior',
+      anam_lbl_since:          'How long has this been happening?',
+      anam_lbl_where:          'Where does it happen?',
+      anam_lbl_who:            'Who is present?',
+      anam_lbl_freq:           'How often does it happen?',
+      anam_lbl_aggr:           'Does it involve aggression?',
+      anam_lbl_history:        'What have you tried so far? (optional)',
+      anam_lbl_theory:         'What do you think is the cause? (optional)',
+      anam_lbl_attach_video:   '📹 Attach a video of the behavior (optional)',
+      anam_lbl_prior_event:    'Before the problem started, do you recall any major change or event worth highlighting?',
+      anam_freq_daily:         'Daily',
+      anam_freq_weekly:        'Several times a week',
+      anam_freq_occasion:      'Occasionally',
+      anam_freq_rare:          'Rarely',
+      anam_drop_text:          'Tap or drag a video here',
+      anam_drop_formats:       'MP4, MOV, AVI · Max 200 MB',
+      anam_modal_title:        'Not enough tokens',
+      anam_modal_text:         'You need at least <strong>10 tokens</strong> to attach a video. You currently have <strong id="modal-token-count">0</strong> tokens.',
+      anam_modal_btn_recharge: '💳 Top up tokens',
+      anam_modal_btn_skip:     'Continue without video',
       // Privacy Policy
       pp_title:                'Privacy Policy',
       pp_subtitle:             'Dogs Mind · Last updated: April 2026',

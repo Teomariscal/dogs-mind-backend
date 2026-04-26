@@ -2398,6 +2398,80 @@ body{
 }
 
 /* ════════════════════════════════════════════════
+   S-TRACKING (Plan de Intervención) — vibrant override
+════════════════════════════════════════════════ */
+#s-tracking {
+  --cream: transparent;
+  --dark: rgba(255,250,240,0.95);
+  --grey: rgba(255,250,240,0.55);
+  --text: rgba(255,250,240,0.95);
+  --text2: rgba(255,250,240,0.78);
+  background:
+    radial-gradient(ellipse 760px 520px at 50% -8%, rgba(255,210,150,0.16), transparent 65%),
+    radial-gradient(ellipse 440px 620px at 100% 38%, rgba(74,103,65,0.10), transparent 70%),
+    linear-gradient(180deg, #324028 0%, #283322 55%, #1f2a1c 100%) !important;
+  color: rgba(255,250,240,0.95) !important;
+}
+#s-tracking [style*="background:var(--cream)"],
+#s-tracking [style*="background: var(--cream)"] {
+  background: rgba(10,14,8,0.55) !important;
+  backdrop-filter: blur(10px);
+  border-bottom-color: rgba(255,250,240,0.08) !important;
+}
+#s-tracking button[onclick="goTo('s-full-analysis')"] {
+  background: rgba(255,250,240,0.10) !important;
+  border-color: rgba(255,250,240,0.18) !important;
+  color: rgba(255,250,240,0.92) !important;
+}
+#s-tracking #interv-title {
+  color: rgba(255,250,240,0.95) !important;
+}
+#s-tracking [style*="rgba(0,0,0,0.08)"] {
+  border-color: rgba(255,250,240,0.10) !important;
+}
+#s-tracking #interv-dog-photo {
+  background: linear-gradient(135deg, rgba(200,169,110,0.14), rgba(74,103,65,0.18)) !important;
+  border-color: rgba(200,169,110,0.32) !important;
+}
+#s-tracking #interv-empty,
+#s-tracking #interv-empty * {
+  color: rgba(255,250,240,0.78) !important;
+}
+#s-tracking #interv-empty [style*="color:var(--dark)"] {
+  color: rgba(255,250,240,0.95) !important;
+}
+#s-tracking #interv-body {
+  color: rgba(255,250,240,0.86) !important;
+}
+#s-tracking #interv-loading > div:first-child {
+  border-color: rgba(200,169,110,0.20) !important;
+  border-top-color: var(--amber) !important;
+}
+#s-tracking #interv-loading div:last-child {
+  color: rgba(255,250,240,0.66) !important;
+}
+/* botones de acción */
+#s-tracking button[onclick="acceptIntervention()"] {
+  background: linear-gradient(180deg, #5e8154 0%, #4a6741 60%, #3d5636 100%) !important;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.20) inset,
+    0 -2px 0 rgba(0,0,0,0.28) inset,
+    0 8px 22px rgba(74,103,65,0.42) !important;
+}
+#s-tracking button[onclick="openRefineChat()"] {
+  background: linear-gradient(180deg, #6a8fc8 0%, #4a73b0 60%, #38598c 100%) !important;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.20) inset,
+    0 -2px 0 rgba(0,0,0,0.28) inset,
+    0 8px 22px rgba(42,74,138,0.40) !important;
+}
+#s-tracking button[onclick="goTo('s-anamnesis')"] {
+  background: rgba(255,250,240,0.05) !important;
+  border-color: rgba(200,169,110,0.55) !important;
+  color: var(--amber) !important;
+}
+
+/* ════════════════════════════════════════════════
    S-TOKENS — vibrant cinematic override
 ════════════════════════════════════════════════ */
 #s-tokens {

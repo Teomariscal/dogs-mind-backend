@@ -5077,8 +5077,8 @@ function confirmAvatar() {
   // i18n: traducir role e intro según idioma actual
   var _lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
   var _t = (window.TRANSLATIONS && window.TRANSLATIONS[_lang]) || {};
-  var _role = _t['chat_role_' + key] || av.role;
-  var _intro = _t['chat_intro_' + key] || av.intro;
+  var _role = _t['chat_role_' + activeAv] || av.role;
+  var _intro = _t['chat_intro_' + activeAv] || av.intro;
   if (hdrStatus) hdrStatus.innerHTML = '<div class="online-dot"></div>' + _role;
   // Reset chat messages with new avatar intro
   const msgs = document.getElementById('msgs');

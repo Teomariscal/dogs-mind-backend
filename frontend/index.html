@@ -2411,17 +2411,17 @@ body{
   opacity: 0;
   transform: translateY(-30vh);
   animation:
-    pomerania-fall 14s linear infinite,
-    pomerania-swing 2s ease-in-out infinite;
+    pomerania-fall 16s linear infinite,
+    pomerania-swing 2.4s ease-in-out infinite;
   filter: drop-shadow(0 6px 14px rgba(0,0,0,0.30));
   will-change: transform, opacity;
 }
 @keyframes pomerania-fall {
   0%   { top: -130px; opacity: 0; }
-  3%   { opacity: 1; }
-  /* 4s caída visible (≈ 4/14 = 28.5%) */
-  28.5% { top: 100%; opacity: 1; }
-  30%  { top: 100%; opacity: 0; }
+  2%   { opacity: 1; }
+  /* 6s caída visible (≈ 6/16 = 37.5%) */
+  37.5% { top: 100%; opacity: 1; }
+  39%  { top: 100%; opacity: 0; }
   100% { top: 100%; opacity: 0; }
 }
 @keyframes pomerania-swing {

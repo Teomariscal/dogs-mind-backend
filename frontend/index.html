@@ -2433,10 +2433,59 @@ body{
 #s-tokens [style*="background:#f5f5ef"] {
   background: rgba(200,169,110,0.14) !important;
 }
-/* donut */
-#s-tokens svg circle:first-of-type { stroke: rgba(255,250,240,0.10) !important; }
-#tokens-arc { stroke: var(--amber) !important; }
-#tokens-big { color: var(--amber) !important; }
+/* donut segmentado tipo tacómetro */
+.token-ring-big {
+  filter: drop-shadow(0 12px 40px rgba(0,0,0,0.55));
+}
+.token-ring-segments path {
+  opacity: 0.18;
+  animation: tachometer 4s ease-in-out infinite;
+}
+.token-ring-segments path:nth-child(1)  { animation-delay: 0.00s; }
+.token-ring-segments path:nth-child(2)  { animation-delay: 0.07s; }
+.token-ring-segments path:nth-child(3)  { animation-delay: 0.14s; }
+.token-ring-segments path:nth-child(4)  { animation-delay: 0.21s; }
+.token-ring-segments path:nth-child(5)  { animation-delay: 0.28s; }
+.token-ring-segments path:nth-child(6)  { animation-delay: 0.35s; }
+.token-ring-segments path:nth-child(7)  { animation-delay: 0.42s; }
+.token-ring-segments path:nth-child(8)  { animation-delay: 0.49s; }
+.token-ring-segments path:nth-child(9)  { animation-delay: 0.56s; }
+.token-ring-segments path:nth-child(10) { animation-delay: 0.63s; }
+.token-ring-segments path:nth-child(11) { animation-delay: 0.70s; }
+.token-ring-segments path:nth-child(12) { animation-delay: 0.77s; }
+.token-ring-segments path:nth-child(13) { animation-delay: 0.84s; }
+.token-ring-segments path:nth-child(14) { animation-delay: 0.91s; }
+.token-ring-segments path:nth-child(15) { animation-delay: 0.98s; }
+.token-ring-segments path:nth-child(16) { animation-delay: 1.05s; }
+.token-ring-segments path:nth-child(17) { animation-delay: 1.12s; }
+.token-ring-segments path:nth-child(18) { animation-delay: 1.19s; }
+.token-ring-segments path:nth-child(19) { animation-delay: 1.26s; }
+.token-ring-segments path:nth-child(20) { animation-delay: 1.33s; }
+@keyframes tachometer {
+  0%   { opacity: 0.18; }
+  18%  { opacity: 1.0; }
+  35%  { opacity: 0.55; }
+  60%  { opacity: 0.18; }
+  100% { opacity: 0.18; }
+}
+.token-ring-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 600;
+  fill: rgba(255,250,240,0.98);
+  letter-spacing: -0.01em;
+}
+.token-ring-num-lbl {
+  font-family: 'Jost', sans-serif;
+  font-size: 6px;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  fill: var(--amber);
+  text-transform: uppercase;
+}
+@media (prefers-reduced-motion: reduce) {
+  .token-ring-segments path { animation: none; opacity: 0.7; }
+}
 
 /* ════════════════════════════════════════════════
    POMERANIA PARACAIDISTA (gag animado en s-anamnesis)
@@ -3598,20 +3647,43 @@ body{
     </div>
 
     <!-- donut grande + saldo -->
-    <div style="display:flex;flex-direction:column;align-items:center;padding:32px 20px 24px;">
-      <div id="tokens-donut" style="position:relative;width:140px;height:140px;">
-        <svg width="140" height="140" style="transform:rotate(-90deg);">
-          <circle cx="70" cy="70" r="56" fill="none" stroke="#e8e4dc" stroke-width="14"/>
-          <circle id="tokens-arc" cx="70" cy="70" r="56" fill="none" stroke="var(--green)" stroke-width="14"
-                  stroke-dasharray="352" stroke-dashoffset="70" stroke-linecap="round"/>
+    <div style="display:flex;flex-direction:column;align-items:center;padding:24px 20px 16px;">
+      <div id="tokens-donut" style="position:relative;width:200px;height:200px;">
+        <svg class="token-ring-big" viewBox="0 0 120 120" width="200" height="200" aria-label="tokens disponibles">
+          <defs>
+            <filter id="tokenGlowBig" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="0.9" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <g class="token-ring-segments">
+            <path d="M61.22,4.01 A56,56 0 0 1 76.14,6.38 L70.95,23.61 A38,38 0 0 0 60.83,22.01 Z" fill="#22c55e" filter="url(#tokenGlowBig)"/>
+            <path d="M78.46,7.13 A56,56 0 0 1 91.92,13.99 L81.66,28.78 A38,38 0 0 0 72.53,24.12 Z" fill="#22c55e" filter="url(#tokenGlowBig)"/>
+            <path d="M93.90,15.42 A56,56 0 0 1 104.58,26.10 L90.25,37.00 A38,38 0 0 0 83.00,29.75 Z" fill="#22c55e" filter="url(#tokenGlowBig)"/>
+            <path d="M106.01,28.08 A56,56 0 0 1 112.87,41.54 L95.88,47.47 A38,38 0 0 0 91.22,38.34 Z" fill="#22c55e" filter="url(#tokenGlowBig)"/>
+            <path d="M113.62,43.86 A56,56 0 0 1 115.99,58.78 L97.99,59.17 A38,38 0 0 0 96.39,49.05 Z" fill="#22c55e" filter="url(#tokenGlowBig)"/>
+            <path d="M115.99,61.22 A56,56 0 0 1 113.62,76.14 L96.39,70.95 A38,38 0 0 0 97.99,60.83 Z" fill="#22c55e" filter="url(#tokenGlowBig)"/>
+            <path d="M112.87,78.46 A56,56 0 0 1 106.01,91.92 L91.22,81.66 A38,38 0 0 0 95.88,72.53 Z" fill="#22c55e" filter="url(#tokenGlowBig)"/>
+            <path d="M104.58,93.90 A56,56 0 0 1 93.90,104.58 L83.00,90.25 A38,38 0 0 0 90.25,83.00 Z" fill="#22c55e" filter="url(#tokenGlowBig)"/>
+            <path d="M91.92,106.01 A56,56 0 0 1 78.46,112.87 L72.53,95.88 A38,38 0 0 0 81.66,91.22 Z" fill="#22c55e" filter="url(#tokenGlowBig)"/>
+            <path d="M76.14,113.62 A56,56 0 0 1 61.22,115.99 L60.83,97.99 A38,38 0 0 0 70.95,96.39 Z" fill="#22c55e" filter="url(#tokenGlowBig)"/>
+            <path d="M58.78,115.99 A56,56 0 0 1 43.86,113.62 L49.05,96.39 A38,38 0 0 0 59.17,97.99 Z" fill="#22c55e" filter="url(#tokenGlowBig)"/>
+            <path d="M41.54,112.87 A56,56 0 0 1 28.08,106.01 L38.34,91.22 A38,38 0 0 0 47.47,95.88 Z" fill="#22c55e" filter="url(#tokenGlowBig)"/>
+            <path d="M26.10,104.58 A56,56 0 0 1 15.42,93.90 L29.75,83.00 A38,38 0 0 0 37.00,90.25 Z" fill="#22c55e" filter="url(#tokenGlowBig)"/>
+            <path d="M13.99,91.92 A56,56 0 0 1 7.13,78.46 L24.12,72.53 A38,38 0 0 0 28.78,81.66 Z" fill="#22c55e" filter="url(#tokenGlowBig)"/>
+            <path d="M6.38,76.14 A56,56 0 0 1 4.01,61.22 L22.01,60.83 A38,38 0 0 0 23.61,70.95 Z" fill="#22c55e" filter="url(#tokenGlowBig)"/>
+            <path d="M4.01,58.78 A56,56 0 0 1 6.38,43.86 L23.61,49.05 A38,38 0 0 0 22.01,59.17 Z" fill="#facc15" filter="url(#tokenGlowBig)"/>
+            <path d="M7.13,41.54 A56,56 0 0 1 13.99,28.08 L28.78,38.34 A38,38 0 0 0 24.12,47.47 Z" fill="#facc15" filter="url(#tokenGlowBig)"/>
+            <path d="M15.42,26.10 A56,56 0 0 1 26.10,15.42 L37.00,29.75 A38,38 0 0 0 29.75,37.00 Z" fill="#dc2626" filter="url(#tokenGlowBig)"/>
+            <path d="M28.08,13.99 A56,56 0 0 1 41.54,7.13 L47.47,24.12 A38,38 0 0 0 38.34,28.78 Z" fill="#dc2626" filter="url(#tokenGlowBig)"/>
+            <path d="M43.86,6.38 A56,56 0 0 1 58.78,4.01 L59.17,22.01 A38,38 0 0 0 49.05,23.61 Z" fill="#dc2626" filter="url(#tokenGlowBig)"/>
+          </g>
+          <text id="tokens-big" x="60" y="68" text-anchor="middle" class="token-ring-num">5</text>
+          <text x="60" y="84" text-anchor="middle" class="token-ring-num-lbl">TOKENS</text>
         </svg>
-        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-          <div id="tokens-big" style="font-size:36px;font-weight:800;color:var(--dark);line-height:1;">5</div>
-          <div style="font-size:12px;color:var(--grey);font-weight:500;">tokens</div>
-        </div>
       </div>
-      <div style="margin-top:16px;font-size:14px;color:var(--text2);text-align:center;line-height:1.5;" data-i18n="tokens_note">
-        Cada análisis completo consume <strong style="color:var(--dark);">1 token</strong>.<br>
+      <div style="margin-top:14px;font-size:14px;color:var(--text2);text-align:center;line-height:1.5;" data-i18n="tokens_note">
+        Cada análisis completo consume <strong style="color:var(--dark);">3 tokens</strong>.<br>
         Los tokens no caducan.
       </div>
     </div>

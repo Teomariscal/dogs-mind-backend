@@ -28,6 +28,12 @@ async def lifespan(app: FastAPI):
             "ALTER TABLE users ALTER COLUMN tokens TYPE NUMERIC(10,2) USING tokens::NUMERIC(10,2)",
             # role column
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(50) NOT NULL DEFAULT 'user'",
+            # GDPR/CCPA: phone (PII opcional) + soft-delete con PII scrub
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(32)",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP",
+            "CREATE INDEX IF NOT EXISTS ix_users_deleted_at ON users(deleted_at)",
+            # Permitir user_id NULL en payments para conservar historial fiscal tras delete del user
+            "ALTER TABLE payments ALTER COLUMN user_id DROP NOT NULL",
         ]
         for sql in migrations:
             try:

@@ -79,6 +79,8 @@ async def get_current_user(
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=401, detail="Usuario no encontrado")
+    if user.deleted_at is not None:
+        raise HTTPException(status_code=401, detail="Cuenta eliminada")
     return user
 
 
@@ -113,7 +115,8 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
 @router.post("/login", response_model=AuthResponse)
 def login(req: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == req.email).first()
-    if not user or not verify_password(req.password, user.password_hash):
+    if not user or user.deleted_at is not None or not verify_password(req.password, user.password_hash):
+        # Mensaje uniforme aunque la cuenta esté eliminada (no leak de existencia/estado)
         raise HTTPException(status_code=401, detail="Email o contraseña incorrectos")
 
     return AuthResponse(
@@ -130,8 +133,125 @@ def me(current_user: User = Depends(get_current_user)):
     return {
         "user_id": str(current_user.id),
         "email":   current_user.email,
+        "phone":   current_user.phone,
         "tokens":  float(current_user.tokens),
         "role":    current_user.role,
+    }
+
+
+# ── GDPR/CCPA: Data export (DSAR) ─────────────────────────────────────────────
+@router.get("/me/data-export")
+def data_export(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Devuelve TODOS los datos personales del usuario en JSON portable.
+    Cumple con: GDPR Art. 15 (right of access) + Art. 20 (data portability),
+    CCPA "right to know".
+    Nota: los datos del PERRO no son PII y no entran aquí.
+    """
+    from app.models.payment import Payment
+    payments = db.query(Payment).filter(Payment.user_id == current_user.id).all()
+    return {
+        "exported_at": datetime.utcnow().isoformat() + "Z",
+        "format_version": "1.0",
+        "data_controller": "The Dogs Mind — Teodoro Mariscal Diaz",
+        "user": {
+            "id":         str(current_user.id),
+            "email":      current_user.email,
+            "phone":      current_user.phone,
+            "tokens":     float(current_user.tokens),
+            "role":       current_user.role,
+            "created_at": current_user.created_at.isoformat() + "Z" if current_user.created_at else None,
+            "deleted_at": current_user.deleted_at.isoformat() + "Z" if current_user.deleted_at else None,
+        },
+        "payments": [
+            {
+                "id":                str(p.id),
+                "stripe_session_id": p.stripe_session_id,
+                "tokens":            p.tokens,
+                "amount_eur":        p.amount_cents / 100.0,
+                "status":            p.status,
+                "created_at":        p.created_at.isoformat() + "Z" if p.created_at else None,
+            }
+            for p in payments
+        ],
+        "subprocessors": [
+            {"name": "Anthropic",   "purpose": "AI inference (clinical analysis + avatars)", "region": "USA"},
+            {"name": "Voyage AI",   "purpose": "Embeddings for RAG",                          "region": "USA"},
+            {"name": "Qdrant Cloud","purpose": "Vector storage (knowledge base, no PII)",    "region": "EU"},
+            {"name": "Railway",     "purpose": "Backend hosting",                             "region": "EU"},
+            {"name": "Netlify",     "purpose": "Frontend hosting",                            "region": "USA/global CDN"},
+            {"name": "Resend",      "purpose": "Transactional email (password recovery)",     "region": "USA"},
+            {"name": "Plausible",   "purpose": "Analytics (privacy-friendly, no cookies)",    "region": "EU"},
+            {"name": "Stripe",      "purpose": "Web payments processing",                     "region": "USA/EU"},
+            {"name": "Apple",       "purpose": "App Store In-App Purchases (when applicable)","region": "USA/EU"},
+        ],
+        "notes": (
+            "Este export incluye toda la información personal (PII) del usuario "
+            "almacenada en nuestros sistemas. Datos del perro (raza, edad, conducta, "
+            "análisis funcional, plan de intervención) no se consideran datos personales "
+            "y por tanto quedan fuera del alcance de GDPR/CCPA respecto al usuario."
+        ),
+    }
+
+
+# ── GDPR/CCPA: Account deletion ──────────────────────────────────────────────
+class DeleteAccountRequest(BaseModel):
+    password: str
+    confirm:  str  # debe ser exactamente "DELETE" o "ELIMINAR"
+
+
+@router.delete("/me")
+def delete_account(
+    req: DeleteAccountRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Elimina la cuenta del usuario con scrub PII (soft-delete).
+    Cumple con: GDPR Art. 17 (right to erasure) + CCPA "right to delete".
+    Requiere Apple App Store Guideline 5.1.1(v) (account deletion in-app).
+
+    Mantiene la fila User para preservar integridad referencial con payments
+    (necesario para registros fiscales). PII (email, password_hash, phone) se
+    anonimiza. user_id de payments se mantiene asociado a la fila scrubeada.
+    """
+    # Re-verificar password (defensa contra session hijack)
+    if not verify_password(req.password, current_user.password_hash):
+        raise HTTPException(status_code=401, detail="Contraseña incorrecta")
+
+    # Confirmación textual obligatoria
+    if req.confirm.strip().upper() not in ("DELETE", "ELIMINAR"):
+        raise HTTPException(
+            status_code=400,
+            detail="Confirmación inválida. Escribe 'DELETE' o 'ELIMINAR' para continuar.",
+        )
+
+    if current_user.deleted_at is not None:
+        # Idempotente: si ya está borrada, no hacemos nada
+        return {"status": "already_deleted", "deleted_at": current_user.deleted_at.isoformat() + "Z"}
+
+    # Scrub PII manteniendo fila para integridad fiscal
+    deletion_ts = datetime.utcnow()
+    current_user.email         = f"deleted-{current_user.id}@thedogsmind.deleted"
+    current_user.password_hash = "deleted"
+    current_user.phone         = None
+    current_user.tokens        = 0
+    current_user.role          = "deleted"
+    current_user.deleted_at    = deletion_ts
+    db.commit()
+
+    return {
+        "status":     "deleted",
+        "deleted_at": deletion_ts.isoformat() + "Z",
+        "message":    (
+            "Tu cuenta y todos tus datos personales han sido eliminados. "
+            "Los registros de pago se conservan anonimizados durante 4 años "
+            "por requisito legal fiscal (España). Puedes solicitar el borrado "
+            "completo de los pagos contactando con privacy@thedogsmind.net."
+        ),
     }
 
 

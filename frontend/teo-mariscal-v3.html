@@ -5070,6 +5070,12 @@ function askCecilia(context) {
 window.askCecilia = askCecilia;
 
 function confirmAvatar() {
+  // Snapshot the one-shot Cecilia context (set by askCecilia) and clear the
+  // global immediately, so it can't leak to subsequent calls (e.g. when the
+  // user enters via Aigents → s-avatars normally, or logs in after a JWT bail).
+  var _cecCtx = (activeAv === 'cecilia') ? window._cecilia_context : null;
+  window._cecilia_context = null;
+
   if (!getJWT()) { goToLogin('s-chat'); return; }
   const av = AVATARS[activeAv];
   // Update home card
@@ -5094,7 +5100,7 @@ function confirmAvatar() {
 
   // ── Contextual handoff: when Cecilia is invoked from analysis/plan results,
   // pre-load the case text into the chat history (one-shot).
-  var _ctx = (activeAv === 'cecilia') ? window._cecilia_context : null;
+  var _ctx = _cecCtx;
   if (_ctx) {
     var _ctxLabel = (_lang === 'en')
       ? (_ctx.type === 'analysis' ? 'Functional analysis of my case' : 'Intervention plan for my case')
@@ -5123,7 +5129,6 @@ function confirmAvatar() {
       { role: 'user', content: _ctxLabel + ':\n\n' + _ctx.text + '\n\n[' + _ctxHelp + ']' },
       { role: 'assistant', content: _ctxIntro }
     ];
-    window._cecilia_context = null; // consume once
   } else {
     if (msgs) {
       msgs.innerHTML = '';

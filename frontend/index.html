@@ -3969,7 +3969,7 @@ body{
         <img src="aig-cecilia-pixar.webp" alt="Cecilia" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid rgba(184,146,42,0.4);flex-shrink:0;">
         <div style="flex:1;min-width:0;">
           <div style="font-size:13px;line-height:1.45;color:var(--dark);" data-i18n="ask_cecilia_text">¿Es muy técnico el lenguaje? Si necesitas ayuda, pregunta a Cecilia.</div>
-          <button onclick="askCecilia()" style="margin-top:8px;padding:8px 14px;border:none;border-radius:100px;background:#b8922a;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.02em;" data-i18n="ask_cecilia_btn">💬 Chat con Cecilia</button>
+          <button onclick="askCecilia('analysis')" style="margin-top:8px;padding:8px 14px;border:none;border-radius:100px;background:#b8922a;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.02em;" data-i18n="ask_cecilia_btn">💬 Chat con Cecilia</button>
         </div>
       </div>
 
@@ -4051,7 +4051,7 @@ body{
         <img src="aig-cecilia-pixar.webp" alt="Cecilia" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid rgba(184,146,42,0.4);flex-shrink:0;">
         <div style="flex:1;min-width:0;">
           <div style="font-size:13px;line-height:1.45;color:var(--dark);" data-i18n="ask_cecilia_text">¿Es muy técnico el lenguaje? Si necesitas ayuda, pregunta a Cecilia.</div>
-          <button onclick="askCecilia()" style="margin-top:8px;padding:8px 14px;border:none;border-radius:100px;background:#b8922a;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.02em;" data-i18n="ask_cecilia_btn">💬 Chat con Cecilia</button>
+          <button onclick="askCecilia('plan')" style="margin-top:8px;padding:8px 14px;border:none;border-radius:100px;background:#b8922a;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.02em;" data-i18n="ask_cecilia_btn">💬 Chat con Cecilia</button>
         </div>
       </div>
       <button onclick="acceptIntervention()" style="width:100%;padding:16px;border:none;border-radius:100px;background:#4a6741;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.02em;box-shadow:0 4px 16px rgba(74,103,65,0.25);" data-i18n="tracking_accept">✅ Aceptar intervención</button>
@@ -5053,7 +5053,16 @@ function selectAv(key) {
   });
 }
 
-function askCecilia() {
+function askCecilia(context) {
+  // context: 'analysis' or 'plan' (optional). Triggers a one-shot contextual
+  // handoff: the analysis/plan text is silently injected into the chat history
+  // so Cecilia answers as if she'd already read the case.
+  window._cecilia_context = null;
+  if (context === 'analysis' && window._lastAnalysisText) {
+    window._cecilia_context = { type: 'analysis', text: window._lastAnalysisText };
+  } else if (context === 'plan' && window._lastInterventionPlan) {
+    window._cecilia_context = { type: 'plan', text: window._lastInterventionPlan };
+  }
   if (typeof selectAv === 'function') selectAv('cecilia');
   else activeAv = 'cecilia';
   confirmAvatar();
@@ -5082,11 +5091,46 @@ function confirmAvatar() {
   if (hdrStatus) hdrStatus.innerHTML = '<div class="online-dot"></div>' + _role;
   // Reset chat messages with new avatar intro
   const msgs = document.getElementById('msgs');
-  if (msgs) {
-    msgs.innerHTML = '';
-    addMsgWithImg('av', _intro, av.img);
+
+  // ── Contextual handoff: when Cecilia is invoked from analysis/plan results,
+  // pre-load the case text into the chat history (one-shot).
+  var _ctx = (activeAv === 'cecilia') ? window._cecilia_context : null;
+  if (_ctx) {
+    var _ctxLabel = (_lang === 'en')
+      ? (_ctx.type === 'analysis' ? 'Functional analysis of my case' : 'Intervention plan for my case')
+      : (_ctx.type === 'analysis' ? 'Análisis funcional de mi caso' : 'Plan de intervención de mi caso');
+    var _ctxIntro = _t['cecilia_intro_' + _ctx.type]
+      || (_ctx.type === 'analysis'
+          ? 'He revisado el análisis del caso, querida. ¿Qué término o concepto te confunde?'
+          : 'He revisado el plan de intervención, querida. ¿Qué parte quieres que te aclare?');
+    var _ctxChip = _t['cecilia_chip_' + _ctx.type]
+      || (_ctx.type === 'analysis'
+          ? '📋 Análisis del caso compartido con Cecilia'
+          : '📋 Plan de intervención compartido con Cecilia');
+    var _ctxHelp = (_lang === 'en')
+      ? 'Please help me understand the technical terms when I ask.'
+      : 'Por favor, ayúdame a entender los términos técnicos cuando te pregunte.';
+
+    if (msgs) {
+      msgs.innerHTML = '';
+      var _chip = document.createElement('div');
+      _chip.style.cssText = 'align-self:center;padding:7px 14px;background:rgba(184,146,42,0.12);border:1px solid rgba(184,146,42,0.3);border-radius:100px;font-size:11.5px;color:#8a6a20;font-weight:500;margin:10px auto 14px;text-align:center;';
+      _chip.textContent = _ctxChip;
+      msgs.appendChild(_chip);
+      addMsgWithImg('av', _ctxIntro, av.img);
+    }
+    _avatarHistory = [
+      { role: 'user', content: _ctxLabel + ':\n\n' + _ctx.text + '\n\n[' + _ctxHelp + ']' },
+      { role: 'assistant', content: _ctxIntro }
+    ];
+    window._cecilia_context = null; // consume once
+  } else {
+    if (msgs) {
+      msgs.innerHTML = '';
+      addMsgWithImg('av', _intro, av.img);
+    }
+    _avatarHistory = [{ role: 'assistant', content: _intro }];
   }
-  _avatarHistory = [{ role: 'assistant', content: _intro }];
   var ta = document.getElementById('chat-ta');
   if (ta) ta.placeholder = (_lang === 'en' ? 'Write to ' : 'Escríbele a ') + av.name + '…';
   goTo('s-chat');
@@ -6568,6 +6612,10 @@ function endTourIntro() {
       loading_msg:      'Estás utilizando una herramienta de análisis de conducta animal muy potente y va a tomar algo de tiempo. Relax que esto puede tardar unos minutos, <strong>no cierres la app</strong>.',
       ask_cecilia_text: '¿Es muy técnico el lenguaje? Si necesitas ayuda, pregunta a Cecilia.',
       ask_cecilia_btn:  '💬 Chat con Cecilia',
+      cecilia_intro_analysis: 'He revisado el análisis del caso, querida. ¿Qué término o concepto te confunde? Te lo traduzco al lenguaje de toda la vida.',
+      cecilia_intro_plan:     'He revisado el plan de intervención, querida. ¿Qué parte quieres que te aclare? Sin tecnicismos, te lo prometo.',
+      cecilia_chip_analysis:  '📋 Análisis del caso compartido con Cecilia',
+      cecilia_chip_plan:      '📋 Plan de intervención compartido con Cecilia',
       // Registration form
       form_welcome_intro:    'Bienvenido a <strong style="color:var(--text)">The Dogs Mind</strong>. Puedes elegir dos modelos de suscripción: <strong style="color:var(--green)">Particular</strong> (hasta 2 perros) o <strong style="color:var(--green)">Profesional</strong> (hasta 20 perros).<br><br>Te invitamos a que descubras gratuitamente el funcionamiento de esta app, que irá creciendo y mejorando contigo. Tienes <strong style="color:var(--text)">5 tokens de regalo</strong>. Al finalizar deberás ir recargando tus tokens.',
       form_user_type:        'Tipo de usuario',
@@ -6901,6 +6949,10 @@ function endTourIntro() {
       loading_msg:      'You are using a very powerful behavioral analysis tool and it will take some time. Relax — this may take a few minutes, <strong>do not close the app</strong>.',
       ask_cecilia_text: 'Is the language too technical? If you need help, ask Cecilia.',
       ask_cecilia_btn:  '💬 Chat with Cecilia',
+      cecilia_intro_analysis: 'I\'ve read the case analysis, darling. Which term or concept is confusing you? I\'ll put it in plain English.',
+      cecilia_intro_plan:     'I\'ve read the intervention plan, darling. Which part would you like me to clarify? No jargon, I promise.',
+      cecilia_chip_analysis:  '📋 Case analysis shared with Cecilia',
+      cecilia_chip_plan:      '📋 Intervention plan shared with Cecilia',
       // Registration form
       form_welcome_intro:    'Welcome to <strong style="color:var(--text)">The Dogs Mind</strong>. You can choose between two subscription plans: <strong style="color:var(--green)">Pet Owner</strong> (up to 2 dogs) or <strong style="color:var(--green)">Professional</strong> (up to 20 dogs).<br><br>We invite you to discover for free how this app works — it will keep growing and improving with you. You have <strong style="color:var(--text)">5 free welcome tokens</strong>. After that you can top up whenever you need.',
       form_user_type:        'User type',

@@ -4038,7 +4038,56 @@ body{
       </div>
     </div>
 
+    <!-- ══ Mi cuenta y privacidad (GDPR/CCPA + Apple) ══ -->
+    <div style="padding:0 16px 32px;">
+      <div style="font-size:10px;font-weight:700;color:var(--grey);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;" data-i18n="account_section">Mi cuenta y privacidad</div>
+
+      <div id="account-email-display" style="background:#fff;border:1.5px solid rgba(0,0,0,0.08);border-radius:14px;padding:14px 16px;margin-bottom:10px;font-size:13px;color:var(--text2);line-height:1.4;">
+        <div style="font-size:10px;color:var(--grey);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;" data-i18n="account_email_label">Email de la cuenta</div>
+        <div id="account-email-value" style="color:var(--dark);font-weight:600;">—</div>
+      </div>
+
+      <button onclick="downloadMyData()" style="width:100%;display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid rgba(0,0,0,0.08);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;text-align:left;font-family:inherit;transition:border-color .2s;" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='rgba(0,0,0,0.08)'">
+        <div style="width:36px;height:36px;background:#f5f5ef;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">📥</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;color:var(--dark);" data-i18n="account_export_title">Descargar mis datos</div>
+          <div style="font-size:12px;color:var(--grey);line-height:1.4;" data-i18n="account_export_desc">Exporta toda tu información personal en formato JSON</div>
+        </div>
+      </button>
+
+      <button onclick="openDeleteAccountModal()" style="width:100%;display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid rgba(220,38,38,0.25);border-radius:14px;padding:14px 16px;margin-bottom:14px;cursor:pointer;text-align:left;font-family:inherit;transition:background .2s;" onmouseover="this.style.background='rgba(220,38,38,0.04)'" onmouseout="this.style.background='#fff'">
+        <div style="width:36px;height:36px;background:rgba(220,38,38,0.08);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🗑️</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;color:#dc2626;" data-i18n="account_delete_title">Eliminar mi cuenta</div>
+          <div style="font-size:12px;color:var(--grey);line-height:1.4;" data-i18n="account_delete_desc">Borra tu cuenta y todos tus datos personales. No se puede deshacer.</div>
+        </div>
+      </button>
+
+      <div style="font-size:11px;color:var(--grey);line-height:1.6;text-align:center;padding:8px 4px;" data-i18n="account_legal_note">
+        Al usar The Dogs Mind aceptas nuestra <a href="#" onclick="goTo('s-privacy');return false;" style="color:var(--green);text-decoration:underline;">Política de Privacidad</a> y <a href="#" onclick="goTo('s-terms');return false;" style="color:var(--green);text-decoration:underline;">Términos de Servicio</a>.
+      </div>
+    </div>
+
   </div><!-- /s-tokens -->
+
+  <!-- ══ Modal confirmar eliminación de cuenta ══ -->
+  <div id="delete-account-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:#fff;border-radius:16px;max-width:380px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+      <div style="font-size:18px;font-weight:700;color:#dc2626;margin-bottom:8px;" data-i18n="del_modal_title">⚠️ Eliminar tu cuenta</div>
+      <div style="font-size:13px;line-height:1.6;color:var(--text2);margin-bottom:16px;" data-i18n="del_modal_body">
+        Tu email, contraseña y teléfono se eliminarán permanentemente. Los registros de pago se conservan anonimizados durante 4 años por requisito fiscal (España). <strong>Esta acción no se puede deshacer.</strong>
+      </div>
+      <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:6px;" data-i18n="del_modal_pw_label">Confirma tu contraseña actual</label>
+      <input id="del-modal-password" type="password" autocomplete="current-password" style="width:100%;padding:12px 14px;border:1.5px solid rgba(0,0,0,0.15);border-radius:10px;font-size:14px;font-family:inherit;margin-bottom:12px;box-sizing:border-box;" />
+      <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:6px;" data-i18n="del_modal_confirm_label">Escribe ELIMINAR para confirmar</label>
+      <input id="del-modal-confirm" type="text" placeholder="ELIMINAR" style="width:100%;padding:12px 14px;border:1.5px solid rgba(0,0,0,0.15);border-radius:10px;font-size:14px;font-family:inherit;margin-bottom:18px;box-sizing:border-box;letter-spacing:0.1em;" />
+      <div id="del-modal-error" style="display:none;font-size:12px;color:#dc2626;margin-bottom:12px;padding:8px;background:rgba(220,38,38,0.08);border-radius:8px;"></div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="closeDeleteAccountModal()" style="flex:1;padding:13px;background:#f5f5ef;color:var(--dark);border:none;border-radius:100px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;" data-i18n="del_modal_cancel">Cancelar</button>
+        <button id="del-modal-confirm-btn" onclick="confirmDeleteAccount()" style="flex:1;padding:13px;background:#dc2626;color:#fff;border:none;border-radius:100px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;" data-i18n="del_modal_confirm">Eliminar</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ══ S-LOADING-ANALYSIS: pantalla de espera (análisis y plan) ══ -->
   <div id="s-loading-analysis" class="screen" style="background:var(--cream);overflow:hidden;">
@@ -4568,8 +4617,8 @@ body{
         <button class="btn-green" onclick="registerUser()" style="margin-top:4px;font-size:16px;padding:16px;" data-i18n="form_submit">
           Crear mi cuenta →
         </button>
-        <div style="text-align:center;margin-top:10px;">
-          <span style="font-size:11px;color:var(--text3);" data-i18n="form_terms_pre">Al registrarte aceptas nuestra </span><a onclick="goTo('s-privacy')" style="font-size:11px;color:var(--green);cursor:pointer;text-decoration:underline;" data-i18n="form_terms_link">Política de Privacidad</a>
+        <div style="margin-top:12px;font-size:11px;color:var(--text3);line-height:1.55;text-align:center;padding:0 4px;" data-i18n="form_consent">
+          Al crear mi cuenta acepto la <a onclick="goTo('s-privacy')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Política de Privacidad</a> y los <a onclick="goTo('s-terms')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Términos de Servicio</a>, y consiento el tratamiento de mis datos personales (email, teléfono) para los fines descritos en la Política de Privacidad.
         </div>
 
       </div>
@@ -5122,6 +5171,7 @@ function toggleProfessional(val) {
 function registerUser() {
   var name     = (document.getElementById('reg-name') ? document.getElementById('reg-name').value : '').trim();
   var email    = (document.getElementById('reg-email') ? document.getElementById('reg-email').value : '').trim();
+  var phone    = (document.getElementById('reg-phone') ? document.getElementById('reg-phone').value : '').trim();
   var password = (document.getElementById('reg-password') ? document.getElementById('reg-password').value : '').trim();
   var inviteCode = (document.getElementById('reg-invite') ? document.getElementById('reg-invite').value : '').trim();
   var dog1     = (document.getElementById('reg-dog1-name') ? document.getElementById('reg-dog1-name').value : '').trim();
@@ -5138,7 +5188,7 @@ function registerUser() {
   fetch(API_URL + '/auth/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: email, password: password, invite_code: inviteCode })
+    body: JSON.stringify({ email: email, password: password, phone: phone || null, invite_code: inviteCode })
   })
   .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
   .then(function(res) {
@@ -5804,6 +5854,7 @@ function getVal(id, fallback) {
     .then(function(d) {
       if (d && d.tokens !== undefined) {
         localStorage.setItem('dm_role', d.role || 'user');
+        if (d.email) localStorage.setItem('dm_email', d.email);
         setTokens(d.tokens);
         if (d.role === 'admin' || d.role === 'developer') {
           ['tok-home','tok-chat','tokens-big'].forEach(function(id) {
@@ -5811,6 +5862,9 @@ function getVal(id, fallback) {
             if (el) el.textContent = '∞';
           });
         }
+        // Pintar email en sección "Mi cuenta y privacidad"
+        var emailEl = document.getElementById('account-email-value');
+        if (emailEl && d.email) emailEl.textContent = d.email;
       }
     })
     .catch(function() {});
@@ -5843,6 +5897,98 @@ function getVal(id, fallback) {
     .catch(function() {
       if (win) win.close();
       alert('Error de conexión.');
+    });
+  }
+
+  // ── GDPR/CCPA: Descargar datos personales (DSAR) ──────────────────────────
+  function downloadMyData() {
+    var jwt = getJWT();
+    if (!jwt) { alert('Inicia sesión primero.'); return; }
+    fetch(API_URL + '/auth/me/data-export', { headers: authHeaders() })
+    .then(function(r) {
+      if (!r.ok) throw new Error('export_failed');
+      return r.json();
+    })
+    .then(function(data) {
+      var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'thedogsmind-data-export-' + (data.user && data.user.email ? data.user.email.split('@')[0] : 'me') + '-' + new Date().toISOString().slice(0,10) + '.json';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function() {
+        URL.revokeObjectURL(url);
+        a.remove();
+      }, 100);
+      showToast('📥 Datos exportados');
+    })
+    .catch(function() { alert('No se pudo descargar el archivo. Inténtalo más tarde.'); });
+  }
+
+  // ── GDPR/CCPA + Apple 5.1.1(v): Eliminar cuenta ───────────────────────────
+  function openDeleteAccountModal() {
+    var modal = document.getElementById('delete-account-modal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    document.getElementById('del-modal-password').value = '';
+    document.getElementById('del-modal-confirm').value = '';
+    document.getElementById('del-modal-error').style.display = 'none';
+  }
+
+  function closeDeleteAccountModal() {
+    var modal = document.getElementById('delete-account-modal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function confirmDeleteAccount() {
+    var pw = document.getElementById('del-modal-password').value;
+    var confirm = document.getElementById('del-modal-confirm').value.trim().toUpperCase();
+    var errEl = document.getElementById('del-modal-error');
+    var btn = document.getElementById('del-modal-confirm-btn');
+
+    errEl.style.display = 'none';
+    if (!pw) { errEl.textContent = 'Introduce tu contraseña.'; errEl.style.display = 'block'; return; }
+    if (confirm !== 'ELIMINAR' && confirm !== 'DELETE') {
+      errEl.textContent = 'Escribe ELIMINAR (o DELETE) exactamente para confirmar.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '...';
+    fetch(API_URL + '/auth/me', {
+      method: 'DELETE',
+      headers: authHeaders(),
+      body: JSON.stringify({ password: pw, confirm: confirm })
+    })
+    .then(function(r) {
+      return r.json().then(function(j) { return { ok: r.ok, body: j }; });
+    })
+    .then(function(res) {
+      if (!res.ok) {
+        var detail = (res.body && res.body.detail) || 'Error al eliminar la cuenta.';
+        errEl.textContent = detail;
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Eliminar';
+        return;
+      }
+      // Cuenta eliminada: limpiar sesión local + redirigir
+      localStorage.removeItem('dm_jwt');
+      localStorage.removeItem('dm_user_id');
+      localStorage.removeItem('dm_email');
+      localStorage.removeItem('dm_role');
+      localStorage.removeItem('dm_tokens');
+      closeDeleteAccountModal();
+      alert('Tu cuenta ha sido eliminada. Los datos fiscales se conservan anonimizados durante 4 años por requisito legal.');
+      goTo('s-splash');
+    })
+    .catch(function() {
+      errEl.textContent = 'Error de conexión. Inténtalo más tarde.';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Eliminar';
     });
   }
 
@@ -6854,6 +7000,20 @@ function endTourIntro() {
       loading_title:    'Analizando con IA…',
       loading_msg:      'Estás utilizando una herramienta de análisis de conducta animal muy potente y va a tomar algo de tiempo. Relax que esto puede tardar unos minutos, <strong>no cierres la app</strong>.',
       loading_disclaimer: 'The Dogs Mind te ofrece un análisis por IA y puede cometer errores. No sustituye a tu etólogo veterinario.',
+      // Mi cuenta y privacidad (GDPR/CCPA + Apple)
+      account_section:        'Mi cuenta y privacidad',
+      account_email_label:    'Email de la cuenta',
+      account_export_title:   'Descargar mis datos',
+      account_export_desc:    'Exporta toda tu información personal en formato JSON',
+      account_delete_title:   'Eliminar mi cuenta',
+      account_delete_desc:    'Borra tu cuenta y todos tus datos personales. No se puede deshacer.',
+      account_legal_note:     'Al usar The Dogs Mind aceptas nuestra <a href="#" onclick="goTo(\'s-privacy\');return false;" style="color:var(--green);text-decoration:underline;">Política de Privacidad</a> y <a href="#" onclick="goTo(\'s-terms\');return false;" style="color:var(--green);text-decoration:underline;">Términos de Servicio</a>.',
+      del_modal_title:        '⚠️ Eliminar tu cuenta',
+      del_modal_body:         'Tu email, contraseña y teléfono se eliminarán permanentemente. Los registros de pago se conservan anonimizados durante 4 años por requisito fiscal (España). <strong>Esta acción no se puede deshacer.</strong>',
+      del_modal_pw_label:     'Confirma tu contraseña actual',
+      del_modal_confirm_label:'Escribe ELIMINAR para confirmar',
+      del_modal_cancel:       'Cancelar',
+      del_modal_confirm:      'Eliminar',
       ask_cecilia_text: '¿Es muy técnico el lenguaje? Si necesitas ayuda, pregunta a Cecilia.',
       ask_cecilia_btn:  '💬 Chat con Cecilia',
       cecilia_intro_analysis: 'He revisado el análisis del caso, querida. ¿Qué término o concepto te confunde? Te lo traduzco al lenguaje de toda la vida.',
@@ -6891,6 +7051,31 @@ function endTourIntro() {
       form_submit:           'Crear mi cuenta →',
       form_terms_pre:        'Al registrarte aceptas nuestra ',
       form_terms_link:       'Política de Privacidad',
+      form_consent:          'Al crear mi cuenta acepto la <a onclick="goTo(\'s-privacy\')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Política de Privacidad</a> y los <a onclick="goTo(\'s-terms\')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Términos de Servicio</a>, y consiento el tratamiento de mis datos personales (email, teléfono) para los fines descritos en la Política de Privacidad.',
+      // Terms of Service (s-terms) — ES
+      tos_title:     'Términos de Servicio',
+      tos_subtitle:  'The Dogs Mind · Última actualización: abril 2026',
+      tos_intro:     'Al usar The Dogs Mind aceptas estos términos. Léelos con atención antes de crear tu cuenta.',
+      tos_h1:        '1. Quién presta el servicio',
+      tos_p1:        'The Dogs Mind es un servicio creado por <strong>Teodoro Mariscal Diaz</strong> (España). Para contacto, escribe a <a href="mailto:info@thedogsmind.net" style="color:var(--green);">info@thedogsmind.net</a>.',
+      tos_h2:        '2. Naturaleza del servicio',
+      tos_p2:        'The Dogs Mind ofrece análisis conductuales y planes de intervención generados por inteligencia artificial. <strong>El contenido es orientativo, puede contener errores y NO sustituye el diagnóstico ni el tratamiento de un etólogo veterinario titulado.</strong> En casos de agresión, conductas autolesivas, o emergencias médicas, acude inmediatamente a un profesional cualificado.',
+      tos_h3:        '3. Cuenta y elegibilidad',
+      tos_p3:        'Debes tener al menos 18 años para crear una cuenta. Eres responsable de la veracidad de los datos que introduces y de mantener tu contraseña segura. Una cuenta = una persona física.',
+      tos_h4:        '4. Tokens y pagos',
+      tos_p4:        'El acceso a análisis y planes consume tokens. Los tokens se compran en packs y no caducan. Los pagos se procesan a través de Stripe (web) o Apple In-App Purchase (iOS). Los tokens son no reembolsables salvo error técnico imputable a nosotros o requisito legal aplicable. Las recargas son finales tras la confirmación.',
+      tos_h5:        '5. Uso aceptable',
+      tos_p5:        'No puedes usar el servicio para fines ilegales, dañinos o que infrinjan derechos de terceros. Tampoco puedes intentar extraer modelos, hacer ingeniería inversa, ni revender el servicio sin autorización escrita.',
+      tos_h6:        '6. Cancelación de cuenta',
+      tos_p6:        'Puedes eliminar tu cuenta en cualquier momento desde la pantalla "Mis Tokens → Eliminar mi cuenta". Tus datos personales se borran inmediatamente. Los registros de pago se conservan anonimizados durante 4 años por requisito fiscal (España).',
+      tos_h7:        '7. Limitación de responsabilidad',
+      tos_p7:        'El servicio se ofrece "tal como es". The Dogs Mind no garantiza resultados específicos sobre la conducta de tu perro y no se hace responsable de daños derivados del uso de los análisis o planes generados. Esto no excluye obligaciones legales mínimas que no puedan limitarse.',
+      tos_h8:        '8. Cambios en los términos',
+      tos_p8:        'Podemos actualizar estos términos. Te notificaremos por email o dentro de la app cuando haya cambios materiales. El uso continuado tras la notificación implica aceptación.',
+      tos_h9:        '9. Ley aplicable y jurisdicción',
+      tos_p9:        'Estos términos se rigen por la ley española. Cualquier disputa se someterá a los juzgados de Madrid (España), salvo que la legislación de protección al consumidor de tu país establezca un foro distinto.',
+      tos_box_label: 'Contacto',
+      tos_box_text:  '¿Dudas sobre estos términos? Escríbenos a <a href="mailto:info@thedogsmind.net" style="color:var(--green);font-weight:600;">info@thedogsmind.net</a>.',
       form_already_account:  '¿Ya tienes cuenta? ',
       form_sign_in:          'Iniciar sesión',
       // Tokens extras
@@ -7197,6 +7382,20 @@ function endTourIntro() {
       loading_title:    'Analyzing with AI…',
       loading_msg:      'You are using a very powerful behavioral analysis tool and it will take some time. Relax — this may take a few minutes, <strong>do not close the app</strong>.',
       loading_disclaimer: 'The Dogs Mind provides an AI-generated analysis and may contain errors. It does not replace your veterinary ethologist.',
+      // My account & privacy (GDPR/CCPA + Apple)
+      account_section:        'My account & privacy',
+      account_email_label:    'Account email',
+      account_export_title:   'Download my data',
+      account_export_desc:    'Export all your personal information as JSON',
+      account_delete_title:   'Delete my account',
+      account_delete_desc:    'Permanently deletes your account and personal data. This cannot be undone.',
+      account_legal_note:     'By using The Dogs Mind you agree to our <a href="#" onclick="goTo(\'s-privacy\');return false;" style="color:var(--green);text-decoration:underline;">Privacy Policy</a> and <a href="#" onclick="goTo(\'s-terms\');return false;" style="color:var(--green);text-decoration:underline;">Terms of Service</a>.',
+      del_modal_title:        '⚠️ Delete your account',
+      del_modal_body:         'Your email, password and phone will be permanently deleted. Payment records are kept anonymized for 4 years for tax compliance (Spain). <strong>This action cannot be undone.</strong>',
+      del_modal_pw_label:     'Confirm your current password',
+      del_modal_confirm_label:'Type DELETE to confirm',
+      del_modal_cancel:       'Cancel',
+      del_modal_confirm:      'Delete',
       ask_cecilia_text: 'Is the language too technical? If you need help, ask Cecilia.',
       ask_cecilia_btn:  '💬 Chat with Cecilia',
       cecilia_intro_analysis: 'I\'ve read the case analysis, darling. Which term or concept is confusing you? I\'ll put it in plain English.',
@@ -7234,6 +7433,31 @@ function endTourIntro() {
       form_submit:           'Create my account →',
       form_terms_pre:        'By registering you accept our ',
       form_terms_link:       'Privacy Policy',
+      form_consent:          'By creating my account I accept the <a onclick="goTo(\'s-privacy\')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Privacy Policy</a> and <a onclick="goTo(\'s-terms\')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Terms of Service</a>, and consent to the processing of my personal data (email, phone) for the purposes described in the Privacy Policy.',
+      // Terms of Service (s-terms) — EN
+      tos_title:     'Terms of Service',
+      tos_subtitle:  'The Dogs Mind · Last updated: April 2026',
+      tos_intro:     'By using The Dogs Mind you accept these terms. Read them carefully before creating your account.',
+      tos_h1:        '1. Service provider',
+      tos_p1:        'The Dogs Mind is a service operated by <strong>Teodoro Mariscal Diaz</strong> (Spain). Contact: <a href="mailto:info@thedogsmind.net" style="color:var(--green);">info@thedogsmind.net</a>.',
+      tos_h2:        '2. Nature of the service',
+      tos_p2:        'The Dogs Mind provides AI-generated behavioral analyses and intervention plans. <strong>The content is informational, may contain errors, and does NOT replace the diagnosis or treatment of a licensed veterinary ethologist.</strong> In cases of aggression, self-harming behavior, or medical emergencies, seek a qualified professional immediately.',
+      tos_h3:        '3. Account and eligibility',
+      tos_p3:        'You must be at least 18 years old to create an account. You are responsible for the accuracy of the data you provide and for keeping your password safe. One account = one natural person.',
+      tos_h4:        '4. Tokens and payments',
+      tos_p4:        'Access to analyses and plans consumes tokens. Tokens are sold in packs and do not expire. Payments are processed via Stripe (web) or Apple In-App Purchase (iOS). Tokens are non-refundable except in cases of technical error attributable to us or applicable legal requirements. Top-ups are final once confirmed.',
+      tos_h5:        '5. Acceptable use',
+      tos_p5:        'You may not use the service for illegal, harmful, or third-party-rights-infringing purposes. You may not attempt to extract models, reverse-engineer, or resell the service without written authorization.',
+      tos_h6:        '6. Account cancellation',
+      tos_p6:        'You may delete your account at any time from "My Tokens → Delete my account". Your personal data is erased immediately. Payment records are retained anonymized for 4 years per Spanish tax law.',
+      tos_h7:        '7. Limitation of liability',
+      tos_p7:        'The service is provided "as is". The Dogs Mind does not guarantee specific results regarding your dog\'s behavior and is not liable for damages arising from the use of generated analyses or plans. This does not exclude minimum legal obligations that cannot be limited.',
+      tos_h8:        '8. Changes to terms',
+      tos_p8:        'We may update these terms. We will notify you by email or in-app for material changes. Continued use after notification implies acceptance.',
+      tos_h9:        '9. Governing law and jurisdiction',
+      tos_p9:        'These terms are governed by Spanish law. Any dispute will be submitted to the courts of Madrid (Spain), unless your country\'s consumer protection laws establish a different forum.',
+      tos_box_label: 'Contact',
+      tos_box_text:  'Questions about these terms? Email us at <a href="mailto:info@thedogsmind.net" style="color:var(--green);font-weight:600;">info@thedogsmind.net</a>.',
       form_already_account:  'Already have an account? ',
       form_sign_in:          'Sign in',
       // Tokens extras
@@ -7414,6 +7638,55 @@ if ('serviceWorker' in navigator) {
       <div style="padding:16px;background:var(--green-bg);border-radius:var(--r);border-left:3px solid var(--green);">
         <div style="font-size:13px;color:var(--green3);font-weight:600;margin-bottom:4px;" data-i18n="pp_box_title">¿Alguna duda?</div>
         <div style="font-size:13px;color:var(--text2);" data-i18n="pp_box_text">Escríbenos a <a href="mailto:info@dogsmind.ai" style="color:var(--green);font-weight:600;">info@dogsmind.ai</a> — respondemos en menos de 48 horas.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ S-TERMS: Términos de Servicio ══ -->
+  <div id="s-terms" class="screen" style="background:var(--cream);overflow-y:auto;">
+    <div style="display:flex;align-items:center;gap:12px;padding:18px 16px 14px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;position:sticky;top:0;background:var(--cream);z-index:10;">
+      <button onclick="history.back()||goTo('s-splash')" style="width:36px;height:36px;border-radius:50%;background:#fff;border:1.5px solid rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">&#8592;</button>
+      <div>
+        <div style="font-size:17px;font-weight:700;color:var(--text);letter-spacing:-0.3px;" data-i18n="tos_title">Términos de Servicio</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:1px;" data-i18n="tos_subtitle">The Dogs Mind · Última actualización: abril 2026</div>
+      </div>
+    </div>
+
+    <div style="padding:24px 20px 60px;font-size:14px;color:var(--text);line-height:1.75;max-width:640px;margin:0 auto;">
+
+      <p style="color:var(--text2);margin-bottom:24px;" data-i18n="tos_intro">Al usar The Dogs Mind aceptas estos términos. Léelos con atención antes de crear tu cuenta.</p>
+
+      <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="tos_h1">1. Quién presta el servicio</h3>
+      <p style="margin:0 0 20px;" data-i18n="tos_p1">The Dogs Mind es un servicio creado por <strong>Teodoro Mariscal Diaz</strong> (España). Para contacto, escribe a <a href="mailto:info@thedogsmind.net" style="color:var(--green);">info@thedogsmind.net</a>.</p>
+
+      <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="tos_h2">2. Naturaleza del servicio</h3>
+      <p style="margin:0 0 20px;" data-i18n="tos_p2">The Dogs Mind ofrece análisis conductuales y planes de intervención generados por inteligencia artificial. <strong>El contenido es orientativo, puede contener errores y NO sustituye el diagnóstico ni el tratamiento de un etólogo veterinario titulado.</strong> En casos de agresión, conductas autolesivas, o emergencias médicas, acude inmediatamente a un profesional cualificado.</p>
+
+      <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="tos_h3">3. Cuenta y elegibilidad</h3>
+      <p style="margin:0 0 20px;" data-i18n="tos_p3">Debes tener al menos 18 años para crear una cuenta. Eres responsable de la veracidad de los datos que introduces y de mantener tu contraseña segura. Una cuenta = una persona física.</p>
+
+      <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="tos_h4">4. Tokens y pagos</h3>
+      <p style="margin:0 0 20px;" data-i18n="tos_p4">El acceso a análisis y planes consume tokens. Los tokens se compran en packs y no caducan. Los pagos se procesan a través de Stripe (web) o Apple In-App Purchase (iOS). Los tokens son no reembolsables salvo error técnico imputable a nosotros o requisito legal aplicable. Las recargas son finales tras la confirmación.</p>
+
+      <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="tos_h5">5. Uso aceptable</h3>
+      <p style="margin:0 0 20px;" data-i18n="tos_p5">No puedes usar el servicio para fines ilegales, dañinos o que infrinjan derechos de terceros. Tampoco puedes intentar extraer modelos, hacer ingeniería inversa, ni revender el servicio sin autorización escrita.</p>
+
+      <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="tos_h6">6. Cancelación de cuenta</h3>
+      <p style="margin:0 0 20px;" data-i18n="tos_p6">Puedes eliminar tu cuenta en cualquier momento desde la pantalla "Mis Tokens → Eliminar mi cuenta". Tus datos personales se borran inmediatamente. Los registros de pago se conservan anonimizados durante 4 años por requisito fiscal (España).</p>
+
+      <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="tos_h7">7. Limitación de responsabilidad</h3>
+      <p style="margin:0 0 20px;" data-i18n="tos_p7">El servicio se ofrece "tal como es". The Dogs Mind no garantiza resultados específicos sobre la conducta de tu perro y no se hace responsable de daños derivados del uso de los análisis o planes generados. Esto no excluye obligaciones legales mínimas que no puedan limitarse.</p>
+
+      <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="tos_h8">8. Cambios en los términos</h3>
+      <p style="margin:0 0 20px;" data-i18n="tos_p8">Podemos actualizar estos términos. Te notificaremos por email o dentro de la app cuando haya cambios materiales. El uso continuado tras la notificación implica aceptación.</p>
+
+      <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="tos_h9">9. Ley aplicable y jurisdicción</h3>
+      <p style="margin:0 0 20px;" data-i18n="tos_p9">Estos términos se rigen por la ley española. Cualquier disputa se someterá a los juzgados de Madrid (España), salvo que la legislación de protección al consumidor de tu país establezca un foro distinto.</p>
+
+      <div style="background:#fff;border:1.5px solid rgba(74,103,65,0.15);border-radius:14px;padding:18px;margin-top:28px;">
+        <div style="font-size:11px;color:var(--green);font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;" data-i18n="tos_box_label">Contacto</div>
+        <div style="font-size:13px;color:var(--text2);" data-i18n="tos_box_text">¿Dudas sobre estos términos? Escríbenos a <a href="mailto:info@thedogsmind.net" style="color:var(--green);font-weight:600;">info@thedogsmind.net</a>.</div>
       </div>
 
     </div>

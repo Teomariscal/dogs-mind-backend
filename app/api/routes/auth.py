@@ -3,6 +3,7 @@ import secrets
 import string
 import httpx
 from datetime import datetime, timedelta
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
@@ -30,7 +31,8 @@ DEFAULT_TOKENS     = 5
 class RegisterRequest(BaseModel):
     email: EmailStr
     password: str
-    invite_code: str = ""   # optional ambassador code
+    phone: Optional[str] = None        # PII — opcional, GDPR/CCPA scope
+    invite_code: str = ""              # optional ambassador code
 
 class LoginRequest(BaseModel):
     email: EmailStr
@@ -97,8 +99,11 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
     role   = "ambassador" if is_ambassador else "user"
     tokens = AMBASSADOR_TOKENS if is_ambassador else DEFAULT_TOKENS
 
+    # Sanitize phone: trim + None si vacío
+    phone_clean = (req.phone or "").strip() or None
+
     user = User(email=req.email, password_hash=hash_password(req.password),
-                tokens=tokens, role=role)
+                phone=phone_clean, tokens=tokens, role=role)
     db.add(user)
     db.commit()
     db.refresh(user)

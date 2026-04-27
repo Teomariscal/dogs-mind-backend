@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'net.thedogsmind.app',
-  appName: 'Dogs Mind',
+  appName: 'The Dogs Mind',
   webDir: '../frontend',
   ios: {
     contentInset: 'always',

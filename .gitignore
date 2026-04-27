@@ -8,3 +8,15 @@ venv/
 dist/
 *.egg-info/
 frontend/
+
+# Node / Capacitor (mobile/)
+node_modules/
+mobile/node_modules/
+mobile/ios/App/build/
+mobile/ios/App/Pods/
+mobile/ios/App/Podfile.lock
+mobile/ios/DerivedData/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+.DS_Store

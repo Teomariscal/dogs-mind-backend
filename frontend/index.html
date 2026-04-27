@@ -4429,6 +4429,9 @@ body{
         <input class="inp" type="email" placeholder="Email..." data-i18n-placeholder="form_email_ph" id="login-email" autocomplete="email">
         <input class="inp" type="password" placeholder="Contraseña..." data-i18n-placeholder="form_password_login_ph" id="login-password" autocomplete="current-password" style="margin-top:10px;">
         <button class="btn-green" onclick="loginUser()" style="margin-top:14px;width:100%;font-size:16px;padding:14px;" data-i18n="login_enter_btn">Entrar →</button>
+        <div style="text-align:center;margin-top:12px;">
+          <a onclick="forgotPassword()" style="font-size:13px;color:#8a6a20;cursor:pointer;text-decoration:underline;font-weight:500;" data-i18n="forgot_password_link">¿Olvidaste tu contraseña?</a>
+        </div>
       </div>
     </div>
 
@@ -5729,6 +5732,43 @@ function getVal(id, fallback) {
     setTimeout(showLoginForm, 80);
   }
 
+  function forgotPassword() {
+    var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+    var emailEl = document.getElementById('login-email');
+    var email = (emailEl && emailEl.value || '').trim();
+    if (!email) {
+      email = (prompt(lang === 'en'
+        ? 'Enter your email and we\'ll send you a new password:'
+        : 'Introduce tu email y te enviaremos una nueva contraseña:') || '').trim();
+    }
+    if (!email) return;
+    if (emailEl) emailEl.value = email;
+    var confirmMsg = lang === 'en'
+      ? 'Send a new password to ' + email + '? Your current password will be replaced.'
+      : '¿Enviar una nueva contraseña a ' + email + '? Tu contraseña actual será reemplazada.';
+    if (!confirm(confirmMsg)) return;
+
+    fetch(API_URL + '/auth/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    })
+    .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+    .then(function(res) {
+      if (!res.ok) {
+        alert(res.data.detail || (lang === 'en' ? 'Could not send the email. Try again later.' : 'No se pudo enviar el email. Inténtalo más tarde.'));
+        return;
+      }
+      alert(lang === 'en'
+        ? '✉️ Check your inbox. We sent you a new password (also check spam).'
+        : '✉️ Revisa tu correo. Te hemos enviado una nueva contraseña (revisa también spam).');
+    })
+    .catch(function() {
+      alert(lang === 'en' ? 'Connection error.' : 'Error de conexión.');
+    });
+  }
+  window.forgotPassword = forgotPassword;
+
   function loginUser() {
     var email    = (document.getElementById('login-email').value || '').trim();
     var password = (document.getElementById('login-password').value || '').trim();
@@ -6823,6 +6863,7 @@ function endTourIntro() {
       form_or:               'o',
       form_new_user:         'Nuevo Usuario',
       splash_home:           'Inicio',
+      forgot_password_link:  '¿Olvidaste tu contraseña?',
       form_welcome_intro:    'Bienvenido a <strong style="color:var(--text)">The Dogs Mind</strong>. Puedes elegir dos modelos de suscripción: <strong style="color:var(--green)">Particular</strong> (hasta 2 perros) o <strong style="color:var(--green)">Profesional</strong> (hasta 20 perros).<br><br>Te invitamos a que descubras gratuitamente el funcionamiento de esta app, que irá creciendo y mejorando contigo. Tienes <strong style="color:var(--text)">5 tokens de regalo</strong>. Al finalizar deberás ir recargando tus tokens.',
       form_user_type:        'Tipo de usuario',
       form_full_name:        'Nombre y apellidos',
@@ -7164,6 +7205,7 @@ function endTourIntro() {
       form_or:               'or',
       form_new_user:         'New user',
       splash_home:           'Home',
+      forgot_password_link:  'Forgot your password?',
       form_welcome_intro:    'Welcome to <strong style="color:var(--text)">The Dogs Mind</strong>. You can choose between two subscription plans: <strong style="color:var(--green)">Pet Owner</strong> (up to 2 dogs) or <strong style="color:var(--green)">Professional</strong> (up to 20 dogs).<br><br>We invite you to discover for free how this app works — it will keep growing and improving with you. You have <strong style="color:var(--text)">5 free welcome tokens</strong>. After that you can top up whenever you need.',
       form_user_type:        'User type',
       form_full_name:        'Full name',

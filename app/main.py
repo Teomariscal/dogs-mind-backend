@@ -87,7 +87,10 @@ app = FastAPI(
 
 # ── CORS ─────────────────────────────────────────────────────────────────────
 _ALLOWED_ORIGINS = [
-    "https://thedogsmindbeta.netlify.app",  # production frontend
+    "https://thedogsmind.net",               # production (custom domain)
+    "https://www.thedogsmind.net",           # production (www variant)
+    "https://beta.thedogsmind.net",          # staging (custom domain)
+    "https://thedogsmindbeta.netlify.app",   # staging (Netlify URL, legacy)
     "http://localhost:3000",                 # local dev
     "http://localhost:8000",                 # local FastAPI
 ]
@@ -121,7 +124,7 @@ def serve_frontend():
     if os.path.isfile(FRONTEND_HTML):
         return FileResponse(FRONTEND_HTML, media_type="text/html")
     # Frontend is hosted on Netlify — redirect there
-    return RedirectResponse(url="https://thedogsmindbeta.netlify.app", status_code=302)
+    return RedirectResponse(url="https://thedogsmind.net", status_code=302)
 
 
 @app.get("/admin", include_in_schema=False)

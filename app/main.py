@@ -105,6 +105,9 @@ _ALLOWED_ORIGINS = [
     "https://www.thedogsmind.net",           # production (www variant)
     "https://beta.thedogsmind.net",          # staging (custom domain)
     "https://thedogsmindbeta.netlify.app",   # staging (Netlify URL, legacy)
+    "capacitor://localhost",                 # iOS app (Capacitor WebView)
+    "ionic://localhost",                     # iOS app (alt scheme legacy)
+    "http://localhost",                      # Android app (Capacitor WebView)
     "http://localhost:3000",                 # local dev
     "http://localhost:8000",                 # local FastAPI
 ]

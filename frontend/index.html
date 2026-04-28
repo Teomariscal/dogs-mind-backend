@@ -6,7 +6,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <meta name="description" content="Dogs Mind — Análisis de conducta canina con IA. Consulta con Teo Mariscal y los Dogs Aigents para entender y mejorar el comportamiento de tu perro.">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
 <title>Canine Behavior Consultancy · Teo Mariscal</title>
 <!-- PWA manifest -->
 <link rel="manifest" href="/manifest.json">
@@ -2442,6 +2442,31 @@ body{
 }
 #s-tracking #interv-body {
   color: rgba(255,250,240,0.86) !important;
+  background: transparent !important;
+}
+/* Forzar color claro en TODO el contenido renderizado por markdownToHtml
+   (h2/h3/p/divs de bullets). Sin esto, los párrafos e ítems del plan
+   heredaban un color claro PERO sobre algún wrapper de fondo claro,
+   resultando en texto invisible. */
+#s-tracking #interv-body,
+#s-tracking #interv-body * {
+  background: transparent !important;
+}
+#s-tracking #interv-body p,
+#s-tracking #interv-body div,
+#s-tracking #interv-body li,
+#s-tracking #interv-body span:not([style*="color:var(--green2)"]):not([style*="color:#"]) {
+  color: rgba(255,250,240,0.92) !important;
+}
+#s-tracking #interv-body strong {
+  color: rgba(255,250,240,1) !important;
+}
+#s-tracking #interv-body h2 {
+  color: var(--amber) !important;
+  border-top-color: rgba(200,169,110,0.25) !important;
+}
+#s-tracking #interv-body h3 {
+  color: var(--amber) !important;
 }
 #s-tracking #interv-loading > div:first-child {
   border-color: rgba(200,169,110,0.20) !important;
@@ -4038,7 +4063,96 @@ body{
       </div>
     </div>
 
+    <!-- ══ Mi cuenta y privacidad (GDPR/CCPA + Apple) ══ -->
+    <div style="padding:0 16px 32px;">
+      <div style="font-size:10px;font-weight:700;color:var(--grey);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;" data-i18n="account_section">Mi cuenta y privacidad</div>
+
+      <div id="account-email-display" style="background:#fff;border:1.5px solid rgba(0,0,0,0.08);border-radius:14px;padding:14px 16px;margin-bottom:10px;font-size:13px;color:var(--text2);line-height:1.4;">
+        <div style="font-size:10px;color:var(--grey);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;" data-i18n="account_email_label">Email de la cuenta</div>
+        <div id="account-email-value" style="color:var(--dark);font-weight:600;">—</div>
+      </div>
+
+      <button onclick="downloadMyData()" style="width:100%;display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid rgba(0,0,0,0.08);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;text-align:left;font-family:inherit;transition:border-color .2s;" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='rgba(0,0,0,0.08)'">
+        <div style="width:36px;height:36px;background:#f5f5ef;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">📥</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;color:var(--dark);" data-i18n="account_export_title">Descargar mis datos</div>
+          <div style="font-size:12px;color:var(--grey);line-height:1.4;" data-i18n="account_export_desc">Exporta toda tu información personal en formato JSON</div>
+        </div>
+      </button>
+
+      <button onclick="openChangePasswordModal()" style="width:100%;display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid rgba(0,0,0,0.08);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;text-align:left;font-family:inherit;transition:border-color .2s;" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='rgba(0,0,0,0.08)'">
+        <div style="width:36px;height:36px;background:#f5f5ef;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🔑</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;color:var(--dark);" data-i18n="account_change_pw_title">Cambiar contraseña</div>
+          <div style="font-size:12px;color:var(--grey);line-height:1.4;" data-i18n="account_change_pw_desc">Actualiza tu contraseña por una nueva</div>
+        </div>
+      </button>
+
+      <button onclick="openSupportEmail()" style="width:100%;display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid rgba(0,0,0,0.08);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;text-align:left;font-family:inherit;transition:border-color .2s;" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='rgba(0,0,0,0.08)'">
+        <div style="width:36px;height:36px;background:#f5f5ef;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">💬</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;color:var(--dark);" data-i18n="account_support_title">Contactar soporte</div>
+          <div style="font-size:12px;color:var(--grey);line-height:1.4;" data-i18n="account_support_desc">Escríbenos si tienes dudas o problemas con la app</div>
+        </div>
+      </button>
+
+      <button onclick="openDeleteAccountModal()" style="width:100%;display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid rgba(220,38,38,0.25);border-radius:14px;padding:14px 16px;margin-bottom:14px;cursor:pointer;text-align:left;font-family:inherit;transition:background .2s;" onmouseover="this.style.background='rgba(220,38,38,0.04)'" onmouseout="this.style.background='#fff'">
+        <div style="width:36px;height:36px;background:rgba(220,38,38,0.08);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🗑️</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;color:#dc2626;" data-i18n="account_delete_title">Eliminar mi cuenta</div>
+          <div style="font-size:12px;color:var(--grey);line-height:1.4;" data-i18n="account_delete_desc">Borra tu cuenta y todos tus datos personales. No se puede deshacer.</div>
+        </div>
+      </button>
+
+      <div style="font-size:11px;color:var(--grey);line-height:1.6;text-align:center;padding:8px 4px;" data-i18n="account_legal_note">
+        Al usar The Dogs Mind aceptas nuestra <a href="#" onclick="goTo('s-privacy');return false;" style="color:var(--green);text-decoration:underline;">Política de Privacidad</a> y <a href="#" onclick="goTo('s-terms');return false;" style="color:var(--green);text-decoration:underline;">Términos de Servicio</a>.
+      </div>
+    </div>
+
   </div><!-- /s-tokens -->
+
+  <!-- ══ Modal cambiar contraseña ══ -->
+  <div id="change-password-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:#fff;border-radius:16px;max-width:380px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+      <div style="font-size:18px;font-weight:700;color:var(--dark);margin-bottom:8px;" data-i18n="cp_modal_title">🔑 Cambiar contraseña</div>
+      <div style="font-size:13px;line-height:1.6;color:var(--text2);margin-bottom:16px;" data-i18n="cp_modal_body">Por seguridad, necesitamos verificar tu contraseña actual antes de establecer una nueva.</div>
+
+      <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:6px;" data-i18n="cp_modal_current_label">Contraseña actual</label>
+      <div style="position:relative;width:100%;"><input id="cp-current" type="password" autocomplete="current-password" style="width:100%;padding-right:42px;padding:12px 14px;border:1.5px solid rgba(0,0,0,0.15);border-radius:10px;font-size:14px;font-family:inherit;margin-bottom:12px;box-sizing:border-box;" /><button type="button" onclick="togglePasswordVisibility('cp-current', this)" aria-label="Mostrar contraseña" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);background:transparent;border:none;cursor:pointer;font-size:18px;padding:4px 8px;color:var(--grey);font-family:inherit;line-height:1;">👁</button></div>
+
+      <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:6px;" data-i18n="cp_modal_new_label">Contraseña nueva (mínimo 6 caracteres)</label>
+      <div style="position:relative;width:100%;"><input id="cp-new" type="password" autocomplete="new-password" style="width:100%;padding-right:42px;padding:12px 14px;border:1.5px solid rgba(0,0,0,0.15);border-radius:10px;font-size:14px;font-family:inherit;margin-bottom:12px;box-sizing:border-box;" /><button type="button" onclick="togglePasswordVisibility('cp-new', this)" aria-label="Mostrar contraseña" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);background:transparent;border:none;cursor:pointer;font-size:18px;padding:4px 8px;color:var(--grey);font-family:inherit;line-height:1;">👁</button></div>
+
+      <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:6px;" data-i18n="cp_modal_confirm_label">Repite la contraseña nueva</label>
+      <div style="position:relative;width:100%;"><input id="cp-confirm" type="password" autocomplete="new-password" style="width:100%;padding-right:42px;padding:12px 14px;border:1.5px solid rgba(0,0,0,0.15);border-radius:10px;font-size:14px;font-family:inherit;margin-bottom:18px;box-sizing:border-box;" /><button type="button" onclick="togglePasswordVisibility('cp-confirm', this)" aria-label="Mostrar contraseña" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);background:transparent;border:none;cursor:pointer;font-size:18px;padding:4px 8px;color:var(--grey);font-family:inherit;line-height:1;">👁</button></div>
+
+      <div id="cp-modal-error" style="display:none;font-size:12px;color:#dc2626;margin-bottom:12px;padding:8px;background:rgba(220,38,38,0.08);border-radius:8px;"></div>
+
+      <div style="display:flex;gap:10px;">
+        <button onclick="closeChangePasswordModal()" style="flex:1;padding:13px;background:#f5f5ef;color:var(--dark);border:none;border-radius:100px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;" data-i18n="cp_modal_cancel">Cancelar</button>
+        <button id="cp-modal-confirm-btn" onclick="confirmChangePassword()" style="flex:1;padding:13px;background:var(--green2);color:#fff;border:none;border-radius:100px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;" data-i18n="cp_modal_confirm">Cambiar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ Modal confirmar eliminación de cuenta ══ -->
+  <div id="delete-account-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:#fff;border-radius:16px;max-width:380px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+      <div style="font-size:18px;font-weight:700;color:#dc2626;margin-bottom:8px;" data-i18n="del_modal_title">⚠️ Eliminar tu cuenta</div>
+      <div style="font-size:13px;line-height:1.6;color:var(--text2);margin-bottom:16px;" data-i18n="del_modal_body">
+        Tu email, contraseña y teléfono se eliminarán permanentemente. Los registros de pago se conservan anonimizados durante 4 años por requisito fiscal (España). <strong>Esta acción no se puede deshacer.</strong>
+      </div>
+      <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:6px;" data-i18n="del_modal_pw_label">Confirma tu contraseña actual</label>
+      <div style="position:relative;width:100%;"><input id="del-modal-password" type="password" autocomplete="current-password" style="width:100%;padding-right:42px;padding:12px 14px;border:1.5px solid rgba(0,0,0,0.15);border-radius:10px;font-size:14px;font-family:inherit;margin-bottom:12px;box-sizing:border-box;" /><button type="button" onclick="togglePasswordVisibility('del-modal-password', this)" aria-label="Mostrar contraseña" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);background:transparent;border:none;cursor:pointer;font-size:18px;padding:4px 8px;color:var(--grey);font-family:inherit;line-height:1;">👁</button></div>
+      <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:6px;" data-i18n="del_modal_confirm_label">Escribe ELIMINAR para confirmar</label>
+      <input id="del-modal-confirm" type="text" placeholder="ELIMINAR" style="width:100%;padding:12px 14px;border:1.5px solid rgba(0,0,0,0.15);border-radius:10px;font-size:14px;font-family:inherit;margin-bottom:18px;box-sizing:border-box;letter-spacing:0.1em;" />
+      <div id="del-modal-error" style="display:none;font-size:12px;color:#dc2626;margin-bottom:12px;padding:8px;background:rgba(220,38,38,0.08);border-radius:8px;"></div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="closeDeleteAccountModal()" style="flex:1;padding:13px;background:#f5f5ef;color:var(--dark);border:none;border-radius:100px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;" data-i18n="del_modal_cancel">Cancelar</button>
+        <button id="del-modal-confirm-btn" onclick="confirmDeleteAccount()" style="flex:1;padding:13px;background:#dc2626;color:#fff;border:none;border-radius:100px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;" data-i18n="del_modal_confirm">Eliminar</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ══ S-LOADING-ANALYSIS: pantalla de espera (análisis y plan) ══ -->
   <div id="s-loading-analysis" class="screen" style="background:var(--cream);overflow:hidden;">
@@ -4052,6 +4166,7 @@ body{
           <span class="dot-pulse" style="width:8px;height:8px;border-radius:50%;background:#4a6741;animation:dotPulse 1.4s infinite ease-in-out;animation-delay:0.2s;"></span>
           <span class="dot-pulse" style="width:8px;height:8px;border-radius:50%;background:#4a6741;animation:dotPulse 1.4s infinite ease-in-out;animation-delay:0.4s;"></span>
         </div>
+        <div style="margin-top:22px;font-size:11px;line-height:1.5;color:var(--text3);opacity:0.75;font-style:italic;max-width:300px;margin-left:auto;margin-right:auto;" data-i18n="loading_disclaimer">The Dogs Mind te ofrece un análisis por IA y puede cometer errores. No sustituye a tu etólogo veterinario.</div>
       </div>
     </div>
   </div>
@@ -4146,10 +4261,6 @@ body{
         <button class="btn-orange" onclick="generateInterventionPlan()" data-i18n="abc_btn_plan">Ver Plan de Intervención</button>
         <button id="btn-full-analysis" onclick="goTo('s-full-analysis')" style="width:100%;padding:15px;border:none;border-radius:100px;background:#c8962a;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.02em;" data-i18n="abc_btn_full">Análisis completo &#8594;</button>
         <button class="btn-outline" onclick="goTo('s-anamnesis')" data-i18n="abc_btn_new">Nuevo análisis</button>
-        <button class="btn-teo-review" onclick="alert('Disponible en versión completa')" style="display:flex;align-items:center;justify-content:center;gap:10px;">
-          <span data-i18n="abc_btn_teo">Revisión personal de Teo Mariscal</span>
-          <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-15.webp" style="width:28px;height:28px;border-radius:50%;object-fit:cover;object-position:center top;flex-shrink:0;border:2px solid rgba(255,255,255,0.6);" alt="Teo Mariscal" />
-        </button>
       </div>
     </div>
   </div>
@@ -4427,7 +4538,7 @@ body{
           <span data-i18n="login_section_title">Iniciar sesión</span>
         </div>
         <input class="inp" type="email" placeholder="Email..." data-i18n-placeholder="form_email_ph" id="login-email" autocomplete="email">
-        <input class="inp" type="password" placeholder="Contraseña..." data-i18n-placeholder="form_password_login_ph" id="login-password" autocomplete="current-password" style="margin-top:10px;">
+        <div style="position:relative;width:100%;"><input class="inp" type="password" placeholder="Contraseña..." data-i18n-placeholder="form_password_login_ph" id="login-password" autocomplete="current-password" style="margin-top:10px;"><button type="button" onclick="togglePasswordVisibility('login-password', this)" aria-label="Mostrar contraseña" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);background:transparent;border:none;cursor:pointer;font-size:18px;padding:4px 8px;color:var(--grey);font-family:inherit;line-height:1;">👁</button></div>
         <button class="btn-green" onclick="loginUser()" style="margin-top:14px;width:100%;font-size:16px;padding:14px;" data-i18n="login_enter_btn">Entrar →</button>
         <div style="text-align:center;margin-top:12px;">
           <a onclick="forgotPassword()" style="font-size:13px;color:#8a6a20;cursor:pointer;text-decoration:underline;font-weight:500;" data-i18n="forgot_password_link">¿Olvidaste tu contraseña?</a>
@@ -4545,7 +4656,7 @@ body{
         <!-- Password -->
         <div>
           <label style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;" data-i18n="form_password">Contraseña</label>
-          <input class="inp" type="password" placeholder="Mínimo 6 caracteres" data-i18n-placeholder="form_password_ph" id="reg-password">
+          <div style="position:relative;width:100%;"><input class="inp" type="password" placeholder="Mínimo 6 caracteres" data-i18n-placeholder="form_password_ph" id="reg-password"><button type="button" onclick="togglePasswordVisibility('reg-password', this)" aria-label="Mostrar contraseña" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);background:transparent;border:none;cursor:pointer;font-size:18px;padding:4px 8px;color:var(--grey);font-family:inherit;line-height:1;">👁</button></div>
         </div>
 
         <!-- Invite code (optional) -->
@@ -4567,8 +4678,8 @@ body{
         <button class="btn-green" onclick="registerUser()" style="margin-top:4px;font-size:16px;padding:16px;" data-i18n="form_submit">
           Crear mi cuenta →
         </button>
-        <div style="text-align:center;margin-top:10px;">
-          <span style="font-size:11px;color:var(--text3);" data-i18n="form_terms_pre">Al registrarte aceptas nuestra </span><a onclick="goTo('s-privacy')" style="font-size:11px;color:var(--green);cursor:pointer;text-decoration:underline;" data-i18n="form_terms_link">Política de Privacidad</a>
+        <div style="margin-top:12px;font-size:11px;color:var(--text3);line-height:1.55;text-align:center;padding:0 4px;" data-i18n="form_consent">
+          Al crear mi cuenta acepto la <a onclick="goTo('s-privacy')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Política de Privacidad</a> y los <a onclick="goTo('s-terms')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Términos de Servicio</a>, y consiento el tratamiento de mis datos personales (email, teléfono) para los fines descritos en la Política de Privacidad.
         </div>
 
       </div>
@@ -4604,62 +4715,6 @@ body{
         </div>
       </div>
 
-      
-      <!-- video consultation -->
-      <div id="video-section">
-        <div style="font-size:10px;font-weight:700;color:var(--grey);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px;" data-i18n="anam_video_label">&#x1F3A5; Consulta en video</div>
-
-        <!-- video thumbnail placeholder -->
-        <div style="position:relative;border-radius:14px;overflow:hidden;background:#1a1a1a;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;margin-bottom:10px;border:2px dashed rgba(255,255,255,0.15);" id="video-thumb-wrap">
-          <!-- fake video still -->
-          <div style="position:absolute;inset:0;background:linear-gradient(135deg,#1f2d1f 0%,#0f1a0f 50%,#1a1f0f 100%);opacity:0.95;"></div>
-          <!-- camera viewfinder grid -->
-          <div style="position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr 1fr;pointer-events:none;">
-            <div style="border-right:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);"></div>
-            <div style="border-right:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);"></div>
-            <div style="border-bottom:1px solid rgba(255,255,255,0.08);"></div>
-            <div style="border-right:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);"></div>
-            <div style="border-right:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);"></div>
-            <div style="border-bottom:1px solid rgba(255,255,255,0.08);"></div>
-            <div style="border-right:1px solid rgba(255,255,255,0.08);"></div>
-            <div style="border-right:1px solid rgba(255,255,255,0.08);"></div>
-            <div></div>
-          </div>
-          <!-- focus corners -->
-          <div style="position:absolute;top:12px;left:12px;width:18px;height:18px;border-top:2px solid rgba(184,149,90,0.7);border-left:2px solid rgba(184,149,90,0.7);border-radius:2px 0 0 0;"></div>
-          <div style="position:absolute;top:12px;right:12px;width:18px;height:18px;border-top:2px solid rgba(184,149,90,0.7);border-right:2px solid rgba(184,149,90,0.7);border-radius:0 2px 0 0;"></div>
-          <div style="position:absolute;bottom:12px;left:12px;width:18px;height:18px;border-bottom:2px solid rgba(184,149,90,0.7);border-left:2px solid rgba(184,149,90,0.7);border-radius:0 0 0 2px;"></div>
-          <div style="position:absolute;bottom:12px;right:12px;width:18px;height:18px;border-bottom:2px solid rgba(184,149,90,0.7);border-right:2px solid rgba(184,149,90,0.7);border-radius:0 0 2px 0;"></div>
-          <!-- rec indicator -->
-          <div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:5px;background:rgba(0,0,0,0.5);padding:3px 8px;border-radius:100px;">
-            <div style="width:6px;height:6px;border-radius:50%;background:#e53e3e;animation:recblink 1.2s infinite;"></div>
-            <span style="font-size:9px;font-weight:700;color:#fff;letter-spacing:1px;">REC</span>
-          </div>
-          <!-- play button -->
-          <div style="position:relative;z-index:2;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
-            <div style="width:0;height:0;border-top:9px solid transparent;border-bottom:9px solid transparent;border-left:16px solid rgba(255,255,255,0.9);margin-left:3px;"></div>
-          </div>
-          <!-- timestamp -->
-          <div style="position:absolute;bottom:10px;right:12px;font-size:10px;font-family:monospace;color:rgba(255,255,255,0.5);background:rgba(0,0,0,0.4);padding:2px 6px;border-radius:4px;">00:00</div>
-          <!-- dog silhouette hint -->
-          <div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:32px;opacity:0.08;line-height:1;">&#x1F415;</div>
-        </div>
-
-        <!-- token cost info -->
-        <div style="display:flex;align-items:flex-start;gap:6px;background:rgba(184,149,90,0.08);border:1px solid rgba(184,149,90,0.25);border-radius:10px;padding:8px 10px;margin-bottom:10px;">
-          <span style="font-size:13px;flex-shrink:0;margin-top:1px;">&#x26A1;</span>
-          <div>
-            <div style="font-size:11px;font-weight:600;color:#8a6a20;margin-bottom:2px;" data-i18n="anam_video_warn_t">An&aacute;lisis de video usa m&aacute;s tokens</div>
-            <div style="font-size:10px;color:var(--grey);line-height:1.45;" data-i18n="anam_video_warn_b">El an&aacute;lisis por video requiere procesar muchos m&aacute;s datos que texto. Cada minuto de video consume aproximadamente <strong>10 tokens</strong>. Val&oacute;ra si te compensa seg&uacute;n el caso.</div>
-          </div>
-        </div>
-
-        <!-- add video button -->
-        <button id="btn-add-video" onclick="checkVideoTokens()" style="width:100%;padding:11px 16px;border-radius:100px;border:1.5px solid var(--green2);background:transparent;color:var(--green2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;">
-          <span>&#x1F3A5;</span> <span data-i18n="anam_video_add">A&ntilde;adir video a la anamnesis</span>
-        </button>
-      </div>
-      <!-- fin video consultation -->
 
       <!-- el perro -->
       <div>
@@ -4668,45 +4723,45 @@ body{
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
           <div>
             <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_name">Nombre</div>
-            <input id="inp-dog-name" type="text" placeholder="Nombre del perro" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+            <input id="inp-dog-name" type="text" data-i18n-placeholder="ph_dog_name" placeholder="Nombre del perro" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
           </div>
           <div>
             <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_age">Edad</div>
-            <input id="inp-dog-age" type="text" placeholder="Ej: 3 a&ntilde;os" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+            <input id="inp-dog-age" type="text" data-i18n-placeholder="ph_dog_age" placeholder="Ej: 3 a&ntilde;os" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
           </div>
         </div>
 
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_breed">Tipolog&iacute;a racial</div>
-          <input id="inp-breed" type="text" placeholder="Raza o raza a la que se parece m&aacute;s..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+          <input id="inp-breed" type="text" data-i18n-placeholder="ph_breed" placeholder="Raza o raza a la que se parece m&aacute;s..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
         </div>
 
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_chronic">&iquest;Tiene alguna dolencia cr&oacute;nica?</div>
           <div style="display:flex;gap:8px;">
-            <button id="dolencia-no" onclick="anam_toggle('dolencia-no','dolencia-si')" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
-            <button id="dolencia-si" onclick="anam_toggle_cond('dolencia-si','dolencia-no','inp-dolencia-wrap')" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
+            <button id="dolencia-no" onclick="anam_toggle('dolencia-no','dolencia-si')" data-i18n="btn_no" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
+            <button id="dolencia-si" onclick="anam_toggle_cond('dolencia-si','dolencia-no','inp-dolencia-wrap')" data-i18n="btn_yes" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
           </div>
           <div id="inp-dolencia-wrap" style="display:none;margin-top:8px;">
-            <input id="inp-dolencia-detail" type="text" placeholder="¿Cuál dolencia? (ej: displasia, epilepsia...)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+            <input id="inp-dolencia-detail" type="text" data-i18n-placeholder="ph_dolencia" placeholder="¿Cuál dolencia? (ej: displasia, epilepsia...)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
           </div>
         </div>
 
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_living">&iquest;Vive dentro o fuera de casa?</div>
           <div style="display:flex;gap:8px;">
-            <button id="vive-dentro" onclick="anam_toggle3('vive-dentro','vive-fuera','vive-ambos')" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Dentro</button>
-            <button id="vive-fuera" onclick="anam_toggle3('vive-fuera','vive-dentro','vive-ambos')" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Fuera</button>
-            <button id="vive-ambos" onclick="anam_toggle3('vive-ambos','vive-dentro','vive-fuera')" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Ambos</button>
+            <button id="vive-dentro" onclick="anam_toggle3('vive-dentro','vive-fuera','vive-ambos')" data-i18n="anam_btn_indoor" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Dentro</button>
+            <button id="vive-fuera" onclick="anam_toggle3('vive-fuera','vive-dentro','vive-ambos')" data-i18n="anam_btn_outdoor" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Fuera</button>
+            <button id="vive-ambos" onclick="anam_toggle3('vive-ambos','vive-dentro','vive-fuera')" data-i18n="anam_btn_both" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Ambos</button>
           </div>
         </div>
 
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_environment">&iquest;Entorno donde vive?</div>
           <div style="display:flex;gap:8px;">
-            <button id="entorno-campo" onclick="anam_toggle3('entorno-campo','entorno-periferia','entorno-ciudad')" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Campo</button>
-            <button id="entorno-periferia" onclick="anam_toggle3('entorno-periferia','entorno-campo','entorno-ciudad')" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Periferia</button>
-            <button id="entorno-ciudad" onclick="anam_toggle3('entorno-ciudad','entorno-campo','entorno-periferia')" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Ciudad</button>
+            <button id="entorno-campo" onclick="anam_toggle3('entorno-campo','entorno-periferia','entorno-ciudad')" data-i18n="anam_btn_country" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Campo</button>
+            <button id="entorno-periferia" onclick="anam_toggle3('entorno-periferia','entorno-campo','entorno-ciudad')" data-i18n="anam_btn_suburb" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Periferia</button>
+            <button id="entorno-ciudad" onclick="anam_toggle3('entorno-ciudad','entorno-campo','entorno-periferia')" data-i18n="anam_btn_city" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Ciudad</button>
           </div>
         </div>
 
@@ -4714,8 +4769,8 @@ body{
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_walks">Paseos diarios</div>
           <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
             <div style="display:flex;gap:8px;">
-              <button id="paseos-no" onclick="anam_toggle_cond('paseos-no','paseos-si','paseos-count-wrap')" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
-              <button id="paseos-si" onclick="anam_toggle_cond('paseos-si','paseos-no','paseos-count-wrap')" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
+              <button id="paseos-no" onclick="anam_toggle_cond('paseos-no','paseos-si','paseos-count-wrap')" data-i18n="btn_no" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
+              <button id="paseos-si" onclick="anam_toggle_cond('paseos-si','paseos-no','paseos-count-wrap')" data-i18n="btn_yes" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
             </div>
             <div id="paseos-count-wrap" style="display:none;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;background:#fff;display:none;align-items:center;padding:6px 12px;gap:8px;">
               <span style="font-size:13px;color:#aaa;">¿Cuántos?</span>
@@ -4728,7 +4783,7 @@ body{
 
         <div>
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_weaning">&iquest;Con cu&aacute;ntos meses sali&oacute; de la camada?</div>
-          <input id="inp-weaning" type="text" placeholder="Ej: 2 meses, 8 semanas..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+          <input id="inp-weaning" type="text" data-i18n-placeholder="ph_weaning" placeholder="Ej: 2 meses, 8 semanas..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
         </div>
       </div>
 
@@ -4751,8 +4806,8 @@ body{
           <div>
             <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_kids">&iquest;Hay ni&ntilde;os?</div>
             <div style="display:flex;gap:8px;">
-              <button id="ninios-no" onclick="anam_toggle('ninios-no','ninios-si')" style="padding:8px 16px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
-              <button id="ninios-si" onclick="anam_toggle('ninios-si','ninios-no')" style="padding:8px 16px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
+              <button id="ninios-no" onclick="anam_toggle('ninios-no','ninios-si')" data-i18n="btn_no" style="padding:8px 16px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
+              <button id="ninios-si" onclick="anam_toggle('ninios-si','ninios-no')" data-i18n="btn_yes" style="padding:8px 16px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
             </div>
           </div>
         </div>
@@ -4760,11 +4815,11 @@ body{
         <div>
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_otherdogs">&iquest;Convive con otros perros?</div>
           <div style="display:flex;gap:8px;">
-            <button id="convive-no" onclick="anam_toggle('convive-no','convive-si')" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
-            <button id="convive-si" onclick="anam_toggle_cond('convive-si','convive-no','inp-convive-wrap')" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
+            <button id="convive-no" onclick="anam_toggle('convive-no','convive-si')" data-i18n="btn_no" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
+            <button id="convive-si" onclick="anam_toggle_cond('convive-si','convive-no','inp-convive-wrap')" data-i18n="btn_yes" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
           </div>
           <div id="inp-convive-wrap" style="display:none;margin-top:8px;">
-            <input id="inp-convive-detail" type="text" placeholder="¿Cuántos y de qué raza? (ej: 2 labradores)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+            <input id="inp-convive-detail" type="text" data-i18n-placeholder="ph_convive" placeholder="¿Cuántos y de qué raza? (ej: 2 labradores)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
           </div>
         </div>
       </div>
@@ -4775,22 +4830,22 @@ body{
 
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_describe">Describe la conducta problema</div>
-          <textarea id="inp-problem" placeholder="Describe con detalle el comportamiento que preocupa..." style="width:100%;min-height:90px;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;resize:none;"></textarea>
+          <textarea id="inp-problem" data-i18n-placeholder="ph_problem" placeholder="Describe con detalle el comportamiento que preocupa..." style="width:100%;min-height:90px;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;resize:none;"></textarea>
         </div>
 
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_since">&iquest;Desde cu&aacute;ndo ocurre?</div>
-          <input id="inp-since" type="text" placeholder="Ej: hace 6 meses, desde cachorro..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+          <input id="inp-since" type="text" data-i18n-placeholder="ph_since" placeholder="Ej: hace 6 meses, desde cachorro..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
         </div>
 
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_where">&iquest;D&oacute;nde ocurre?</div>
-          <input id="inp-where" type="text" placeholder="Ej: en casa, en la calle, en el parque..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+          <input id="inp-where" type="text" data-i18n-placeholder="ph_where" placeholder="Ej: en casa, en la calle, en el parque..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
         </div>
 
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_who">&iquest;Qui&eacute;n est&aacute; presente?</div>
-          <input id="inp-who" type="text" placeholder="Ej: toda la familia, solo yo, extraños..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+          <input id="inp-who" type="text" data-i18n-placeholder="ph_who" placeholder="Ej: toda la familia, solo yo, extraños..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
         </div>
 
         <div style="margin-bottom:12px;">
@@ -4806,56 +4861,48 @@ body{
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_aggr">&iquest;Implica agresi&oacute;n?</div>
           <div style="display:flex;gap:8px;">
-            <button id="agresion-no" onclick="anam_toggle_cond('agresion-no','agresion-si','agresion-dist-wrap')" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
-            <button id="agresion-si" onclick="anam_toggle_cond('agresion-si','agresion-no','agresion-dist-wrap')" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
+            <button id="agresion-no" onclick="anam_toggle_cond('agresion-no','agresion-si','agresion-dist-wrap')" data-i18n="btn_no" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
+            <button id="agresion-si" onclick="anam_toggle_cond('agresion-si','agresion-no','agresion-dist-wrap')" data-i18n="btn_yes" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
           </div>
           <div id="agresion-dist-wrap" style="display:none;margin-top:8px;">
-            <input id="inp-agresion-dist" type="number" placeholder="Distancia a la que empieza la agresión (cm)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+            <input id="inp-agresion-dist" type="number" data-i18n-placeholder="ph_agresion_dist" placeholder="Distancia a la que empieza la agresión (cm)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
           </div>
         </div>
 
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_history">&iquest;Qu&eacute; has intentado hasta ahora? (opcional)</div>
-          <textarea id="inp-history" placeholder="Ej: castigo, ignorar, acudir al veterinario..." style="width:100%;min-height:70px;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;resize:none;"></textarea>
+          <textarea id="inp-history" data-i18n-placeholder="ph_history" placeholder="Ej: castigo, ignorar, acudir al veterinario..." style="width:100%;min-height:70px;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;resize:none;"></textarea>
         </div>
 
         <div>
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_theory">&iquest;Cu&aacute;l crees t&uacute; que es la causa? (opcional)</div>
-          <textarea id="inp-theory" placeholder="Tu hipótesis sobre por qué ocurre este comportamiento..." style="width:100%;min-height:70px;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;resize:none;"></textarea>
+          <textarea id="inp-theory" data-i18n-placeholder="ph_theory" placeholder="Tu hipótesis sobre por qué ocurre este comportamiento..." style="width:100%;min-height:70px;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;resize:none;"></textarea>
         </div>
       </div>
 
-      <!-- Video upload (optional) -->
+      <!-- Análisis multimodal con vídeo — BETA PRIVADA (acceso restringido) -->
       <div style="margin-top:16px;margin-bottom:4px;">
-        <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_attach_video">📹 Adjuntar vídeo del comportamiento (opcional)</div>
-
-        <div id="video-drop-zone"
-             onclick="document.getElementById('inp-video').click()"
-             ondragover="event.preventDefault();this.style.borderColor='#4a6741';"
-             ondragleave="this.style.borderColor='rgba(0,0,0,0.12)';"
-             ondrop="handleVideoDrop(event)"
-             style="border:2px dashed rgba(0,0,0,0.15);border-radius:14px;padding:18px 16px;text-align:center;cursor:pointer;background:#fafaf8;transition:border-color 0.2s;">
-          <div id="video-drop-label" style="font-size:13px;color:var(--grey);line-height:1.5;">
-            <span style="font-size:22px;display:block;margin-bottom:6px;">🎬</span>
-            <span data-i18n="anam_drop_text">Pulsa o arrastra un vídeo aquí</span><br>
-            <span style="font-size:11px;opacity:0.7;" data-i18n="anam_drop_formats">MP4, MOV, AVI · Máx 200 MB</span>
+        <div style="position:relative;border-radius:14px;overflow:hidden;background:#1a1a1a;aspect-ratio:16/9;">
+          <img src="dog-observed.webp" alt="Perro siendo observado en su entorno natural" style="width:100%;height:100%;object-fit:cover;display:block;">
+          <!-- Overlay sutil para legibilidad del badge -->
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 50%,rgba(0,0,0,0.55) 100%);pointer-events:none;"></div>
+          <!-- Badge BETA PRIVADA -->
+          <div style="position:absolute;top:12px;left:12px;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.95);padding:5px 10px;border-radius:100px;box-shadow:0 2px 8px rgba(0,0,0,0.18);">
+            <div style="width:6px;height:6px;border-radius:50%;background:#dc2626;"></div>
+            <span style="font-size:9px;font-weight:800;letter-spacing:1.2px;color:#1a1a1a;" data-i18n="video_badge">BETA PRIVADA</span>
           </div>
-          <div id="video-preview-wrap" style="display:none;">
-            <video id="video-preview-el" controls style="width:100%;border-radius:10px;max-height:200px;background:#000;"></video>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
-              <span id="video-file-info" style="font-size:12px;color:var(--grey);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
-              <button onclick="event.stopPropagation();removeVideo()" style="border:none;background:none;color:#c0392b;font-size:12px;font-weight:600;cursor:pointer;padding:4px 8px;border-radius:6px;">✕ Quitar</button>
-            </div>
+          <!-- Pie con texto explicativo -->
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:14px 16px;color:#fff;">
+            <div style="font-size:13px;font-weight:700;letter-spacing:0.2px;line-height:1.3;margin-bottom:3px;" data-i18n="video_teaser_t">Análisis multimodal con vídeo</div>
+            <div style="font-size:11px;font-weight:500;color:rgba(255,255,255,0.85);line-height:1.4;" data-i18n="video_teaser_b">BETA PRIVADA · Solo profesionales acreditados</div>
           </div>
         </div>
-
-        <input id="inp-video" type="file" accept="video/mp4,video/quicktime,video/x-msvideo,video/x-matroska,video/webm,.mp4,.mov,.avi,.mkv,.webm" style="display:none;" onchange="handleVideoSelect(this)" />
       </div>
 
       <!-- Cambio o evento importante antes del problema -->
       <div style="margin-bottom:12px;">
         <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_prior_event">Antes de que comenzase el problema, ¿recuerdas algún cambio o evento importante que resaltar?</div>
-        <textarea id="inp-evento-previo" placeholder="Contesta brevemente (mudanza, llegada de un bebé, fallecimiento, viaje, cambio de horario, etc.)" rows="3" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;resize:vertical;"></textarea>
+        <textarea id="inp-evento-previo" data-i18n-placeholder="ph_evento_previo" placeholder="Contesta brevemente (mudanza, llegada de un bebé, fallecimiento, viaje, cambio de horario, etc.)" rows="3" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;resize:vertical;"></textarea>
       </div>
 
       <!-- submit -->
@@ -5121,6 +5168,7 @@ function toggleProfessional(val) {
 function registerUser() {
   var name     = (document.getElementById('reg-name') ? document.getElementById('reg-name').value : '').trim();
   var email    = (document.getElementById('reg-email') ? document.getElementById('reg-email').value : '').trim();
+  var phone    = (document.getElementById('reg-phone') ? document.getElementById('reg-phone').value : '').trim();
   var password = (document.getElementById('reg-password') ? document.getElementById('reg-password').value : '').trim();
   var inviteCode = (document.getElementById('reg-invite') ? document.getElementById('reg-invite').value : '').trim();
   var dog1     = (document.getElementById('reg-dog1-name') ? document.getElementById('reg-dog1-name').value : '').trim();
@@ -5137,7 +5185,7 @@ function registerUser() {
   fetch(API_URL + '/auth/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: email, password: password, invite_code: inviteCode })
+    body: JSON.stringify({ email: email, password: password, phone: phone || null, invite_code: inviteCode })
   })
   .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
   .then(function(res) {
@@ -5572,6 +5620,77 @@ function getVal(id, fallback) {
   // ── RECORDS ─────────────────────────────────────────────────────────────────
   var _recordsFilter = 'todos';
 
+
+  // ── Records storage helpers — namespace por usuario (Nivel 1 seguridad) ─────
+  // Cada usuario logueado tiene su propio bucket localStorage. Si se comparte
+  // navegador, los registros NO se cruzan entre cuentas.
+  function _hashEmail(email) {
+    // Hash djb2 → 8 chars hex. Solo namespacing, NO seguridad cripto.
+    var h = 5381;
+    for (var i = 0; i < email.length; i++) {
+      h = ((h << 5) + h) + email.charCodeAt(i);
+      h = h & 0xFFFFFFFF;
+    }
+    return ('00000000' + (h >>> 0).toString(16)).slice(-8);
+  }
+  function _recordsKey() {
+    var email = (localStorage.getItem('dm_email') || '').trim().toLowerCase();
+    if (!email) return 'dm_behavioral_records'; // fallback legacy si no hay sesión
+    return 'dm_records_' + _hashEmail(email);
+  }
+  function getRecords() {
+    try {
+      var k = _recordsKey();
+      var stored = localStorage.getItem(k);
+      if (stored !== null) return JSON.parse(stored);
+      // Migración suave: el primer usuario que entre tras este cambio absorbe el legacy
+      var legacy = JSON.parse(localStorage.getItem('dm_behavioral_records') || '[]');
+      if (legacy && legacy.length > 0 && k !== 'dm_behavioral_records') {
+        localStorage.setItem(k, JSON.stringify(legacy));
+        localStorage.removeItem('dm_behavioral_records');
+        return legacy;
+      }
+      return [];
+    } catch(e) { return []; }
+  }
+  function setRecords(records) {
+    try { localStorage.setItem(_recordsKey(), JSON.stringify(records)); } catch(e) {}
+  }
+
+  // ── Abrir caso archivado: reusa s-abc / s-tracking / Cecilia handoff ────────
+  function openRecord(idx) {
+    var records = getRecords();
+    var filtered = _recordsFilter === 'todos' ? records : records.filter(function(r){ return r.status === _recordsFilter; });
+    var r = filtered[idx];
+    if (!r) return;
+
+    // Cargar el caso en los globals para que las pantallas existentes lo lean
+    window._lastAnalysisText      = r.analysis || '';
+    window._lastInterventionPlan  = r.plan     || '';
+    window._lastDogName           = r.dog_name || '';
+    window._lastAnamnesisData = {
+      dog_name:            r.dog_name || '',
+      breed:               r.breed    || '',
+      dog_age:             r.dog_age  || '',
+      problem_description: r.problem  || '',
+    };
+    // Flag: estamos viendo un caso archivado → "Ver Plan de Intervención"
+    // debe mostrar el plan guardado SIN regenerar (la anamnesis archivada
+    // no tiene todos los campos required que pide /intervention).
+    window._loadedFromArchive = true;
+
+    // Repoblar s-abc con el análisis archivado (función ya existente)
+    if (typeof fillABCScreen === 'function' && r.analysis) {
+      try { fillABCScreen(r.dog_name || 'Sin nombre', r.analysis, []); } catch(e) {}
+    }
+
+    // Navegar al análisis funcional. Desde aquí el usuario tiene los flows
+    // habituales: "Análisis completo →", "Ver Plan de Intervención",
+    // "💬 Chat con Cecilia" — todos siguen funcionando con el caso cargado.
+    goTo('s-abc');
+  }
+  window.openRecord = openRecord;
+
   function filterRecords(f) {
     _recordsFilter = f;
     ['todos','active','resolved','closed'].forEach(function(k) {
@@ -5602,7 +5721,7 @@ function getVal(id, fallback) {
     var list = document.getElementById('records-list');
     if (!list) return;
     var records = [];
-    try { records = JSON.parse(localStorage.getItem('dm_behavioral_records') || '[]'); } catch(e) {}
+    records = getRecords();
 
     var filtered = _recordsFilter === 'todos'
       ? records
@@ -5623,7 +5742,7 @@ function getVal(id, fallback) {
       var sl = statusLabel(r.status);
       var shortProblem = (r.problem || '').substring(0, 120);
       if ((r.problem || '').length > 120) shortProblem += '…';
-      html += '<div style="background:#fff;border-radius:14px;padding:14px 16px;border:1px solid rgba(0,0,0,0.07);margin-bottom:10px;">' +
+      html += '<div onclick="openRecord(' + i + ')" style="background:#fff;border-radius:14px;padding:14px 16px;border:1px solid rgba(0,0,0,0.07);margin-bottom:10px;cursor:pointer;" onmouseover="this.style.borderColor=\'rgba(74,103,65,0.4)\'" onmouseout="this.style.borderColor=\'rgba(0,0,0,0.07)\'">' +
         '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;">' +
           '<div style="display:flex;align-items:center;gap:10px;">' +
             '<div style="width:40px;height:40px;border-radius:50%;background:#e8f0e8;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🐕</div>' +
@@ -5644,8 +5763,8 @@ function getVal(id, fallback) {
           '<div style="display:flex;align-items:center;gap:8px;">' +
             '<div style="font-size:10px;color:var(--grey);">' + (r.date || '') + '</div>' +
             '<div style="display:flex;gap:4px;">' +
-              '<button onclick="changeRecordStatus(' + i + ')" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid rgba(0,0,0,0.12);background:#fafafa;cursor:pointer;color:var(--grey);">✏️ Estado</button>' +
-              '<button onclick="deleteRecord(' + i + ')" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid rgba(220,80,80,0.2);background:#fff5f5;cursor:pointer;color:#c03030;">🗑</button>' +
+              '<button onclick="event.stopPropagation();changeRecordStatus(' + i + ')" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid rgba(0,0,0,0.12);background:#fafafa;cursor:pointer;color:var(--grey);">✏️ Estado</button>' +
+              '<button onclick="event.stopPropagation();deleteRecord(' + i + ')" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid rgba(220,80,80,0.2);background:#fff5f5;cursor:pointer;color:#c03030;">🗑</button>' +
             '</div>' +
           '</div>' +
         '</div>' +
@@ -5658,7 +5777,7 @@ function getVal(id, fallback) {
 
   function changeRecordStatus(idx) {
     var records = [];
-    try { records = JSON.parse(localStorage.getItem('dm_behavioral_records') || '[]'); } catch(e) {}
+    records = getRecords();
     var filtered = _recordsFilter === 'todos' ? records : records.filter(function(r){ return r.status === _recordsFilter; });
     var r = filtered[idx];
     if (!r) return;
@@ -5669,19 +5788,19 @@ function getVal(id, fallback) {
     // find in full records and update
     var fullIdx = records.indexOf(r);
     if (fullIdx >= 0) records[fullIdx].status = next;
-    localStorage.setItem('dm_behavioral_records', JSON.stringify(records));
+    setRecords(records);
     renderRecords();
   }
 
   function deleteRecord(idx) {
     if (!confirm('¿Eliminar este caso?')) return;
     var records = [];
-    try { records = JSON.parse(localStorage.getItem('dm_behavioral_records') || '[]'); } catch(e) {}
+    records = getRecords();
     var filtered = _recordsFilter === 'todos' ? records : records.filter(function(r){ return r.status === _recordsFilter; });
     var r = filtered[idx];
     var fullIdx = records.indexOf(r);
     if (fullIdx >= 0) records.splice(fullIdx, 1);
-    localStorage.setItem('dm_behavioral_records', JSON.stringify(records));
+    setRecords(records);
     renderRecords();
   }
 
@@ -5803,6 +5922,7 @@ function getVal(id, fallback) {
     .then(function(d) {
       if (d && d.tokens !== undefined) {
         localStorage.setItem('dm_role', d.role || 'user');
+        if (d.email) localStorage.setItem('dm_email', d.email);
         setTokens(d.tokens);
         if (d.role === 'admin' || d.role === 'developer') {
           ['tok-home','tok-chat','tokens-big'].forEach(function(id) {
@@ -5810,6 +5930,9 @@ function getVal(id, fallback) {
             if (el) el.textContent = '∞';
           });
         }
+        // Pintar email en sección "Mi cuenta y privacidad"
+        var emailEl = document.getElementById('account-email-value');
+        if (emailEl && d.email) emailEl.textContent = d.email;
       }
     })
     .catch(function() {});
@@ -5842,6 +5965,184 @@ function getVal(id, fallback) {
     .catch(function() {
       if (win) win.close();
       alert('Error de conexión.');
+    });
+  }
+
+
+  // ── Toggle visibilidad password (icono ojo) ────────────────────────────────
+  function togglePasswordVisibility(inputId, btn) {
+    var inp = document.getElementById(inputId);
+    if (!inp) return;
+    if (inp.type === 'password') {
+      inp.type = 'text';
+      btn.innerHTML = '🙈';
+      btn.setAttribute('aria-label', 'Ocultar contraseña');
+    } else {
+      inp.type = 'password';
+      btn.innerHTML = '👁';
+      btn.setAttribute('aria-label', 'Mostrar contraseña');
+    }
+  }
+  window.togglePasswordVisibility = togglePasswordVisibility;
+
+  // ── Soporte: abrir cliente de email con datos pre-rellenados ───────────────
+  function openSupportEmail() {
+    var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+    var email = localStorage.getItem('dm_email') || '';
+    var subject, bodyIntro;
+    if (lang === 'en') {
+      subject = 'Dogs Mind Support — Question';
+      bodyIntro = 'Hi, I need help with the app:\n\n[Describe your question or issue here]\n\n— Sent from The Dogs Mind app';
+    } else {
+      subject = 'Soporte Dogs Mind — Consulta';
+      bodyIntro = 'Hola, necesito ayuda con la app:\n\n[Describe aquí tu duda o incidencia]\n\n— Enviado desde la app The Dogs Mind';
+    }
+    if (email) bodyIntro += '\nUsuario: ' + email;
+    var url = 'mailto:info@thedogsmind.net?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(bodyIntro);
+    window.location.href = url;
+  }
+  window.openSupportEmail = openSupportEmail;
+
+  // ── Cambiar contraseña ────────────────────────────────────────────────────
+  function openChangePasswordModal() {
+    var m = document.getElementById('change-password-modal');
+    if (!m) return;
+    m.style.display = 'flex';
+    document.getElementById('cp-current').value = '';
+    document.getElementById('cp-new').value = '';
+    document.getElementById('cp-confirm').value = '';
+    document.getElementById('cp-modal-error').style.display = 'none';
+  }
+  function closeChangePasswordModal() {
+    var m = document.getElementById('change-password-modal');
+    if (m) m.style.display = 'none';
+  }
+  function confirmChangePassword() {
+    var cur = document.getElementById('cp-current').value;
+    var nw  = document.getElementById('cp-new').value;
+    var cf  = document.getElementById('cp-confirm').value;
+    var err = document.getElementById('cp-modal-error');
+    var btn = document.getElementById('cp-modal-confirm-btn');
+    err.style.display = 'none';
+
+    if (!cur || !nw || !cf) { err.textContent = 'Rellena todos los campos.'; err.style.display = 'block'; return; }
+    if (nw.length < 6) { err.textContent = 'La contraseña nueva debe tener al menos 6 caracteres.'; err.style.display = 'block'; return; }
+    if (nw !== cf) { err.textContent = 'Las dos contraseñas nuevas no coinciden.'; err.style.display = 'block'; return; }
+    if (nw === cur) { err.textContent = 'La nueva contraseña debe ser distinta de la actual.'; err.style.display = 'block'; return; }
+
+    btn.disabled = true; btn.textContent = '...';
+    fetch(API_URL + '/auth/change-password', {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ current_password: cur, new_password: nw })
+    })
+    .then(function(r) { return r.json().then(function(j) { return { ok: r.ok, body: j }; }); })
+    .then(function(res) {
+      if (!res.ok) {
+        err.textContent = (res.body && res.body.detail) || 'Error al cambiar la contraseña.';
+        err.style.display = 'block';
+        btn.disabled = false; btn.textContent = 'Cambiar';
+        return;
+      }
+      closeChangePasswordModal();
+      showToast('🔑 Contraseña actualizada');
+    })
+    .catch(function() {
+      err.textContent = 'Error de conexión. Inténtalo más tarde.';
+      err.style.display = 'block';
+      btn.disabled = false; btn.textContent = 'Cambiar';
+    });
+  }
+
+  // ── GDPR/CCPA: Descargar datos personales (DSAR) ──────────────────────────
+  function downloadMyData() {
+    var jwt = getJWT();
+    if (!jwt) { alert('Inicia sesión primero.'); return; }
+    fetch(API_URL + '/auth/me/data-export', { headers: authHeaders() })
+    .then(function(r) {
+      if (!r.ok) throw new Error('export_failed');
+      return r.json();
+    })
+    .then(function(data) {
+      var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'thedogsmind-data-export-' + (data.user && data.user.email ? data.user.email.split('@')[0] : 'me') + '-' + new Date().toISOString().slice(0,10) + '.json';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function() {
+        URL.revokeObjectURL(url);
+        a.remove();
+      }, 100);
+      showToast('📥 Datos exportados');
+    })
+    .catch(function() { alert('No se pudo descargar el archivo. Inténtalo más tarde.'); });
+  }
+
+  // ── GDPR/CCPA + Apple 5.1.1(v): Eliminar cuenta ───────────────────────────
+  function openDeleteAccountModal() {
+    var modal = document.getElementById('delete-account-modal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    document.getElementById('del-modal-password').value = '';
+    document.getElementById('del-modal-confirm').value = '';
+    document.getElementById('del-modal-error').style.display = 'none';
+  }
+
+  function closeDeleteAccountModal() {
+    var modal = document.getElementById('delete-account-modal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function confirmDeleteAccount() {
+    var pw = document.getElementById('del-modal-password').value;
+    var confirm = document.getElementById('del-modal-confirm').value.trim().toUpperCase();
+    var errEl = document.getElementById('del-modal-error');
+    var btn = document.getElementById('del-modal-confirm-btn');
+
+    errEl.style.display = 'none';
+    if (!pw) { errEl.textContent = 'Introduce tu contraseña.'; errEl.style.display = 'block'; return; }
+    if (confirm !== 'ELIMINAR' && confirm !== 'DELETE') {
+      errEl.textContent = 'Escribe ELIMINAR (o DELETE) exactamente para confirmar.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '...';
+    fetch(API_URL + '/auth/me', {
+      method: 'DELETE',
+      headers: authHeaders(),
+      body: JSON.stringify({ password: pw, confirm: confirm })
+    })
+    .then(function(r) {
+      return r.json().then(function(j) { return { ok: r.ok, body: j }; });
+    })
+    .then(function(res) {
+      if (!res.ok) {
+        var detail = (res.body && res.body.detail) || 'Error al eliminar la cuenta.';
+        errEl.textContent = detail;
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Eliminar';
+        return;
+      }
+      // Cuenta eliminada: limpiar sesión local + redirigir
+      localStorage.removeItem('dm_jwt');
+      localStorage.removeItem('dm_user_id');
+      localStorage.removeItem('dm_email');
+      localStorage.removeItem('dm_role');
+      localStorage.removeItem('dm_tokens');
+      closeDeleteAccountModal();
+      alert('Tu cuenta ha sido eliminada. Los datos fiscales se conservan anonimizados durante 4 años por requisito legal.');
+      goTo('s-splash');
+    })
+    .catch(function() {
+      errEl.textContent = 'Error de conexión. Inténtalo más tarde.';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Eliminar';
     });
   }
 
@@ -5912,7 +6213,16 @@ function getVal(id, fallback) {
     _refineHistory = [];
     var msgs = document.getElementById('refine-messages');
     if (msgs) {
-      msgs.innerHTML = '<div class="refine-msg refine-ai" style="background:#fff;border-radius:16px 16px 16px 4px;padding:14px 16px;max-width:85%;align-self:flex-start;box-shadow:0 2px 8px rgba(0,0,0,0.06);font-size:14px;line-height:1.6;color:#1a1a2e;">Hola. He revisado el análisis y el plan de intervención de este caso. 👋<br><br>Cuéntame qué parte no encaja con la situación real del cliente o qué datos quieres añadir. Ajustaré el plan en consecuencia.<div style="font-size:11px;color:#aaa;margin-top:6px;">−0.25 tokens por mensaje</div></div>';
+      var _lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+      var introText, tokenLine;
+      if (_lang === 'en') {
+        introText = "Hi. I've reviewed the analysis and intervention plan for this case. 👋<br><br>Tell me which part doesn't fit the client's real situation or what data you want to add. I'll adjust the plan accordingly.";
+        tokenLine = '−0.25 tokens per message';
+      } else {
+        introText = 'Hola. He revisado el análisis y el plan de intervención de este caso. 👋<br><br>Cuéntame qué parte no encaja con la situación real del cliente o qué datos quieres añadir. Ajustaré el plan en consecuencia.';
+        tokenLine = '−0.25 tokens por mensaje';
+      }
+      msgs.innerHTML = '<div class="refine-msg refine-ai" style="background:#fff;border-radius:16px 16px 16px 4px;padding:14px 16px;max-width:85%;align-self:flex-start;box-shadow:0 2px 8px rgba(0,0,0,0.06);font-size:14px;line-height:1.6;color:#1a1a2e;">' + introText + '<div style="font-size:11px;color:#aaa;margin-top:6px;">' + tokenLine + '</div></div>';
     }
     updateTokensScreen();
     goTo('s-refine');
@@ -5947,7 +6257,8 @@ function getVal(id, fallback) {
       var payload = {
         anamnesis:         window._lastAnamnesisData || {},
         original_analysis: (window._lastAnalysisText || '') + '\n\n' + (window._lastInterventionPlan || ''),
-        messages:          _refineHistory
+        messages:          _refineHistory,
+        lang:              (window.getCurrentLang ? window.getCurrentLang() : 'es')
       };
       var res = await fetch(API_BASE + '/analysis/chat', {
         method:  'POST',
@@ -6026,9 +6337,9 @@ function getVal(id, fallback) {
       status:   'active'
     };
     try {
-      var records = JSON.parse(localStorage.getItem('dm_behavioral_records') || '[]');
+      var records = getRecords();
       records.unshift(record);
-      localStorage.setItem('dm_behavioral_records', JSON.stringify(records));
+      setRecords(records);
     } catch(e) {}
 
     goTo('s-records');
@@ -6042,9 +6353,51 @@ function getVal(id, fallback) {
     }, 300);
   }
 
+  // Helper que renderiza el plan ya generado en s-tracking — reutilizable
+  // para casos nuevos (tras llamar API) y para casos archivados (sin API).
+  function renderInterventionPlan(planText, dogName) {
+    var loading = document.getElementById('interv-loading');
+    var empty   = document.getElementById('interv-empty');
+    var body    = document.getElementById('interv-body');
+    var actions = document.getElementById('interv-actions');
+
+    var planHtml = markdownToHtml(planText || '');
+
+    var titleEl = document.getElementById('interv-title');
+    if (titleEl && dogName) titleEl.textContent = 'Plan · ' + dogName;
+
+    var fullHtml =
+      '<div style="font-size:14px;line-height:1.75;color:var(--dark);margin-bottom:20px;padding:18px;border-radius:14px;border:1px solid rgba(0,0,0,0.07);position:relative;overflow:hidden;background:#fff;">' +
+        '<div style="position:absolute;inset:0;background-image:url(https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-21.webp);background-size:cover;background-position:center 30%;opacity:0.25;border-radius:14px;"></div>' +
+        '<div style="position:relative;z-index:1;">A continuación, y en función del análisis funcional realizado por la IA entrenada por Teo Mariscal y un equipo de los mejores etólogos mundiales que participa de este proyecto, nuestra recomendación es:</div>' +
+      '</div>' +
+      '<div style="background:#f7f9f5;border-left:4px solid #4a6741;border-radius:0 14px 14px 0;padding:20px 18px;margin-bottom:20px;">' +
+        planHtml +
+      '</div>' +
+      '<div style="font-size:13px;line-height:1.75;color:#555;padding:18px;background:#fff;border-radius:14px;border:1px solid rgba(0,0,0,0.07);margin-bottom:8px;">' +
+        'Si aceptas, tu caso quedará registrado en el registro de datos de conducta. Puedes volver a realizar tantas consultas como quieras sobre el mismo caso; cada vez que realices una nueva consulta estarás pidiendo una segunda opinión al equipo de expertos.' +
+        '<br><br>' +
+        'Nuestro porcentaje de acierto en los análisis funcionales y planes de intervención es muy alto, pero nunca está de más pedir una segunda opinión si algo no te convence.' +
+      '</div>';
+
+    if (loading) loading.style.display = 'none';
+    if (empty)   empty.style.display   = 'none';
+    if (body)    { body.innerHTML = fullHtml; body.style.display = 'block'; }
+    if (actions) actions.style.display = 'flex';
+    goTo('s-tracking');
+  }
+
   async function generateInterventionPlan() {
     if (!window._lastAnalysisText) {
       alert('Por favor realiza primero un análisis funcional.');
+      return;
+    }
+    // Si venimos de un caso archivado (openRecord setea _loadedFromArchive),
+    // renderizamos directamente el plan guardado SIN regenerar — la anamnesis
+    // archivada no tiene todos los campos required que pide el endpoint.
+    if (window._loadedFromArchive && window._lastInterventionPlan) {
+      var dn = (window._lastAnamnesisData && window._lastAnamnesisData.dog_name) || '';
+      renderInterventionPlan(window._lastInterventionPlan, dn);
       return;
     }
     // Show shared loading screen
@@ -6126,6 +6479,10 @@ function getVal(id, fallback) {
   }
 
 async function analyzeWithAI() {
+  // Análisis nuevo → ya no estamos viendo un archivo. Reseteamos flag para
+  // que generateInterventionPlan regenere normalmente con la anamnesis fresca.
+  window._loadedFromArchive = false;
+
   var btn = document.getElementById('btn-analyze');
 
   // Collect text fields
@@ -6313,19 +6670,34 @@ async function analyzeWithAI() {
 // ── SPLIT RESPONSE INTO SÍNTESIS / ANÁLISIS COMPLETO ─
 function splitAnalysisParts(text) {
   if (!text || typeof text !== 'string') return { sintesis: '', completo: '', newFormat: false };
-  var sintesisMarker  = 'SÍNTESIS ABC';
-  var completoMarker  = 'ANÁLISIS COMPLETO';
-  var idxS = text.indexOf(sintesisMarker);
-  var idxC = text.indexOf(completoMarker);
-  if (idxS !== -1 && idxC !== -1) {
+  // Aceptar marcadores ES y EN (Sonnet a veces los traduce):
+  // SÍNTESIS ABC / SINTESIS ABC / ABC SYNTHESIS
+  // ANÁLISIS COMPLETO / ANALISIS COMPLETO / FULL ANALYSIS / COMPLETE ANALYSIS
+  var sMarkers = ['SÍNTESIS ABC', 'SINTESIS ABC', 'ABC SYNTHESIS', 'ABC SUMMARY'];
+  var cMarkers = ['ANÁLISIS COMPLETO', 'ANALISIS COMPLETO', 'FULL ANALYSIS', 'COMPLETE ANALYSIS'];
+
+  var idxS = -1, lenS = 0;
+  for (var i = 0; i < sMarkers.length; i++) {
+    var p = text.indexOf(sMarkers[i]);
+    if (p !== -1) { idxS = p; lenS = sMarkers[i].length; break; }
+  }
+  var idxC = -1, lenC = 0;
+  for (var j = 0; j < cMarkers.length; j++) {
+    var q = text.indexOf(cMarkers[j]);
+    if (q !== -1) { idxC = q; lenC = cMarkers[j].length; break; }
+  }
+
+  if (idxS !== -1 && idxC !== -1 && idxC > idxS) {
     return {
-      sintesis:  text.substring(idxS + sintesisMarker.length, idxC).trim(),
-      completo:  text.substring(idxC + completoMarker.length).trim(),
+      sintesis:  text.substring(idxS + lenS, idxC).trim(),
+      completo:  text.substring(idxC + lenC).trim(),
       newFormat: true
     };
   }
-  // Formato antiguo: todo el texto va a completo; extraemos secciones para síntesis
-  return { sintesis: text, completo: text, newFormat: false };
+  // Formato sin marcadores: todo el texto va a ambos campos. fillABCScreen
+  // usa extractSectionByLetter (regex estructural) que detecta los bloques
+  // A/B/C aunque no haya separación SÍNTESIS / COMPLETO.
+  return { sintesis: text, completo: text, newFormat: true };
 }
 
 // ── PARSE A SUB-SECTION FROM SÍNTESIS ────────────────
@@ -6333,6 +6705,30 @@ function splitAnalysisParts(text) {
 
 // Returns content of first ## section whose title contains any of the
 // pipe-separated keywords (case-insensitive).
+// Detector estructural por letra del bloque (A/B/C). Mucho más robusto que
+// matching de keywords porque sobrevive a variaciones de Sonnet:
+//   "## BLOQUE B — CONDUCTA"   "## B — CONDUCTA"
+//   "## B - Conducta"           "## SECTION B — BEHAVIOR"
+//   "## B: Behavior"            "## B"  (solo letra)
+function extractSectionByLetter(text, letter) {
+  if (!text) return '';
+  // Acepta: ## [BLOQUE/BLOCK/SECTION ]?LETTER[separator|EOL]
+  var startRe = new RegExp('^[ \\t]*##[ \\t]+(?:BLOQUE[ \\t]+|BLOCK[ \\t]+|SECTION[ \\t]+)?' + letter + '(?:[ \\t]*$|[ \\t]*[\\-—–:][ \\t])', 'i');
+  var anyH2 = /^[ \t]*##[^#]/;
+  var lines = text.split('\n');
+  var inside = false;
+  var out = [];
+  for (var i = 0; i < lines.length; i++) {
+    var l = lines[i];
+    if (anyH2.test(l)) {
+      if (startRe.test(l)) { inside = true; continue; }
+      if (inside) break;
+    }
+    if (inside) out.push(l);
+  }
+  return out.join('\n').trim();
+}
+
 function extractSection(text, headerKeywords) {
   if (!text) return '';
   var keys = headerKeywords.split('|').map(function(k){ return k.trim().toLowerCase(); });
@@ -6407,7 +6803,10 @@ function fillABCScreen(dogName, analysisText, sources) {
 
   if (parts.newFormat) {
     // ── Nuevo formato: sub-secciones explícitas ──
-    var bloqueA   = extractSection(sintesis, 'BLOQUE A');
+    // Usamos el detector estructural por letra (A/B/C) en lugar de keywords
+    // específicas — sobrevive a "BLOQUE B", "B — CONDUCTA", "B - Behavior",
+    // "SECTION B", "B:" o cualquier variación que Sonnet emita.
+    var bloqueA   = extractSectionByLetter(sintesis, 'A');
     var aVars     = extractSubSection(bloqueA || sintesis, 'Variables disposicionales');
     var aEc       = extractSubSection(bloqueA || sintesis, 'Estímulos condicionados|Estimulos condicionados|EC[^a-z]');
     var aEd       = extractSubSection(bloqueA || sintesis, 'ED[\s\-—–]|Estímulo [Dd]iscriminativo|Estimulo [Dd]iscriminativo');
@@ -6416,8 +6815,8 @@ function fillABCScreen(dogName, analysisText, sources) {
     renderItems('abc-a-vars',  aVars);
     renderItems('abc-a-ec',    aEc);
     renderItems('abc-a-ed',    aEd);
-    renderItems('abc-b-items', extractSection(sintesis, 'BLOQUE B'));
-    renderItems('abc-c-items', extractSection(sintesis, 'BLOQUE C'));
+    renderItems('abc-b-items', extractSectionByLetter(sintesis, 'B'));
+    renderItems('abc-c-items', extractSectionByLetter(sintesis, 'C'));
   } else {
     // ── Formato antiguo: mapear secciones al diseño ABC ──
     var oldA = extractSection(sintesis, 'A\s*[—–-]+\s*ANTECEDENT');
@@ -6621,9 +7020,9 @@ function endTourIntro() {
       pp_subtitle:             'Dogs Mind · Última actualización: abril 2026',
       pp_intro:                'Esta política explica qué datos recogemos, cómo los usamos y cómo los protegemos cuando usas Dogs Mind.',
       pp_h1:                   '1. Quién es el responsable',
-      pp_p1:                   'Dogs Mind es un servicio creado por <strong>Teo Mariscal</strong>, especialista en conducta canina con más de 25 años de experiencia. Puedes contactarnos en <a href="mailto:info@dogsmind.ai" style="color:var(--green);">info@dogsmind.ai</a>.',
+      pp_p1:                   'The Dogs Mind es un servicio operado por <strong>Teodoro Mariscal Diaz</strong>, especialista en conducta canina con más de 25 años de experiencia, con domicilio en Perales 15, 28609 Villamantilla, España. Para asuntos de privacidad y datos personales escríbenos a <a href="mailto:privacy@thedogsmind.net" style="color:var(--green);">privacy@thedogsmind.net</a>. Soporte general: <a href="mailto:info@thedogsmind.net" style="color:var(--green);">info@thedogsmind.net</a>.',
       pp_h2:                   '2. Qué datos recogemos',
-      pp_l2_1:                 '<strong style="color:var(--text);">Cuenta:</strong> email y contraseña (encriptada). Nunca vemos tu contraseña.',
+      pp_l2_1:                 '<strong style="color:var(--text);">Cuenta:</strong> email, contraseña (encriptada con bcrypt) y, opcionalmente, número de teléfono. Nunca vemos tu contraseña en claro.',
       pp_l2_2:                 '<strong style="color:var(--text);">Datos de tu perro:</strong> nombre, raza, edad, historial conductual que introduces en los formularios.',
       pp_l2_3:                 '<strong style="color:var(--text);">Conversaciones:</strong> los mensajes que envías a los Aigents y los análisis generados.',
       pp_l2_4:                 '<strong style="color:var(--text);">Uso:</strong> páginas visitadas y acciones dentro de la app (a través de Plausible Analytics, sin cookies).',
@@ -6639,7 +7038,7 @@ function endTourIntro() {
       pp_l4_3:                 '<strong style="color:var(--text);">Qdrant</strong> — base de conocimiento vectorial (textos clínicos, sin datos de usuarios).',
       pp_l4_4:                 '<strong style="color:var(--text);">Plausible Analytics</strong> — analítica web sin cookies y sin datos personales. <a href="https://plausible.io/privacy" target="_blank" style="color:var(--green);">Su política →</a>',
       pp_h5:                   '5. Cuánto tiempo guardamos tus datos',
-      pp_p5:                   'Conservamos tus datos mientras tu cuenta esté activa. Puedes solicitar la eliminación de tu cuenta y todos tus datos en cualquier momento escribiéndonos a <a href="mailto:info@dogsmind.ai" style="color:var(--green);">info@dogsmind.ai</a>.',
+      pp_p5:                   'Conservamos tus datos personales (email, teléfono, contraseña) mientras tu cuenta esté activa. Puedes eliminar tu cuenta directamente en la app desde <em>Mis Tokens → Eliminar mi cuenta</em>, o exportar todos tus datos en JSON desde <em>Mis Tokens → Descargar mis datos</em>. Tras eliminar la cuenta, los registros de pago se conservan anonimizados durante 4 años por requisito fiscal español (Ley 58/2003 General Tributaria).',
       pp_h6:                   '6. Tus derechos (RGPD)',
       pp_p6_lead:              'Si resides en la UE tienes derecho a:',
       pp_l6_1:                 'Acceder a tus datos.',
@@ -6647,13 +7046,13 @@ function endTourIntro() {
       pp_l6_3:                 'Solicitar su eliminación.',
       pp_l6_4:                 'Oponerte a su tratamiento.',
       pp_l6_5:                 'Presentar una reclamación ante la autoridad de protección de datos de tu país.',
-      pp_p6_end:               'Para ejercer cualquiera de estos derechos escríbenos a <a href="mailto:info@dogsmind.ai" style="color:var(--green);">info@dogsmind.ai</a>.',
+      pp_p6_end:               'Para ejercer cualquiera de estos derechos escríbenos a <a href="mailto:info@thedogsmind.net" style="color:var(--green);">info@thedogsmind.net</a>.',
       pp_h7:                   '7. Seguridad',
       pp_p7:                   'Todas las conexiones van cifradas con HTTPS. Las contraseñas se almacenan con hash bcrypt. Nunca vendemos ni compartimos tus datos con terceros con fines comerciales.',
       pp_h8:                   '8. Cambios en esta política',
       pp_p8:                   'Si realizamos cambios relevantes te lo comunicaremos dentro de la app. La fecha de la última actualización siempre aparece en el encabezado de esta página.',
       pp_box_title:            '¿Alguna duda?',
-      pp_box_text:             'Escríbenos a <a href="mailto:info@dogsmind.ai" style="color:var(--green);font-weight:600;">info@dogsmind.ai</a> — respondemos en menos de 48 horas.',
+      pp_box_text:             'Escríbenos a <a href="mailto:info@thedogsmind.net" style="color:var(--green);font-weight:600;">info@thedogsmind.net</a> — respondemos en menos de 48 horas.',
       // CV / Profile
       cv_back:                 'Volver',
       cv_eyebrow:              'Dogs Mind · Founder',
@@ -6852,6 +7251,59 @@ function endTourIntro() {
       // Loading screen + Cecilia helper CTA
       loading_title:    'Analizando con IA…',
       loading_msg:      'Estás utilizando una herramienta de análisis de conducta animal muy potente y va a tomar algo de tiempo. Relax que esto puede tardar unos minutos, <strong>no cierres la app</strong>.',
+      loading_disclaimer: 'The Dogs Mind te ofrece un análisis por IA y puede cometer errores. No sustituye a tu etólogo veterinario.',
+      // Análisis multimodal con vídeo — beta privada
+      video_badge:    'BETA PRIVADA',
+      video_teaser_t: 'Análisis multimodal con vídeo',
+      video_teaser_b: 'BETA PRIVADA · Solo profesionales acreditados',
+      // Anamnesis — botones reutilizables y placeholders (i18n completo)
+      btn_no:           'No',
+      btn_yes:          'Sí',
+      anam_btn_indoor:  'Dentro',
+      anam_btn_outdoor: 'Fuera',
+      anam_btn_both:    'Ambos',
+      anam_btn_country: 'Campo',
+      anam_btn_suburb:  'Periferia',
+      anam_btn_city:    'Ciudad',
+      ph_dog_name:      'Nombre del perro',
+      ph_dog_age:       'Ej: 3 años',
+      ph_breed:         'Raza o raza a la que se parece más...',
+      ph_dolencia:      '¿Cuál dolencia? (ej: displasia, epilepsia...)',
+      ph_weaning:       'Ej: 2 meses, 8 semanas...',
+      ph_convive:       '¿Cuántos y de qué raza? (ej: 2 labradores)',
+      ph_problem:       'Describe con detalle el comportamiento que preocupa...',
+      ph_since:         'Ej: hace 6 meses, desde cachorro...',
+      ph_where:         'Ej: en casa, en la calle, en el parque...',
+      ph_who:           'Ej: toda la familia, solo yo, extraños...',
+      ph_agresion_dist: 'Distancia a la que empieza la agresión (cm)',
+      ph_history:       'Ej: castigo, ignorar, acudir al veterinario...',
+      ph_theory:        'Tu hipótesis sobre por qué ocurre este comportamiento...',
+      ph_evento_previo: 'Contesta brevemente (mudanza, llegada de un bebé, fallecimiento, viaje, cambio de horario, etc.)',
+      // Mi cuenta y privacidad (GDPR/CCPA + Apple)
+      account_section:        'Mi cuenta y privacidad',
+      account_email_label:    'Email de la cuenta',
+      account_support_title:   'Contactar soporte',
+      account_support_desc:    'Escríbenos si tienes dudas o problemas con la app',
+            account_change_pw_title: 'Cambiar contraseña',
+      account_change_pw_desc:  'Actualiza tu contraseña por una nueva',
+      cp_modal_title:          '🔑 Cambiar contraseña',
+      cp_modal_body:           'Por seguridad, necesitamos verificar tu contraseña actual antes de establecer una nueva.',
+      cp_modal_current_label:  'Contraseña actual',
+      cp_modal_new_label:      'Contraseña nueva (mínimo 6 caracteres)',
+      cp_modal_confirm_label:  'Repite la contraseña nueva',
+      cp_modal_cancel:         'Cancelar',
+      cp_modal_confirm:        'Cambiar',
+            account_export_title:   'Descargar mis datos',
+      account_export_desc:    'Exporta toda tu información personal en formato JSON',
+      account_delete_title:   'Eliminar mi cuenta',
+      account_delete_desc:    'Borra tu cuenta y todos tus datos personales. No se puede deshacer.',
+      account_legal_note:     'Al usar The Dogs Mind aceptas nuestra <a href="#" onclick="goTo(\'s-privacy\');return false;" style="color:var(--green);text-decoration:underline;">Política de Privacidad</a> y <a href="#" onclick="goTo(\'s-terms\');return false;" style="color:var(--green);text-decoration:underline;">Términos de Servicio</a>.',
+      del_modal_title:        '⚠️ Eliminar tu cuenta',
+      del_modal_body:         'Tu email, contraseña y teléfono se eliminarán permanentemente. Los registros de pago se conservan anonimizados durante 4 años por requisito fiscal (España). <strong>Esta acción no se puede deshacer.</strong>',
+      del_modal_pw_label:     'Confirma tu contraseña actual',
+      del_modal_confirm_label:'Escribe ELIMINAR para confirmar',
+      del_modal_cancel:       'Cancelar',
+      del_modal_confirm:      'Eliminar',
       ask_cecilia_text: '¿Es muy técnico el lenguaje? Si necesitas ayuda, pregunta a Cecilia.',
       ask_cecilia_btn:  '💬 Chat con Cecilia',
       cecilia_intro_analysis: 'He revisado el análisis del caso, querida. ¿Qué término o concepto te confunde? Te lo traduzco al lenguaje de toda la vida.',
@@ -6889,6 +7341,31 @@ function endTourIntro() {
       form_submit:           'Crear mi cuenta →',
       form_terms_pre:        'Al registrarte aceptas nuestra ',
       form_terms_link:       'Política de Privacidad',
+      form_consent:          'Al crear mi cuenta acepto la <a onclick="goTo(\'s-privacy\')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Política de Privacidad</a> y los <a onclick="goTo(\'s-terms\')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Términos de Servicio</a>, y consiento el tratamiento de mis datos personales (email, teléfono) para los fines descritos en la Política de Privacidad.',
+      // Terms of Service (s-terms) — ES
+      tos_title:     'Términos de Servicio',
+      tos_subtitle:  'The Dogs Mind · Última actualización: abril 2026',
+      tos_intro:     'Al usar The Dogs Mind aceptas estos términos. Léelos con atención antes de crear tu cuenta.',
+      tos_h1:        '1. Quién presta el servicio',
+      tos_p1:        'The Dogs Mind es un servicio creado por <strong>Teodoro Mariscal Diaz</strong> (España). Para contacto, escribe a <a href="mailto:info@thedogsmind.net" style="color:var(--green);">info@thedogsmind.net</a>.',
+      tos_h2:        '2. Naturaleza del servicio',
+      tos_p2:        'The Dogs Mind ofrece análisis conductuales y planes de intervención generados por inteligencia artificial. <strong>El contenido es orientativo, puede contener errores y NO sustituye el diagnóstico ni el tratamiento de un etólogo veterinario titulado.</strong> En casos de agresión, conductas autolesivas, o emergencias médicas, acude inmediatamente a un profesional cualificado.',
+      tos_h3:        '3. Cuenta y elegibilidad',
+      tos_p3:        'Debes tener al menos 18 años para crear una cuenta. Eres responsable de la veracidad de los datos que introduces y de mantener tu contraseña segura. Una cuenta = una persona física.',
+      tos_h4:        '4. Tokens y pagos',
+      tos_p4:        'El acceso a análisis y planes consume tokens. Los tokens se compran en packs y no caducan. Los pagos se procesan a través de Stripe (web) o Apple In-App Purchase (iOS). Los tokens son no reembolsables salvo error técnico imputable a nosotros o requisito legal aplicable. Las recargas son finales tras la confirmación.',
+      tos_h5:        '5. Uso aceptable',
+      tos_p5:        'No puedes usar el servicio para fines ilegales, dañinos o que infrinjan derechos de terceros. Tampoco puedes intentar extraer modelos, hacer ingeniería inversa, ni revender el servicio sin autorización escrita.',
+      tos_h6:        '6. Cancelación de cuenta',
+      tos_p6:        'Puedes eliminar tu cuenta en cualquier momento desde la pantalla "Mis Tokens → Eliminar mi cuenta". Tus datos personales se borran inmediatamente. Los registros de pago se conservan anonimizados durante 4 años por requisito fiscal (España).',
+      tos_h7:        '7. Limitación de responsabilidad',
+      tos_p7:        'El servicio se ofrece "tal como es". The Dogs Mind no garantiza resultados específicos sobre la conducta de tu perro y no se hace responsable de daños derivados del uso de los análisis o planes generados. Esto no excluye obligaciones legales mínimas que no puedan limitarse.',
+      tos_h8:        '8. Cambios en los términos',
+      tos_p8:        'Podemos actualizar estos términos. Te notificaremos por email o dentro de la app cuando haya cambios materiales. El uso continuado tras la notificación implica aceptación.',
+      tos_h9:        '9. Ley aplicable y jurisdicción',
+      tos_p9:        'Estos términos se rigen por la ley española. Cualquier disputa se someterá a los juzgados de Madrid (España), salvo que la legislación de protección al consumidor de tu país establezca un foro distinto.',
+      tos_box_label: 'Contacto',
+      tos_box_text:  '¿Dudas sobre estos términos? Escríbenos a <a href="mailto:info@thedogsmind.net" style="color:var(--green);font-weight:600;">info@thedogsmind.net</a>.',
       form_already_account:  '¿Ya tienes cuenta? ',
       form_sign_in:          'Iniciar sesión',
       // Tokens extras
@@ -6963,9 +7440,9 @@ function endTourIntro() {
       pp_subtitle:             'Dogs Mind · Last updated: April 2026',
       pp_intro:                'This policy explains what data we collect, how we use it and how we protect it when you use Dogs Mind.',
       pp_h1:                   '1. Who is responsible',
-      pp_p1:                   'Dogs Mind is a service created by <strong>Teo Mariscal</strong>, canine behavior specialist with over 25 years of experience. You can contact us at <a href="mailto:info@dogsmind.ai" style="color:var(--green);">info@dogsmind.ai</a>.',
+      pp_p1:                   'The Dogs Mind is a service operated by <strong>Teodoro Mariscal Diaz</strong>, canine behavior specialist with over 25 years of experience, registered at Perales 15, 28609 Villamantilla, Spain. For privacy and data matters write to <a href="mailto:privacy@thedogsmind.net" style="color:var(--green);">privacy@thedogsmind.net</a>. General support: <a href="mailto:info@thedogsmind.net" style="color:var(--green);">info@thedogsmind.net</a>.',
       pp_h2:                   '2. What data we collect',
-      pp_l2_1:                 '<strong style="color:var(--text);">Account:</strong> email and password (encrypted). We never see your password.',
+      pp_l2_1:                 '<strong style="color:var(--text);">Account:</strong> email, password (bcrypt-hashed) and, optionally, phone number. We never see your password in plaintext.',
       pp_l2_2:                 '<strong style="color:var(--text);">Your dog\'s data:</strong> name, breed, age, behavioral history you enter in the forms.',
       pp_l2_3:                 '<strong style="color:var(--text);">Conversations:</strong> messages you send to the Aigents and the analyses generated.',
       pp_l2_4:                 '<strong style="color:var(--text);">Usage:</strong> pages visited and actions inside the app (via Plausible Analytics, no cookies).',
@@ -6976,12 +7453,19 @@ function endTourIntro() {
       pp_l3_3:                 'Improve service quality (aggregate usage analytics, without identifying you).',
       pp_l3_4:                 'Send communications related to your account when needed.',
       pp_h4:                   '4. Third parties involved',
-      pp_l4_1:                 '<strong style="color:var(--text);">Anthropic</strong> — processes the text of analyses and conversational AI. <a href="https://www.anthropic.com/privacy" target="_blank" style="color:var(--green);">Their privacy policy →</a>',
-      pp_l4_2:                 '<strong style="color:var(--text);">Railway</strong> — server and database hosting in Europe.',
-      pp_l4_3:                 '<strong style="color:var(--text);">Qdrant</strong> — vector knowledge base (clinical texts, no user data).',
-      pp_l4_4:                 '<strong style="color:var(--text);">Plausible Analytics</strong> — web analytics without cookies and no personal data. <a href="https://plausible.io/privacy" target="_blank" style="color:var(--green);">Their policy →</a>',
-      pp_h5:                   '5. How long we keep your data',
-      pp_p5:                   'We keep your data while your account is active. You can request deletion of your account and all your data at any time by writing to <a href="mailto:info@dogsmind.ai" style="color:var(--green);">info@dogsmind.ai</a>.',
+      pp_l4_1:                 '<strong style="color:var(--text);">Anthropic</strong> (USA) — clinical AI (Claude Sonnet) and avatars (Claude Haiku). Receives the anamnesis text and conversations to generate responses. <a href="https://www.anthropic.com/privacy" target="_blank" style="color:var(--green);">Their policy →</a>',
+      pp_l4_2:                 '<strong style="color:var(--text);">Voyage AI</strong> (USA) — vector embeddings for RAG. Does NOT receive user data; only processes the internal clinical corpus. <a href="https://www.voyageai.com/privacy" target="_blank" style="color:var(--green);">Their policy →</a>',
+      pp_l4_3:                 '<strong style="color:var(--text);">Qdrant Cloud</strong> (EU) — vector storage of the clinical corpus. Does NOT store user data.',
+      pp_l4_4:                 '<strong style="color:var(--text);">Railway</strong> (EU) — backend hosting and PostgreSQL database that stores your account and payment records. <a href="https://railway.com/legal/privacy" target="_blank" style="color:var(--green);">Their policy →</a>',
+      pp_l4_5:                 '<strong style="color:var(--text);">Netlify</strong> (USA, global CDN) — frontend hosting. Serves static files; does not process your personal data.',
+      pp_l4_6:                 '<strong style="color:var(--text);">Resend</strong> (USA) — transactional email (password recovery). Receives your email and the message content. <a href="https://resend.com/legal/privacy-policy" target="_blank" style="color:var(--green);">Their policy →</a>',
+      pp_l4_7:                 '<strong style="color:var(--text);">Plausible Analytics</strong> (EU) — cookie-less web analytics with no personal data. <a href="https://plausible.io/privacy" target="_blank" style="color:var(--green);">Their policy →</a>',
+      pp_l4_8:                 '<strong style="color:var(--text);">Stripe</strong> (USA/EU) — web payments. Card data does NOT pass through our servers; Stripe handles it directly. <a href="https://stripe.com/privacy" target="_blank" style="color:var(--green);">Their policy →</a>',
+      pp_l4_9:                 '<strong style="color:var(--text);">Apple</strong> (USA/EU) — In-App Purchase on iOS where applicable. App Store payments are handled by Apple. <a href="https://www.apple.com/legal/privacy/en-ww/" target="_blank" style="color:var(--green);">Their policy →</a>',
+      pp_h_lawful:             '4b. Legal basis for processing (GDPR)',
+      pp_p_lawful:             'We process your personal data based on (a) <strong>your consent</strong> upon registration and acceptance of this policy, (b) <strong>contract performance</strong> (account management, delivery of analyses and plans), and (c) <strong>legitimate interest</strong> in improving service quality, preventing fraud, and maintaining security. You can withdraw consent at any time by deleting your account.',
+            pp_h5:                   '5. How long we keep your data',
+      pp_p5:                   'We keep your personal data (email, phone, password) while your account is active. You can delete your account directly in-app from <em>My Tokens → Delete my account</em>, or export all your data as JSON from <em>My Tokens → Download my data</em>. After account deletion, payment records are kept anonymized for 4 years per Spanish tax law (Law 58/2003).',
       pp_h6:                   '6. Your rights (GDPR)',
       pp_p6_lead:              'If you reside in the EU you have the right to:',
       pp_l6_1:                 'Access your data.',
@@ -6989,13 +7473,15 @@ function endTourIntro() {
       pp_l6_3:                 'Request its deletion.',
       pp_l6_4:                 'Object to its processing.',
       pp_l6_5:                 'File a complaint with the data protection authority of your country.',
-      pp_p6_end:               'To exercise any of these rights write us at <a href="mailto:info@dogsmind.ai" style="color:var(--green);">info@dogsmind.ai</a>.',
-      pp_h7:                   '7. Security',
+      pp_p6_end:               'To exercise any of these rights write us at <a href="mailto:info@thedogsmind.net" style="color:var(--green);">info@thedogsmind.net</a>.',
+      pp_h_ccpa:               '6b. California residents (CCPA/CPRA)',
+      pp_p_ccpa:               'If you reside in California (USA) you have additional rights: (a) to know what personal information we collect about you and with whom we share it, (b) to delete your personal information, (c) to correct inaccurate information, (d) to limit the use of sensitive information, and (e) not to be discriminated against for exercising these rights. <strong>We do NOT sell or share your personal information for advertising purposes.</strong> To exercise these rights contact us at <a href=\"mailto:privacy@thedogsmind.net\" style=\"color:var(--green);\">privacy@thedogsmind.net</a>.',
+            pp_h7:                   '7. Security',
       pp_p7:                   'All connections are encrypted with HTTPS. Passwords are stored with bcrypt hash. We never sell or share your data with third parties for commercial purposes.',
       pp_h8:                   '8. Changes to this policy',
       pp_p8:                   'If we make significant changes we will notify you within the app. The last update date always appears in the header of this page.',
       pp_box_title:            'Any questions?',
-      pp_box_text:             'Write us at <a href="mailto:info@dogsmind.ai" style="color:var(--green);font-weight:600;">info@dogsmind.ai</a> — we reply within 48 hours.',
+      pp_box_text:             'Write us at <a href="mailto:info@thedogsmind.net" style="color:var(--green);font-weight:600;">info@thedogsmind.net</a> — we reply within 48 hours.',
       // CV / Profile
       cv_back:                 'Back',
       cv_eyebrow:              'Dogs Mind · Founder',
@@ -7194,6 +7680,59 @@ function endTourIntro() {
       // Loading screen + Cecilia helper CTA
       loading_title:    'Analyzing with AI…',
       loading_msg:      'You are using a very powerful behavioral analysis tool and it will take some time. Relax — this may take a few minutes, <strong>do not close the app</strong>.',
+      loading_disclaimer: 'The Dogs Mind provides an AI-generated analysis and may contain errors. It does not replace your veterinary ethologist.',
+      // Multimodal video analysis — private beta
+      video_badge:    'PRIVATE BETA',
+      video_teaser_t: 'Multimodal analysis with video',
+      video_teaser_b: 'PRIVATE BETA · Accredited professionals only',
+      // Anamnesis — reusable buttons and placeholders (full i18n)
+      btn_no:           'No',
+      btn_yes:          'Yes',
+      anam_btn_indoor:  'Indoor',
+      anam_btn_outdoor: 'Outdoor',
+      anam_btn_both:    'Both',
+      anam_btn_country: 'Countryside',
+      anam_btn_suburb:  'Suburban',
+      anam_btn_city:    'City',
+      ph_dog_name:      'Dog name',
+      ph_dog_age:       'E.g.: 3 years',
+      ph_breed:         'Breed or closest breed...',
+      ph_dolencia:      'Which condition? (e.g. dysplasia, epilepsy...)',
+      ph_weaning:       'E.g.: 2 months, 8 weeks...',
+      ph_convive:       'How many and which breeds? (e.g. 2 labradors)',
+      ph_problem:       'Describe in detail the behavior that worries you...',
+      ph_since:         'E.g.: 6 months ago, since puppyhood...',
+      ph_where:         'E.g.: at home, in the street, at the park...',
+      ph_who:           'E.g.: whole family, only me, strangers...',
+      ph_agresion_dist: 'Distance at which aggression starts (cm)',
+      ph_history:       'E.g.: punishment, ignore, vet visit...',
+      ph_theory:        'Your hypothesis on why this behavior occurs...',
+      ph_evento_previo: 'Briefly: moving house, new baby, bereavement, travel, schedule change, etc.',
+      // My account & privacy (GDPR/CCPA + Apple)
+      account_section:        'My account & privacy',
+      account_email_label:    'Account email',
+      account_support_title:   'Contact support',
+      account_support_desc:    'Write to us if you have questions or issues with the app',
+            account_change_pw_title: 'Change password',
+      account_change_pw_desc:  'Update your password to a new one',
+      cp_modal_title:          '🔑 Change password',
+      cp_modal_body:           'For security, we need to verify your current password before setting a new one.',
+      cp_modal_current_label:  'Current password',
+      cp_modal_new_label:      'New password (min. 6 characters)',
+      cp_modal_confirm_label:  'Repeat new password',
+      cp_modal_cancel:         'Cancel',
+      cp_modal_confirm:        'Change',
+            account_export_title:   'Download my data',
+      account_export_desc:    'Export all your personal information as JSON',
+      account_delete_title:   'Delete my account',
+      account_delete_desc:    'Permanently deletes your account and personal data. This cannot be undone.',
+      account_legal_note:     'By using The Dogs Mind you agree to our <a href="#" onclick="goTo(\'s-privacy\');return false;" style="color:var(--green);text-decoration:underline;">Privacy Policy</a> and <a href="#" onclick="goTo(\'s-terms\');return false;" style="color:var(--green);text-decoration:underline;">Terms of Service</a>.',
+      del_modal_title:        '⚠️ Delete your account',
+      del_modal_body:         'Your email, password and phone will be permanently deleted. Payment records are kept anonymized for 4 years for tax compliance (Spain). <strong>This action cannot be undone.</strong>',
+      del_modal_pw_label:     'Confirm your current password',
+      del_modal_confirm_label:'Type DELETE to confirm',
+      del_modal_cancel:       'Cancel',
+      del_modal_confirm:      'Delete',
       ask_cecilia_text: 'Is the language too technical? If you need help, ask Cecilia.',
       ask_cecilia_btn:  '💬 Chat with Cecilia',
       cecilia_intro_analysis: 'I\'ve read the case analysis, darling. Which term or concept is confusing you? I\'ll put it in plain English.',
@@ -7231,6 +7770,31 @@ function endTourIntro() {
       form_submit:           'Create my account →',
       form_terms_pre:        'By registering you accept our ',
       form_terms_link:       'Privacy Policy',
+      form_consent:          'By creating my account I accept the <a onclick="goTo(\'s-privacy\')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Privacy Policy</a> and <a onclick="goTo(\'s-terms\')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Terms of Service</a>, and consent to the processing of my personal data (email, phone) for the purposes described in the Privacy Policy.',
+      // Terms of Service (s-terms) — EN
+      tos_title:     'Terms of Service',
+      tos_subtitle:  'The Dogs Mind · Last updated: April 2026',
+      tos_intro:     'By using The Dogs Mind you accept these terms. Read them carefully before creating your account.',
+      tos_h1:        '1. Service provider',
+      tos_p1:        'The Dogs Mind is a service operated by <strong>Teodoro Mariscal Diaz</strong> (Spain). Contact: <a href="mailto:info@thedogsmind.net" style="color:var(--green);">info@thedogsmind.net</a>.',
+      tos_h2:        '2. Nature of the service',
+      tos_p2:        'The Dogs Mind provides AI-generated behavioral analyses and intervention plans. <strong>The content is informational, may contain errors, and does NOT replace the diagnosis or treatment of a licensed veterinary ethologist.</strong> In cases of aggression, self-harming behavior, or medical emergencies, seek a qualified professional immediately.',
+      tos_h3:        '3. Account and eligibility',
+      tos_p3:        'You must be at least 18 years old to create an account. You are responsible for the accuracy of the data you provide and for keeping your password safe. One account = one natural person.',
+      tos_h4:        '4. Tokens and payments',
+      tos_p4:        'Access to analyses and plans consumes tokens. Tokens are sold in packs and do not expire. Payments are processed via Stripe (web) or Apple In-App Purchase (iOS). Tokens are non-refundable except in cases of technical error attributable to us or applicable legal requirements. Top-ups are final once confirmed.',
+      tos_h5:        '5. Acceptable use',
+      tos_p5:        'You may not use the service for illegal, harmful, or third-party-rights-infringing purposes. You may not attempt to extract models, reverse-engineer, or resell the service without written authorization.',
+      tos_h6:        '6. Account cancellation',
+      tos_p6:        'You may delete your account at any time from "My Tokens → Delete my account". Your personal data is erased immediately. Payment records are retained anonymized for 4 years per Spanish tax law.',
+      tos_h7:        '7. Limitation of liability',
+      tos_p7:        'The service is provided "as is". The Dogs Mind does not guarantee specific results regarding your dog\'s behavior and is not liable for damages arising from the use of generated analyses or plans. This does not exclude minimum legal obligations that cannot be limited.',
+      tos_h8:        '8. Changes to terms',
+      tos_p8:        'We may update these terms. We will notify you by email or in-app for material changes. Continued use after notification implies acceptance.',
+      tos_h9:        '9. Governing law and jurisdiction',
+      tos_p9:        'These terms are governed by Spanish law. Any dispute will be submitted to the courts of Madrid (Spain), unless your country\'s consumer protection laws establish a different forum.',
+      tos_box_label: 'Contact',
+      tos_box_text:  'Questions about these terms? Email us at <a href="mailto:info@thedogsmind.net" style="color:var(--green);font-weight:600;">info@thedogsmind.net</a>.',
       form_already_account:  'Already have an account? ',
       form_sign_in:          'Sign in',
       // Tokens extras
@@ -7336,7 +7900,11 @@ function endTourIntro() {
 
 <!-- ── SERVICE WORKER REGISTRATION ── -->
 <script>
-if ('serviceWorker' in navigator) {
+// SW solo en navegador web. En contexto Capacitor (capacitor:// scheme o window.Capacitor)
+// el SW no aplica y romper el registro evita 404s en consola.
+var __isCapacitor = (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform())
+  || /^(capacitor|ionic):/.test(location.protocol);
+if ('serviceWorker' in navigator && !__isCapacitor) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('/service-worker.js')
       .then(function(reg) { console.log('[SW] Registered:', reg.scope); })
@@ -7361,7 +7929,7 @@ if ('serviceWorker' in navigator) {
       <p style="color:var(--text2);margin-bottom:24px;" data-i18n="pp_intro">Esta política explica qué datos recogemos, cómo los usamos y cómo los protegemos cuando usas Dogs Mind.</p>
 
       <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="pp_h1">1. Quién es el responsable</h3>
-      <p style="margin:0 0 20px;" data-i18n="pp_p1">Dogs Mind es un servicio creado por <strong>Teo Mariscal</strong>, especialista en conducta canina con más de 25 años de experiencia. Puedes contactarnos en <a href="mailto:info@dogsmind.ai" style="color:var(--green);">info@dogsmind.ai</a>.</p>
+      <p style="margin:0 0 20px;" data-i18n="pp_p1">Dogs Mind es un servicio creado por <strong>Teo Mariscal</strong>, especialista en conducta canina con más de 25 años de experiencia. Puedes contactarnos en <a href="mailto:info@thedogsmind.net" style="color:var(--green);">info@thedogsmind.net</a>.</p>
 
       <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="pp_h2">2. Qué datos recogemos</h3>
       <ul style="margin:0 0 20px;padding-left:18px;color:var(--text2);">
@@ -7385,11 +7953,19 @@ if ('serviceWorker' in navigator) {
         <li style="margin-bottom:8px;" data-i18n="pp_l4_1"><strong style="color:var(--text);">Anthropic</strong> — procesa el texto de los análisis e IA conversacional. <a href="https://www.anthropic.com/privacy" target="_blank" style="color:var(--green);">Su política de privacidad →</a></li>
         <li style="margin-bottom:8px;" data-i18n="pp_l4_2"><strong style="color:var(--text);">Railway</strong> — alojamiento del servidor y base de datos en Europa.</li>
         <li style="margin-bottom:8px;" data-i18n="pp_l4_3"><strong style="color:var(--text);">Qdrant</strong> — base de conocimiento vectorial (textos clínicos, sin datos de usuarios).</li>
-        <li style="margin-bottom:8px;" data-i18n="pp_l4_4"><strong style="color:var(--text);">Plausible Analytics</strong> — analítica web sin cookies y sin datos personales. <a href="https://plausible.io/privacy" target="_blank" style="color:var(--green);">Su política →</a></li>
+        <li style="margin-bottom:8px;" data-i18n="pp_l4_4"><strong style="color:var(--text);">Railway</strong> (UE) — backend hosting y base de datos PostgreSQL donde reside tu cuenta y los registros de pago.</li>
+        <li style="margin-bottom:8px;" data-i18n="pp_l4_5"><strong style="color:var(--text);">Netlify</strong> (USA, CDN global) — hosting del frontend de la app.</li>
+        <li style="margin-bottom:8px;" data-i18n="pp_l4_6"><strong style="color:var(--text);">Resend</strong> (USA) — email transaccional (recuperación de contraseña).</li>
+        <li style="margin-bottom:8px;" data-i18n="pp_l4_7"><strong style="color:var(--text);">Plausible Analytics</strong> (UE) — analítica web sin cookies y sin datos personales.</li>
+        <li style="margin-bottom:8px;" data-i18n="pp_l4_8"><strong style="color:var(--text);">Stripe</strong> (USA/UE) — pagos en web; los datos de tarjeta NO pasan por nuestros servidores.</li>
+        <li style="margin-bottom:8px;" data-i18n="pp_l4_9"><strong style="color:var(--text);">Apple</strong> (USA/UE) — In-App Purchase en iOS cuando aplique.</li>
       </ul>
 
+      <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="pp_h_lawful">4b. Base legal del tratamiento (RGPD)</h3>
+      <p style="margin:0 0 20px;color:var(--text2);" data-i18n="pp_p_lawful">Tratamos tus datos personales basándonos en (a) tu consentimiento al registrarte, (b) la ejecución del contrato de servicio, y (c) interés legítimo en mejorar la calidad del servicio.</p>
+
       <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="pp_h5">5. Cuánto tiempo guardamos tus datos</h3>
-      <p style="margin:0 0 20px;color:var(--text2);" data-i18n="pp_p5">Conservamos tus datos mientras tu cuenta esté activa. Puedes solicitar la eliminación de tu cuenta y todos tus datos en cualquier momento escribiéndonos a <a href="mailto:info@dogsmind.ai" style="color:var(--green);">info@dogsmind.ai</a>.</p>
+      <p style="margin:0 0 20px;color:var(--text2);" data-i18n="pp_p5">Conservamos tus datos mientras tu cuenta esté activa. Puedes solicitar la eliminación de tu cuenta y todos tus datos en cualquier momento escribiéndonos a <a href="mailto:info@thedogsmind.net" style="color:var(--green);">info@thedogsmind.net</a>.</p>
 
       <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="pp_h6">6. Tus derechos (RGPD)</h3>
       <p style="margin:0 0 12px;color:var(--text2);" data-i18n="pp_p6_lead">Si resides en la UE tienes derecho a:</p>
@@ -7400,7 +7976,10 @@ if ('serviceWorker' in navigator) {
         <li style="margin-bottom:6px;" data-i18n="pp_l6_4">Oponerte a su tratamiento.</li>
         <li style="margin-bottom:6px;" data-i18n="pp_l6_5">Presentar una reclamación ante la autoridad de protección de datos de tu país.</li>
       </ul>
-      <p style="margin:0 0 20px;color:var(--text2);" data-i18n="pp_p6_end">Para ejercer cualquiera de estos derechos escríbenos a <a href="mailto:info@dogsmind.ai" style="color:var(--green);">info@dogsmind.ai</a>.</p>
+      <p style="margin:0 0 20px;color:var(--text2);" data-i18n="pp_p6_end">Para ejercer cualquiera de estos derechos escríbenos a <a href="mailto:info@thedogsmind.net" style="color:var(--green);">info@thedogsmind.net</a>.</p>
+
+      <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="pp_h_ccpa">6b. Residentes de California (CCPA/CPRA)</h3>
+      <p style="margin:0 0 20px;color:var(--text2);" data-i18n="pp_p_ccpa">Si resides en California tienes derechos adicionales bajo la CCPA/CPRA. NO vendemos tu información personal. Para ejercer estos derechos: <a href="mailto:privacy@thedogsmind.net" style="color:var(--green);">privacy@thedogsmind.net</a>.</p>
 
       <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="pp_h7">7. Seguridad</h3>
       <p style="margin:0 0 20px;color:var(--text2);" data-i18n="pp_p7">Todas las conexiones van cifradas con HTTPS. Las contraseñas se almacenan con hash bcrypt. Nunca vendemos ni compartimos tus datos con terceros con fines comerciales.</p>
@@ -7410,7 +7989,56 @@ if ('serviceWorker' in navigator) {
 
       <div style="padding:16px;background:var(--green-bg);border-radius:var(--r);border-left:3px solid var(--green);">
         <div style="font-size:13px;color:var(--green3);font-weight:600;margin-bottom:4px;" data-i18n="pp_box_title">¿Alguna duda?</div>
-        <div style="font-size:13px;color:var(--text2);" data-i18n="pp_box_text">Escríbenos a <a href="mailto:info@dogsmind.ai" style="color:var(--green);font-weight:600;">info@dogsmind.ai</a> — respondemos en menos de 48 horas.</div>
+        <div style="font-size:13px;color:var(--text2);" data-i18n="pp_box_text">Escríbenos a <a href="mailto:info@thedogsmind.net" style="color:var(--green);font-weight:600;">info@thedogsmind.net</a> — respondemos en menos de 48 horas.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ S-TERMS: Términos de Servicio ══ -->
+  <div id="s-terms" class="screen" style="background:var(--cream);overflow-y:auto;">
+    <div style="display:flex;align-items:center;gap:12px;padding:18px 16px 14px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;position:sticky;top:0;background:var(--cream);z-index:10;">
+      <button onclick="history.back()||goTo('s-splash')" style="width:36px;height:36px;border-radius:50%;background:#fff;border:1.5px solid rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">&#8592;</button>
+      <div>
+        <div style="font-size:17px;font-weight:700;color:var(--text);letter-spacing:-0.3px;" data-i18n="tos_title">Términos de Servicio</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:1px;" data-i18n="tos_subtitle">The Dogs Mind · Última actualización: abril 2026</div>
+      </div>
+    </div>
+
+    <div style="padding:24px 20px 60px;font-size:14px;color:var(--text);line-height:1.75;max-width:640px;margin:0 auto;">
+
+      <p style="color:var(--text2);margin-bottom:24px;" data-i18n="tos_intro">Al usar The Dogs Mind aceptas estos términos. Léelos con atención antes de crear tu cuenta.</p>
+
+      <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="tos_h1">1. Quién presta el servicio</h3>
+      <p style="margin:0 0 20px;" data-i18n="tos_p1">The Dogs Mind es un servicio creado por <strong>Teodoro Mariscal Diaz</strong> (España). Para contacto, escribe a <a href="mailto:info@thedogsmind.net" style="color:var(--green);">info@thedogsmind.net</a>.</p>
+
+      <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="tos_h2">2. Naturaleza del servicio</h3>
+      <p style="margin:0 0 20px;" data-i18n="tos_p2">The Dogs Mind ofrece análisis conductuales y planes de intervención generados por inteligencia artificial. <strong>El contenido es orientativo, puede contener errores y NO sustituye el diagnóstico ni el tratamiento de un etólogo veterinario titulado.</strong> En casos de agresión, conductas autolesivas, o emergencias médicas, acude inmediatamente a un profesional cualificado.</p>
+
+      <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="tos_h3">3. Cuenta y elegibilidad</h3>
+      <p style="margin:0 0 20px;" data-i18n="tos_p3">Debes tener al menos 18 años para crear una cuenta. Eres responsable de la veracidad de los datos que introduces y de mantener tu contraseña segura. Una cuenta = una persona física.</p>
+
+      <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="tos_h4">4. Tokens y pagos</h3>
+      <p style="margin:0 0 20px;" data-i18n="tos_p4">El acceso a análisis y planes consume tokens. Los tokens se compran en packs y no caducan. Los pagos se procesan a través de Stripe (web) o Apple In-App Purchase (iOS). Los tokens son no reembolsables salvo error técnico imputable a nosotros o requisito legal aplicable. Las recargas son finales tras la confirmación.</p>
+
+      <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="tos_h5">5. Uso aceptable</h3>
+      <p style="margin:0 0 20px;" data-i18n="tos_p5">No puedes usar el servicio para fines ilegales, dañinos o que infrinjan derechos de terceros. Tampoco puedes intentar extraer modelos, hacer ingeniería inversa, ni revender el servicio sin autorización escrita.</p>
+
+      <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="tos_h6">6. Cancelación de cuenta</h3>
+      <p style="margin:0 0 20px;" data-i18n="tos_p6">Puedes eliminar tu cuenta en cualquier momento desde la pantalla "Mis Tokens → Eliminar mi cuenta". Tus datos personales se borran inmediatamente. Los registros de pago se conservan anonimizados durante 4 años por requisito fiscal (España).</p>
+
+      <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="tos_h7">7. Limitación de responsabilidad</h3>
+      <p style="margin:0 0 20px;" data-i18n="tos_p7">El servicio se ofrece "tal como es". The Dogs Mind no garantiza resultados específicos sobre la conducta de tu perro y no se hace responsable de daños derivados del uso de los análisis o planes generados. Esto no excluye obligaciones legales mínimas que no puedan limitarse.</p>
+
+      <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="tos_h8">8. Cambios en los términos</h3>
+      <p style="margin:0 0 20px;" data-i18n="tos_p8">Podemos actualizar estos términos. Te notificaremos por email o dentro de la app cuando haya cambios materiales. El uso continuado tras la notificación implica aceptación.</p>
+
+      <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="tos_h9">9. Ley aplicable y jurisdicción</h3>
+      <p style="margin:0 0 20px;" data-i18n="tos_p9">Estos términos se rigen por la ley española. Cualquier disputa se someterá a los juzgados de Madrid (España), salvo que la legislación de protección al consumidor de tu país establezca un foro distinto.</p>
+
+      <div style="background:#fff;border:1.5px solid rgba(74,103,65,0.15);border-radius:14px;padding:18px;margin-top:28px;">
+        <div style="font-size:11px;color:var(--green);font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;" data-i18n="tos_box_label">Contacto</div>
+        <div style="font-size:13px;color:var(--text2);" data-i18n="tos_box_text">¿Dudas sobre estos términos? Escríbenos a <a href="mailto:info@thedogsmind.net" style="color:var(--green);font-weight:600;">info@thedogsmind.net</a>.</div>
       </div>
 
     </div>

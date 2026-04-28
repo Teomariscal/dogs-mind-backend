@@ -7900,7 +7900,11 @@ function endTourIntro() {
 
 <!-- ── SERVICE WORKER REGISTRATION ── -->
 <script>
-if ('serviceWorker' in navigator) {
+// SW solo en navegador web. En contexto Capacitor (capacitor:// scheme o window.Capacitor)
+// el SW no aplica y romper el registro evita 404s en consola.
+var __isCapacitor = (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform())
+  || /^(capacitor|ionic):/.test(location.protocol);
+if ('serviceWorker' in navigator && !__isCapacitor) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('/service-worker.js')
       .then(function(reg) { console.log('[SW] Registered:', reg.scope); })

@@ -38,6 +38,10 @@ async def lifespan(app: FastAPI):
             # Apoya a init_db() que crea la tabla; aquí garantizamos índice en score
             "CREATE INDEX IF NOT EXISTS ix_safety_log_score ON safety_log(score_global)",
             "CREATE INDEX IF NOT EXISTS ix_safety_log_created ON safety_log(created_at DESC)",
+            # Cost tracking — usage_log índices para queries CFO
+            "CREATE INDEX IF NOT EXISTS ix_usage_log_endpoint ON usage_log(endpoint)",
+            "CREATE INDEX IF NOT EXISTS ix_usage_log_created ON usage_log(created_at DESC)",
+            "CREATE INDEX IF NOT EXISTS ix_usage_log_cost ON usage_log(cost_eur)",
         ]
         for sql in migrations:
             try:

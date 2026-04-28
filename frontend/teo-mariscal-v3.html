@@ -4063,6 +4063,14 @@ body{
         </div>
       </button>
 
+      <button onclick="openSupportEmail()" style="width:100%;display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid rgba(0,0,0,0.08);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;text-align:left;font-family:inherit;transition:border-color .2s;" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='rgba(0,0,0,0.08)'">
+        <div style="width:36px;height:36px;background:#f5f5ef;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">💬</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;color:var(--dark);" data-i18n="account_support_title">Contactar soporte</div>
+          <div style="font-size:12px;color:var(--grey);line-height:1.4;" data-i18n="account_support_desc">Escríbenos si tienes dudas o problemas con la app</div>
+        </div>
+      </button>
+
       <button onclick="openDeleteAccountModal()" style="width:100%;display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid rgba(220,38,38,0.25);border-radius:14px;padding:14px 16px;margin-bottom:14px;cursor:pointer;text-align:left;font-family:inherit;transition:background .2s;" onmouseover="this.style.background='rgba(220,38,38,0.04)'" onmouseout="this.style.background='#fff'">
         <div style="width:36px;height:36px;background:rgba(220,38,38,0.08);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🗑️</div>
         <div style="flex:1;">
@@ -5948,6 +5956,24 @@ function getVal(id, fallback) {
   }
   window.togglePasswordVisibility = togglePasswordVisibility;
 
+  // ── Soporte: abrir cliente de email con datos pre-rellenados ───────────────
+  function openSupportEmail() {
+    var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+    var email = localStorage.getItem('dm_email') || '';
+    var subject, bodyIntro;
+    if (lang === 'en') {
+      subject = 'Dogs Mind Support — Question';
+      bodyIntro = 'Hi, I need help with the app:\n\n[Describe your question or issue here]\n\n— Sent from The Dogs Mind app';
+    } else {
+      subject = 'Soporte Dogs Mind — Consulta';
+      bodyIntro = 'Hola, necesito ayuda con la app:\n\n[Describe aquí tu duda o incidencia]\n\n— Enviado desde la app The Dogs Mind';
+    }
+    if (email) bodyIntro += '\nUsuario: ' + email;
+    var url = 'mailto:info@thedogsmind.net?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(bodyIntro);
+    window.location.href = url;
+  }
+  window.openSupportEmail = openSupportEmail;
+
   // ── Cambiar contraseña ────────────────────────────────────────────────────
   function openChangePasswordModal() {
     var m = document.getElementById('change-password-modal');
@@ -6662,8 +6688,9 @@ function fillABCScreen(dogName, analysisText, sources) {
     renderItems('abc-a-vars',  aVars);
     renderItems('abc-a-ec',    aEc);
     renderItems('abc-a-ed',    aEd);
-    renderItems('abc-b-items', extractSection(sintesis, 'BLOQUE B'));
-    renderItems('abc-c-items', extractSection(sintesis, 'BLOQUE C'));
+    // Ampliar keywords: Sonnet a veces emite "B — CONDUCTA" sin "BLOQUE"
+    renderItems('abc-b-items', extractSection(sintesis, 'BLOQUE B|B — CONDUCT|B—CONDUCT|B - CONDUCT|B — BEHAV|B—BEHAV|B - BEHAV'));
+    renderItems('abc-c-items', extractSection(sintesis, 'BLOQUE C|C — HIPÓTES|C—HIPÓTES|C - HIPÓTES|C — CONSEC|C—CONSEC|C - CONSEC|C — REINFORC|C—REINFORC|C — CONSEQ|C—CONSEQ'));
   } else {
     // ── Formato antiguo: mapear secciones al diseño ABC ──
     var oldA = extractSection(sintesis, 'A\s*[—–-]+\s*ANTECEDENT');
@@ -7129,7 +7156,9 @@ function endTourIntro() {
       // Mi cuenta y privacidad (GDPR/CCPA + Apple)
       account_section:        'Mi cuenta y privacidad',
       account_email_label:    'Email de la cuenta',
-      account_change_pw_title: 'Cambiar contraseña',
+      account_support_title:   'Contactar soporte',
+      account_support_desc:    'Escríbenos si tienes dudas o problemas con la app',
+            account_change_pw_title: 'Cambiar contraseña',
       account_change_pw_desc:  'Actualiza tu contraseña por una nueva',
       cp_modal_title:          '🔑 Cambiar contraseña',
       cp_modal_body:           'Por seguridad, necesitamos verificar tu contraseña actual antes de establecer una nueva.',
@@ -7556,7 +7585,9 @@ function endTourIntro() {
       // My account & privacy (GDPR/CCPA + Apple)
       account_section:        'My account & privacy',
       account_email_label:    'Account email',
-      account_change_pw_title: 'Change password',
+      account_support_title:   'Contact support',
+      account_support_desc:    'Write to us if you have questions or issues with the app',
+            account_change_pw_title: 'Change password',
       account_change_pw_desc:  'Update your password to a new one',
       cp_modal_title:          '🔑 Change password',
       cp_modal_body:           'For security, we need to verify your current password before setting a new one.',

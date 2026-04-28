@@ -2,3 +2,4 @@
 from app.models.user import User
 from app.models.payment import Payment
 from app.models.safety_log import SafetyLog
+from app.models.usage_log import UsageLog

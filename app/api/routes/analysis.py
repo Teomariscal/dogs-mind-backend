@@ -12,6 +12,8 @@ from app.models.anamnesis import AnamnesisInput, AnalysisResponse
 from app.services.clinical_ai import run_clinical_analysis
 from app.database import get_db
 from app.core.safety import log_classification_sync
+from app.core.usage_tracker import log_usage
+from app.config import get_settings
 
 
 def _extract_user_id(authorization: Optional[str]) -> Optional[UUID]:
@@ -83,18 +85,40 @@ def create_analysis(
     (no añade latencia) que loguea categorías de riesgo en safety_log.
     """
     deduct_token(authorization, db, amount=3.0, require_auth=True)
+    user_id_for_logs = _extract_user_id(authorization)
     # Shadow-mode safety classifier — no bloquea, solo loguea para análisis posterior
     safety_text = _anamnesis_text_for_safety(anamnesis)
     if safety_text:
         background_tasks.add_task(
             log_classification_sync,
-            user_id=_extract_user_id(authorization),
+            user_id=user_id_for_logs,
             endpoint="/analysis",
             input_text=safety_text,
         )
     try:
-        return run_clinical_analysis(anamnesis)
+        result = run_clinical_analysis(anamnesis)
+        # Cost tracking — fire-and-forget tras la response
+        background_tasks.add_task(
+            log_usage,
+            user_id=user_id_for_logs,
+            endpoint="/analysis",
+            model=get_settings().clinical_model,
+            input_tokens=getattr(result, "input_tokens", None),
+            output_tokens=getattr(result, "output_tokens", None),
+            tokens_charged=3.0,
+            success="ok",
+        )
+        return result
     except Exception as e:
+        background_tasks.add_task(
+            log_usage,
+            user_id=user_id_for_logs,
+            endpoint="/analysis",
+            model=get_settings().clinical_model,
+            tokens_charged=3.0,
+            success="error",
+            notes=str(e)[:200],
+        )
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -274,15 +298,37 @@ def analysis_chat(
         messages.append({"role": m.role, "content": m.content})
 
     client = get_anthropic_client()
+    chat_model = "claude-sonnet-4-5"        # Sonnet 4.5 — fast & high quality for chat
+    user_id_for_logs = _extract_user_id(authorization)
     try:
         response = client.messages.create(
-            model="claude-sonnet-4-5",        # Sonnet 4.5 — fast & high quality for chat
+            model=chat_model,
             max_tokens=1024,
             system=CHAT_SYSTEM_PROMPT,
             messages=messages,
         )
         reply = _strip_markdown(response.content[0].text)
+        # Cost tracking — fire-and-forget
+        background_tasks.add_task(
+            log_usage,
+            user_id=user_id_for_logs,
+            endpoint="/analysis/chat",
+            model=chat_model,
+            input_tokens=getattr(response.usage, "input_tokens", None),
+            output_tokens=getattr(response.usage, "output_tokens", None),
+            tokens_charged=0.25,
+            success="ok",
+        )
     except Exception as e:
+        background_tasks.add_task(
+            log_usage,
+            user_id=user_id_for_logs,
+            endpoint="/analysis/chat",
+            model=chat_model,
+            tokens_charged=0.25,
+            success="error",
+            notes=str(e)[:200],
+        )
         raise HTTPException(status_code=500, detail=f"Error de IA: {e}")
 
     return ChatResponse(reply=reply, tokens_remaining=tokens_left)

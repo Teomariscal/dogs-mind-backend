@@ -5,6 +5,8 @@ Each avatar has its own personality system prompt.
 The client maintains and sends the full conversation history on each request.
 """
 
+import random
+
 from app.config import get_settings
 from app.core.anthropic_client import get_anthropic_client
 from app.core.prompts.avatar import AVATAR_PROMPTS, AVATAR_SYSTEM_PROMPT
@@ -33,12 +35,15 @@ def chat(request: AvatarChatRequest) -> AvatarChatResponse:
             "Solo cambia de idioma si el usuario escribe explícitamente en otro idioma."
         )
 
-    # ── Easter egg Niaz TDAH ──────────────────────────────────────────────
-    # Cada 3 preguntas del usuario, Niaz arranca su respuesta admitiendo
-    # un despiste momentáneo (refleja su TDAH de forma divertida, no exagerada).
+    # ── Easter egg Niaz TDAH (programa de Razón Variable VR-4) ────────────
+    # En vez de un FR fijo (cada N exacto), aplicamos un VR-4: probabilidad
+    # independiente 1/4 en cada pregunta del usuario. Da una media de un
+    # despiste cada 4 preguntas pero con variabilidad real — a veces toca
+    # 2 cerca, a veces pasan 6 sin disparar. Más natural y menos predecible.
+    # Saltamos la primera pregunta para que el saludo inicial sea limpio.
     if request.avatar_id == "niaz":
         user_msg_count = sum(1 for m in request.messages if m.role == "user")
-        if user_msg_count > 0 and user_msg_count % 3 == 0:
+        if user_msg_count >= 2 and random.random() < 0.25:
             system_prompt += (
                 "\n\n[NOTA INTERNA — momento TDAH] "
                 "Para ESTA respuesta concreta, empieza con una frase corta y natural admitiendo "

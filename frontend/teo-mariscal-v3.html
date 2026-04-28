@@ -4654,62 +4654,6 @@ body{
         </div>
       </div>
 
-      
-      <!-- video consultation -->
-      <div id="video-section">
-        <div style="font-size:10px;font-weight:700;color:var(--grey);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px;" data-i18n="anam_video_label">&#x1F3A5; Consulta en video</div>
-
-        <!-- video thumbnail placeholder -->
-        <div style="position:relative;border-radius:14px;overflow:hidden;background:#1a1a1a;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;margin-bottom:10px;border:2px dashed rgba(255,255,255,0.15);" id="video-thumb-wrap">
-          <!-- fake video still -->
-          <div style="position:absolute;inset:0;background:linear-gradient(135deg,#1f2d1f 0%,#0f1a0f 50%,#1a1f0f 100%);opacity:0.95;"></div>
-          <!-- camera viewfinder grid -->
-          <div style="position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr 1fr;pointer-events:none;">
-            <div style="border-right:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);"></div>
-            <div style="border-right:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);"></div>
-            <div style="border-bottom:1px solid rgba(255,255,255,0.08);"></div>
-            <div style="border-right:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);"></div>
-            <div style="border-right:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);"></div>
-            <div style="border-bottom:1px solid rgba(255,255,255,0.08);"></div>
-            <div style="border-right:1px solid rgba(255,255,255,0.08);"></div>
-            <div style="border-right:1px solid rgba(255,255,255,0.08);"></div>
-            <div></div>
-          </div>
-          <!-- focus corners -->
-          <div style="position:absolute;top:12px;left:12px;width:18px;height:18px;border-top:2px solid rgba(184,149,90,0.7);border-left:2px solid rgba(184,149,90,0.7);border-radius:2px 0 0 0;"></div>
-          <div style="position:absolute;top:12px;right:12px;width:18px;height:18px;border-top:2px solid rgba(184,149,90,0.7);border-right:2px solid rgba(184,149,90,0.7);border-radius:0 2px 0 0;"></div>
-          <div style="position:absolute;bottom:12px;left:12px;width:18px;height:18px;border-bottom:2px solid rgba(184,149,90,0.7);border-left:2px solid rgba(184,149,90,0.7);border-radius:0 0 0 2px;"></div>
-          <div style="position:absolute;bottom:12px;right:12px;width:18px;height:18px;border-bottom:2px solid rgba(184,149,90,0.7);border-right:2px solid rgba(184,149,90,0.7);border-radius:0 0 2px 0;"></div>
-          <!-- rec indicator -->
-          <div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:5px;background:rgba(0,0,0,0.5);padding:3px 8px;border-radius:100px;">
-            <div style="width:6px;height:6px;border-radius:50%;background:#e53e3e;animation:recblink 1.2s infinite;"></div>
-            <span style="font-size:9px;font-weight:700;color:#fff;letter-spacing:1px;">REC</span>
-          </div>
-          <!-- play button -->
-          <div style="position:relative;z-index:2;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
-            <div style="width:0;height:0;border-top:9px solid transparent;border-bottom:9px solid transparent;border-left:16px solid rgba(255,255,255,0.9);margin-left:3px;"></div>
-          </div>
-          <!-- timestamp -->
-          <div style="position:absolute;bottom:10px;right:12px;font-size:10px;font-family:monospace;color:rgba(255,255,255,0.5);background:rgba(0,0,0,0.4);padding:2px 6px;border-radius:4px;">00:00</div>
-          <!-- dog silhouette hint -->
-          <div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:32px;opacity:0.08;line-height:1;">&#x1F415;</div>
-        </div>
-
-        <!-- token cost info -->
-        <div style="display:flex;align-items:flex-start;gap:6px;background:rgba(184,149,90,0.08);border:1px solid rgba(184,149,90,0.25);border-radius:10px;padding:8px 10px;margin-bottom:10px;">
-          <span style="font-size:13px;flex-shrink:0;margin-top:1px;">&#x26A1;</span>
-          <div>
-            <div style="font-size:11px;font-weight:600;color:#8a6a20;margin-bottom:2px;" data-i18n="anam_video_warn_t">An&aacute;lisis de video usa m&aacute;s tokens</div>
-            <div style="font-size:10px;color:var(--grey);line-height:1.45;" data-i18n="anam_video_warn_b">El an&aacute;lisis por video requiere procesar muchos m&aacute;s datos que texto. Cada minuto de video consume aproximadamente <strong>10 tokens</strong>. Val&oacute;ra si te compensa seg&uacute;n el caso.</div>
-          </div>
-        </div>
-
-        <!-- add video button -->
-        <button id="btn-add-video" onclick="checkVideoTokens()" style="width:100%;padding:11px 16px;border-radius:100px;border:1.5px solid var(--green2);background:transparent;color:var(--green2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;">
-          <span>&#x1F3A5;</span> <span data-i18n="anam_video_add">A&ntilde;adir video a la anamnesis</span>
-        </button>
-      </div>
-      <!-- fin video consultation -->
 
       <!-- el perro -->
       <div>
@@ -4875,31 +4819,23 @@ body{
         </div>
       </div>
 
-      <!-- Video upload (optional) -->
+      <!-- Análisis multimodal con vídeo — BETA PRIVADA (acceso restringido) -->
       <div style="margin-top:16px;margin-bottom:4px;">
-        <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_attach_video">📹 Adjuntar vídeo del comportamiento (opcional)</div>
-
-        <div id="video-drop-zone"
-             onclick="document.getElementById('inp-video').click()"
-             ondragover="event.preventDefault();this.style.borderColor='#4a6741';"
-             ondragleave="this.style.borderColor='rgba(0,0,0,0.12)';"
-             ondrop="handleVideoDrop(event)"
-             style="border:2px dashed rgba(0,0,0,0.15);border-radius:14px;padding:18px 16px;text-align:center;cursor:pointer;background:#fafaf8;transition:border-color 0.2s;">
-          <div id="video-drop-label" style="font-size:13px;color:var(--grey);line-height:1.5;">
-            <span style="font-size:22px;display:block;margin-bottom:6px;">🎬</span>
-            <span data-i18n="anam_drop_text">Pulsa o arrastra un vídeo aquí</span><br>
-            <span style="font-size:11px;opacity:0.7;" data-i18n="anam_drop_formats">MP4, MOV, AVI · Máx 200 MB</span>
+        <div style="position:relative;border-radius:14px;overflow:hidden;background:#1a1a1a;aspect-ratio:16/9;">
+          <img src="dog-observed.webp" alt="Perro siendo observado en su entorno natural" style="width:100%;height:100%;object-fit:cover;display:block;">
+          <!-- Overlay sutil para legibilidad del badge -->
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 50%,rgba(0,0,0,0.55) 100%);pointer-events:none;"></div>
+          <!-- Badge BETA PRIVADA -->
+          <div style="position:absolute;top:12px;left:12px;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.95);padding:5px 10px;border-radius:100px;box-shadow:0 2px 8px rgba(0,0,0,0.18);">
+            <div style="width:6px;height:6px;border-radius:50%;background:#dc2626;"></div>
+            <span style="font-size:9px;font-weight:800;letter-spacing:1.2px;color:#1a1a1a;" data-i18n="video_badge">BETA PRIVADA</span>
           </div>
-          <div id="video-preview-wrap" style="display:none;">
-            <video id="video-preview-el" controls style="width:100%;border-radius:10px;max-height:200px;background:#000;"></video>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
-              <span id="video-file-info" style="font-size:12px;color:var(--grey);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
-              <button onclick="event.stopPropagation();removeVideo()" style="border:none;background:none;color:#c0392b;font-size:12px;font-weight:600;cursor:pointer;padding:4px 8px;border-radius:6px;">✕ Quitar</button>
-            </div>
+          <!-- Pie con texto explicativo -->
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:14px 16px;color:#fff;">
+            <div style="font-size:13px;font-weight:700;letter-spacing:0.2px;line-height:1.3;margin-bottom:3px;" data-i18n="video_teaser_t">Análisis multimodal con vídeo</div>
+            <div style="font-size:11px;font-weight:500;color:rgba(255,255,255,0.85);line-height:1.4;" data-i18n="video_teaser_b">BETA PRIVADA · Solo profesionales acreditados</div>
           </div>
         </div>
-
-        <input id="inp-video" type="file" accept="video/mp4,video/quicktime,video/x-msvideo,video/x-matroska,video/webm,.mp4,.mov,.avi,.mkv,.webm" style="display:none;" onchange="handleVideoSelect(this)" />
       </div>
 
       <!-- Cambio o evento importante antes del problema -->
@@ -7000,6 +6936,10 @@ function endTourIntro() {
       loading_title:    'Analizando con IA…',
       loading_msg:      'Estás utilizando una herramienta de análisis de conducta animal muy potente y va a tomar algo de tiempo. Relax que esto puede tardar unos minutos, <strong>no cierres la app</strong>.',
       loading_disclaimer: 'The Dogs Mind te ofrece un análisis por IA y puede cometer errores. No sustituye a tu etólogo veterinario.',
+      // Análisis multimodal con vídeo — beta privada
+      video_badge:    'BETA PRIVADA',
+      video_teaser_t: 'Análisis multimodal con vídeo',
+      video_teaser_b: 'BETA PRIVADA · Solo profesionales acreditados',
       // Mi cuenta y privacidad (GDPR/CCPA + Apple)
       account_section:        'Mi cuenta y privacidad',
       account_email_label:    'Email de la cuenta',
@@ -7382,6 +7322,10 @@ function endTourIntro() {
       loading_title:    'Analyzing with AI…',
       loading_msg:      'You are using a very powerful behavioral analysis tool and it will take some time. Relax — this may take a few minutes, <strong>do not close the app</strong>.',
       loading_disclaimer: 'The Dogs Mind provides an AI-generated analysis and may contain errors. It does not replace your veterinary ethologist.',
+      // Multimodal video analysis — private beta
+      video_badge:    'PRIVATE BETA',
+      video_teaser_t: 'Multimodal analysis with video',
+      video_teaser_b: 'PRIVATE BETA · Accredited professionals only',
       // My account & privacy (GDPR/CCPA + Apple)
       account_section:        'My account & privacy',
       account_email_label:    'Account email',

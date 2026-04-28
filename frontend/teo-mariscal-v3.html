@@ -5674,6 +5674,10 @@ function getVal(id, fallback) {
       dog_age:             r.dog_age  || '',
       problem_description: r.problem  || '',
     };
+    // Flag: estamos viendo un caso archivado → "Ver Plan de Intervención"
+    // debe mostrar el plan guardado SIN regenerar (la anamnesis archivada
+    // no tiene todos los campos required que pide /intervention).
+    window._loadedFromArchive = true;
 
     // Repoblar s-abc con el análisis archivado (función ya existente)
     if (typeof fillABCScreen === 'function' && r.analysis) {
@@ -6349,9 +6353,51 @@ function getVal(id, fallback) {
     }, 300);
   }
 
+  // Helper que renderiza el plan ya generado en s-tracking — reutilizable
+  // para casos nuevos (tras llamar API) y para casos archivados (sin API).
+  function renderInterventionPlan(planText, dogName) {
+    var loading = document.getElementById('interv-loading');
+    var empty   = document.getElementById('interv-empty');
+    var body    = document.getElementById('interv-body');
+    var actions = document.getElementById('interv-actions');
+
+    var planHtml = markdownToHtml(planText || '');
+
+    var titleEl = document.getElementById('interv-title');
+    if (titleEl && dogName) titleEl.textContent = 'Plan · ' + dogName;
+
+    var fullHtml =
+      '<div style="font-size:14px;line-height:1.75;color:var(--dark);margin-bottom:20px;padding:18px;border-radius:14px;border:1px solid rgba(0,0,0,0.07);position:relative;overflow:hidden;background:#fff;">' +
+        '<div style="position:absolute;inset:0;background-image:url(https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-21.webp);background-size:cover;background-position:center 30%;opacity:0.25;border-radius:14px;"></div>' +
+        '<div style="position:relative;z-index:1;">A continuación, y en función del análisis funcional realizado por la IA entrenada por Teo Mariscal y un equipo de los mejores etólogos mundiales que participa de este proyecto, nuestra recomendación es:</div>' +
+      '</div>' +
+      '<div style="background:#f7f9f5;border-left:4px solid #4a6741;border-radius:0 14px 14px 0;padding:20px 18px;margin-bottom:20px;">' +
+        planHtml +
+      '</div>' +
+      '<div style="font-size:13px;line-height:1.75;color:#555;padding:18px;background:#fff;border-radius:14px;border:1px solid rgba(0,0,0,0.07);margin-bottom:8px;">' +
+        'Si aceptas, tu caso quedará registrado en el registro de datos de conducta. Puedes volver a realizar tantas consultas como quieras sobre el mismo caso; cada vez que realices una nueva consulta estarás pidiendo una segunda opinión al equipo de expertos.' +
+        '<br><br>' +
+        'Nuestro porcentaje de acierto en los análisis funcionales y planes de intervención es muy alto, pero nunca está de más pedir una segunda opinión si algo no te convence.' +
+      '</div>';
+
+    if (loading) loading.style.display = 'none';
+    if (empty)   empty.style.display   = 'none';
+    if (body)    { body.innerHTML = fullHtml; body.style.display = 'block'; }
+    if (actions) actions.style.display = 'flex';
+    goTo('s-tracking');
+  }
+
   async function generateInterventionPlan() {
     if (!window._lastAnalysisText) {
       alert('Por favor realiza primero un análisis funcional.');
+      return;
+    }
+    // Si venimos de un caso archivado (openRecord setea _loadedFromArchive),
+    // renderizamos directamente el plan guardado SIN regenerar — la anamnesis
+    // archivada no tiene todos los campos required que pide el endpoint.
+    if (window._loadedFromArchive && window._lastInterventionPlan) {
+      var dn = (window._lastAnamnesisData && window._lastAnamnesisData.dog_name) || '';
+      renderInterventionPlan(window._lastInterventionPlan, dn);
       return;
     }
     // Show shared loading screen
@@ -6433,6 +6479,10 @@ function getVal(id, fallback) {
   }
 
 async function analyzeWithAI() {
+  // Análisis nuevo → ya no estamos viendo un archivo. Reseteamos flag para
+  // que generateInterventionPlan regenere normalmente con la anamnesis fresca.
+  window._loadedFromArchive = false;
+
   var btn = document.getElementById('btn-analyze');
 
   // Collect text fields

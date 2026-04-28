@@ -89,7 +89,11 @@ async def get_current_user(
 # ── Endpoints ─────────────────────────────────────────────────────────────────
 @router.post("/register", response_model=AuthResponse)
 def register(req: RegisterRequest, db: Session = Depends(get_db)):
-    if db.query(User).filter(User.email == req.email).first():
+    # Normalizar email para evitar bugs case-sensitive (autocomplete navegador
+    # puede mandar emails con mayúsculas que rompen logins posteriores).
+    from sqlalchemy import func
+    email_norm = str(req.email).strip().lower()
+    if db.query(User).filter(func.lower(User.email) == email_norm).first():
         raise HTTPException(status_code=400, detail="Email ya registrado")
     if len(req.password) < 6:
         raise HTTPException(status_code=400, detail="La contraseña debe tener al menos 6 caracteres")
@@ -102,7 +106,7 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
     # Sanitize phone: trim + None si vacío
     phone_clean = (req.phone or "").strip() or None
 
-    user = User(email=req.email, password_hash=hash_password(req.password),
+    user = User(email=email_norm, password_hash=hash_password(req.password),
                 phone=phone_clean, tokens=tokens, role=role)
     db.add(user)
     db.commit()
@@ -119,7 +123,11 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=AuthResponse)
 def login(req: LoginRequest, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == req.email).first()
+    # Email normalizado lowercase + búsqueda case-insensitive — fix para usuarios
+    # que se registraron con email en mayúscula vía autocomplete del navegador.
+    from sqlalchemy import func
+    email_norm = (req.email or "").strip().lower()
+    user = db.query(User).filter(func.lower(User.email) == email_norm).first()
     if not user or user.deleted_at is not None or not verify_password(req.password, user.password_hash):
         # Mensaje uniforme aunque la cuenta esté eliminada (no leak de existencia/estado)
         raise HTTPException(status_code=401, detail="Email o contraseña incorrectos")
@@ -328,12 +336,53 @@ def forgot_password(req: ForgotPasswordRequest, db: Session = Depends(get_db)):
     """
     Generate a new password, store its hash, and email it to the user.
     Returns 200 even if email doesn't exist (no enumeration leakage).
+    Email is normalized to lowercase to avoid case-mismatch bugs.
     """
-    user = db.query(User).filter(User.email == req.email).first()
-    if user:
+    email_norm = (req.email or "").strip().lower()
+    user = db.query(User).filter(User.email == email_norm).first()
+    if user and user.deleted_at is None:
         new_password = _generate_temp_password()
         user.password_hash = hash_password(new_password)
         db.commit()
-        _send_password_email(req.email, new_password)
+        try:
+            _send_password_email(user.email, new_password)
+        except HTTPException:
+            # El email falló pero el password ya quedó cambiado en DB —
+            # log explícito para diagnosticar y rollback NO se hace porque
+            # el usuario ya no podría usar el password viejo de todas formas
+            import logging
+            logging.getLogger(__name__).warning(
+                "forgot-password: hash actualizado pero envío email falló (user_id=%s)",
+                str(user.id)
+            )
+            raise
     # Always return same response regardless of email existence
     return {"ok": True, "message": "Si el email existe, recibirás una nueva contraseña en unos segundos."}
+
+
+# ── Change password (logged in) ──────────────────────────────────────────────
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+
+@router.post("/change-password")
+def change_password(
+    req: ChangePasswordRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Cambia la contraseña del usuario autenticado.
+    Requiere reautenticación con la contraseña actual (defensa session hijack).
+    """
+    if not verify_password(req.current_password, current_user.password_hash):
+        raise HTTPException(status_code=401, detail="Contraseña actual incorrecta")
+    new_pw = (req.new_password or "")
+    if len(new_pw) < 6:
+        raise HTTPException(status_code=400, detail="La contraseña nueva debe tener al menos 6 caracteres")
+    if new_pw == req.current_password:
+        raise HTTPException(status_code=400, detail="La nueva contraseña debe ser distinta de la actual")
+    current_user.password_hash = hash_password(new_pw)
+    db.commit()
+    return {"ok": True, "message": "Contraseña actualizada correctamente"}

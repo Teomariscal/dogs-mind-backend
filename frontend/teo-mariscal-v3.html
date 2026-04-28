@@ -2442,6 +2442,31 @@ body{
 }
 #s-tracking #interv-body {
   color: rgba(255,250,240,0.86) !important;
+  background: transparent !important;
+}
+/* Forzar color claro en TODO el contenido renderizado por markdownToHtml
+   (h2/h3/p/divs de bullets). Sin esto, los párrafos e ítems del plan
+   heredaban un color claro PERO sobre algún wrapper de fondo claro,
+   resultando en texto invisible. */
+#s-tracking #interv-body,
+#s-tracking #interv-body * {
+  background: transparent !important;
+}
+#s-tracking #interv-body p,
+#s-tracking #interv-body div,
+#s-tracking #interv-body li,
+#s-tracking #interv-body span:not([style*="color:var(--green2)"]):not([style*="color:#"]) {
+  color: rgba(255,250,240,0.92) !important;
+}
+#s-tracking #interv-body strong {
+  color: rgba(255,250,240,1) !important;
+}
+#s-tracking #interv-body h2 {
+  color: var(--amber) !important;
+  border-top-color: rgba(200,169,110,0.25) !important;
+}
+#s-tracking #interv-body h3 {
+  color: var(--amber) !important;
 }
 #s-tracking #interv-loading > div:first-child {
   border-color: rgba(200,169,110,0.20) !important;
@@ -6184,7 +6209,16 @@ function getVal(id, fallback) {
     _refineHistory = [];
     var msgs = document.getElementById('refine-messages');
     if (msgs) {
-      msgs.innerHTML = '<div class="refine-msg refine-ai" style="background:#fff;border-radius:16px 16px 16px 4px;padding:14px 16px;max-width:85%;align-self:flex-start;box-shadow:0 2px 8px rgba(0,0,0,0.06);font-size:14px;line-height:1.6;color:#1a1a2e;">Hola. He revisado el análisis y el plan de intervención de este caso. 👋<br><br>Cuéntame qué parte no encaja con la situación real del cliente o qué datos quieres añadir. Ajustaré el plan en consecuencia.<div style="font-size:11px;color:#aaa;margin-top:6px;">−0.25 tokens por mensaje</div></div>';
+      var _lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+      var introText, tokenLine;
+      if (_lang === 'en') {
+        introText = "Hi. I've reviewed the analysis and intervention plan for this case. 👋<br><br>Tell me which part doesn't fit the client's real situation or what data you want to add. I'll adjust the plan accordingly.";
+        tokenLine = '−0.25 tokens per message';
+      } else {
+        introText = 'Hola. He revisado el análisis y el plan de intervención de este caso. 👋<br><br>Cuéntame qué parte no encaja con la situación real del cliente o qué datos quieres añadir. Ajustaré el plan en consecuencia.';
+        tokenLine = '−0.25 tokens por mensaje';
+      }
+      msgs.innerHTML = '<div class="refine-msg refine-ai" style="background:#fff;border-radius:16px 16px 16px 4px;padding:14px 16px;max-width:85%;align-self:flex-start;box-shadow:0 2px 8px rgba(0,0,0,0.06);font-size:14px;line-height:1.6;color:#1a1a2e;">' + introText + '<div style="font-size:11px;color:#aaa;margin-top:6px;">' + tokenLine + '</div></div>';
     }
     updateTokensScreen();
     goTo('s-refine');
@@ -6219,7 +6253,8 @@ function getVal(id, fallback) {
       var payload = {
         anamnesis:         window._lastAnamnesisData || {},
         original_analysis: (window._lastAnalysisText || '') + '\n\n' + (window._lastInterventionPlan || ''),
-        messages:          _refineHistory
+        messages:          _refineHistory,
+        lang:              (window.getCurrentLang ? window.getCurrentLang() : 'es')
       };
       var res = await fetch(API_BASE + '/analysis/chat', {
         method:  'POST',

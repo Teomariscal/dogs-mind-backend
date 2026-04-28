@@ -213,6 +213,7 @@ class ChatRequest(BaseModel):
     anamnesis: dict  # free-form dict — no strict validation needed for chat context
     original_analysis: str
     messages: List[ChatMessage]  # full conversation history incl. latest user message
+    lang: Optional[str] = "es"   # 'es' or 'en' — UI language for the response
 
 class ChatResponse(BaseModel):
     reply: str
@@ -236,7 +237,10 @@ Tu misión:
 - IMPORTANTE: No uses nunca markdown. Nada de ##, ###, **, *, `, — decorativo ni ningún símbolo de formato. \
   Escribe texto limpio con párrafos separados por saltos de línea. Para listas usa guión simple seguido de espacio.
 
-Responde en español. Sé conciso y útil."""
+Sé conciso y útil. {LANG_INSTRUCTION}"""
+
+LANG_INSTRUCTION_ES = "Responde en español por defecto. Si el usuario te escribe en otro idioma, cambia a ese idioma."
+LANG_INSTRUCTION_EN = "Respond in English by default. If the user writes to you in another language, switch to that language."
 
 
 @router.post("/chat", response_model=ChatResponse)
@@ -300,11 +304,15 @@ def analysis_chat(
     client = get_anthropic_client()
     chat_model = "claude-sonnet-4-5"        # Sonnet 4.5 — fast & high quality for chat
     user_id_for_logs = _extract_user_id(authorization)
+    # Inject UI language so Sonnet responds in the right language
+    lang = (req.lang or "es").lower()
+    lang_instr = LANG_INSTRUCTION_EN if lang == "en" else LANG_INSTRUCTION_ES
+    system_prompt_localized = CHAT_SYSTEM_PROMPT.replace("{LANG_INSTRUCTION}", lang_instr)
     try:
         response = client.messages.create(
             model=chat_model,
             max_tokens=1024,
-            system=CHAT_SYSTEM_PROMPT,
+            system=system_prompt_localized,
             messages=messages,
         )
         reply = _strip_markdown(response.content[0].text)

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!--
+        The Dogs Mind — Apple Privacy Manifest
+        Required by Apple for iOS 17+ submissions.
+
+        Coherente con Privacy Policy publicada (s-privacy):
+        - PII recogida: email, phone (opcional), user_id (UUID interno)
+        - Analytics: Plausible (privacy-friendly, sin cookies, sin tracking cross-app)
+        - NO se hace tracking entre apps ni con dominios externos
+        - NO se vende información personal
+    -->
+
+    <!-- ¿Realiza tracking entre apps/sitios? NO. -->
+    <key>NSPrivacyTracking</key>
+    <false/>
+
+    <!-- Sin dominios de tracking. -->
+    <key>NSPrivacyTrackingDomains</key>
+    <array/>
+
+    <!-- Tipos de datos recogidos por la app. -->
+    <key>NSPrivacyCollectedDataTypes</key>
+    <array>
+        <!-- Email Address (auth + recovery) -->
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypeEmailAddress</string>
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <true/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+            </array>
+        </dict>
+
+        <!-- Phone Number (opcional, contacto) -->
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypePhoneNumber</string>
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <true/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+            </array>
+        </dict>
+
+        <!-- User ID (UUID interno asignado por backend) -->
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypeUserID</string>
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <true/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+            </array>
+        </dict>
+
+        <!-- Purchase History (registros de pago Stripe/Apple IAP) -->
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypePurchaseHistory</string>
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <true/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+            </array>
+        </dict>
+
+        <!-- Product Interaction (uso de la app, vía Plausible y endpoints) -->
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypeProductInteraction</string>
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeAnalytics</string>
+            </array>
+        </dict>
+
+        <!-- Other User Content (anamnesis, conversaciones con avatares — no son
+             datos personales del owner, pero son contenido generado por usuario
+             que se procesa via Anthropic) -->
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypeOtherUserContent</string>
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <true/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+            </array>
+        </dict>
+    </array>
+
+    <!--
+        Required Reason APIs declarations.
+        Solo declaramos las que SABEMOS que el binario invoca a través de
+        Capacitor o nuestras dependencias. Apple penaliza sobre-declaraciones.
+    -->
+    <key>NSPrivacyAccessedAPITypes</key>
+    <array>
+        <!-- NSUserDefaults — usado por Capacitor Preferences plugin para
+             persistencia de settings de la app. Reason CA92.1: acceso a
+             info almacenada por la app para uso dentro de la misma. -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>CA92.1</string>
+            </array>
+        </dict>
+
+        <!-- File Timestamp — usado por WKWebView para cache de assets.
+             Reason C617.1: visualizar info del archivo al usuario / cache. -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>C617.1</string>
+            </array>
+        </dict>
+
+        <!-- System Boot Time — usado para cálculo de timeouts/durations
+             relativos. Reason 35F9.1: medir tiempo transcurrido para mejorar UX. -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategorySystemBootTime</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>35F9.1</string>
+            </array>
+        </dict>
+
+        <!-- Disk Space — usado para verificar espacio antes de cachear o
+             descargar assets WebView. Reason E174.1. -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryDiskSpace</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>E174.1</string>
+            </array>
+        </dict>
+    </array>
+</dict>
+</plist>

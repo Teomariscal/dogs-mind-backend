@@ -4085,13 +4085,13 @@ body{
       <div style="font-size:13px;line-height:1.6;color:var(--text2);margin-bottom:16px;" data-i18n="cp_modal_body">Por seguridad, necesitamos verificar tu contraseña actual antes de establecer una nueva.</div>
 
       <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:6px;" data-i18n="cp_modal_current_label">Contraseña actual</label>
-      <input id="cp-current" type="password" autocomplete="current-password" style="width:100%;padding:12px 14px;border:1.5px solid rgba(0,0,0,0.15);border-radius:10px;font-size:14px;font-family:inherit;margin-bottom:12px;box-sizing:border-box;" />
+      <div style="position:relative;width:100%;"><input id="cp-current" type="password" autocomplete="current-password" style="width:100%;padding-right:42px;padding:12px 14px;border:1.5px solid rgba(0,0,0,0.15);border-radius:10px;font-size:14px;font-family:inherit;margin-bottom:12px;box-sizing:border-box;" /><button type="button" onclick="togglePasswordVisibility('cp-current', this)" aria-label="Mostrar contraseña" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);background:transparent;border:none;cursor:pointer;font-size:18px;padding:4px 8px;color:var(--grey);font-family:inherit;line-height:1;">👁</button></div>
 
       <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:6px;" data-i18n="cp_modal_new_label">Contraseña nueva (mínimo 6 caracteres)</label>
-      <input id="cp-new" type="password" autocomplete="new-password" style="width:100%;padding:12px 14px;border:1.5px solid rgba(0,0,0,0.15);border-radius:10px;font-size:14px;font-family:inherit;margin-bottom:12px;box-sizing:border-box;" />
+      <div style="position:relative;width:100%;"><input id="cp-new" type="password" autocomplete="new-password" style="width:100%;padding-right:42px;padding:12px 14px;border:1.5px solid rgba(0,0,0,0.15);border-radius:10px;font-size:14px;font-family:inherit;margin-bottom:12px;box-sizing:border-box;" /><button type="button" onclick="togglePasswordVisibility('cp-new', this)" aria-label="Mostrar contraseña" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);background:transparent;border:none;cursor:pointer;font-size:18px;padding:4px 8px;color:var(--grey);font-family:inherit;line-height:1;">👁</button></div>
 
       <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:6px;" data-i18n="cp_modal_confirm_label">Repite la contraseña nueva</label>
-      <input id="cp-confirm" type="password" autocomplete="new-password" style="width:100%;padding:12px 14px;border:1.5px solid rgba(0,0,0,0.15);border-radius:10px;font-size:14px;font-family:inherit;margin-bottom:18px;box-sizing:border-box;" />
+      <div style="position:relative;width:100%;"><input id="cp-confirm" type="password" autocomplete="new-password" style="width:100%;padding-right:42px;padding:12px 14px;border:1.5px solid rgba(0,0,0,0.15);border-radius:10px;font-size:14px;font-family:inherit;margin-bottom:18px;box-sizing:border-box;" /><button type="button" onclick="togglePasswordVisibility('cp-confirm', this)" aria-label="Mostrar contraseña" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);background:transparent;border:none;cursor:pointer;font-size:18px;padding:4px 8px;color:var(--grey);font-family:inherit;line-height:1;">👁</button></div>
 
       <div id="cp-modal-error" style="display:none;font-size:12px;color:#dc2626;margin-bottom:12px;padding:8px;background:rgba(220,38,38,0.08);border-radius:8px;"></div>
 
@@ -4110,7 +4110,7 @@ body{
         Tu email, contraseña y teléfono se eliminarán permanentemente. Los registros de pago se conservan anonimizados durante 4 años por requisito fiscal (España). <strong>Esta acción no se puede deshacer.</strong>
       </div>
       <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:6px;" data-i18n="del_modal_pw_label">Confirma tu contraseña actual</label>
-      <input id="del-modal-password" type="password" autocomplete="current-password" style="width:100%;padding:12px 14px;border:1.5px solid rgba(0,0,0,0.15);border-radius:10px;font-size:14px;font-family:inherit;margin-bottom:12px;box-sizing:border-box;" />
+      <div style="position:relative;width:100%;"><input id="del-modal-password" type="password" autocomplete="current-password" style="width:100%;padding-right:42px;padding:12px 14px;border:1.5px solid rgba(0,0,0,0.15);border-radius:10px;font-size:14px;font-family:inherit;margin-bottom:12px;box-sizing:border-box;" /><button type="button" onclick="togglePasswordVisibility('del-modal-password', this)" aria-label="Mostrar contraseña" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);background:transparent;border:none;cursor:pointer;font-size:18px;padding:4px 8px;color:var(--grey);font-family:inherit;line-height:1;">👁</button></div>
       <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:6px;" data-i18n="del_modal_confirm_label">Escribe ELIMINAR para confirmar</label>
       <input id="del-modal-confirm" type="text" placeholder="ELIMINAR" style="width:100%;padding:12px 14px;border:1.5px solid rgba(0,0,0,0.15);border-radius:10px;font-size:14px;font-family:inherit;margin-bottom:18px;box-sizing:border-box;letter-spacing:0.1em;" />
       <div id="del-modal-error" style="display:none;font-size:12px;color:#dc2626;margin-bottom:12px;padding:8px;background:rgba(220,38,38,0.08);border-radius:8px;"></div>
@@ -4505,7 +4505,7 @@ body{
           <span data-i18n="login_section_title">Iniciar sesión</span>
         </div>
         <input class="inp" type="email" placeholder="Email..." data-i18n-placeholder="form_email_ph" id="login-email" autocomplete="email">
-        <input class="inp" type="password" placeholder="Contraseña..." data-i18n-placeholder="form_password_login_ph" id="login-password" autocomplete="current-password" style="margin-top:10px;">
+        <div style="position:relative;width:100%;"><input class="inp" type="password" placeholder="Contraseña..." data-i18n-placeholder="form_password_login_ph" id="login-password" autocomplete="current-password" style="margin-top:10px;"><button type="button" onclick="togglePasswordVisibility('login-password', this)" aria-label="Mostrar contraseña" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);background:transparent;border:none;cursor:pointer;font-size:18px;padding:4px 8px;color:var(--grey);font-family:inherit;line-height:1;">👁</button></div>
         <button class="btn-green" onclick="loginUser()" style="margin-top:14px;width:100%;font-size:16px;padding:14px;" data-i18n="login_enter_btn">Entrar →</button>
         <div style="text-align:center;margin-top:12px;">
           <a onclick="forgotPassword()" style="font-size:13px;color:#8a6a20;cursor:pointer;text-decoration:underline;font-weight:500;" data-i18n="forgot_password_link">¿Olvidaste tu contraseña?</a>
@@ -4623,7 +4623,7 @@ body{
         <!-- Password -->
         <div>
           <label style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;" data-i18n="form_password">Contraseña</label>
-          <input class="inp" type="password" placeholder="Mínimo 6 caracteres" data-i18n-placeholder="form_password_ph" id="reg-password">
+          <div style="position:relative;width:100%;"><input class="inp" type="password" placeholder="Mínimo 6 caracteres" data-i18n-placeholder="form_password_ph" id="reg-password"><button type="button" onclick="togglePasswordVisibility('reg-password', this)" aria-label="Mostrar contraseña" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);background:transparent;border:none;cursor:pointer;font-size:18px;padding:4px 8px;color:var(--grey);font-family:inherit;line-height:1;">👁</button></div>
         </div>
 
         <!-- Invite code (optional) -->
@@ -5930,6 +5930,23 @@ function getVal(id, fallback) {
       alert('Error de conexión.');
     });
   }
+
+
+  // ── Toggle visibilidad password (icono ojo) ────────────────────────────────
+  function togglePasswordVisibility(inputId, btn) {
+    var inp = document.getElementById(inputId);
+    if (!inp) return;
+    if (inp.type === 'password') {
+      inp.type = 'text';
+      btn.innerHTML = '🙈';
+      btn.setAttribute('aria-label', 'Ocultar contraseña');
+    } else {
+      inp.type = 'password';
+      btn.innerHTML = '👁';
+      btn.setAttribute('aria-label', 'Mostrar contraseña');
+    }
+  }
+  window.togglePasswordVisibility = togglePasswordVisibility;
 
   // ── Cambiar contraseña ────────────────────────────────────────────────────
   function openChangePasswordModal() {

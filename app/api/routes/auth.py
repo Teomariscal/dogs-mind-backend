@@ -301,9 +301,13 @@ def _send_password_email(to_email: str, temp_password: str) -> None:
       <div style="font-style: italic; color: #6a6a55; margin-bottom: 24px;">by Teo Mariscal</div>
       <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Has solicitado recuperar tu contraseña. Aquí tienes una nueva, generada al azar:</p>
       <div style="background: #f7f5ee; border: 1.5px solid rgba(184,146,42,0.45); border-radius: 12px; padding: 18px; text-align: center; font-size: 22px; font-weight: 700; letter-spacing: 2px; color: #1a1f17; font-family: 'Courier New', monospace; margin: 16px 0 24px;">{temp_password}</div>
-      <p style="font-size: 14px; line-height: 1.6; color: #555; margin-bottom: 8px;">Por seguridad, te recomendamos cambiarla por una nueva contraseña al iniciar sesión.</p>
+      <div style="background: #fff8e6; border: 1.5px solid #e8c46c; border-radius: 10px; padding: 14px 16px; margin: 0 0 20px; font-size: 14px; line-height: 1.6; color: #6a4f10;">
+        ⚠️ <strong>Importante:</strong> escribe esta contraseña <strong>a mano</strong> al iniciar sesión.<br>
+        Si la copias y pegas, algunos clientes de email añaden caracteres invisibles (espacios o saltos de línea) que impiden el inicio de sesión y dan el mensaje &quot;Email o contraseña incorrectos&quot;.
+      </div>
+      <p style="font-size: 14px; line-height: 1.6; color: #555; margin-bottom: 8px;">Una vez dentro, te recomendamos cambiarla por una contraseña tuya en <em>Mis Tokens → Cambiar contraseña</em>.</p>
       <p style="font-size: 14px; line-height: 1.6; margin-top: 24px;"><a href="{APP_URL}" style="color: #4a6741; text-decoration: underline;">Iniciar sesión en Dogs Mind →</a></p>
-      <p style="font-size: 12px; color: #999; margin-top: 32px; border-top: 1px solid #eee; padding-top: 16px;">Si no solicitaste este cambio, contacta con nosotros lo antes posible.</p>
+      <p style="font-size: 12px; color: #999; margin-top: 32px; border-top: 1px solid #eee; padding-top: 16px;">Si no solicitaste este cambio, contacta con nosotros lo antes posible en <a href="mailto:privacy@thedogsmind.net" style="color: #999;">privacy@thedogsmind.net</a>.</p>
     </div>
     """
 

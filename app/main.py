@@ -34,6 +34,10 @@ async def lifespan(app: FastAPI):
             "CREATE INDEX IF NOT EXISTS ix_users_deleted_at ON users(deleted_at)",
             # Permitir user_id NULL en payments para conservar historial fiscal tras delete del user
             "ALTER TABLE payments ALTER COLUMN user_id DROP NOT NULL",
+            # Safety classifier shadow log (Apple Guideline 1.1.6 + IA risk mitigation)
+            # Apoya a init_db() que crea la tabla; aquí garantizamos índice en score
+            "CREATE INDEX IF NOT EXISTS ix_safety_log_score ON safety_log(score_global)",
+            "CREATE INDEX IF NOT EXISTS ix_safety_log_created ON safety_log(created_at DESC)",
         ]
         for sql in migrations:
             try:

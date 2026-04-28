@@ -2,14 +2,37 @@ import json
 import os
 import tempfile
 from typing import Optional, List
+from uuid import UUID
 
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile, Header, Depends
+from fastapi import APIRouter, BackgroundTasks, File, Form, HTTPException, UploadFile, Header, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.models.anamnesis import AnamnesisInput, AnalysisResponse
 from app.services.clinical_ai import run_clinical_analysis
 from app.database import get_db
+from app.core.safety import log_classification_sync
+
+
+def _extract_user_id(authorization: Optional[str]) -> Optional[UUID]:
+    """Extrae user_id del Bearer token sin lanzar excepción (para shadow log)."""
+    if not authorization or not authorization.startswith("Bearer "):
+        return None
+    try:
+        from app.api.routes.auth import decode_token
+        token = authorization.split(" ", 1)[1]
+        return UUID(decode_token(token))
+    except Exception:
+        return None
+
+
+def _anamnesis_text_for_safety(anam: AnamnesisInput) -> str:
+    """Concatena campos libres de la anamnesis para clasificar (no incluye datos del perro estructurados)."""
+    parts = []
+    for fld in ("problem", "since", "where", "who", "history", "theory", "prior_event"):
+        v = getattr(anam, fld, None)
+        if v: parts.append(str(v))
+    return " | ".join(parts)
 
 router = APIRouter(prefix="/analysis", tags=["clinical-analysis"])
 
@@ -43,6 +66,7 @@ ALLOWED_VIDEO_TYPES = {
 @router.post("", response_model=AnalysisResponse)
 def create_analysis(
     anamnesis: AnamnesisInput,
+    background_tasks: BackgroundTasks,
     authorization: Optional[str] = Header(None),
     db: Session = Depends(get_db),
 ):
@@ -54,8 +78,20 @@ def create_analysis(
     Sonnet 4.6 with prompt caching active on the system prompt.
     Deducts 3 tokens from the authenticated user (requires login).
     Admins and collaborators are exempt from deduction.
+
+    SHADOW SAFETY: lanza un classifier en background tras la respuesta
+    (no añade latencia) que loguea categorías de riesgo en safety_log.
     """
     deduct_token(authorization, db, amount=3.0, require_auth=True)
+    # Shadow-mode safety classifier — no bloquea, solo loguea para análisis posterior
+    safety_text = _anamnesis_text_for_safety(anamnesis)
+    if safety_text:
+        background_tasks.add_task(
+            log_classification_sync,
+            user_id=_extract_user_id(authorization),
+            endpoint="/analysis",
+            input_text=safety_text,
+        )
     try:
         return run_clinical_analysis(anamnesis)
     except Exception as e:
@@ -64,6 +100,7 @@ def create_analysis(
 
 @router.post("/video", response_model=AnalysisResponse)
 async def create_analysis_with_video(
+    background_tasks: BackgroundTasks,
     anamnesis_json: str = Form(..., description="Full AnamnesisInput serialised as JSON"),
     video: UploadFile = File(..., description="Video of the dog's behavior (MP4, MOV, AVI…)"),
     authorization: Optional[str] = Header(None),
@@ -101,6 +138,16 @@ async def create_analysis_with_video(
         anamnesis = AnamnesisInput(**anamnesis_data)
     except Exception as e:
         raise HTTPException(status_code=422, detail=f"Invalid anamnesis JSON: {e}")
+
+    # ── Shadow safety classifier (no bloquea, fire-and-forget) ───────────────
+    safety_text = _anamnesis_text_for_safety(anamnesis)
+    if safety_text:
+        background_tasks.add_task(
+            log_classification_sync,
+            user_id=_extract_user_id(authorization),
+            endpoint="/analysis/video",
+            input_text=safety_text,
+        )
 
     # ── Write video to temp file & extract frames ────────────────────────────
     suffix = os.path.splitext(video.filename or "video.mp4")[1] or ".mp4"
@@ -171,6 +218,7 @@ Responde en español. Sé conciso y útil."""
 @router.post("/chat", response_model=ChatResponse)
 def analysis_chat(
     req: ChatRequest,
+    background_tasks: BackgroundTasks,
     authorization: Optional[str] = Header(None),
     db: Session = Depends(get_db),
 ):
@@ -179,8 +227,28 @@ def analysis_chat(
 
     Accepts the original anamnesis, the full analysis text, and the
     accumulated conversation history. Returns the AI's next reply.
+
+    SHADOW SAFETY: clasifica el último mensaje del usuario en background
+    (no bloquea, solo loguea para análisis posterior).
     """
     tokens_left = deduct_token(authorization, db, amount=0.25)
+
+    # Shadow safety classifier sobre el último mensaje del usuario
+    last_user_msg = ""
+    try:
+        for m in reversed(req.history or []):
+            if getattr(m, "role", "") == "user":
+                last_user_msg = (getattr(m, "content", "") or "").strip()
+                break
+    except Exception:
+        last_user_msg = ""
+    if last_user_msg:
+        background_tasks.add_task(
+            log_classification_sync,
+            user_id=_extract_user_id(authorization),
+            endpoint="/analysis/chat",
+            input_text=last_user_msg,
+        )
 
     from app.core.anthropic_client import get_anthropic_client
 

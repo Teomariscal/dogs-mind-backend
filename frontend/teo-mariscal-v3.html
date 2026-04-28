@@ -6620,19 +6620,34 @@ async function analyzeWithAI() {
 // ── SPLIT RESPONSE INTO SÍNTESIS / ANÁLISIS COMPLETO ─
 function splitAnalysisParts(text) {
   if (!text || typeof text !== 'string') return { sintesis: '', completo: '', newFormat: false };
-  var sintesisMarker  = 'SÍNTESIS ABC';
-  var completoMarker  = 'ANÁLISIS COMPLETO';
-  var idxS = text.indexOf(sintesisMarker);
-  var idxC = text.indexOf(completoMarker);
-  if (idxS !== -1 && idxC !== -1) {
+  // Aceptar marcadores ES y EN (Sonnet a veces los traduce):
+  // SÍNTESIS ABC / SINTESIS ABC / ABC SYNTHESIS
+  // ANÁLISIS COMPLETO / ANALISIS COMPLETO / FULL ANALYSIS / COMPLETE ANALYSIS
+  var sMarkers = ['SÍNTESIS ABC', 'SINTESIS ABC', 'ABC SYNTHESIS', 'ABC SUMMARY'];
+  var cMarkers = ['ANÁLISIS COMPLETO', 'ANALISIS COMPLETO', 'FULL ANALYSIS', 'COMPLETE ANALYSIS'];
+
+  var idxS = -1, lenS = 0;
+  for (var i = 0; i < sMarkers.length; i++) {
+    var p = text.indexOf(sMarkers[i]);
+    if (p !== -1) { idxS = p; lenS = sMarkers[i].length; break; }
+  }
+  var idxC = -1, lenC = 0;
+  for (var j = 0; j < cMarkers.length; j++) {
+    var q = text.indexOf(cMarkers[j]);
+    if (q !== -1) { idxC = q; lenC = cMarkers[j].length; break; }
+  }
+
+  if (idxS !== -1 && idxC !== -1 && idxC > idxS) {
     return {
-      sintesis:  text.substring(idxS + sintesisMarker.length, idxC).trim(),
-      completo:  text.substring(idxC + completoMarker.length).trim(),
+      sintesis:  text.substring(idxS + lenS, idxC).trim(),
+      completo:  text.substring(idxC + lenC).trim(),
       newFormat: true
     };
   }
-  // Formato antiguo: todo el texto va a completo; extraemos secciones para síntesis
-  return { sintesis: text, completo: text, newFormat: false };
+  // Formato sin marcadores: todo el texto va a ambos campos. fillABCScreen
+  // usa extractSectionByLetter (regex estructural) que detecta los bloques
+  // A/B/C aunque no haya separación SÍNTESIS / COMPLETO.
+  return { sintesis: text, completo: text, newFormat: true };
 }
 
 // ── PARSE A SUB-SECTION FROM SÍNTESIS ────────────────

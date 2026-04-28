@@ -6640,6 +6640,30 @@ function splitAnalysisParts(text) {
 
 // Returns content of first ## section whose title contains any of the
 // pipe-separated keywords (case-insensitive).
+// Detector estructural por letra del bloque (A/B/C). Mucho más robusto que
+// matching de keywords porque sobrevive a variaciones de Sonnet:
+//   "## BLOQUE B — CONDUCTA"   "## B — CONDUCTA"
+//   "## B - Conducta"           "## SECTION B — BEHAVIOR"
+//   "## B: Behavior"            "## B"  (solo letra)
+function extractSectionByLetter(text, letter) {
+  if (!text) return '';
+  // Acepta: ## [BLOQUE/BLOCK/SECTION ]?LETTER[separator|EOL]
+  var startRe = new RegExp('^[ \\t]*##[ \\t]+(?:BLOQUE[ \\t]+|BLOCK[ \\t]+|SECTION[ \\t]+)?' + letter + '(?:[ \\t]*$|[ \\t]*[\\-—–:][ \\t])', 'i');
+  var anyH2 = /^[ \t]*##[^#]/;
+  var lines = text.split('\n');
+  var inside = false;
+  var out = [];
+  for (var i = 0; i < lines.length; i++) {
+    var l = lines[i];
+    if (anyH2.test(l)) {
+      if (startRe.test(l)) { inside = true; continue; }
+      if (inside) break;
+    }
+    if (inside) out.push(l);
+  }
+  return out.join('\n').trim();
+}
+
 function extractSection(text, headerKeywords) {
   if (!text) return '';
   var keys = headerKeywords.split('|').map(function(k){ return k.trim().toLowerCase(); });
@@ -6714,7 +6738,10 @@ function fillABCScreen(dogName, analysisText, sources) {
 
   if (parts.newFormat) {
     // ── Nuevo formato: sub-secciones explícitas ──
-    var bloqueA   = extractSection(sintesis, 'BLOQUE A');
+    // Usamos el detector estructural por letra (A/B/C) en lugar de keywords
+    // específicas — sobrevive a "BLOQUE B", "B — CONDUCTA", "B - Behavior",
+    // "SECTION B", "B:" o cualquier variación que Sonnet emita.
+    var bloqueA   = extractSectionByLetter(sintesis, 'A');
     var aVars     = extractSubSection(bloqueA || sintesis, 'Variables disposicionales');
     var aEc       = extractSubSection(bloqueA || sintesis, 'Estímulos condicionados|Estimulos condicionados|EC[^a-z]');
     var aEd       = extractSubSection(bloqueA || sintesis, 'ED[\s\-—–]|Estímulo [Dd]iscriminativo|Estimulo [Dd]iscriminativo');
@@ -6723,9 +6750,8 @@ function fillABCScreen(dogName, analysisText, sources) {
     renderItems('abc-a-vars',  aVars);
     renderItems('abc-a-ec',    aEc);
     renderItems('abc-a-ed',    aEd);
-    // Ampliar keywords: Sonnet a veces emite "B — CONDUCTA" sin "BLOQUE"
-    renderItems('abc-b-items', extractSection(sintesis, 'BLOQUE B|B — CONDUCT|B—CONDUCT|B - CONDUCT|B — BEHAV|B—BEHAV|B - BEHAV'));
-    renderItems('abc-c-items', extractSection(sintesis, 'BLOQUE C|C — HIPÓTES|C—HIPÓTES|C - HIPÓTES|C — CONSEC|C—CONSEC|C - CONSEC|C — REINFORC|C—REINFORC|C — CONSEQ|C—CONSEQ'));
+    renderItems('abc-b-items', extractSectionByLetter(sintesis, 'B'));
+    renderItems('abc-c-items', extractSectionByLetter(sintesis, 'C'));
   } else {
     // ── Formato antiguo: mapear secciones al diseño ABC ──
     var oldA = extractSection(sintesis, 'A\s*[—–-]+\s*ANTECEDENT');

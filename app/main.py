@@ -6,6 +6,8 @@ from fastapi.responses import FileResponse
 
 from app.api.routes import health, analysis, avatar, documents, intervention
 from app.api.routes import auth, payments as payments_router
+from app.api.routes import dogs as dogs_router
+from app.api.routes import cases as cases_router
 
 # Path to the frontend HTML — override via FRONTEND_HTML env var
 FRONTEND_HTML = os.environ.get(
@@ -42,6 +44,23 @@ async def lifespan(app: FastAPI):
             "CREATE INDEX IF NOT EXISTS ix_usage_log_endpoint ON usage_log(endpoint)",
             "CREATE INDEX IF NOT EXISTS ix_usage_log_created ON usage_log(created_at DESC)",
             "CREATE INDEX IF NOT EXISTS ix_usage_log_cost ON usage_log(cost_eur)",
+            # Dogs — perfil de perro persistente del usuario (Pet Owner: max 2 dogs)
+            # init_db() crea la tabla via Base.metadata.create_all(); aquí garantizamos
+            # los índices que SQLAlchemy puede no haber creado en upgrades (si la tabla
+            # existía antes con otro esquema).
+            "CREATE INDEX IF NOT EXISTS ix_dogs_user_id ON dogs(user_id)",
+            "CREATE INDEX IF NOT EXISTS ix_dogs_deleted_at ON dogs(deleted_at)",
+            "CREATE INDEX IF NOT EXISTS ix_dogs_user_active ON dogs(user_id, deleted_at)",
+            # Cases + CaseEntries — historial clínico persistente del caso
+            "CREATE INDEX IF NOT EXISTS ix_cases_user_id ON cases(user_id)",
+            "CREATE INDEX IF NOT EXISTS ix_cases_dog_id ON cases(dog_id)",
+            "CREATE INDEX IF NOT EXISTS ix_cases_status ON cases(status)",
+            "CREATE INDEX IF NOT EXISTS ix_cases_deleted_at ON cases(deleted_at)",
+            "CREATE INDEX IF NOT EXISTS ix_cases_user_active ON cases(user_id, deleted_at, updated_at DESC)",
+            "CREATE INDEX IF NOT EXISTS ix_case_entries_case_id ON case_entries(case_id)",
+            "CREATE INDEX IF NOT EXISTS ix_case_entries_type ON case_entries(type)",
+            "CREATE INDEX IF NOT EXISTS ix_case_entries_created_at ON case_entries(created_at)",
+            "CREATE INDEX IF NOT EXISTS ix_case_entries_case_chrono ON case_entries(case_id, created_at)",
         ]
         for sql in migrations:
             try:
@@ -132,6 +151,8 @@ app.include_router(analysis.router)
 app.include_router(intervention.router)
 app.include_router(avatar.router)
 app.include_router(documents.router)
+app.include_router(dogs_router.router)
+app.include_router(cases_router.router)
 
 
 @app.get("/", include_in_schema=False)

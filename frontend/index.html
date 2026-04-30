@@ -194,6 +194,31 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 }
 .dog-name{font-size:12px;color:var(--text2);font-weight:500;}
 .dog-img-hint{font-size:10px;color:var(--text3);text-align:center;max-width:64px;}
+/* Foto del perro dentro del círculo de la home */
+.dog-circle img{width:100%;height:100%;object-fit:cover;display:block;}
+/* Badge de estado del slot dentro del círculo (ej. "+" para añadir) */
+.dog-circle .dog-add{position:absolute;font-size:30px;color:var(--text2);font-weight:300;line-height:1;}
+
+/* ── S-DOG-PROFILE ───────────────────────────────────────────────────── */
+#s-dog-profile .form-label{
+  display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text3);margin-bottom:6px;font-weight:600;
+}
+#s-dog-profile .inp,
+#s-dog-profile .sel{
+  width:100%;padding:12px 14px;border:1px solid var(--border2);
+  border-radius:12px;background:var(--white);font-family:inherit;
+  font-size:14px;color:var(--text);outline:none;
+  -webkit-appearance:none;appearance:none;
+}
+#s-dog-profile .inp:focus,
+#s-dog-profile .sel:focus{border-color:var(--green);}
+#s-dog-profile .sel{
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;
+}
+#s-dog-profile .inp::placeholder{color:var(--text3);opacity:0.7;}
+#s-dog-profile .back-round{background:var(--white);}
 
 /* ACTION CARDS */
 .cards-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:14px 16px 0;}
@@ -3725,23 +3750,19 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
         </div>
       </div>
 
-      <!-- My Dogs -->
+      <!-- My Dogs (renderizado dinámicamente desde el backend; fallback Buddy/Laika
+           si no hay sesión o usuario aún sin perros — ver renderHomeDogs() en JS) -->
       <div class="section">
         <div class="section-title" data-i18n="my_dogs">My Dogs</div>
-        <div class="dogs-row">
-          <div class="dog-item">
-            <div class="dog-circle" style="background:none;padding:0;overflow:hidden">
-              <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-03.webp" style="width:100%;height:100%;object-fit:cover;object-position:center 40%">
-              <div class="dog-check">✓</div>
-            </div>
-            <div class="dog-name">Buddy</div>
+        <div class="dogs-row" id="home-dogs-row" role="list" aria-label="Mis perros">
+          <!-- Skeleton inicial; se sustituye al cargar /dogs -->
+          <div class="dog-item" aria-hidden="true">
+            <div class="dog-circle" style="background:#e8e2d6;"></div>
+            <div class="dog-name">…</div>
           </div>
-          <div class="dog-item">
-            <div class="dog-circle inactive" style="background:none;padding:0;overflow:hidden">
-              <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-04.webp" style="width:100%;height:100%;object-fit:cover;object-position:center 20%">
-              <div class="dog-check">✓</div>
-            </div>
-            <div class="dog-name">Laika</div>
+          <div class="dog-item" aria-hidden="true">
+            <div class="dog-circle inactive" style="background:#e8e2d6;"></div>
+            <div class="dog-name">…</div>
           </div>
         </div>
       </div>
@@ -4970,6 +4991,105 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   </div>
   <!-- fin s-records -->
 
+  <!-- ══ S-DOG-PROFILE: ficha del perro (crear / editar / borrar) ══════════
+       Estados manejados por openDogProfile() / openCreateDog() en JS:
+         • mode='create' → datos vacíos, botón "Crear perro"
+         • mode='edit'   → datos del dog cargados, botón "Guardar cambios" + "Eliminar"
+       La foto se sube por separado (PUT /dogs/{id}/photo) tras crear el perro;
+       en modo create se mete tras guardar inicial. Comprimida a ≤200 KB en cliente.
+  ============================================================================ -->
+  <div id="s-dog-profile" class="screen" style="background:var(--cream);overflow:hidden;display:flex;flex-direction:column;">
+    <!-- Header -->
+    <div style="padding:calc(env(safe-area-inset-top, 0px) + 14px) 16px 12px;display:flex;align-items:center;gap:12px;background:var(--cream2);border-bottom:1px solid var(--border);flex-shrink:0;">
+      <div class="back-round" onclick="goTo('s-home')" aria-label="Volver">←</div>
+      <div style="flex:1;min-width:0;">
+        <div id="dog-profile-title" style="font-family:var(--ff-serif);font-size:20px;font-weight:600;color:var(--text);line-height:1.1;" data-i18n="dog_profile_title_create">Nuevo perro</div>
+        <div id="dog-profile-subtitle" style="font-size:12px;color:var(--text2);margin-top:2px;" data-i18n="dog_profile_subtitle_create">Añade los datos básicos de tu perro.</div>
+      </div>
+    </div>
+
+    <!-- Cuerpo scrolleable -->
+    <div style="flex:1;overflow-y:auto;padding:18px 16px calc(env(safe-area-inset-bottom, 0px) + 110px);">
+
+      <!-- Estado: cargando -->
+      <div id="dog-profile-loading" style="display:none;text-align:center;padding:40px 0;color:var(--text3);">
+        <div style="font-size:13px;" data-i18n="loading_dots">Cargando…</div>
+      </div>
+
+      <!-- Estado: error de carga -->
+      <div id="dog-profile-error" style="display:none;text-align:center;padding:30px 16px;color:var(--text2);">
+        <div style="font-size:13px;margin-bottom:12px;" data-i18n="dog_profile_load_error">No hemos podido cargar este perro.</div>
+        <button onclick="goTo('s-home')" style="padding:10px 18px;border:1px solid var(--border2);border-radius:100px;background:var(--white);color:var(--text2);font-size:13px;font-family:inherit;cursor:pointer;" data-i18n="back_to_home">Volver al inicio</button>
+      </div>
+
+      <!-- Form (oculto mientras carga) -->
+      <div id="dog-profile-form" style="display:none;">
+
+        <!-- Foto del perro -->
+        <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:24px;">
+          <div id="dog-photo-wrap" style="width:140px;height:140px;border-radius:50%;overflow:hidden;background:#e8e2d6;border:3px solid var(--green);display:flex;align-items:center;justify-content:center;position:relative;">
+            <img id="dog-photo-img" src="" style="width:100%;height:100%;object-fit:cover;display:none;">
+            <div id="dog-photo-placeholder" style="font-size:48px;color:var(--text3);">🐕</div>
+          </div>
+          <input id="dog-photo-input" type="file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="onDogPhotoSelected(event)">
+          <button id="dog-photo-btn" type="button" onclick="document.getElementById('dog-photo-input').click()" style="margin-top:12px;padding:8px 16px;border:1px solid var(--border2);border-radius:100px;background:var(--white);color:var(--text2);font-size:12px;font-family:inherit;cursor:pointer;" data-i18n="dog_photo_change">Cambiar foto</button>
+          <button id="dog-photo-remove-btn" type="button" onclick="onDogPhotoRemove()" style="margin-top:6px;padding:6px 12px;border:none;background:none;color:var(--text3);font-size:11px;font-family:inherit;cursor:pointer;display:none;" data-i18n="dog_photo_remove">Quitar foto</button>
+          <div style="font-size:11px;color:var(--text3);margin-top:8px;text-align:center;max-width:240px;" data-i18n="dog_photo_hint">Foto de perfil opcional. Se comprime automáticamente.</div>
+        </div>
+
+        <!-- Campos del formulario -->
+        <div style="display:flex;flex-direction:column;gap:14px;">
+
+          <div>
+            <label class="form-label" data-i18n="dog_field_name">Nombre</label>
+            <input id="dog-field-name" class="inp" type="text" maxlength="50" placeholder="Ej: Buddy" data-i18n-placeholder="dog_field_name_ph">
+          </div>
+
+          <div>
+            <label class="form-label" data-i18n="dog_field_breed">Raza</label>
+            <input id="dog-field-breed" class="inp" type="text" maxlength="100" placeholder="Ej: Border Collie" data-i18n-placeholder="dog_field_breed_ph">
+          </div>
+
+          <div style="display:flex;gap:10px;">
+            <div style="flex:1;">
+              <label class="form-label" data-i18n="dog_field_birth_year">Año de nacimiento</label>
+              <input id="dog-field-birth-year" class="inp" type="number" min="1900" max="2100" inputmode="numeric" placeholder="2022">
+            </div>
+            <div style="flex:1;">
+              <label class="form-label" data-i18n="dog_field_weight">Peso aprox. (kg)</label>
+              <input id="dog-field-weight" class="inp" type="number" min="0" max="120" inputmode="numeric" placeholder="—">
+            </div>
+          </div>
+
+          <div>
+            <label class="form-label" data-i18n="dog_field_sex">Sexo</label>
+            <select id="dog-field-sex" class="sel" style="width:100%;">
+              <option value="M" data-i18n="dog_sex_male">Macho</option>
+              <option value="F" data-i18n="dog_sex_female">Hembra</option>
+            </select>
+          </div>
+
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 0;">
+            <input id="dog-field-neutered" type="checkbox" style="width:18px;height:18px;accent-color:var(--green);">
+            <span style="font-size:14px;color:var(--text);" data-i18n="dog_field_neutered">Esterilizado</span>
+          </label>
+
+        </div>
+
+        <!-- Mensajes -->
+        <div id="dog-profile-msg" style="margin-top:14px;font-size:13px;text-align:center;min-height:18px;"></div>
+
+        <!-- Botones de acción -->
+        <button id="dog-save-btn" type="button" onclick="saveDogFromForm()" style="margin-top:18px;width:100%;padding:14px;border:none;border-radius:100px;background:var(--green);color:#fff;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;" data-i18n="dog_save_btn_create">Crear perro</button>
+
+        <button id="dog-delete-btn" type="button" onclick="confirmDeleteDog()" style="margin-top:10px;width:100%;padding:12px;border:1px solid #d05050;border-radius:100px;background:transparent;color:#d05050;font-size:13px;font-family:inherit;cursor:pointer;display:none;" data-i18n="dog_delete_btn">Eliminar perro</button>
+
+      </div>
+    </div>
+
+  </div>
+  <!-- fin s-dog-profile -->
+
   <!-- ══ S-REFINE: Chat analítico de refinamiento del plan ══ -->
   <div id="s-refine" class="screen" style="background:#f0f4ff;flex-direction:column;">
 
@@ -5228,6 +5348,8 @@ function registerUser() {
     setJWT(res.data.token);
     setTokens(res.data.tokens);
     if (res.data.role) localStorage.setItem('dm_role', res.data.role);
+    // Precargar lista de perros tras registro exitoso
+    if (typeof loadMyDogs === 'function') loadMyDogs();
 
     // Actualizar nombres de perros si se rellenaron
     if (dog1) {
@@ -5921,6 +6043,8 @@ function getVal(id, fallback) {
       setTokens(res.data.tokens);
       if (res.data.role) localStorage.setItem('dm_role', res.data.role);
       localStorage.setItem('dm_last_email', email);
+      // Precargar lista de perros tras login exitoso
+      if (typeof loadMyDogs === 'function') loadMyDogs();
       showToast('👋 ¡Bienvenido!');
       var dest = localStorage.getItem('dm_login_dest') || 's-home';
       localStorage.removeItem('dm_login_dest');
@@ -6969,6 +7093,401 @@ function markdownToHtml(md) {
   closePara();
   return out.join('\n');
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DOG PROFILE — gestión completa de perros (CRUD + foto + cuotas)
+// Backend: /dogs (list/get/create/update/delete) + /dogs/{id}/photo (PUT/DELETE).
+// Cache: window._myDogs, refrescado tras cada operación. Fallback Buddy/Laika
+// para usuarios sin sesión o sin perros (los círculos demo abren openCreateDog).
+// Subida de foto: comprimida en cliente (Canvas → WebP ≤200 KB raw).
+// INVARIANTE: cuota Pet Owner máx 2 perros — validada en cliente Y backend (429).
+// ═══════════════════════════════════════════════════════════════════════════
+
+window._myDogs = null;
+window._dogProfileState = { mode: 'create', dogId: null, pendingPhotoBase64: null };
+
+var _DEMO_DOGS = [
+  { id: '_demo_buddy', name: 'Buddy',
+    photoUrl: 'https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-03.webp',
+    _demo: true, _imgPos: 'center 40%' },
+  { id: '_demo_laika', name: 'Laika',
+    photoUrl: 'https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-04.webp',
+    _demo: true, _imgPos: 'center 20%' }
+];
+
+function _i18nText(key, fallback) {
+  try {
+    var lang = (window.getCurrentLang && window.getCurrentLang()) || 'es';
+    var dict = (window.TRANSLATIONS && window.TRANSLATIONS[lang]) || {};
+    return dict[key] || fallback;
+  } catch(e) { return fallback; }
+}
+function _escapeAttr(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+function _escapeText(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+async function loadMyDogs() {
+  if (!getJWT()) {
+    window._myDogs = null;
+    renderHomeDogs();
+    return;
+  }
+  try {
+    var res = await fetch(API_BASE + '/dogs', { headers: authHeaders(), cache: 'no-store' });
+    if (!res.ok) {
+      console.warn('loadMyDogs: HTTP ' + res.status);
+      window._myDogs = [];
+      renderHomeDogs();
+      return;
+    }
+    window._myDogs = await res.json();
+    renderHomeDogs();
+  } catch (e) {
+    console.warn('loadMyDogs error:', e);
+    window._myDogs = [];
+    renderHomeDogs();
+  }
+}
+window.loadMyDogs = loadMyDogs;
+
+function renderHomeDogs() {
+  var row = document.getElementById('home-dogs-row');
+  if (!row) return;
+
+  var dogs = (window._myDogs || []).slice(0, 2);
+  var slots = [];
+  if (dogs.length === 0) {
+    slots = [{ dog: _DEMO_DOGS[0] }, { dog: _DEMO_DOGS[1] }];
+  } else if (dogs.length === 1) {
+    slots = [{ dog: dogs[0] }, { dog: _DEMO_DOGS[1] }];
+  } else {
+    slots = [{ dog: dogs[0] }, { dog: dogs[1] }];
+  }
+
+  row.innerHTML = slots.map(function(slot, idx) {
+    var d = slot.dog;
+    var isDemo = !!d._demo;
+    var imgSrc = d.photo_base64 || d.photoUrl || '';
+    var imgPos = d._imgPos || 'center';
+    var clickAttr = isDemo
+      ? 'onclick="openCreateDog()"'
+      : 'onclick="openDogProfile(\'' + _escapeAttr(d.id) + '\')"';
+    var inactiveClass = (idx === 1 && isDemo) ? ' inactive' : '';
+    var imgHtml = imgSrc
+      ? '<img src="' + _escapeAttr(imgSrc) + '" style="object-position:' + imgPos + ';" alt="">'
+      : '<span style="font-size:24px;">🐕</span>';
+    var name = _escapeText(d.name || '');
+    return (
+      '<div class="dog-item" ' + clickAttr + ' role="listitem">' +
+        '<div class="dog-circle' + inactiveClass + '" style="background:none;padding:0;overflow:hidden;">' +
+          imgHtml +
+        '</div>' +
+        '<div class="dog-name">' + name + '</div>' +
+      '</div>'
+    );
+  }).join('');
+}
+window.renderHomeDogs = renderHomeDogs;
+
+function openCreateDog() {
+  if (!getJWT()) {
+    showToast(_i18nText('dog_login_required', '⚠️ Inicia sesión para crear un perro.'));
+    goTo('s-splash');
+    return;
+  }
+  var current = (window._myDogs || []).length;
+  if (current >= 2) {
+    showToast(_i18nText('dog_quota_full_short', '⚠️ Máximo 2 perros activos.'));
+    return;
+  }
+  window._dogProfileState = { mode: 'create', dogId: null, pendingPhotoBase64: null };
+  _resetDogForm();
+  _setDogProfileTitle('create');
+  document.getElementById('dog-delete-btn').style.display = 'none';
+  document.getElementById('dog-save-btn').textContent = _i18nText('dog_save_btn_create', 'Crear perro');
+  document.getElementById('dog-photo-remove-btn').style.display = 'none';
+  goTo('s-dog-profile');
+}
+window.openCreateDog = openCreateDog;
+
+async function openDogProfile(dogId) {
+  if (!getJWT()) {
+    showToast(_i18nText('dog_login_required_view', '⚠️ Inicia sesión para ver la ficha.'));
+    goTo('s-splash');
+    return;
+  }
+  window._dogProfileState = { mode: 'edit', dogId: dogId, pendingPhotoBase64: null };
+  _setDogProfileTitle('edit');
+  goTo('s-dog-profile');
+  _showDogProfileLoading(true);
+  try {
+    var res = await fetch(API_BASE + '/dogs/' + encodeURIComponent(dogId), {
+      headers: authHeaders(), cache: 'no-store'
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var dog = await res.json();
+    _fillDogForm(dog);
+    _showDogProfileLoading(false);
+    document.getElementById('dog-delete-btn').style.display = 'block';
+    document.getElementById('dog-save-btn').textContent = _i18nText('dog_save_btn_edit', 'Guardar cambios');
+  } catch (e) {
+    _showDogProfileError(true);
+  }
+}
+window.openDogProfile = openDogProfile;
+
+function _showDogProfileLoading(on) {
+  document.getElementById('dog-profile-loading').style.display = on ? 'block' : 'none';
+  document.getElementById('dog-profile-form').style.display = on ? 'none' : 'block';
+  document.getElementById('dog-profile-error').style.display = 'none';
+}
+function _showDogProfileError(on) {
+  document.getElementById('dog-profile-loading').style.display = 'none';
+  document.getElementById('dog-profile-form').style.display = 'none';
+  document.getElementById('dog-profile-error').style.display = on ? 'block' : 'none';
+}
+function _setDogProfileTitle(mode) {
+  var t = document.getElementById('dog-profile-title');
+  var s = document.getElementById('dog-profile-subtitle');
+  if (mode === 'create') {
+    t.textContent = _i18nText('dog_profile_title_create', 'Nuevo perro');
+    s.textContent = _i18nText('dog_profile_subtitle_create', 'Añade los datos básicos de tu perro.');
+  } else {
+    t.textContent = _i18nText('dog_profile_title_edit', 'Ficha del perro');
+    s.textContent = _i18nText('dog_profile_subtitle_edit', 'Edita los datos o la foto.');
+  }
+}
+function _resetDogForm() {
+  document.getElementById('dog-field-name').value = '';
+  document.getElementById('dog-field-breed').value = '';
+  document.getElementById('dog-field-birth-year').value = '';
+  document.getElementById('dog-field-weight').value = '';
+  document.getElementById('dog-field-sex').value = 'M';
+  document.getElementById('dog-field-neutered').checked = false;
+  _setDogPhoto(null);
+  _showDogProfileLoading(false);
+  _showDogProfileError(false);
+  document.getElementById('dog-profile-msg').textContent = '';
+}
+function _fillDogForm(dog) {
+  document.getElementById('dog-field-name').value = dog.name || '';
+  document.getElementById('dog-field-breed').value = dog.breed || '';
+  document.getElementById('dog-field-birth-year').value = dog.birth_year || '';
+  document.getElementById('dog-field-weight').value = dog.weight_kg_approx == null ? '' : dog.weight_kg_approx;
+  document.getElementById('dog-field-sex').value = (dog.sex === 'F') ? 'F' : 'M';
+  document.getElementById('dog-field-neutered').checked = !!dog.neutered;
+  _setDogPhoto(dog.photo_base64 || null);
+  document.getElementById('dog-profile-msg').textContent = '';
+}
+function _setDogPhoto(dataUrlOrNull) {
+  var img = document.getElementById('dog-photo-img');
+  var ph = document.getElementById('dog-photo-placeholder');
+  var rmBtn = document.getElementById('dog-photo-remove-btn');
+  if (dataUrlOrNull) {
+    img.src = dataUrlOrNull;
+    img.style.display = 'block';
+    ph.style.display = 'none';
+    rmBtn.style.display = 'inline-block';
+  } else {
+    img.src = '';
+    img.style.display = 'none';
+    ph.style.display = 'block';
+    rmBtn.style.display = 'none';
+  }
+}
+function _setDogMsg(txt, isError) {
+  var m = document.getElementById('dog-profile-msg');
+  m.textContent = txt;
+  m.style.color = isError ? '#d05050' : 'var(--green2)';
+}
+
+async function saveDogFromForm() {
+  if (!getJWT()) { showToast(_i18nText('dog_login_required', '⚠️ Inicia sesión.')); return; }
+  _setDogMsg('', false);
+
+  var name = (document.getElementById('dog-field-name').value || '').trim();
+  var breed = (document.getElementById('dog-field-breed').value || '').trim();
+  var birthYear = parseInt(document.getElementById('dog-field-birth-year').value, 10);
+  var weightVal = document.getElementById('dog-field-weight').value;
+  var sex = document.getElementById('dog-field-sex').value;
+  var neutered = document.getElementById('dog-field-neutered').checked;
+  var photoBase64 = window._dogProfileState.pendingPhotoBase64;
+
+  if (!name) return _setDogMsg(_i18nText('dog_validation_name', 'Pon un nombre.'), true);
+  if (!breed) return _setDogMsg(_i18nText('dog_validation_breed', 'Indica la raza.'), true);
+  var thisYear = new Date().getFullYear();
+  if (!birthYear || birthYear < 1900 || birthYear > thisYear)
+    return _setDogMsg(_i18nText('dog_validation_birth_year', 'Año de nacimiento no válido.'), true);
+  if (sex !== 'M' && sex !== 'F') return _setDogMsg(_i18nText('dog_validation_sex', 'Sexo no válido.'), true);
+  var weightInt = (weightVal === '' || weightVal == null) ? null : parseInt(weightVal, 10);
+  if (weightInt !== null && (isNaN(weightInt) || weightInt < 0 || weightInt > 120))
+    return _setDogMsg(_i18nText('dog_validation_weight', 'Peso fuera de rango.'), true);
+
+  var btn = document.getElementById('dog-save-btn');
+  btn.disabled = true;
+  var prevText = btn.textContent;
+  btn.textContent = '…';
+
+  try {
+    var state = window._dogProfileState;
+    var url, method, body;
+
+    if (state.mode === 'create') {
+      url = API_BASE + '/dogs';
+      method = 'POST';
+      body = { name: name, breed: breed, birth_year: birthYear, sex: sex,
+               neutered: neutered, weight_kg_approx: weightInt, photo_base64: photoBase64 };
+    } else {
+      url = API_BASE + '/dogs/' + encodeURIComponent(state.dogId);
+      method = 'PATCH';
+      body = { name: name, breed: breed, birth_year: birthYear, sex: sex,
+               neutered: neutered, weight_kg_approx: weightInt };
+    }
+
+    var res = await fetch(url, { method: method, headers: authHeaders(), body: JSON.stringify(body) });
+    if (!res.ok) {
+      var detail = '';
+      try { detail = (await res.json()).detail || ''; } catch(e) {}
+      if (res.status === 429) return _setDogMsg(detail || _i18nText('dog_quota_full', 'Has alcanzado el máximo de perros activos.'), true);
+      if (res.status === 422) return _setDogMsg(detail || _i18nText('dog_validation_failed', 'Datos no válidos.'), true);
+      if (res.status === 401) { showToast(_i18nText('session_expired', 'Sesión caducada.')); goTo('s-splash'); return; }
+      throw new Error('HTTP ' + res.status);
+    }
+
+    if (state.mode === 'edit' && photoBase64) {
+      await fetch(API_BASE + '/dogs/' + encodeURIComponent(state.dogId) + '/photo', {
+        method: 'PUT', headers: authHeaders(), body: JSON.stringify({ photo_base64: photoBase64 })
+      });
+    }
+    showToast(state.mode === 'create'
+      ? _i18nText('dog_created_ok', 'Perro creado ✓')
+      : _i18nText('dog_saved_ok', 'Cambios guardados ✓'));
+    await loadMyDogs();
+    goTo('s-home');
+  } catch (e) {
+    _setDogMsg(_i18nText('dog_save_error', 'Error guardando. Inténtalo de nuevo.'), true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = prevText;
+  }
+}
+window.saveDogFromForm = saveDogFromForm;
+
+async function onDogPhotoSelected(event) {
+  var file = event.target.files && event.target.files[0];
+  if (!file) return;
+  if (!/^image\/(jpeg|png|webp)$/.test(file.type)) {
+    return _setDogMsg(_i18nText('dog_photo_type_error', 'Sólo JPG, PNG o WebP.'), true);
+  }
+  try {
+    var dataUrl = await _compressImageToDataUrl(file, 800, 0.82);
+    var rawSize = _estimateBase64ByteSize(dataUrl);
+    if (rawSize > 200 * 1024) {
+      dataUrl = await _compressImageToDataUrl(file, 600, 0.7);
+      rawSize = _estimateBase64ByteSize(dataUrl);
+      if (rawSize > 200 * 1024) {
+        return _setDogMsg(_i18nText('dog_photo_too_big', 'La foto es demasiado grande, prueba con otra.'), true);
+      }
+    }
+    _setDogPhoto(dataUrl);
+    window._dogProfileState.pendingPhotoBase64 = dataUrl;
+    _setDogMsg('', false);
+  } catch (e) {
+    _setDogMsg(_i18nText('dog_photo_process_error', 'No hemos podido procesar la foto.'), true);
+  } finally {
+    // Limpiar el input para permitir re-seleccionar la misma foto si hace falta
+    try { event.target.value = ''; } catch(_) {}
+  }
+}
+window.onDogPhotoSelected = onDogPhotoSelected;
+
+async function onDogPhotoRemove() {
+  var state = window._dogProfileState;
+  if (state.mode === 'edit' && state.dogId) {
+    try {
+      await fetch(API_BASE + '/dogs/' + encodeURIComponent(state.dogId) + '/photo', {
+        method: 'DELETE', headers: authHeaders()
+      });
+    } catch(e) {}
+    await loadMyDogs();
+  }
+  window._dogProfileState.pendingPhotoBase64 = null;
+  _setDogPhoto(null);
+}
+window.onDogPhotoRemove = onDogPhotoRemove;
+
+function _estimateBase64ByteSize(dataUrl) {
+  if (!dataUrl) return 0;
+  var i = dataUrl.indexOf(',');
+  var b64 = i > 0 ? dataUrl.substring(i + 1) : dataUrl;
+  return Math.floor(b64.length * 3 / 4);
+}
+
+function _compressImageToDataUrl(file, maxSize, quality) {
+  return new Promise(function(resolve, reject) {
+    var fr = new FileReader();
+    fr.onload = function(ev) {
+      var img = new Image();
+      img.onload = function() {
+        var w = img.naturalWidth || img.width;
+        var h = img.naturalHeight || img.height;
+        var ratio = Math.min(maxSize / w, maxSize / h, 1);
+        var dw = Math.round(w * ratio);
+        var dh = Math.round(h * ratio);
+        var c = document.createElement('canvas');
+        c.width = dw; c.height = dh;
+        var ctx = c.getContext('2d');
+        ctx.drawImage(img, 0, 0, dw, dh);
+        var url = c.toDataURL('image/webp', quality);
+        if (!url || url.indexOf('image/webp') === -1) {
+          url = c.toDataURL('image/jpeg', quality);
+        }
+        resolve(url);
+      };
+      img.onerror = function() { reject(new Error('image load fail')); };
+      img.src = ev.target.result;
+    };
+    fr.onerror = function() { reject(new Error('file read fail')); };
+    fr.readAsDataURL(file);
+  });
+}
+
+function confirmDeleteDog() {
+  var state = window._dogProfileState;
+  if (state.mode !== 'edit' || !state.dogId) return;
+  var ok = confirm(_i18nText('dog_delete_confirm', '¿Eliminar este perro? Esta acción no se puede deshacer.'));
+  if (!ok) return;
+  _doDeleteDog(state.dogId);
+}
+window.confirmDeleteDog = confirmDeleteDog;
+
+async function _doDeleteDog(dogId) {
+  var btn = document.getElementById('dog-delete-btn');
+  btn.disabled = true;
+  try {
+    var res = await fetch(API_BASE + '/dogs/' + encodeURIComponent(dogId), {
+      method: 'DELETE', headers: authHeaders()
+    });
+    if (!res.ok && res.status !== 204) throw new Error('HTTP ' + res.status);
+    showToast(_i18nText('dog_deleted_ok', 'Perro eliminado'));
+    await loadMyDogs();
+    goTo('s-home');
+  } catch (e) {
+    _setDogMsg(_i18nText('dog_delete_error', 'No se pudo eliminar.'), true);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ── Auto-carga al arranque (si ya hay sesión) ─────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  // Pequeño delay para permitir que i18n se aplique antes
+  setTimeout(loadMyDogs, 50);
+});
+// Si el documento ya está cargado (script al final del body), llamamos sin esperar evento.
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  setTimeout(loadMyDogs, 50);
+}
+
 </script>
 
 
@@ -7303,6 +7822,50 @@ function endTourIntro() {
       av_desc_borja: 'Razas · Historia · Perros de campo · Consejos de toda la vida. Un Cayetano de toda la vida.',
       av_role_cecilia: 'Etóloga, Veterinaria, Entrenadora de caballos y perros, la mejor profesora de aprendizaje animal. Chilena y profundamente «Pelolais»',
       av_desc_cecilia: 'Sabe mucho de aprendizaje, es algo snob y bastante selectiva, pero eso no hace que no tenga un corazón enorme, especialmente para su caballo ;) si te descuidas acaba hablando de él.',
+      // ── Dog Profile (ficha del perro) ─────────────────────────────────
+      dog_profile_title_create:    'Nuevo perro',
+      dog_profile_subtitle_create: 'Añade los datos básicos de tu perro.',
+      dog_profile_title_edit:      'Ficha del perro',
+      dog_profile_subtitle_edit:   'Edita los datos o la foto.',
+      dog_profile_load_error:      'No hemos podido cargar este perro.',
+      back_to_home:                'Volver al inicio',
+      loading_dots:                'Cargando…',
+      dog_photo_change:            'Cambiar foto',
+      dog_photo_remove:            'Quitar foto',
+      dog_photo_hint:              'Foto de perfil opcional. Se comprime automáticamente.',
+      dog_field_name:              'Nombre',
+      dog_field_name_ph:           'Ej: Buddy',
+      dog_field_breed:             'Raza',
+      dog_field_breed_ph:          'Ej: Border Collie',
+      dog_field_birth_year:        'Año de nacimiento',
+      dog_field_weight:            'Peso aprox. (kg)',
+      dog_field_sex:               'Sexo',
+      dog_field_neutered:          'Esterilizado',
+      dog_sex_male:                'Macho',
+      dog_sex_female:              'Hembra',
+      dog_save_btn_create:         'Crear perro',
+      dog_save_btn_edit:           'Guardar cambios',
+      dog_delete_btn:              'Eliminar perro',
+      dog_login_required:          '⚠️ Inicia sesión para crear un perro.',
+      dog_login_required_view:     '⚠️ Inicia sesión para ver la ficha.',
+      dog_quota_full_short:        '⚠️ Máximo 2 perros activos.',
+      dog_quota_full:              'Has alcanzado el máximo de perros activos.',
+      dog_validation_name:         'Pon un nombre.',
+      dog_validation_breed:        'Indica la raza.',
+      dog_validation_birth_year:   'Año de nacimiento no válido.',
+      dog_validation_sex:          'Sexo no válido.',
+      dog_validation_weight:       'Peso fuera de rango.',
+      dog_validation_failed:       'Datos no válidos.',
+      dog_created_ok:              'Perro creado ✓',
+      dog_saved_ok:                'Cambios guardados ✓',
+      dog_save_error:              'Error guardando. Inténtalo de nuevo.',
+      dog_delete_confirm:          '¿Eliminar este perro? Esta acción no se puede deshacer.',
+      dog_deleted_ok:              'Perro eliminado',
+      dog_delete_error:            'No se pudo eliminar.',
+      dog_photo_type_error:        'Sólo JPG, PNG o WebP.',
+      dog_photo_too_big:           'La foto es demasiado grande, prueba con otra.',
+      dog_photo_process_error:     'No hemos podido procesar la foto.',
+      session_expired:             'Sesión caducada.',
       // Loading screen + Cecilia helper CTA
       loading_title:    'Analizando con IA…',
       loading_msg:      'Estás utilizando una herramienta de análisis de conducta animal muy potente y va a tomar algo de tiempo. Relax que esto puede tardar unos minutos, <strong>no cierres la app</strong>.',
@@ -7733,6 +8296,50 @@ function endTourIntro() {
       av_desc_borja: 'Breeds · History · Field dogs · Timeless advice. An old-school Cayetano through and through.',
       av_role_cecilia: 'Ethologist, Veterinarian, Horse and dog trainer, the best teacher of animal learning. Chilean and deeply «Pelolais»',
       av_desc_cecilia: 'She knows a lot about learning, is somewhat snobbish and quite selective, but that does not stop her from having a huge heart — especially for her horse ;) if you let your guard down, she ends up talking about him.',
+      // ── Dog Profile ──────────────────────────────────────────────────
+      dog_profile_title_create:    'New dog',
+      dog_profile_subtitle_create: 'Add your dog\'s basic info.',
+      dog_profile_title_edit:      'Dog profile',
+      dog_profile_subtitle_edit:   'Edit the data or the photo.',
+      dog_profile_load_error:      'We could not load this dog.',
+      back_to_home:                'Back to home',
+      loading_dots:                'Loading…',
+      dog_photo_change:            'Change photo',
+      dog_photo_remove:            'Remove photo',
+      dog_photo_hint:              'Profile photo optional. Auto-compressed on upload.',
+      dog_field_name:              'Name',
+      dog_field_name_ph:           'e.g. Buddy',
+      dog_field_breed:             'Breed',
+      dog_field_breed_ph:          'e.g. Border Collie',
+      dog_field_birth_year:        'Birth year',
+      dog_field_weight:            'Weight ~ (kg)',
+      dog_field_sex:               'Sex',
+      dog_field_neutered:          'Neutered',
+      dog_sex_male:                'Male',
+      dog_sex_female:              'Female',
+      dog_save_btn_create:         'Create dog',
+      dog_save_btn_edit:           'Save changes',
+      dog_delete_btn:              'Delete dog',
+      dog_login_required:          '⚠️ Sign in to create a dog.',
+      dog_login_required_view:     '⚠️ Sign in to see the profile.',
+      dog_quota_full_short:        '⚠️ Maximum 2 active dogs.',
+      dog_quota_full:              'You have reached the maximum number of active dogs.',
+      dog_validation_name:         'Please enter a name.',
+      dog_validation_breed:        'Please enter the breed.',
+      dog_validation_birth_year:   'Invalid birth year.',
+      dog_validation_sex:          'Invalid sex.',
+      dog_validation_weight:       'Weight out of range.',
+      dog_validation_failed:       'Invalid data.',
+      dog_created_ok:              'Dog created ✓',
+      dog_saved_ok:                'Changes saved ✓',
+      dog_save_error:              'Save error. Please try again.',
+      dog_delete_confirm:          'Delete this dog? This cannot be undone.',
+      dog_deleted_ok:              'Dog deleted',
+      dog_delete_error:            'Could not delete.',
+      dog_photo_type_error:        'Only JPG, PNG or WebP.',
+      dog_photo_too_big:           'Photo too large, try another.',
+      dog_photo_process_error:     'We could not process the photo.',
+      session_expired:             'Session expired.',
       // Loading screen + Cecilia helper CTA
       loading_title:    'Analyzing with AI…',
       loading_msg:      'You are using a very powerful behavioral analysis tool and it will take some time. Relax — this may take a few minutes, <strong>do not close the app</strong>.',

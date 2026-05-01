@@ -199,20 +199,42 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 /* Badge de estado del slot dentro del círculo (ej. "+" para añadir) */
 .dog-circle .dog-add{position:absolute;font-size:30px;color:var(--text2);font-weight:300;line-height:1;}
 
-/* ── S-DOG-PROFILE ───────────────────────────────────────────────────── */
-#s-dog-profile .form-label{
+/* ── S-DOG-PROFILE + S-SEGUIMIENTO (estilos compartidos para forms vibrant) ── */
+#s-dog-profile .form-label,
+#s-seguimiento .form-label{
   display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;
   color:var(--text3);margin-bottom:6px;font-weight:600;
 }
 #s-dog-profile .inp,
-#s-dog-profile .sel{
+#s-dog-profile .sel,
+#s-seguimiento .inp,
+#s-seguimiento .sel{
   width:100%;padding:12px 14px;border:1px solid var(--border2);
   border-radius:12px;background:var(--white);font-family:inherit;
   font-size:14px;color:var(--text);outline:none;
   -webkit-appearance:none;appearance:none;
 }
 #s-dog-profile .inp:focus,
-#s-dog-profile .sel:focus{border-color:var(--green);}
+#s-dog-profile .sel:focus,
+#s-seguimiento .inp:focus,
+#s-seguimiento .sel:focus{border-color:var(--green);}
+
+/* Radios sí/no del seguimiento */
+#s-seguimiento .seg-radio{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px;border:1px solid var(--border2);border-radius:12px;
+  background:var(--white);font-size:14px;color:var(--text);
+  cursor:pointer;transition:border-color .15s,background .15s;
+}
+#s-seguimiento .seg-radio:has(input:checked){
+  border-color:var(--green);background:rgba(74,103,65,0.08);
+  font-weight:600;color:var(--green2);
+}
+#s-seguimiento .seg-radio input{accent-color:var(--green);}
+#s-seguimiento .seg-counter{
+  font-size:11px;color:var(--text3);text-align:right;margin-top:4px;
+}
+#s-seguimiento .back-round{background:var(--white);}
 #s-dog-profile .sel{
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/></svg>");
   background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;
@@ -5099,6 +5121,126 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   </div>
   <!-- fin s-dog-profile -->
 
+  <!-- ══ S-SEGUIMIENTO: plantilla estructurada de seguimiento de caso ════════
+       Plantilla con 8 campos (días tratamiento, sesiones, evolución, criterio,
+       descripción, dificultades, motivo, info extra). Envía a POST
+       /cases/{case_id}/seguimiento que cobra 1.5 tokens (INVARIANTE FINANCIERA),
+       llama a Sonnet 4.6 + RAG con summary_full del caso, y devuelve respuesta
+       clínica que se muestra como entry tipo 'seguimiento' del caso.
+
+       Flujo: openSeguimiento(caseId) prepara state y abre la pantalla.
+       Tras submit exitoso: muestra la respuesta IA + 2 botones (Nueva Consulta
+       o Chatea con tu Aigent).
+  ============================================================================ -->
+  <div id="s-seguimiento" class="screen" style="background:linear-gradient(180deg, #2d4a3a 0%, #4a6741 25%, var(--cream2) 65%, var(--cream) 100%);">
+    <!-- Hero vibrant: golden retriever nadando + degradado oliva -->
+    <div style="position:relative;height:200px;flex-shrink:0;overflow:hidden;background:#3a4a30;">
+      <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/scenes/seguimiento-hero.webp"
+           alt=""
+           style="width:100%;height:100%;object-fit:cover;object-position:center 35%;display:block;">
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0.18) 0%,rgba(0,0,0,0) 35%,rgba(45,74,58,0.55) 70%,rgba(45,74,58,0.92) 100%);"></div>
+      <div class="back-round" onclick="goTo('s-records')" aria-label="Volver"
+           style="position:absolute;top:calc(env(safe-area-inset-top, 0px) + 12px);left:14px;background:rgba(255,250,240,0.92);box-shadow:0 2px 8px rgba(0,0,0,0.25);z-index:2;">←</div>
+      <div style="position:absolute;left:0;right:0;bottom:14px;padding:0 18px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.45);">
+        <div style="font-family:var(--ff-serif);font-size:22px;font-weight:600;line-height:1.1;" data-i18n="seg_title">Consulta de seguimiento</div>
+        <div id="seg-subtitle" style="font-size:12.5px;opacity:0.92;margin-top:3px;" data-i18n="seg_subtitle">Cuéntale a Teo cómo va tu perro.</div>
+      </div>
+    </div>
+
+    <!-- Cuerpo -->
+    <div style="flex:1;overflow-y:auto;padding:18px 14px calc(env(safe-area-inset-bottom, 0px) + 110px);">
+
+      <!-- Texto introductorio (se oculta tras enviar) -->
+      <div id="seg-intro-block" style="background:var(--white);border-radius:18px;padding:18px 18px;box-shadow:0 6px 24px rgba(74,103,65,0.18),0 2px 6px rgba(0,0,0,0.06);margin-bottom:14px;">
+        <p style="font-size:13.5px;line-height:1.7;color:var(--text);margin:0;" data-i18n="seg_intro">
+          No hay plan mágico, los avances se basan en la constancia y en la confianza en el modelo. Seguir el caso, supervisar los avances y a veces reconocer que se han cometido errores y corregirlos es parte del proceso. Ahora dime:
+        </p>
+      </div>
+
+      <!-- Form de seguimiento -->
+      <div id="seg-form" style="background:var(--white);border-radius:18px;padding:20px 18px;box-shadow:0 6px 24px rgba(74,103,65,0.18),0 2px 6px rgba(0,0,0,0.06);">
+        <div style="display:flex;flex-direction:column;gap:14px;">
+
+          <div style="display:flex;gap:10px;">
+            <div style="flex:1;">
+              <label class="form-label" data-i18n="seg_field_dias">Días de tratamiento</label>
+              <input id="seg-field-dias" class="inp" type="number" min="0" max="3650" inputmode="numeric" placeholder="14">
+            </div>
+            <div style="flex:1;">
+              <label class="form-label" data-i18n="seg_field_sesiones">Nº de sesiones</label>
+              <input id="seg-field-sesiones" class="inp" type="number" min="0" max="10000" inputmode="numeric" placeholder="5">
+            </div>
+          </div>
+
+          <div>
+            <label class="form-label" data-i18n="seg_field_evolucion">¿Ves evolución?</label>
+            <div style="display:flex;gap:10px;">
+              <label class="seg-radio" style="flex:1;">
+                <input type="radio" name="seg-evolucion" value="true">
+                <span data-i18n="seg_radio_yes">Sí</span>
+              </label>
+              <label class="seg-radio" style="flex:1;">
+                <input type="radio" name="seg-evolucion" value="false">
+                <span data-i18n="seg_radio_no">No</span>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label class="form-label" data-i18n="seg_field_criterio">¿Qué criterio usas para medirla?</label>
+            <input id="seg-field-criterio" class="inp" type="text" maxlength="500" placeholder="Ej: distancia, frecuencia, duración" data-i18n-placeholder="seg_field_criterio_ph">
+          </div>
+
+          <div>
+            <label class="form-label" data-i18n="seg_field_descripcion">Describe la evolución</label>
+            <textarea id="seg-field-descripcion" class="inp" rows="3" maxlength="1500" placeholder="Cuéntame qué cambios has notado…" data-i18n-placeholder="seg_field_descripcion_ph" style="resize:vertical;font-family:inherit;"></textarea>
+            <div id="seg-counter-descripcion" class="seg-counter">0 / 1500</div>
+          </div>
+
+          <div>
+            <label class="form-label" data-i18n="seg_field_dificultades">¿Te dificulta algo aplicar las propuestas?</label>
+            <textarea id="seg-field-dificultades" class="inp" rows="3" maxlength="1500" placeholder="Si algo no encaja en tu día a día, dilo aquí." data-i18n-placeholder="seg_field_dificultades_ph" style="resize:vertical;font-family:inherit;"></textarea>
+            <div id="seg-counter-dificultades" class="seg-counter">0 / 1500</div>
+          </div>
+
+          <div>
+            <label class="form-label" data-i18n="seg_field_motivo">Resume el motivo de esta consulta (1 frase)</label>
+            <input id="seg-field-motivo" class="inp" type="text" maxlength="300" placeholder="Ej: ya no reacciona en la calle pero sigue en casa" data-i18n-placeholder="seg_field_motivo_ph">
+          </div>
+
+          <div>
+            <label class="form-label" data-i18n="seg_field_extra">Información extra (máx 4 frases)</label>
+            <textarea id="seg-field-extra" class="inp" rows="3" maxlength="1000" placeholder="Cualquier dato relevante para el análisis." data-i18n-placeholder="seg_field_extra_ph" style="resize:vertical;font-family:inherit;"></textarea>
+            <div id="seg-counter-extra" class="seg-counter">0 / 1000</div>
+          </div>
+
+        </div>
+
+        <div id="seg-msg" style="margin-top:14px;font-size:13px;text-align:center;min-height:18px;"></div>
+
+        <button id="seg-submit-btn" type="button" onclick="submitSeguimiento()" style="margin-top:18px;width:100%;padding:14px;border:none;border-radius:100px;background:var(--green);color:#fff;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;" data-i18n="seg_submit_btn">Enviar seguimiento (1,5 tokens)</button>
+
+        <div style="margin-top:10px;font-size:11px;color:var(--text3);text-align:center;" data-i18n="seg_cost_hint">Coste: 1,5 tokens · Teo procesará tu informe con tu historial.</div>
+      </div>
+
+      <!-- Pantalla de respuesta IA (oculta hasta que se envíe correctamente) -->
+      <div id="seg-response" style="display:none;background:var(--white);border-radius:18px;padding:20px 18px;box-shadow:0 6px 24px rgba(74,103,65,0.18),0 2px 6px rgba(0,0,0,0.06);">
+        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--green2);font-weight:700;margin-bottom:8px;" data-i18n="seg_response_label">Respuesta de Teo</div>
+        <div id="seg-response-body" style="font-size:13.5px;line-height:1.65;color:var(--text);"></div>
+
+        <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border);font-size:13px;color:var(--text2);text-align:center;" data-i18n="seg_thanks">Gracias por confiar en The Dogs Mind.</div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px;">
+          <button type="button" onclick="goTo('s-anamnesis')" style="width:100%;padding:13px;border:none;border-radius:100px;background:var(--green);color:#fff;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;" data-i18n="seg_btn_new_consult">+ Nueva Consulta</button>
+          <button type="button" onclick="goTo('s-avatars')" style="width:100%;padding:13px;border:1px solid var(--green);border-radius:100px;background:var(--white);color:var(--green2);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;" data-i18n="seg_btn_chat_aigent">Chatea con tu Aigent preferido</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+  <!-- fin s-seguimiento -->
+
   <!-- ══ S-REFINE: Chat analítico de refinamiento del plan ══ -->
   <div id="s-refine" class="screen" style="background:#f0f4ff;flex-direction:column;">
 
@@ -5909,7 +6051,8 @@ function getVal(id, fallback) {
           '</div>' +
           '<div style="display:flex;align-items:center;gap:8px;">' +
             '<div style="font-size:10px;color:var(--grey);">' + (r.date || '') + '</div>' +
-            '<div style="display:flex;gap:4px;">' +
+            '<div style="display:flex;gap:4px;flex-wrap:wrap;">' +
+              '<button onclick="event.stopPropagation();openSeguimientoFromRecord(' + i + ')" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid rgba(74,103,65,0.3);background:rgba(74,103,65,0.08);cursor:pointer;color:var(--green2);font-weight:600;">+ Seguimiento</button>' +
               '<button onclick="event.stopPropagation();changeRecordStatus(' + i + ')" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid rgba(0,0,0,0.12);background:#fafafa;cursor:pointer;color:var(--grey);">✏️ Estado</button>' +
               '<button onclick="event.stopPropagation();deleteRecord(' + i + ')" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid rgba(220,80,80,0.2);background:#fff5f5;cursor:pointer;color:#c03030;">🗑</button>' +
             '</div>' +
@@ -7487,16 +7630,267 @@ async function _doDeleteDog(dogId) {
   }
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// SEGUIMIENTO — plantilla estructurada de seguimiento de caso
+// Backend: POST /cases/{case_id}/seguimiento (cobra 1.5 tokens, Sonnet 4.6+RAG)
+// Estado: window._seguimientoState = { caseId }
+// ═══════════════════════════════════════════════════════════════════════════
+
+window._seguimientoState = { caseId: null };
+
+// ── Lazy migration: si el record solo está en localStorage (sin backend_case_id),
+// lo migramos al backend bajo demanda al pulsar "Seguimiento". Eso garantiza que
+// los casos viejos (pre-migración) puedan recibir seguimientos sin pedir al
+// usuario una acción "migrar" explícita.
+async function openSeguimientoFromRecord(idx) {
+  if (!getJWT()) {
+    showToast(_i18nText('seg_login_required', '⚠️ Inicia sesión.'));
+    goTo('s-splash');
+    return;
+  }
+  try {
+    var records = (typeof getRecords === 'function') ? getRecords() : [];
+    var filtered = (window._recordsFilter && window._recordsFilter !== 'todos')
+      ? records.filter(function(r) { return r.status === window._recordsFilter; })
+      : records;
+    var rec = filtered[idx];
+    if (!rec) {
+      showToast(_i18nText('seg_no_case', 'Caso no encontrado.'));
+      return;
+    }
+    // Si el record ya tiene backend_case_id (tras una migración previa), abrir directo
+    if (rec.backend_case_id) {
+      openSeguimiento(rec.backend_case_id);
+      return;
+    }
+    // Lazy migration: subir solo este record al backend
+    showToast(_i18nText('seg_migrating', 'Sincronizando caso…'));
+    var migratePayload = {
+      records: [{
+        id: rec.id || Date.now(),
+        date: rec.date || null,
+        dog_name: rec.dog_name || null,
+        breed: rec.breed || null,
+        dog_age: rec.dog_age || null,
+        problem: rec.problem || null,
+        analysis: rec.analysis || null,
+        plan: rec.plan || null,
+        status: rec.status || 'active'
+      }]
+    };
+    var res = await fetch(API_BASE + '/cases/migrate', {
+      method: 'POST', headers: authHeaders(), body: JSON.stringify(migratePayload)
+    });
+    if (!res.ok) {
+      if (res.status === 401) { showToast(_i18nText('session_expired', 'Sesión caducada.')); goTo('s-splash'); return; }
+      throw new Error('HTTP ' + res.status);
+    }
+    var data = await res.json();
+    var result = (data.results && data.results[0]) || null;
+    if (!result || (result.status !== 'created' && result.status !== 'skipped_duplicate')) {
+      showToast(_i18nText('seg_migration_failed', 'No se pudo sincronizar el caso.'));
+      return;
+    }
+    var backendCaseId = result.case_id;
+    // Si el migrate devolvió 'skipped_duplicate' sin case_id, hay que buscarlo:
+    // ya existe un Case con ese legacy_id. Por ahora, sin GET search por legacy_id
+    // disponible, mostramos un mensaje y lo dejamos como mejora pendiente.
+    if (!backendCaseId) {
+      showToast(_i18nText('seg_already_migrated', 'Caso ya estaba sincronizado.'));
+      return;
+    }
+    // Persistir el backend_case_id en localStorage para futuras consultas
+    var fullIdx = records.indexOf(rec);
+    if (fullIdx >= 0) {
+      records[fullIdx].backend_case_id = backendCaseId;
+      if (typeof setRecords === 'function') setRecords(records);
+    }
+    openSeguimiento(backendCaseId);
+  } catch (e) {
+    showToast(_i18nText('seg_migration_failed', 'No se pudo sincronizar el caso.'));
+    console.error('openSeguimientoFromRecord:', e);
+  }
+}
+window.openSeguimientoFromRecord = openSeguimientoFromRecord;
+
+function openSeguimiento(caseId) {
+  if (!getJWT()) {
+    showToast(_i18nText('seg_login_required', '⚠️ Inicia sesión.'));
+    goTo('s-splash');
+    return;
+  }
+  if (!caseId) {
+    showToast(_i18nText('seg_no_case', '⚠️ Falta identificador del caso.'));
+    return;
+  }
+  window._seguimientoState = { caseId: String(caseId) };
+  _resetSeguimientoForm();
+  goTo('s-seguimiento');
+}
+window.openSeguimiento = openSeguimiento;
+
+function _resetSeguimientoForm() {
+  document.getElementById('seg-field-dias').value = '';
+  document.getElementById('seg-field-sesiones').value = '';
+  document.getElementById('seg-field-criterio').value = '';
+  document.getElementById('seg-field-descripcion').value = '';
+  document.getElementById('seg-field-dificultades').value = '';
+  document.getElementById('seg-field-motivo').value = '';
+  document.getElementById('seg-field-extra').value = '';
+  // Radio limpio
+  document.querySelectorAll('input[name="seg-evolucion"]').forEach(function(r) { r.checked = false; });
+  // Estado UI
+  _updateSegCounters();
+  document.getElementById('seg-msg').textContent = '';
+  document.getElementById('seg-form').style.display = 'block';
+  document.getElementById('seg-intro-block').style.display = 'block';
+  document.getElementById('seg-response').style.display = 'none';
+  document.getElementById('seg-response-body').innerHTML = '';
+}
+
+function _updateSegCounters() {
+  ['descripcion', 'dificultades', 'extra'].forEach(function(field) {
+    var input = document.getElementById('seg-field-' + field);
+    var counter = document.getElementById('seg-counter-' + field);
+    if (!input || !counter) return;
+    var max = parseInt(input.getAttribute('maxlength'), 10) || 1500;
+    var len = (input.value || '').length;
+    counter.textContent = len + ' / ' + max;
+    counter.style.color = len > max * 0.9 ? '#d05050' : 'var(--text3)';
+  });
+}
+
+function _setSegMsg(txt, isError) {
+  var m = document.getElementById('seg-msg');
+  m.textContent = txt;
+  m.style.color = isError ? '#d05050' : 'var(--green2)';
+}
+
+async function submitSeguimiento() {
+  if (!getJWT()) { showToast(_i18nText('seg_login_required', '⚠️ Inicia sesión.')); return; }
+  var caseId = window._seguimientoState && window._seguimientoState.caseId;
+  if (!caseId) { _setSegMsg(_i18nText('seg_no_case', 'Falta identificador del caso.'), true); return; }
+
+  // Recoger valores
+  var dias = parseInt(document.getElementById('seg-field-dias').value, 10);
+  var sesiones = parseInt(document.getElementById('seg-field-sesiones').value, 10);
+  var evolEl = document.querySelector('input[name="seg-evolucion"]:checked');
+  var ve_evolucion = evolEl ? (evolEl.value === 'true') : null;
+  var criterio = (document.getElementById('seg-field-criterio').value || '').trim() || null;
+  var descripcion = (document.getElementById('seg-field-descripcion').value || '').trim() || null;
+  var dificultades = (document.getElementById('seg-field-dificultades').value || '').trim() || null;
+  var motivo = (document.getElementById('seg-field-motivo').value || '').trim() || null;
+  var extra = (document.getElementById('seg-field-extra').value || '').trim() || null;
+
+  // Validaciones cliente espejo backend
+  if (isNaN(dias) || dias < 0 || dias > 3650) return _setSegMsg(_i18nText('seg_validation_dias', 'Días de tratamiento no válidos.'), true);
+  if (isNaN(sesiones) || sesiones < 0 || sesiones > 10000) return _setSegMsg(_i18nText('seg_validation_sesiones', 'Número de sesiones no válido.'), true);
+  if (ve_evolucion === null) return _setSegMsg(_i18nText('seg_validation_evolucion', 'Indica si ves evolución.'), true);
+
+  var btn = document.getElementById('seg-submit-btn');
+  btn.disabled = true;
+  var prevText = btn.textContent;
+  btn.textContent = _i18nText('seg_processing', 'Procesando con Teo…');
+  _setSegMsg('', false);
+
+  try {
+    var body = {
+      dias_tratamiento: dias,
+      numero_sesiones: sesiones,
+      ve_evolucion: ve_evolucion,
+      criterio_medicion: criterio,
+      descripcion_evolucion: descripcion,
+      dificultades: dificultades,
+      motivo_consulta_resumido: motivo,
+      informacion_extra: extra
+    };
+    var res = await fetch(API_BASE + '/cases/' + encodeURIComponent(caseId) + '/seguimiento', {
+      method: 'POST', headers: authHeaders(), body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      var detail = '';
+      try { detail = (await res.json()).detail || ''; } catch(e) {}
+      if (res.status === 402) return _setSegMsg(_i18nText('seg_insufficient_tokens', 'Saldo insuficiente. Recarga 1,5 tokens.'), true);
+      if (res.status === 422) return _setSegMsg(detail || _i18nText('seg_validation_failed', 'Datos no válidos.'), true);
+      if (res.status === 429) return _setSegMsg(detail || _i18nText('seg_quota_full', 'Has alcanzado el máximo de entries en este caso.'), true);
+      if (res.status === 401) { showToast(_i18nText('session_expired', 'Sesión caducada.')); goTo('s-splash'); return; }
+      if (res.status === 404) return _setSegMsg(_i18nText('seg_case_not_found', 'Caso no encontrado.'), true);
+      throw new Error('HTTP ' + res.status);
+    }
+    var data = await res.json();
+    // Actualizar saldo local de tokens si lo manejas
+    if (typeof setTokens === 'function' && typeof data.balance_after === 'number') {
+      setTokens(data.balance_after);
+    }
+    // Mostrar respuesta IA, ocultar form e intro
+    var responseHTML = (typeof markdownToHtml === 'function')
+      ? markdownToHtml(data.entry.content || '')
+      : (data.entry.content || '').replace(/\n/g, '<br>');
+    document.getElementById('seg-response-body').innerHTML = responseHTML;
+    document.getElementById('seg-form').style.display = 'none';
+    document.getElementById('seg-intro-block').style.display = 'none';
+    document.getElementById('seg-response').style.display = 'block';
+    // Scroll al inicio de la respuesta
+    var responseEl = document.getElementById('seg-response');
+    if (responseEl && responseEl.scrollIntoView) responseEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    showToast(_i18nText('seg_sent_ok', 'Seguimiento enviado ✓'));
+  } catch (e) {
+    _setSegMsg(_i18nText('seg_send_error', 'Error al enviar. Inténtalo de nuevo.'), true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = prevText;
+  }
+}
+window.submitSeguimiento = submitSeguimiento;
+
+// Listeners de char counters
+function _bindSeguimientoCounters() {
+  ['descripcion', 'dificultades', 'extra'].forEach(function(field) {
+    var input = document.getElementById('seg-field-' + field);
+    if (input && !input._segCounterBound) {
+      input.addEventListener('input', _updateSegCounters);
+      input._segCounterBound = true;
+    }
+  });
+}
+
+function _installSeguimientoGuardian() {
+  var screen = document.getElementById('s-seguimiento');
+  if (!screen || screen._segGuardianInstalled) return;
+  screen._segGuardianInstalled = true;
+  _bindSeguimientoCounters();
+
+  var ensureFormVisible = function() {
+    if (!screen.classList.contains('active')) return;
+    var form = document.getElementById('seg-form');
+    var resp = document.getElementById('seg-response');
+    if (!form) return;
+    // Si la respuesta NO está visible explícitamente, asegurar form visible
+    var respVisible = resp && resp.style.display === 'block';
+    if (!respVisible) form.style.display = 'block';
+  };
+
+  new MutationObserver(function(muts) {
+    muts.forEach(function(m) {
+      if (m.attributeName === 'class') setTimeout(ensureFormVisible, 0);
+    });
+  }).observe(screen, { attributes: true, attributeFilter: ['class'] });
+  ensureFormVisible();
+}
+
 // ── Auto-carga al arranque (si ya hay sesión) ─────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
   // Pequeño delay para permitir que i18n se aplique antes
   setTimeout(loadMyDogs, 50);
   _installDogProfileGuardian();
+  _installSeguimientoGuardian();
 });
 // Si el documento ya está cargado (script al final del body), llamamos sin esperar evento.
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
   setTimeout(loadMyDogs, 50);
   _installDogProfileGuardian();
+  _installSeguimientoGuardian();
 }
 
 // ── GUARDIAN DEFENSIVO ─────────────────────────────────────────────────────
@@ -7914,6 +8308,46 @@ function endTourIntro() {
       dog_photo_too_big:           'La foto es demasiado grande, prueba con otra.',
       dog_photo_process_error:     'No hemos podido procesar la foto.',
       session_expired:             'Sesión caducada.',
+      // ── Seguimiento (plantilla) ──────────────────────────────────────
+      seg_title:                   'Consulta de seguimiento',
+      seg_subtitle:                'Cuéntale a Teo cómo va tu perro.',
+      seg_intro:                   'No hay plan mágico, los avances se basan en la constancia y en la confianza en el modelo. Seguir el caso, supervisar los avances y a veces reconocer que se han cometido errores y corregirlos es parte del proceso. Ahora dime:',
+      seg_field_dias:              'Días de tratamiento',
+      seg_field_sesiones:          'Nº de sesiones',
+      seg_field_evolucion:         '¿Ves evolución?',
+      seg_radio_yes:               'Sí',
+      seg_radio_no:                'No',
+      seg_field_criterio:          '¿Qué criterio usas para medirla?',
+      seg_field_criterio_ph:       'Ej: distancia, frecuencia, duración',
+      seg_field_descripcion:       'Describe la evolución',
+      seg_field_descripcion_ph:    'Cuéntame qué cambios has notado…',
+      seg_field_dificultades:      '¿Te dificulta algo aplicar las propuestas?',
+      seg_field_dificultades_ph:   'Si algo no encaja en tu día a día, dilo aquí.',
+      seg_field_motivo:            'Resume el motivo de esta consulta (1 frase)',
+      seg_field_motivo_ph:         'Ej: ya no reacciona en la calle pero sigue en casa',
+      seg_field_extra:             'Información extra (máx 4 frases)',
+      seg_field_extra_ph:          'Cualquier dato relevante para el análisis.',
+      seg_submit_btn:              'Enviar seguimiento (1,5 tokens)',
+      seg_cost_hint:               'Coste: 1,5 tokens · Teo procesará tu informe con tu historial.',
+      seg_processing:              'Procesando con Teo…',
+      seg_response_label:          'Respuesta de Teo',
+      seg_thanks:                  'Gracias por confiar en The Dogs Mind.',
+      seg_btn_new_consult:         '+ Nueva Consulta',
+      seg_btn_chat_aigent:         'Chatea con tu Aigent preferido',
+      seg_login_required:          '⚠️ Inicia sesión.',
+      seg_no_case:                 'Falta identificador del caso.',
+      seg_validation_dias:         'Días de tratamiento no válidos.',
+      seg_validation_sesiones:     'Número de sesiones no válido.',
+      seg_validation_evolucion:    'Indica si ves evolución.',
+      seg_validation_failed:       'Datos no válidos.',
+      seg_insufficient_tokens:     'Saldo insuficiente. Recarga 1,5 tokens.',
+      seg_quota_full:              'Has alcanzado el máximo de entries en este caso.',
+      seg_case_not_found:          'Caso no encontrado.',
+      seg_sent_ok:                 'Seguimiento enviado ✓',
+      seg_send_error:              'Error al enviar. Inténtalo de nuevo.',
+      seg_migrating:               'Sincronizando caso…',
+      seg_migration_failed:        'No se pudo sincronizar el caso.',
+      seg_already_migrated:        'Caso ya estaba sincronizado. Recarga la lista.',
       // Loading screen + Cecilia helper CTA
       loading_title:    'Analizando con IA…',
       loading_msg:      'Estás utilizando una herramienta de análisis de conducta animal muy potente y va a tomar algo de tiempo. Relax que esto puede tardar unos minutos, <strong>no cierres la app</strong>.',
@@ -8388,6 +8822,46 @@ function endTourIntro() {
       dog_photo_too_big:           'Photo too large, try another.',
       dog_photo_process_error:     'We could not process the photo.',
       session_expired:             'Session expired.',
+      // ── Seguimiento (follow-up template) ─────────────────────────────
+      seg_title:                   'Follow-up consultation',
+      seg_subtitle:                'Tell Teo how your dog is doing.',
+      seg_intro:                   'There is no magic plan; progress is built on consistency and trust in the model. Tracking the case, monitoring progress and sometimes acknowledging mistakes to correct them is part of the process. Now tell me:',
+      seg_field_dias:              'Days of treatment',
+      seg_field_sesiones:          '# of sessions',
+      seg_field_evolucion:         'Do you see progress?',
+      seg_radio_yes:               'Yes',
+      seg_radio_no:                'No',
+      seg_field_criterio:          'What criterion do you use to measure it?',
+      seg_field_criterio_ph:       'e.g. distance, frequency, duration',
+      seg_field_descripcion:       'Describe the evolution',
+      seg_field_descripcion_ph:    'Tell me what changes you have noticed…',
+      seg_field_dificultades:      'Anything making it hard to apply the plan?',
+      seg_field_dificultades_ph:   'If something does not fit your daily routine, say it here.',
+      seg_field_motivo:            'Summarize this consultation (one sentence)',
+      seg_field_motivo_ph:         'e.g. no longer reactive in the street but still at home',
+      seg_field_extra:             'Extra info (max ~4 sentences)',
+      seg_field_extra_ph:          'Any data relevant to the analysis.',
+      seg_submit_btn:              'Send follow-up (1.5 tokens)',
+      seg_cost_hint:               'Cost: 1.5 tokens · Teo will process your report with your history.',
+      seg_processing:              'Processing with Teo…',
+      seg_response_label:          'Teo\'s response',
+      seg_thanks:                  'Thank you for trusting The Dogs Mind.',
+      seg_btn_new_consult:         '+ New Consultation',
+      seg_btn_chat_aigent:         'Chat with your favourite Aigent',
+      seg_login_required:          '⚠️ Sign in.',
+      seg_no_case:                 'Missing case identifier.',
+      seg_validation_dias:         'Invalid days of treatment.',
+      seg_validation_sesiones:     'Invalid session count.',
+      seg_validation_evolucion:    'Indicate whether you see progress.',
+      seg_validation_failed:       'Invalid data.',
+      seg_insufficient_tokens:     'Insufficient balance. Top up 1.5 tokens.',
+      seg_quota_full:              'You have reached the maximum entries in this case.',
+      seg_case_not_found:          'Case not found.',
+      seg_sent_ok:                 'Follow-up sent ✓',
+      seg_send_error:              'Send error. Please try again.',
+      seg_migrating:               'Syncing case…',
+      seg_migration_failed:        'Could not sync the case.',
+      seg_already_migrated:        'Case was already synced. Refresh the list.',
       // Loading screen + Cecilia helper CTA
       loading_title:    'Analyzing with AI…',
       loading_msg:      'You are using a very powerful behavioral analysis tool and it will take some time. Relax — this may take a few minutes, <strong>do not close the app</strong>.',

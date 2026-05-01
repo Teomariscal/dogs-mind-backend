@@ -5597,8 +5597,10 @@ let _avatarHistory = [];
 function selectAv(key) {
   activeAv = key;
   localStorage.setItem('dm_active_av', key);
-  // Update card styles
-  ['niaz','leo','katja','mario','ale','borja'].forEach(k => {
+  // Update card styles — usamos Object.keys(AVATARS) para que CUALQUIER
+  // Aigent registrado en el dict (cecilia, iris, futuros) se actualice
+  // visualmente sin tener que mantener una lista hardcoded aquí.
+  Object.keys(AVATARS).forEach(k => {
     const card = document.getElementById('avc-' + k);
     const check = document.getElementById('avck-' + k);
     if (card) card.classList.toggle('selected', k === key);
@@ -6505,8 +6507,10 @@ function getVal(id, fallback) {
       var homeBadge = document.getElementById('home-av-badge');
       if (homeImg && av.img) homeImg.src = av.img;
       if (homeBadge) homeBadge.textContent = av.name;
-      // Update card selection highlights
-      ['niaz','leo','katja','mario','ale','borja'].forEach(function(k) {
+      // Update card selection highlights — Object.keys(AVATARS) para que
+      // funcione con cualquier Aigent registrado (incluye cecilia, iris y
+      // futuros sin tocar este código).
+      Object.keys(AVATARS).forEach(function(k) {
         var card = document.getElementById('avc-' + k);
         var check = document.getElementById('avck-' + k);
         if (card) card.classList.toggle('selected', k === saved);

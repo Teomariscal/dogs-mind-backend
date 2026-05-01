@@ -148,6 +148,40 @@ class SeguimientoResponse(BaseModel):
     cache_hit: bool = Field(..., description="True si la llamada IA usó prompt caching (debug/CFO)")
 
 
+# ── Schemas para migración localStorage → backend ────────────────────────────
+class LegacyRecord(BaseModel):
+    """
+    Record tal y como estaba guardado en localStorage del navegador
+    bajo la clave dm_records_<hash_email>.
+    """
+    id: int = Field(..., description="Timestamp ms de creación (id local)")
+    date: Optional[str] = Field(None, description="Fecha en formato dd/mm/yyyy")
+    dog_name: Optional[str] = Field(None, max_length=80)
+    breed: Optional[str] = Field(None, max_length=120)
+    dog_age: Optional[str] = Field(None, max_length=80)
+    problem: Optional[str] = Field(None, max_length=20000)
+    analysis: Optional[str] = Field(None, max_length=200000)
+    plan: Optional[str] = Field(None, max_length=200000)
+    status: Optional[str] = Field("active", max_length=40)
+
+
+class MigrateRequest(BaseModel):
+    records: List[LegacyRecord] = Field(..., max_length=500)
+
+
+class MigrateResponseItem(BaseModel):
+    legacy_id: int
+    case_id: Optional[str] = None
+    status: str  # "created" | "skipped_duplicate" | "skipped_quota" | "skipped_empty"
+    detail: Optional[str] = None
+
+
+class MigrateResponse(BaseModel):
+    results: List[MigrateResponseItem]
+    created_count: int
+    skipped_count: int
+
+
 class CaseEntryResponse(BaseModel):
     id: str
     case_id: str
@@ -598,4 +632,212 @@ def post_seguimiento(
         entry=_to_entry_response(entry),
         balance_after=new_balance,
         cache_hit=ai_result.cache_hit,
+    )
+
+
+# ── Generación de resúmenes (extracción simple) ─────────────────────────────
+# Pensados como punto de partida: comprimir un análisis ABC o un plan completo
+# (~5-15 KB) a ~500-800 chars que entran como contexto en futuras consultas.
+# Estrategia: limpiar markdown decorativo, tomar las primeras N frases / chars.
+# Mejorable a futuro con llamada Haiku para resumir, pero el coste actual de
+# extraer es 0 € y el resultado es suficiente para inyectar en summary_full.
+
+import re as _re
+
+_MD_HEADER_RE = _re.compile(r"^[#>]+\s*", _re.MULTILINE)
+_MD_BOLD_RE = _re.compile(r"\*\*([^*]+)\*\*")
+_MD_ITALIC_RE = _re.compile(r"(?<!\*)\*([^*\n]+)\*(?!\*)")
+_MD_CITATION_RE = _re.compile(r"\[(\d+(?:,\s*\d+)*)\]")
+_MD_DECOR_RE = _re.compile(r"^[─═]{3,}$", _re.MULTILINE)
+_WS_RE = _re.compile(r"\s+")
+
+
+def _strip_markdown(text: str) -> str:
+    """Limpia markdown inline para extracción de resumen plano."""
+    if not text:
+        return ""
+    t = text
+    t = _MD_HEADER_RE.sub("", t)
+    t = _MD_BOLD_RE.sub(r"\1", t)
+    t = _MD_ITALIC_RE.sub(r"\1", t)
+    t = _MD_CITATION_RE.sub("", t)
+    t = _MD_DECOR_RE.sub("", t)
+    t = _WS_RE.sub(" ", t).strip()
+    return t
+
+
+def _summarize_text(text: str, max_chars: int = 500) -> Optional[str]:
+    """Devuelve los primeros max_chars del texto limpiado, cortando en frase."""
+    clean = _strip_markdown(text or "")
+    if not clean:
+        return None
+    if len(clean) <= max_chars:
+        return clean
+    cut = clean[:max_chars]
+    last_period = cut.rfind(". ")
+    if last_period > max_chars * 0.5:
+        return cut[: last_period + 1]
+    return cut.rstrip() + "…"
+
+
+def _build_summary_full(case: Case, dog: Optional[Dog]) -> str:
+    """Combina identidad + ABC + plan en un bloque compacto (~2 KB)."""
+    parts: List[str] = []
+    if dog:
+        edad = datetime.utcnow().year - dog.birth_year
+        parts.append(
+            f"PERRO: {dog.name}, raza {dog.breed}, "
+            f"{edad} años, sexo {dog.sex}, "
+            f"{'esterilizado' if dog.neutered else 'sin esterilizar'}"
+        )
+    parts.append(f"TÍTULO: {case.title}")
+    if case.motivo_consulta:
+        parts.append(f"MOTIVO: {case.motivo_consulta[:500]}")
+    if case.summary_abc:
+        parts.append(f"ABC: {case.summary_abc[:600]}")
+    if case.summary_plan:
+        parts.append(f"PLAN: {case.summary_plan[:600]}")
+    return "\n\n".join(parts)
+
+
+# ── Endpoint de migración localStorage → backend ─────────────────────────────
+@router.post(
+    "/migrate",
+    response_model=MigrateResponse,
+    status_code=status.HTTP_200_OK,
+)
+def migrate_legacy_records(
+    payload: MigrateRequest,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """
+    Migra los casos guardados en localStorage del navegador a la base de datos.
+
+    Idempotente: cada record trae un id local (timestamp ms) que se persiste en
+    `case.meta.legacy_id`. Si el usuario ya tiene un Case con ese legacy_id,
+    se devuelve 'skipped_duplicate' sin volver a crear nada.
+
+    Cuotas:
+      - Si el usuario ya está en MAX_CASES_PER_USER, los nuevos se devuelven
+        como 'skipped_quota' (sin error 429 — es migración masiva, no fallo).
+
+    Records con análisis o plan vacíos se crean igualmente (el usuario
+    pudo tener un caso a medias en localStorage). Sin texto Y sin problem
+    Y sin nombre se devuelven como 'skipped_empty' (basura del cliente).
+    """
+    results: List[MigrateResponseItem] = []
+    created = 0
+    skipped = 0
+
+    # Pre-cargar legacy_ids ya migrados del usuario para detectar duplicados sin
+    # hacer N queries (uno por record).
+    existing_cases = db.query(Case).filter(
+        Case.user_id == user.id,
+        Case.deleted_at.is_(None),
+    ).all()
+    existing_legacy = set()
+    for c in existing_cases:
+        if c.summary_abc is None and c.summary_plan is None and c.title is None:
+            continue
+        meta_legacy_id = None
+        # Buscamos legacy_id en cualquier entry tipo anamnesis del caso
+        for e in db.query(CaseEntry).filter(
+            CaseEntry.case_id == c.id,
+            CaseEntry.type == "anamnesis",
+        ).all():
+            if e.meta and isinstance(e.meta, dict) and "legacy_id" in e.meta:
+                meta_legacy_id = e.meta["legacy_id"]
+                break
+        if meta_legacy_id is not None:
+            existing_legacy.add(meta_legacy_id)
+
+    active_count = len([c for c in existing_cases if c.deleted_at is None])
+
+    for rec in payload.records:
+        # 1. Saltar duplicados ya migrados
+        if rec.id in existing_legacy:
+            results.append(MigrateResponseItem(
+                legacy_id=rec.id, status="skipped_duplicate",
+                detail="Ya migrado en una sincronización anterior."
+            ))
+            skipped += 1
+            continue
+
+        # 2. Saltar records vacíos / basura
+        has_content = any([rec.problem, rec.analysis, rec.plan, rec.dog_name])
+        if not has_content:
+            results.append(MigrateResponseItem(
+                legacy_id=rec.id, status="skipped_empty",
+                detail="Record sin contenido relevante."
+            ))
+            skipped += 1
+            continue
+
+        # 3. Cuota
+        if active_count >= MAX_CASES_PER_USER:
+            results.append(MigrateResponseItem(
+                legacy_id=rec.id, status="skipped_quota",
+                detail=f"Cuota máxima alcanzada ({MAX_CASES_PER_USER}). Casos restantes no migrados."
+            ))
+            skipped += 1
+            continue
+
+        # 4. Crear Case
+        title = (rec.problem or rec.dog_name or "Caso clínico").strip()[:150]
+        case_status = "archived" if (rec.status or "").lower() in {"archived", "closed", "resolved"} else "open"
+        case = Case(
+            user_id=user.id,
+            dog_id=None,  # Sin vínculo: el usuario lo asocia luego desde la ficha
+            title=title,
+            motivo_consulta=rec.problem,
+            status=case_status,
+            summary_abc=_summarize_text(rec.analysis),
+            summary_plan=_summarize_text(rec.plan),
+        )
+        case.summary_full = _build_summary_full(case, dog=None)
+        db.add(case)
+        db.flush()  # asegurar case.id antes de crear entries
+
+        # 5. Crear entries (anamnesis con legacy_id en meta + abc + intervention)
+        anamnesis_meta = {
+            "legacy_id": rec.id,
+            "legacy_date": rec.date,
+            "dog_name": rec.dog_name,
+            "breed": rec.breed,
+            "dog_age": rec.dog_age,
+            "migrated_from_localstorage": True,
+        }
+        anam = CaseEntry(
+            case_id=case.id, type="anamnesis",
+            content=(rec.problem or "(Sin texto en el formulario inicial)"),
+            meta=anamnesis_meta,
+        )
+        db.add(anam)
+
+        if rec.analysis:
+            db.add(CaseEntry(
+                case_id=case.id, type="abc",
+                content=rec.analysis,
+                meta={"migrated": True},
+            ))
+        if rec.plan:
+            db.add(CaseEntry(
+                case_id=case.id, type="intervention",
+                content=rec.plan,
+                meta={"migrated": True},
+            ))
+
+        results.append(MigrateResponseItem(
+            legacy_id=rec.id, case_id=str(case.id), status="created"
+        ))
+        created += 1
+        active_count += 1
+
+    db.commit()
+
+    return MigrateResponse(
+        results=results,
+        created_count=created,
+        skipped_count=skipped,
     )

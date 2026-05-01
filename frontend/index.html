@@ -7492,10 +7492,49 @@ async function _doDeleteDog(dogId) {
 document.addEventListener('DOMContentLoaded', function() {
   // Pequeño delay para permitir que i18n se aplique antes
   setTimeout(loadMyDogs, 50);
+  _installDogProfileGuardian();
 });
 // Si el documento ya está cargado (script al final del body), llamamos sin esperar evento.
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
   setTimeout(loadMyDogs, 50);
+  _installDogProfileGuardian();
+}
+
+// ── GUARDIAN DEFENSIVO ─────────────────────────────────────────────────────
+// Cada vez que la pantalla s-dog-profile se vuelve activa (recibe la clase
+// .active vía goTo()), garantiza que el form sea visible — salvo que en ese
+// momento se esté mostrando loading o error explícitos. Esto cubre cualquier
+// flujo que llegue a la pantalla sin pasar por openCreateDog/openDogProfile,
+// o cualquier fallo silencioso de JS que dejara el form oculto.
+function _installDogProfileGuardian() {
+  var screen = document.getElementById('s-dog-profile');
+  if (!screen || screen._dogGuardianInstalled) return;
+  screen._dogGuardianInstalled = true;
+
+  var ensureFormVisible = function() {
+    if (!screen.classList.contains('active')) return;
+    var form = document.getElementById('dog-profile-form');
+    var loading = document.getElementById('dog-profile-loading');
+    var error = document.getElementById('dog-profile-error');
+    if (!form) return;
+    var loadingVisible = loading && loading.style.display === 'block';
+    var errorVisible   = error && error.style.display === 'block';
+    if (!loadingVisible && !errorVisible) {
+      form.style.display = 'block';
+    }
+  };
+
+  new MutationObserver(function(muts) {
+    muts.forEach(function(m) {
+      if (m.attributeName === 'class') {
+        // Pequeño delay para que goTo() termine de aplicar todo
+        setTimeout(ensureFormVisible, 0);
+      }
+    });
+  }).observe(screen, { attributes: true, attributeFilter: ['class'] });
+
+  // Run inicial por si la pantalla ya está activa al instalar el guardian
+  ensureFormVisible();
 }
 
 </script>

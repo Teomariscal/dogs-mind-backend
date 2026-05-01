@@ -4,7 +4,7 @@ import tempfile
 from typing import Optional, List
 from uuid import UUID
 
-from fastapi import APIRouter, BackgroundTasks, File, Form, HTTPException, UploadFile, Header, Depends
+from fastapi import APIRouter, BackgroundTasks, File, Form, HTTPException, UploadFile, Header, Depends, Query
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -13,6 +13,7 @@ from app.services.clinical_ai import run_clinical_analysis
 from app.database import get_db
 from app.core.safety import log_classification_sync
 from app.core.usage_tracker import log_usage
+from app.core.case_persistence import persist_to_case_safely, get_user_from_authorization
 from app.config import get_settings
 
 
@@ -69,6 +70,7 @@ ALLOWED_VIDEO_TYPES = {
 def create_analysis(
     anamnesis: AnamnesisInput,
     background_tasks: BackgroundTasks,
+    case_id: Optional[str] = Query(None, description="Si se pasa, persiste el ABC como entry del caso"),
     authorization: Optional[str] = Header(None),
     db: Session = Depends(get_db),
 ):
@@ -108,6 +110,20 @@ def create_analysis(
             tokens_charged=3.0,
             success="ok",
         )
+        # Persistencia opcional al caso (no rompe respuesta si falla)
+        if case_id:
+            user = get_user_from_authorization(authorization, db)
+            persist_to_case_safely(
+                case_id, user, db,
+                entry_type="abc",
+                content=getattr(result, "full_analysis", None) or getattr(result, "analysis", None) or "",
+                meta={"endpoint": "/analysis"},
+                ai_model=get_settings().clinical_model,
+                input_tokens=getattr(result, "input_tokens", None),
+                output_tokens=getattr(result, "output_tokens", None),
+                tokens_charged=3.0,
+                update_summary_abc=True,
+            )
         return result
     except Exception as e:
         background_tasks.add_task(

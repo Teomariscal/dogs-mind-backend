@@ -1,6 +1,6 @@
 from typing import Optional
 from uuid import UUID
-from fastapi import APIRouter, BackgroundTasks, HTTPException, Header, Depends
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Header, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.models.avatar import AvatarChatRequest, AvatarChatResponse
@@ -8,6 +8,7 @@ from app.services.avatar_ai import chat
 from app.database import get_db
 from app.core.token_utils import deduct_token
 from app.core.usage_tracker import log_usage
+from app.core.case_persistence import persist_to_case_safely, get_user_from_authorization
 from app.config import get_settings
 
 router = APIRouter(prefix="/avatar", tags=["avatar"])
@@ -27,6 +28,8 @@ def _extract_user_id_av(authorization: Optional[str]) -> Optional[UUID]:
 def avatar_chat(
     request: AvatarChatRequest,
     background_tasks: BackgroundTasks,
+    case_id: Optional[str] = Query(None, description="Si se pasa, persiste el turno usuario+IA como entries del caso (chat_aigent)"),
+    purpose: Optional[str] = Query(None, description="Purpose del chat dentro del caso: 'progress_tracking' o 'general_chat'"),
     authorization: Optional[str] = Header(None),
     db: Session = Depends(get_db),
 ):
@@ -34,6 +37,11 @@ def avatar_chat(
     Send a message to one of the Aigent avatars (Claude Haiku 4.5).
     Costs 0.10 tokens per message. Requires login.
     Admins and collaborators are exempt.
+
+    Si se pasa case_id como query, el turno (último mensaje del usuario + respuesta
+    de la IA) se persiste como entries tipo 'chat_aigent' del caso, con
+    meta.aigent_id y meta.purpose para distinguir progresos clínicos de chat
+    general dentro del caso.
     """
     if request.messages[-1].role != "user":
         raise HTTPException(
@@ -54,6 +62,32 @@ def avatar_chat(
             success="ok",
             notes=f"avatar={request.avatar_id}",
         )
+        # Persistencia opcional al caso (no rompe respuesta si falla)
+        if case_id:
+            user = get_user_from_authorization(authorization, db)
+            user_msg = (request.messages[-1].content if request.messages else "") or ""
+            base_meta = {
+                "aigent_id": getattr(request, "avatar_id", None),
+                "purpose": purpose or "general_chat",
+            }
+            # Persistir mensaje del usuario (sin coste tokens — input usuario)
+            persist_to_case_safely(
+                case_id, user, db,
+                entry_type="chat_aigent",
+                content=user_msg,
+                meta={**base_meta, "role": "user"},
+            )
+            # Persistir respuesta del Aigent (con cobro 0.10 tokens)
+            persist_to_case_safely(
+                case_id, user, db,
+                entry_type="chat_aigent",
+                content=getattr(result, "reply", None) or getattr(result, "content", None) or "",
+                meta={**base_meta, "role": "assistant"},
+                ai_model=get_settings().avatar_model,
+                input_tokens=getattr(result, "input_tokens", None),
+                output_tokens=getattr(result, "output_tokens", None),
+                tokens_charged=0.10,
+            )
         return result
     except Exception as e:
         background_tasks.add_task(

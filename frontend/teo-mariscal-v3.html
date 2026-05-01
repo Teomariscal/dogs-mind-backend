@@ -4469,6 +4469,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
         <li><img class="aig-bullet-avatar" src="aig-ale-pixar.webp" alt=""><div data-i18n="aig_bullet_ale"><strong>Ale</strong> te va a llevar a muchos viajes, alojamientos donde admiten perros, rutas por el campo y también cómo entrenar muchos trucos.</div></li>
         <li><img class="aig-bullet-avatar" src="aig-borja-pixar.webp" alt=""><div data-i18n="aig_bullet_borja"><strong>Borja</strong> es el pijo Cayetano español por excelencia.</div></li>
         <li><img class="aig-bullet-avatar" src="aig-leo-pixar.webp" alt=""><div data-i18n="aig_bullet_leo"><strong>Leo</strong> es un ex ejecutivo reciclado en Boho y espiritualidad.</div></li>
+        <li><img class="aig-bullet-avatar" src="aig-iris-pixar.webp" alt=""><div data-i18n="aig_bullet_iris"><strong>Iris</strong> es tu perfecto apoyo emocional. Te ayuda a que tu perro y tú os apoyéis mutuamente en momentos difíciles. Vive en Holanda pero es española y tiene un Beagle.</div></li>
       </ul>
 
       <p class="aig-closing" data-i18n="aig_closing">Entra en cada uno y descubre todo lo que te pueden aportar tus nuevos <em>Ai-Amigos</em>.</p>
@@ -4563,6 +4564,17 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
         </div>
         <div class="av-check" id="avck-borja" style="display:none">✓</div>
       </div>
+
+      <div class="av-card" id="avc-iris" onclick="selectAv('iris')">
+        <img class="av-photo" src="aig-iris-pixar.webp" alt="Iris">
+        <div class="av-info">
+          <div class="av-name">Iris</div>
+          <div class="av-role" style="color:#a86a8a" data-i18n="av_role_iris">Apoyo emocional · Humanista</div>
+          <div class="av-desc" data-i18n="av_desc_iris">Tu perfecto apoyo emocional. Te ayuda a que tu perro y tú os apoyéis mutuamente en situaciones difíciles. También hace unos cócteles increíbles que en algún caso ayudan si no te pasas con ellos. Vive en Holanda pero es española.</div>
+        </div>
+        <div class="av-check" id="avck-iris" style="display:none">✓</div>
+      </div>
+
       <button class="btn-green" onclick="confirmAvatar()" style="margin-top:6px;margin-bottom:16px">
         Empezar a chatear →
       </button>
@@ -8188,6 +8200,7 @@ function endTourIntro() {
       aig_bullet_ale:         '<strong>Ale</strong> te va a llevar a muchos viajes, alojamientos donde admiten perros, rutas por el campo y también cómo entrenar muchos trucos.',
       aig_bullet_borja:       '<strong>Borja</strong> es el pijo Cayetano español por excelencia.',
       aig_bullet_leo:         '<strong>Leo</strong> es un ex ejecutivo reciclado en Boho y espiritualidad.',
+      aig_bullet_iris:        '<strong>Iris</strong> es tu perfecto apoyo emocional. Te ayuda a que tu perro y tú os apoyéis mutuamente en momentos difíciles. Vive en Holanda pero es española y tiene un Beagle.',
       aig_closing:            'Entra en cada uno y descubre todo lo que te pueden aportar tus nuevos <em>Ai-Amigos</em>.',
       aig_cta:                'Elige tu avatar',
       // Splash
@@ -8262,6 +8275,8 @@ function endTourIntro() {
       av_desc_ale:   'Trucos · Enriquecimiento · Rutas de campo · Medicina natural. Ale realmente disfruta de los perros y la naturaleza. Es capaz de comer pan encima de una pickup lloviendo en una carretera de montaña y pasarlo bien.',
       av_role_borja: 'Cultura canina clásica',
       av_desc_borja: 'Razas · Historia · Perros de campo · Consejos de toda la vida. Un Cayetano de toda la vida.',
+      av_role_iris:  'Apoyo emocional · Humanista',
+      av_desc_iris:  'Tu perfecto apoyo emocional. Te ayuda a que tu perro y tú os apoyéis mutuamente en situaciones difíciles. También hace unos cócteles increíbles que en algún caso ayudan si no te pasas con ellos. Vive en Holanda pero es española.',
       av_role_cecilia: 'Etóloga, Veterinaria, Entrenadora de caballos y perros, la mejor profesora de aprendizaje animal. Chilena y profundamente «Pelolais»',
       av_desc_cecilia: 'Sabe mucho de aprendizaje, es algo snob y bastante selectiva, pero eso no hace que no tenga un corazón enorme, especialmente para su caballo ;) si te descuidas acaba hablando de él.',
       // ── Dog Profile (ficha del perro) ─────────────────────────────────
@@ -8702,6 +8717,7 @@ function endTourIntro() {
       aig_bullet_ale:         '<strong>Ale</strong> will take you on many trips, dog-friendly accommodations, country routes, and also how to train many tricks.',
       aig_bullet_borja:       '<strong>Borja</strong> is the quintessential Spanish posh "Cayetano".',
       aig_bullet_leo:         '<strong>Leo</strong> is a former executive turned Boho and spirituality.',
+      aig_bullet_iris:        '<strong>Iris</strong> is your perfect emotional support. She helps you and your dog support each other through tough moments. She lives in the Netherlands but is Spanish, and has a Beagle.',
       aig_closing:            'Enter each one and discover everything your new <em>Ai-Friends</em> can bring you.',
       aig_cta:                'Choose your avatar',
       // Splash
@@ -8776,6 +8792,8 @@ function endTourIntro() {
       av_desc_ale:   'Tricks · Enrichment · Countryside routes · Natural medicine. Ale truly enjoys dogs and nature. She can eat bread on the back of a pickup truck in the rain on a mountain road and have a great time.',
       av_role_borja: 'Classic dog culture',
       av_desc_borja: 'Breeds · History · Field dogs · Timeless advice. An old-school Cayetano through and through.',
+      av_role_iris:  'Emotional support · Humanist',
+      av_desc_iris:  'Your perfect emotional support. She helps you and your dog support each other through tough situations. She also makes amazing cocktails that sometimes help — as long as you do not overdo it. Lives in the Netherlands but is Spanish.',
       av_role_cecilia: 'Ethologist, Veterinarian, Horse and dog trainer, the best teacher of animal learning. Chilean and deeply «Pelolais»',
       av_desc_cecilia: 'She knows a lot about learning, is somewhat snobbish and quite selective, but that does not stop her from having a huge heart — especially for her horse ;) if you let your guard down, she ends up talking about him.',
       // ── Dog Profile ──────────────────────────────────────────────────

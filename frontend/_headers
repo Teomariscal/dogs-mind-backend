@@ -41,12 +41,6 @@
 /manifest.json
   Cache-Control: public, max-age=86400, must-revalidate
 
-# ─── Iconos PWA — cache largo (estables) ───────────────────────────────────
-# Estos sí pueden cachearse 30 días: solo cambian cuando re-generamos el
-# icon set entero, lo cual ocurre raramente (cambio de marca, etc.).
-/icons/*
-  Cache-Control: public, max-age=2592000, must-revalidate
-
 # ─── Imágenes — cache moderado (1 día) ─────────────────────────────────────
 # Si regeneramos una imagen con el mismo nombre (ej. dog-profile-hero.webp),
 # el peor caso es 1 día de retraso de propagación. Suficiente para iterar
@@ -71,3 +65,10 @@
 # ─── Favicon ──────────────────────────────────────────────────────────────
 /favicon.ico
   Cache-Control: public, max-age=86400
+
+# ─── Iconos PWA — cache largo (estables) ───────────────────────────────────
+# IMPORTANTE: este bloque va AL FINAL para que Netlify lo aplique como última
+# regla y gane sobre /*.png, /*.svg de arriba. Estos iconos solo cambian
+# cuando re-generamos el icon set entero (cambio de marca), así que cache 30d.
+/icons/*
+  Cache-Control: public, max-age=2592000, must-revalidate

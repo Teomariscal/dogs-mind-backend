@@ -9112,18 +9112,61 @@ function endTourIntro() {
 })();
 </script>
 
-<!-- ── SERVICE WORKER REGISTRATION ── -->
+<!-- ── SERVICE WORKER REGISTRATION + UPDATE DETECTION ── -->
 <script>
 // SW solo en navegador web. En contexto Capacitor (capacitor:// scheme o window.Capacitor)
 // el SW no aplica y romper el registro evita 404s en consola.
 var __isCapacitor = (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform())
   || /^(capacitor|ionic):/.test(location.protocol);
+
 if ('serviceWorker' in navigator && !__isCapacitor) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('/service-worker.js')
-      .then(function(reg) { console.log('[SW] Registered:', reg.scope); })
+      .then(function(reg) {
+        console.log('[SW] Registered:', reg.scope);
+        // Detectar updates: cuando se descubre nueva versión del SW que pasa
+        // a 'installed' mientras hay un SW antiguo controlando, mostrar banner.
+        reg.addEventListener('updatefound', function() {
+          var newWorker = reg.installing;
+          if (!newWorker) return;
+          newWorker.addEventListener('statechange', function() {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              showUpdateBanner();
+            }
+          });
+        });
+        // Comprobar updates al volver del background (PWA en home screen)
+        window.addEventListener('focus', function() {
+          reg.update().catch(function() {});
+        });
+      })
       .catch(function(err) { console.warn('[SW] Registration failed:', err); });
   });
+
+  // Banner discreto fijo abajo. NO recarga silenciosamente: el usuario decide
+  // cuándo actualizar para no perder el estado de un formulario en curso.
+  function showUpdateBanner() {
+    if (document.getElementById('sw-update-banner')) return; // ya visible
+    var b = document.createElement('div');
+    b.id = 'sw-update-banner';
+    b.style.cssText = 'position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom, 0px) + 100px);transform:translateX(-50%);' +
+      'background:#4a6741;color:#fff;padding:11px 14px 11px 18px;border-radius:14px;' +
+      'box-shadow:0 8px 28px rgba(0,0,0,0.3);z-index:99999;display:flex;align-items:center;' +
+      'gap:10px;font-family:inherit;font-size:13px;line-height:1.3;max-width:calc(100% - 28px);';
+    b.innerHTML =
+      '<span style="flex:1;min-width:0;">Nueva versión disponible</span>' +
+      '<button id="sw-update-btn-reload" style="background:#fff;color:#4a6741;border:none;padding:7px 14px;' +
+      'border-radius:100px;font-weight:600;font-size:12.5px;font-family:inherit;cursor:pointer;flex-shrink:0;">Actualizar</button>' +
+      '<button id="sw-update-btn-close" aria-label="Cerrar" style="background:transparent;color:rgba(255,255,255,0.7);border:none;' +
+      'font-size:20px;cursor:pointer;padding:0 4px;line-height:1;flex-shrink:0;">&times;</button>';
+    document.body.appendChild(b);
+    document.getElementById('sw-update-btn-reload').addEventListener('click', function() {
+      location.reload();
+    });
+    document.getElementById('sw-update-btn-close').addEventListener('click', function() {
+      b.remove();
+    });
+  }
 }
 </script>
 

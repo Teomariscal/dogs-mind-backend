@@ -62,6 +62,15 @@ class Case(Base):
     motivo_consulta = Column(Text, nullable=True)
     status          = Column(String(20), nullable=False, default="open", index=True)
 
+    # Identidad del perro cuando NO está en el perfil del usuario (solo profesionales).
+    # Si el caso está sobre un perro propio del usuario, dog_id apunta al Dog y estos
+    # tres campos se quedan NULL. Si el caso es de un perro de cliente del profesional,
+    # dog_id es NULL y estos campos guardan los datos libres introducidos por el usuario.
+    # Validación de exclusividad (dog_id XOR client_dog_*) se hace en endpoint.
+    client_dog_name  = Column(String(80), nullable=True)
+    client_dog_breed = Column(String(120), nullable=True)
+    client_dog_age   = Column(String(80), nullable=True)   # texto libre (ej. "3 años", "5m")
+
     # Resúmenes para contexto IA (ver docstring del módulo)
     summary_abc     = Column(Text, nullable=True)
     summary_plan    = Column(Text, nullable=True)

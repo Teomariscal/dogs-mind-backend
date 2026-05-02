@@ -8,6 +8,7 @@ from app.api.routes import health, analysis, avatar, documents, intervention
 from app.api.routes import auth, payments as payments_router
 from app.api.routes import dogs as dogs_router
 from app.api.routes import cases as cases_router
+from app.api.routes import account as account_router
 
 # Path to the frontend HTML — override via FRONTEND_HTML env var
 FRONTEND_HTML = os.environ.get(
@@ -61,6 +62,25 @@ async def lifespan(app: FastAPI):
             "CREATE INDEX IF NOT EXISTS ix_case_entries_type ON case_entries(type)",
             "CREATE INDEX IF NOT EXISTS ix_case_entries_created_at ON case_entries(created_at)",
             "CREATE INDEX IF NOT EXISTS ix_case_entries_case_chrono ON case_entries(case_id, created_at)",
+            # Account type (particular | professional) + perfil empresa para profesionales.
+            # account_type por defecto 'particular' para preservar comportamiento de usuarios existentes.
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS account_type VARCHAR(20) NOT NULL DEFAULT 'particular'",
+            "CREATE INDEX IF NOT EXISTS ix_users_account_type ON users(account_type)",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS company_name VARCHAR(120)",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS company_web VARCHAR(255)",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS company_cif VARCHAR(40)",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS company_clients_per_year INTEGER",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS company_city VARCHAR(80)",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS company_country VARCHAR(80)",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS company_billing_email VARCHAR(255)",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS company_collaborate_interest BOOLEAN",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS company_logo_base64 TEXT",
+            # Cases — datos libres del perro de cliente (solo profesionales). dog_id sigue
+            # siendo el camino canónico para perros propios; estos campos se rellenan solo
+            # cuando el caso es sobre un perro que NO está en el perfil del usuario.
+            "ALTER TABLE cases ADD COLUMN IF NOT EXISTS client_dog_name VARCHAR(80)",
+            "ALTER TABLE cases ADD COLUMN IF NOT EXISTS client_dog_breed VARCHAR(120)",
+            "ALTER TABLE cases ADD COLUMN IF NOT EXISTS client_dog_age VARCHAR(80)",
         ]
         for sql in migrations:
             try:
@@ -153,6 +173,7 @@ app.include_router(avatar.router)
 app.include_router(documents.router)
 app.include_router(dogs_router.router)
 app.include_router(cases_router.router)
+app.include_router(account_router.router)
 
 
 @app.get("/", include_in_schema=False)

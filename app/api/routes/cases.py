@@ -54,12 +54,20 @@ SEGUIMIENTO_MAX_MOTIVO_RESUMIDO_CHARS = 300 # 1 frase
 class CaseCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=150, description="Título del caso (motivo principal)")
     motivo_consulta: Optional[str] = Field(None, max_length=5000, description="Descripción libre del motivo")
-    dog_id: Optional[str] = Field(None, description="UUID del perro al que pertenece el caso")
+    dog_id: Optional[str] = Field(None, description="UUID del perro propio (Particular: obligatorio. Profesional: opcional)")
+    # Campos solo profesionales — perro de cliente que NO está en el perfil del usuario.
+    # Validación de tier + exclusividad con dog_id se hace en endpoint.
+    client_dog_name: Optional[str] = Field(None, max_length=80)
+    client_dog_breed: Optional[str] = Field(None, max_length=120)
+    client_dog_age: Optional[str] = Field(None, max_length=80)
 
-    @field_validator("title", "motivo_consulta")
+    @field_validator("title", "motivo_consulta", "client_dog_name", "client_dog_breed", "client_dog_age")
     @classmethod
     def strip_text(cls, v: Optional[str]) -> Optional[str]:
-        return v.strip() if v else v
+        if v is None:
+            return v
+        s = v.strip()
+        return s or None
 
 
 class CaseUpdate(BaseModel):
@@ -67,11 +75,17 @@ class CaseUpdate(BaseModel):
     motivo_consulta: Optional[str] = Field(None, max_length=5000)
     status: Optional[Literal["open", "archived"]] = None
     dog_id: Optional[str] = None
+    client_dog_name: Optional[str] = Field(None, max_length=80)
+    client_dog_breed: Optional[str] = Field(None, max_length=120)
+    client_dog_age: Optional[str] = Field(None, max_length=80)
 
-    @field_validator("title", "motivo_consulta")
+    @field_validator("title", "motivo_consulta", "client_dog_name", "client_dog_breed", "client_dog_age")
     @classmethod
     def strip_text(cls, v: Optional[str]) -> Optional[str]:
-        return v.strip() if v else v
+        if v is None:
+            return v
+        s = v.strip()
+        return s or None
 
 
 class CaseResponse(BaseModel):
@@ -84,6 +98,9 @@ class CaseResponse(BaseModel):
     summary_abc: Optional[str]
     summary_plan: Optional[str]
     summary_full: Optional[str]
+    client_dog_name: Optional[str] = None
+    client_dog_breed: Optional[str] = None
+    client_dog_age: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
@@ -224,6 +241,66 @@ def _validate_dog_ownership(dog_id: Optional[str], user: User, db: Session) -> O
     return dog_id
 
 
+def _validate_case_subject(
+    user: User,
+    dog_id: Optional[str],
+    client_dog_name: Optional[str],
+    client_dog_breed: Optional[str],
+    client_dog_age: Optional[str],
+    db: Session,
+) -> tuple[Optional[str], Optional[str], Optional[str], Optional[str]]:
+    """
+    Aplica las reglas de tier sobre el sujeto del caso.
+
+    Particular:
+        - dog_id obligatorio y debe ser de uno de sus perros.
+        - client_dog_* prohibidos (rechazo 422).
+    Professional:
+        - Si dog_id se pasa, debe ser de uno de sus perros (mismo check de ownership).
+        - Si no hay dog_id, client_dog_name es obligatorio (los demás opcionales).
+        - dog_id y client_dog_name son mutuamente excluyentes (no aceptamos los dos
+          a la vez para evitar ambigüedad sobre quién es el sujeto del caso).
+
+    Devuelve la tupla (dog_id_valido, client_dog_name, client_dog_breed, client_dog_age).
+    """
+    has_client = bool(client_dog_name)
+
+    if user.account_type == "particular":
+        if any([client_dog_name, client_dog_breed, client_dog_age]):
+            raise HTTPException(
+                status_code=422,
+                detail=(
+                    "Las cuentas Particular solo pueden abrir casos con perros propios. "
+                    "Para registrar perros de clientes cambia tu cuenta a Profesional."
+                ),
+            )
+        if not dog_id:
+            raise HTTPException(
+                status_code=422,
+                detail="Debes seleccionar uno de tus perros para abrir el caso.",
+            )
+        valid_dog_id = _validate_dog_ownership(dog_id, user, db)
+        return valid_dog_id, None, None, None
+
+    # account_type == 'professional'
+    if dog_id and has_client:
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                "Indica un perro propio (dog_id) o los datos de un perro de cliente "
+                "(client_dog_name), pero no ambos."
+            ),
+        )
+    if not dog_id and not has_client:
+        raise HTTPException(
+            status_code=422,
+            detail="Indica un perro propio (dog_id) o el nombre del perro del cliente.",
+        )
+
+    valid_dog_id = _validate_dog_ownership(dog_id, user, db) if dog_id else None
+    return valid_dog_id, client_dog_name, client_dog_breed, client_dog_age
+
+
 def _count_active_cases(user: User, db: Session) -> int:
     return db.query(Case).filter(
         Case.user_id == user.id,
@@ -246,6 +323,9 @@ def _to_case_response(case: Case) -> CaseResponse:
         summary_abc=case.summary_abc,
         summary_plan=case.summary_plan,
         summary_full=case.summary_full,
+        client_dog_name=case.client_dog_name,
+        client_dog_breed=case.client_dog_breed,
+        client_dog_age=case.client_dog_age,
         created_at=case.created_at,
         updated_at=case.updated_at,
     )
@@ -442,8 +522,15 @@ def create_case(
             detail=f"Has alcanzado el máximo de {MAX_CASES_PER_USER} casos activos.",
         )
 
-    # Validar dog si se pasa
-    valid_dog_id = _validate_dog_ownership(payload.dog_id, user, db)
+    # Gating por tier (Particular: solo perros propios; Profesional: propios o cliente)
+    valid_dog_id, client_name, client_breed, client_age = _validate_case_subject(
+        user,
+        payload.dog_id,
+        payload.client_dog_name,
+        payload.client_dog_breed,
+        payload.client_dog_age,
+        db,
+    )
 
     case = Case(
         user_id=user.id,
@@ -451,6 +538,9 @@ def create_case(
         title=payload.title,
         motivo_consulta=payload.motivo_consulta,
         status="open",
+        client_dog_name=client_name,
+        client_dog_breed=client_breed,
+        client_dog_age=client_age,
     )
     db.add(case)
     db.commit()
@@ -468,9 +558,22 @@ def update_case(
     case = _get_owned_case(case_id, user, db)
     data = payload.model_dump(exclude_unset=True)
 
-    # Validar dog si cambia
-    if "dog_id" in data:
-        data["dog_id"] = _validate_dog_ownership(data["dog_id"], user, db)
+    # Si el patch toca cualquier campo del sujeto del caso (perro propio o cliente),
+    # revalidamos el conjunto completo aplicando las reglas de tier. Mantiene el
+    # invariante de que un caso siempre tiene exactamente un sujeto bien identificado.
+    subject_keys = {"dog_id", "client_dog_name", "client_dog_breed", "client_dog_age"}
+    if subject_keys & data.keys():
+        new_dog_id        = data.get("dog_id",        str(case.dog_id) if case.dog_id else None)
+        new_client_name   = data.get("client_dog_name",  case.client_dog_name)
+        new_client_breed  = data.get("client_dog_breed", case.client_dog_breed)
+        new_client_age    = data.get("client_dog_age",   case.client_dog_age)
+        valid_dog_id, c_name, c_breed, c_age = _validate_case_subject(
+            user, new_dog_id, new_client_name, new_client_breed, new_client_age, db,
+        )
+        data["dog_id"]           = valid_dog_id
+        data["client_dog_name"]  = c_name
+        data["client_dog_breed"] = c_breed
+        data["client_dog_age"]   = c_age
 
     for k, v in data.items():
         setattr(case, k, v)

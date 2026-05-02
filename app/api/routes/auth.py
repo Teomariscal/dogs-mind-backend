@@ -44,6 +44,7 @@ class AuthResponse(BaseModel):
     email: str
     tokens: float
     role: str = "user"
+    account_type: str = "particular"
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -118,6 +119,7 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
         email=user.email,
         tokens=float(user.tokens),
         role=user.role,
+        account_type=user.account_type,
     )
 
 
@@ -138,17 +140,19 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
         email=user.email,
         tokens=float(user.tokens),
         role=user.role,
+        account_type=user.account_type,
     )
 
 
 @router.get("/me")
 def me(current_user: User = Depends(get_current_user)):
     return {
-        "user_id": str(current_user.id),
-        "email":   current_user.email,
-        "phone":   current_user.phone,
-        "tokens":  float(current_user.tokens),
-        "role":    current_user.role,
+        "user_id":      str(current_user.id),
+        "email":        current_user.email,
+        "phone":        current_user.phone,
+        "tokens":       float(current_user.tokens),
+        "role":         current_user.role,
+        "account_type": current_user.account_type,
     }
 
 
@@ -171,14 +175,26 @@ def data_export(
         "format_version": "1.0",
         "data_controller": "The Dogs Mind — Teodoro Mariscal Diaz",
         "user": {
-            "id":         str(current_user.id),
-            "email":      current_user.email,
-            "phone":      current_user.phone,
-            "tokens":     float(current_user.tokens),
-            "role":       current_user.role,
-            "created_at": current_user.created_at.isoformat() + "Z" if current_user.created_at else None,
-            "deleted_at": current_user.deleted_at.isoformat() + "Z" if current_user.deleted_at else None,
+            "id":           str(current_user.id),
+            "email":        current_user.email,
+            "phone":        current_user.phone,
+            "tokens":       float(current_user.tokens),
+            "role":         current_user.role,
+            "account_type": current_user.account_type,
+            "created_at":   current_user.created_at.isoformat() + "Z" if current_user.created_at else None,
+            "deleted_at":   current_user.deleted_at.isoformat() + "Z" if current_user.deleted_at else None,
         },
+        "company": {
+            "name":                  current_user.company_name,
+            "web":                   current_user.company_web,
+            "cif":                   current_user.company_cif,
+            "clients_per_year":      current_user.company_clients_per_year,
+            "city":                  current_user.company_city,
+            "country":               current_user.company_country,
+            "billing_email":         current_user.company_billing_email,
+            "collaborate_interest":  current_user.company_collaborate_interest,
+            "has_logo":              bool(current_user.company_logo_base64),
+        } if current_user.company_name else None,
         "payments": [
             {
                 "id":                str(p.id),
@@ -254,6 +270,16 @@ def delete_account(
     current_user.tokens        = 0
     current_user.role          = "deleted"
     current_user.deleted_at    = deletion_ts
+    # Scrub PII de empresa (también es PII profesional bajo GDPR)
+    current_user.company_name                 = None
+    current_user.company_web                  = None
+    current_user.company_cif                  = None
+    current_user.company_clients_per_year     = None
+    current_user.company_city                 = None
+    current_user.company_country              = None
+    current_user.company_billing_email        = None
+    current_user.company_collaborate_interest = None
+    current_user.company_logo_base64          = None
     db.commit()
 
     return {

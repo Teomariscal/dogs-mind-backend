@@ -1,0 +1,73 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Netlify _headers — cache-control y seguridad para Dogs Mind
+#
+# Filosofía:
+#   • HTML y Service Worker → siempre revalidar (el navegador pregunta al
+#     servidor antes de servir caché). Garantiza que tras un deploy, el
+#     usuario ve la versión nueva sin tener que borrar caché.
+#   • Imágenes y assets estables → cache moderado (1 día). Si regeneramos
+#     una imagen con el mismo nombre, máximo 1 día de retraso de propagación.
+#   • Iconos PWA → cache largo (cambian muy raramente).
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Headers de seguridad básicos para todas las rutas
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: SAMEORIGIN
+
+# ─── HTML — revalidación obligatoria en cada navegación ────────────────────
+# El navegador puede mantener caché local, pero SIEMPRE pregunta al servidor
+# (con ETag / If-Modified-Since) antes de servirla. Si no cambió, 304 Not
+# Modified (rápido); si cambió, descarga la nueva versión. Sin esto, el
+# navegador podría servir HTML viejo durante horas tras un deploy.
+/
+  Cache-Control: no-cache, must-revalidate
+/index.html
+  Cache-Control: no-cache, must-revalidate
+/teo-mariscal-v3.html
+  Cache-Control: no-cache, must-revalidate
+
+# ─── Service Worker — crítico ──────────────────────────────────────────────
+# El navegador no debe cachear el SW más de 0 segundos. Esto garantiza que
+# detecta versiones nuevas del SW al instante (lo que dispara skipWaiting +
+# clients.claim para activar el nuevo SW sin esperar). Sin esto, los usuarios
+# pueden seguir con SW antiguo durante 24h y servir contenido obsoleto.
+/service-worker.js
+  Cache-Control: max-age=0, must-revalidate
+
+# ─── Manifest PWA ──────────────────────────────────────────────────────────
+# Cambia raramente; cache 1 día con revalidación.
+/manifest.json
+  Cache-Control: public, max-age=86400, must-revalidate
+
+# ─── Iconos PWA — cache largo (estables) ───────────────────────────────────
+# Estos sí pueden cachearse 30 días: solo cambian cuando re-generamos el
+# icon set entero, lo cual ocurre raramente (cambio de marca, etc.).
+/icons/*
+  Cache-Control: public, max-age=2592000, must-revalidate
+
+# ─── Imágenes — cache moderado (1 día) ─────────────────────────────────────
+# Si regeneramos una imagen con el mismo nombre (ej. dog-profile-hero.webp),
+# el peor caso es 1 día de retraso de propagación. Suficiente para iterar
+# diseños sin pisar a usuarios.
+/*.webp
+  Cache-Control: public, max-age=86400, must-revalidate
+/*.png
+  Cache-Control: public, max-age=86400, must-revalidate
+/*.jpg
+  Cache-Control: public, max-age=86400, must-revalidate
+/*.jpeg
+  Cache-Control: public, max-age=86400, must-revalidate
+/*.gif
+  Cache-Control: public, max-age=86400, must-revalidate
+/*.svg
+  Cache-Control: public, max-age=86400, must-revalidate
+
+# ─── Video — cache largo ───────────────────────────────────────────────────
+/*.mp4
+  Cache-Control: public, max-age=2592000
+
+# ─── Favicon ──────────────────────────────────────────────────────────────
+/favicon.ico
+  Cache-Control: public, max-age=86400

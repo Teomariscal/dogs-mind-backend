@@ -24,8 +24,9 @@ qdrant-client==1.12.1
 # Embeddings
 voyageai
 
-# PDF parsing
+# PDF parsing (lectura) + generación de informes (escritura)
 pypdf==5.1.0
+reportlab==4.2.5
 
 # Config & validation
 pydantic==2.10.4

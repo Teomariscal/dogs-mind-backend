@@ -22,7 +22,7 @@ GDPR: deleted_at marca borrado lógico; las entries se preservan para audit clí
 from datetime import datetime
 from typing import Optional, List, Literal
 
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, Response
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field, field_validator
 
@@ -594,6 +594,53 @@ def delete_case(
     case.deleted_at = datetime.utcnow()
     db.commit()
     return None
+
+
+@router.get("/{case_id}/export.pdf")
+def export_case_pdf(
+    case_id: str,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """
+    Genera un PDF unificado con análisis funcional ABC + plan de intervención.
+
+    Disponible solo cuando el caso ya tiene generadas ambas piezas (lo que
+    coincide con el contrato de UI: el botón solo aparece cuando hay las dos).
+
+    Cabecera: logo TDM + nombre del perro + fecha. Si el usuario es profesional
+    con logo de empresa subido, se añade en el margen opuesto. Sin datos de
+    cliente humano (privacidad).
+
+    Pie: disclaimer clínico + número de página.
+    """
+    from app.services.pdf_export import (
+        build_case_pdf, build_export_filename, has_required_entries_for_export,
+    )
+
+    case = _get_owned_case(case_id, user, db)
+    if not has_required_entries_for_export(case.id, db):
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                "El caso aún no tiene análisis funcional y plan de intervención generados. "
+                "Genera ambos antes de descargar el informe."
+            ),
+        )
+
+    pdf_bytes = build_case_pdf(case, user, db)
+    filename = build_export_filename(case, db)
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Length": str(len(pdf_bytes)),
+            # Evita cachés agresivas: el PDF puede regenerarse si cambian datos del caso.
+            "Cache-Control": "private, max-age=0, must-revalidate",
+        },
+    )
 
 
 @router.post("/{case_id}/entries", response_model=CaseEntryResponse, status_code=status.HTTP_201_CREATED)

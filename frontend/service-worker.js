@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v33 (Fase 2: network-first para HTML)
+// Dogs Mind Service Worker — v34 (fix iOS Safari < 16.4: regex sin lookbehind)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v33';
+const CACHE_NAME = 'dogs-mind-v34';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

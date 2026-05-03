@@ -7105,8 +7105,16 @@ function cleanInlineMarkdown(text) {
     .replace(/^[\s]*[\u{1F534}\u{1F7E0}\u{1F7E1}\u{1F7E2}\u{1F535}⚠️✅❌]\s*/gu, '')
     // Convertir **bold** → <strong>bold</strong>
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    // Convertir *italic* → <em>italic</em> (cuidado de no pisar ** ya hechos)
-    .replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, '<em>$1</em>')
+    // Convertir *italic* → <em>italic</em> (cuidado de no pisar ** ya hechos).
+    // Sin lookbehind (?<!) — incompatible con Safari iOS < 16.4 al PARSEAR el script
+    // entero; usamos callback para inspeccionar el carácter previo/posterior y
+    // descartar matches flanqueados por otro asterisco (mantiene la semántica original).
+    .replace(/\*([^*\n]+)\*/g, function(match, inner, offset, str) {
+      var before = offset > 0 ? str.charAt(offset - 1) : '';
+      var after  = str.charAt(offset + match.length);
+      if (before === '*' || after === '*') return match;
+      return '<em>' + inner + '</em>';
+    })
     // Quitar asteriscos sueltos sin par
     .replace(/\*+/g, '')
     // Citas tipo [4] o [1, 4] → super-índices verdes
@@ -7253,7 +7261,13 @@ function markdownToHtml(md) {
       // el escape básico, pero el bullet text necesita pasada propia).
       txt = txt
         .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-        .replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, '<em>$1</em>')
+        // Sin lookbehind — compat Safari iOS < 16.4. Misma semántica vía callback.
+        .replace(/\*([^*\n]+)\*/g, function(match, inner, offset, str) {
+          var before = offset > 0 ? str.charAt(offset - 1) : '';
+          var after  = str.charAt(offset + match.length);
+          if (before === '*' || after === '*') return match;
+          return '<em>' + inner + '</em>';
+        })
         .replace(/\*+/g, '');
       out.push('<div style="padding:4px 0 4px 16px;position:relative;font-size:13.5px;line-height:1.6;text-align:justify;"><span style="position:absolute;left:4px;color:var(--green2);">•</span>' + txt + '</div>');
       return;

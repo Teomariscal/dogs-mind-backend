@@ -19,7 +19,7 @@ Ownership: cada endpoint verifica Case.user_id == current_user.id.
 GDPR: deleted_at marca borrado lógico; las entries se preservan para audit clínico.
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional, List, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Response
@@ -45,6 +45,14 @@ MAX_ENTRIES_PER_CASE = 500
 # ── Tarifas tokens (INVARIANTES FINANCIERAS — no tocar sin aprobación CFO) ──
 # Ver dogsmind-modelo-negocio-pricing.md y memoria CFO.
 SEGUIMIENTO_TOKEN_COST = 1.5  # plantilla + respuesta IA Sonnet 4.6 + RAG
+
+# Plan Sencillo / Pet Owners — INVARIANTE FINANCIERA (CFO 2026-05-04).
+# Haiku 4.5 reformula el plan técnico en formato receta. 96 % margen alineado
+# con mensaje Aigent. Persistencia obligatoria (solo 1ª generación cobra) +
+# rate limit 5/h por caso (anti-abuso). Ver dogs-mind-state.md invariantes 4 y 5.
+PLAN_SIMPLE_TOKEN_COST = 0.1
+PLAN_SIMPLE_RATE_LIMIT_PER_HOUR = 5
+PLAN_SIMPLE_MAX_OUTPUT_TOKENS = 800
 SEGUIMIENTO_MAX_OBSERVACIONES_CHARS = 1500  # límite anti-abuso, alineado con chat clínico cap
 SEGUIMIENTO_MAX_INFO_EXTRA_CHARS = 1000     # ~4 frases típicas
 SEGUIMIENTO_MAX_MOTIVO_RESUMIDO_CHARS = 300 # 1 frase
@@ -782,6 +790,149 @@ def post_seguimiento(
         entry=_to_entry_response(entry),
         balance_after=new_balance,
         cache_hit=ai_result.cache_hit,
+    )
+
+
+# ── Plan Sencillo / Pet Owners ───────────────────────────────────────────────
+class PlanSimpleResponse(BaseModel):
+    text: str
+    cached: bool
+    balance_after: Optional[float]
+    created_at: datetime
+    case_id: str
+
+
+@router.post("/{case_id}/plan-simple", response_model=PlanSimpleResponse)
+def generate_plan_simple(
+    case_id: str,
+    force: bool = Query(False, description="Si true, regenera ignorando cached (cobra otros 0,1)"),
+    lang: str = Query("es", description="'es' (default) o 'en'"),
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """
+    Plan Sencillo / Pet Owners — versión accesible del plan de intervención.
+
+    Invariantes financieras (CFO 2026-05-04):
+      - 0,1 tokens por generación (margen 96 %, alineado con mensaje Aigent).
+      - Persistencia: si existe `CaseEntry.type='plan_simple'`, devuelve cached
+        SIN cobro. Solo la primera generación (o force=true explícito) cobra.
+      - Rate limit duro: máximo 5 generaciones por caso por hora.
+      - Modelo: Haiku 4.5 (sin RAG, sin prompt cache, output ≤800 tok).
+
+    Errores:
+      - 404 si el caso aún no tiene plan de intervención generado.
+      - 429 si superó rate limit (5/h por caso).
+      - 402 si saldo insuficiente para cobrar 0,1 tokens.
+    """
+    case = _get_owned_case(case_id, user, db)
+
+    # 1. Si existe cached y no force → devolver sin cobro
+    if not force:
+        cached = (
+            db.query(CaseEntry)
+            .filter(CaseEntry.case_id == case.id, CaseEntry.type == "plan_simple")
+            .order_by(CaseEntry.created_at.desc())
+            .first()
+        )
+        if cached and cached.content:
+            return PlanSimpleResponse(
+                text=cached.content,
+                cached=True,
+                balance_after=float(user.tokens),
+                created_at=cached.created_at,
+                case_id=str(case.id),
+            )
+
+    # 2. Verificar que existe un plan de intervención previo (input)
+    intervention_entry = (
+        db.query(CaseEntry)
+        .filter(CaseEntry.case_id == case.id, CaseEntry.type == "intervention")
+        .order_by(CaseEntry.created_at.desc())
+        .first()
+    )
+    if not intervention_entry or not intervention_entry.content:
+        raise HTTPException(
+            status_code=404,
+            detail="Necesitas generar el plan de intervención antes de pedir la versión sencilla.",
+        )
+
+    # 3. Rate limit (5 generaciones por caso por hora)
+    one_hour_ago = datetime.utcnow() - timedelta(hours=1)
+    recent_count = (
+        db.query(CaseEntry)
+        .filter(
+            CaseEntry.case_id == case.id,
+            CaseEntry.type == "plan_simple",
+            CaseEntry.created_at >= one_hour_ago,
+        )
+        .count()
+    )
+    if recent_count >= PLAN_SIMPLE_RATE_LIMIT_PER_HOUR:
+        raise HTTPException(
+            status_code=429,
+            detail=(
+                f"Has alcanzado el máximo de {PLAN_SIMPLE_RATE_LIMIT_PER_HOUR} "
+                "generaciones por hora. Espera un momento e inténtalo de nuevo."
+            ),
+        )
+
+    # 4. Cobrar 0,1 tokens ANTES de invocar IA (invariante financiera)
+    new_balance = _charge_user_tokens(user, PLAN_SIMPLE_TOKEN_COST, db)
+
+    # 5. Llamar Haiku 4.5
+    try:
+        from app.services.plan_simple_ai import run_plan_simple
+        ai_result = run_plan_simple(
+            original_plan_text=intervention_entry.content,
+            lang=lang,
+        )
+    except Exception as e:
+        # Refund si falla la IA
+        user.tokens = float(user.tokens) + PLAN_SIMPLE_TOKEN_COST
+        db.commit()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error generando plan sencillo: {str(e)[:200]}",
+        )
+
+    # 6. Persistir entry tipo 'plan_simple'
+    settings = get_settings()
+    entry = CaseEntry(
+        case_id=case.id,
+        type="plan_simple",
+        content=ai_result.text,
+        ai_model=settings.avatar_model,
+        input_tokens=ai_result.input_tokens,
+        output_tokens=ai_result.output_tokens,
+        tokens_charged=PLAN_SIMPLE_TOKEN_COST,
+    )
+    db.add(entry)
+    case.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(entry)
+
+    # 7. Tracking de coste (CFO oversight, fire-and-forget en log)
+    try:
+        from app.core.usage_tracker import log_usage
+        log_usage(
+            user_id=str(user.id),
+            endpoint="/cases/plan-simple",
+            model=settings.avatar_model,
+            input_tokens=ai_result.input_tokens,
+            output_tokens=ai_result.output_tokens,
+            tokens_charged=PLAN_SIMPLE_TOKEN_COST,
+            success="ok",
+        )
+    except Exception:
+        pass
+
+    return PlanSimpleResponse(
+        text=ai_result.text,
+        cached=False,
+        balance_after=new_balance,
+        created_at=entry.created_at,
+        case_id=str(case.id),
     )
 
 

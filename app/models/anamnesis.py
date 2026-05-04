@@ -18,6 +18,13 @@ class LivingEnvironment(str, Enum):
     both = "both"
 
 
+class FavoriteReward(str, Enum):
+    food = "food"
+    ball = "ball"
+    petting = "petting"
+    none = "none"           # "Nada le motiva" — anhedonia / clinical signal
+
+
 class AnamnesisInput(BaseModel):
     # Dog profile
     dog_name: str = Field(..., description="Dog's name")
@@ -38,8 +45,32 @@ class AnamnesisInput(BaseModel):
 
     # Environment & exercise
     urban_rural: Optional[str] = Field(None, description="'campo', 'periferia' or 'ciudad'")
-    daily_walks: bool = Field(False, description="Has daily walks?")
-    walks_per_day: Optional[int] = Field(None, description="Number of walks per day")
+    # walks_per_day es ahora la fuente de verdad — null = no aportado, 0 = ninguno,
+    # 1/2 = exacto, 3 = "3 o más". `daily_walks` se mantiene por backward compat
+    # pero se ignora si walks_per_day está presente; ambos se renderizan distinto
+    # a "no aportado" en build_anamnesis_block.
+    daily_walks: Optional[bool] = Field(None, description="DEPRECATED. Has daily walks? (null = no aportado)")
+    walks_per_day: Optional[int] = Field(None, ge=0, le=3, description="Walks per day: 0, 1, 2, or 3 (3 = '3 or more'). null = no aportado.")
+
+    # Historial y refuerzos
+    other_behavior_problems: Optional[str] = Field(
+        None,
+        description="Other behavior problems (free text). Empty/null = no aportado.",
+        max_length=2000,
+    )
+    attended_training_school: Optional[bool] = Field(
+        None,
+        description="Has the dog attended a dog training school? null = no aportado.",
+    )
+    training_school_result: Optional[str] = Field(
+        None,
+        description="Result/outcome of the training school (only meaningful if attended_training_school=True).",
+        max_length=2000,
+    )
+    favorite_reward: Optional[FavoriteReward] = Field(
+        None,
+        description="Dog's favorite reinforcer: food / ball / petting / none. null = no aportado.",
+    )
 
     # Behavior problem
     problem_description: str = Field(..., description="Owner's description of the problem")
@@ -55,6 +86,9 @@ class AnamnesisInput(BaseModel):
     # History
     previous_attempts: Optional[str] = Field(None, description="What has the owner tried so far?")
     owner_theory: Optional[str] = Field(None, description="Owner's hypothesis about the cause")
+
+    # Pre-existing extra context field used by frontend
+    prior_event: Optional[str] = Field(None, description="Major event/change before the problem started.")
 
     # UI language — controls the language of the AI analysis output
     lang: Optional[str] = Field("es", description="Response language: 'es' (Spanish) or 'en' (English)")

@@ -72,38 +72,121 @@ def build_rag_context_block(chunks: list[RetrievedChunk]) -> str:
     return "\n".join(lines)
 
 
+_NOT_PROVIDED = "información no aportada / not provided"
+
+
+def _walks_label(a: dict) -> str:
+    """
+    Render walks_per_day distinguiendo:
+      None      → 'no aportado'
+      0         → 'no walks (0)'
+      1, 2      → 'N walks per day'
+      3 or more → '3 or more walks per day'
+    """
+    wpd = a.get("walks_per_day")
+    if wpd is None:
+        # Fallback al campo legacy daily_walks si está presente, de lo contrario no aportado
+        dw = a.get("daily_walks")
+        if dw is True:
+            return "Yes, but number per day not specified"
+        if dw is False:
+            return "No"
+        return _NOT_PROVIDED
+    if wpd == 0:
+        return "0 (no walks)"
+    if wpd >= 3:
+        return "3 or more walks per day"
+    return f"{wpd} walks per day"
+
+
+def _bool_label(value, *, yes_text: str = "Yes", no_text: str = "No") -> str:
+    """Render booleano nullable: None → 'no aportado', True → yes_text, False → no_text."""
+    if value is None:
+        return _NOT_PROVIDED
+    return yes_text if value else no_text
+
+
+def _str_label(value) -> str:
+    """Render string optional: None / '' → 'no aportado'."""
+    if value is None or (isinstance(value, str) and not value.strip()):
+        return _NOT_PROVIDED
+    return str(value).strip()
+
+
+_FAVORITE_REWARD_LABELS = {
+    "food":    "Food (treats)",
+    "ball":    "Ball / toy",
+    "petting": "Petting / social attention",
+    "none":    "Nothing motivates the dog (possible anhedonia / chronic stress signal)",
+}
+
+
 def build_anamnesis_block(anamnesis: dict) -> str:
     """
     Format the anamnesis dict as a structured text block for the clinical AI.
+
+    Rendering principle (anti-fabrication):
+    Cada campo distingue explícitamente entre "Sí", "No" e "información no
+    aportada". El modelo lee literalmente; cualquier 'información no aportada'
+    debe permanecer así en el output (ver Section 0 del system prompt clínico).
     """
     a = anamnesis
+
+    # Campos del perro
+    weaning = a.get("weaning_age_weeks")
+    weaning_str = f"{weaning} weeks" if weaning is not None else _NOT_PROVIDED
+
+    # Reforzador favorito
+    fav_raw = a.get("favorite_reward")
+    fav_str = _FAVORITE_REWARD_LABELS.get(fav_raw, _NOT_PROVIDED) if fav_raw else _NOT_PROVIDED
+
+    # Escuela canina
+    attended = a.get("attended_training_school")
+    if attended is True:
+        result = a.get("training_school_result")
+        training_str = "Yes — Result: " + (result.strip() if result and result.strip() else _NOT_PROVIDED)
+    elif attended is False:
+        training_str = "No"
+    else:
+        training_str = _NOT_PROVIDED
+
     lines = [
         "<anamnesis>",
-        f"Dog: {a.get('dog_name', 'Unknown')}, {a.get('breed', '?')}, {a.get('dog_age', '?')}",
-        f"Weaning age: {a.get('weaning_age_weeks', 'unknown')} weeks",
-        f"Chronic disease: {'Yes — ' + a.get('chronic_disease_detail', '') if a.get('chronic_disease') else 'No'}",
-        f"Living environment: {a.get('living_environment', '?')}",
-        f"Household: {a.get('household_members', '?')} person(s)",
-        f"Children present: {'Yes' if a.get('children_present') else 'No'}",
-        f"Other dogs: {'Yes — ' + a.get('other_dogs_detail', '') if a.get('other_dogs') else 'No'}",
-        f"Urban/rural: {a.get('urban_rural', 'unknown')}",
-        f"Daily walks: {'Yes, ' + str(a.get('walks_per_day', '?')) + ' per day' if a.get('daily_walks') else 'No'}",
+        "## Dog profile",
+        f"Dog: {a.get('dog_name') or _NOT_PROVIDED}, {a.get('breed') or _NOT_PROVIDED}, {a.get('dog_age') or _NOT_PROVIDED}",
+        f"Weaning age: {weaning_str}",
+        f"Chronic disease: {'Yes — ' + (a.get('chronic_disease_detail') or _NOT_PROVIDED) if a.get('chronic_disease') else _bool_label(a.get('chronic_disease'))}",
         "",
-        f"Problem description: {a.get('problem_description', '')}",
-        f"When it happens: {a.get('when_it_happens', '')}",
-        f"Frequency: {a.get('frequency', '')}",
-        f"Where: {a.get('where_it_happens', '')}",
-        f"Who is present: {a.get('who_is_present', '')}",
+        "## Living situation",
+        f"Living environment: {a.get('living_environment') or _NOT_PROVIDED}",
+        f"Urban/rural: {a.get('urban_rural') or _NOT_PROVIDED}",
+        f"Household members: {a.get('household_members') if a.get('household_members') is not None else _NOT_PROVIDED}",
+        f"Children present: {_bool_label(a.get('children_present'))}",
+        f"Other dogs: {'Yes — ' + (a.get('other_dogs_detail') or _NOT_PROVIDED) if a.get('other_dogs') else _bool_label(a.get('other_dogs'))}",
         "",
-        f"Involves aggression: {'Yes' if a.get('involves_aggression') else 'No'}",
+        "## Routine & history",
+        f"Walks per day: {_walks_label(a)}",
+        f"Other behavior problems reported by owner: {_str_label(a.get('other_behavior_problems'))}",
+        f"Has attended dog training school: {training_str}",
+        f"Favorite reinforcer (motivator): {fav_str}",
+        "",
+        "## Behavior problem",
+        f"Problem description: {_str_label(a.get('problem_description'))}",
+        f"When it happens: {_str_label(a.get('when_it_happens'))}",
+        f"Frequency: {a.get('frequency') or _NOT_PROVIDED}",
+        f"Where: {_str_label(a.get('where_it_happens'))}",
+        f"Who is present: {_str_label(a.get('who_is_present'))}",
+        f"Involves aggression: {_bool_label(a.get('involves_aggression'))}",
     ]
-    if a.get("involves_aggression") and a.get("aggression_distance_cm"):
+
+    if a.get("involves_aggression") and a.get("aggression_distance_cm") is not None:
         lines.append(f"Aggression onset distance: {a['aggression_distance_cm']} cm")
 
-    if a.get("previous_attempts"):
-        lines.append(f"Previous attempts: {a['previous_attempts']}")
-    if a.get("owner_theory"):
-        lines.append(f"Owner's theory: {a['owner_theory']}")
+    lines.append("")
+    lines.append("## Owner-provided extra context")
+    lines.append(f"Previous attempts: {_str_label(a.get('previous_attempts'))}")
+    lines.append(f"Owner's theory: {_str_label(a.get('owner_theory'))}")
+    lines.append(f"Major event/change before problem started: {_str_label(a.get('prior_event'))}")
 
     lines.append("</anamnesis>")
     return "\n".join(lines)

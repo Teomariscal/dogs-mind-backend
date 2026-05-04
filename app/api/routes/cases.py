@@ -53,6 +53,13 @@ SEGUIMIENTO_TOKEN_COST = 1.5  # plantilla + respuesta IA Sonnet 4.6 + RAG
 PLAN_SIMPLE_TOKEN_COST = 0.1
 PLAN_SIMPLE_RATE_LIMIT_PER_HOUR = 5
 PLAN_SIMPLE_MAX_OUTPUT_TOKENS = 800
+
+# ABC Explained / Cecilia te explica — INVARIANTE FINANCIERA (CFO 2026-05-04).
+# Haiku 4.5 traduce análisis ABC técnico a 4 párrafos accesibles. Mismo patrón
+# que Plan Sencillo (96 % margen, persistencia, rate limit 5/h por caso).
+ABC_EXPLAINED_TOKEN_COST = 0.1
+ABC_EXPLAINED_RATE_LIMIT_PER_HOUR = 5
+ABC_EXPLAINED_MAX_OUTPUT_TOKENS = 600
 SEGUIMIENTO_MAX_OBSERVACIONES_CHARS = 1500  # límite anti-abuso, alineado con chat clínico cap
 SEGUIMIENTO_MAX_INFO_EXTRA_CHARS = 1000     # ~4 frases típicas
 SEGUIMIENTO_MAX_MOTIVO_RESUMIDO_CHARS = 300 # 1 frase
@@ -928,6 +935,149 @@ def generate_plan_simple(
         pass
 
     return PlanSimpleResponse(
+        text=ai_result.text,
+        cached=False,
+        balance_after=new_balance,
+        created_at=entry.created_at,
+        case_id=str(case.id),
+    )
+
+
+# ── ABC Explained / Cecilia te explica ──────────────────────────────────────
+class AbcExplainedResponse(BaseModel):
+    text: str
+    cached: bool
+    balance_after: Optional[float]
+    created_at: datetime
+    case_id: str
+
+
+@router.post("/{case_id}/abc-explained", response_model=AbcExplainedResponse)
+def generate_abc_explained(
+    case_id: str,
+    force: bool = Query(False, description="Si true, regenera ignorando cached (cobra otros 0,1)"),
+    lang: str = Query("es", description="'es' (default) o 'en'"),
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """
+    Cecilia te explica — versión accesible del análisis funcional ABC.
+
+    Mismas invariantes financieras que Plan Sencillo (CFO 2026-05-04):
+      - 0,1 tokens por generación.
+      - Persistencia: si existe `CaseEntry.type='abc_explained'`, devuelve
+        cached SIN cobro. Solo la primera (o force=true) cobra.
+      - Rate limit 5 generaciones por caso por hora.
+      - Modelo: Haiku 4.5, output ≤600 tokens (≈4 párrafos 200-350 palabras).
+
+    Errores:
+      - 404 si el caso aún no tiene análisis ABC generado.
+      - 429 si superó rate limit.
+      - 402 si saldo insuficiente.
+    """
+    case = _get_owned_case(case_id, user, db)
+
+    # 1. Cached → devolver sin cobro
+    if not force:
+        cached = (
+            db.query(CaseEntry)
+            .filter(CaseEntry.case_id == case.id, CaseEntry.type == "abc_explained")
+            .order_by(CaseEntry.created_at.desc())
+            .first()
+        )
+        if cached and cached.content:
+            return AbcExplainedResponse(
+                text=cached.content,
+                cached=True,
+                balance_after=float(user.tokens),
+                created_at=cached.created_at,
+                case_id=str(case.id),
+            )
+
+    # 2. Verificar que existe análisis ABC previo (input)
+    abc_entry = (
+        db.query(CaseEntry)
+        .filter(CaseEntry.case_id == case.id, CaseEntry.type == "abc")
+        .order_by(CaseEntry.created_at.desc())
+        .first()
+    )
+    if not abc_entry or not abc_entry.content:
+        raise HTTPException(
+            status_code=404,
+            detail="Necesitas generar primero el análisis funcional ABC.",
+        )
+
+    # 3. Rate limit (5 generaciones/h por caso)
+    one_hour_ago = datetime.utcnow() - timedelta(hours=1)
+    recent_count = (
+        db.query(CaseEntry)
+        .filter(
+            CaseEntry.case_id == case.id,
+            CaseEntry.type == "abc_explained",
+            CaseEntry.created_at >= one_hour_ago,
+        )
+        .count()
+    )
+    if recent_count >= ABC_EXPLAINED_RATE_LIMIT_PER_HOUR:
+        raise HTTPException(
+            status_code=429,
+            detail=(
+                f"Has alcanzado el máximo de {ABC_EXPLAINED_RATE_LIMIT_PER_HOUR} "
+                "generaciones por hora. Espera un momento e inténtalo de nuevo."
+            ),
+        )
+
+    # 4. Cobrar 0,1 tokens ANTES de invocar IA
+    new_balance = _charge_user_tokens(user, ABC_EXPLAINED_TOKEN_COST, db)
+
+    # 5. Llamar Haiku 4.5
+    try:
+        from app.services.abc_explained_ai import run_abc_explained
+        ai_result = run_abc_explained(
+            original_abc_text=abc_entry.content,
+            lang=lang,
+        )
+    except Exception as e:
+        # Refund si falla la IA
+        user.tokens = float(user.tokens) + ABC_EXPLAINED_TOKEN_COST
+        db.commit()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error generando explicación: {str(e)[:200]}",
+        )
+
+    # 6. Persistir entry tipo 'abc_explained'
+    settings = get_settings()
+    entry = CaseEntry(
+        case_id=case.id,
+        type="abc_explained",
+        content=ai_result.text,
+        ai_model=settings.avatar_model,
+        input_tokens=ai_result.input_tokens,
+        output_tokens=ai_result.output_tokens,
+        tokens_charged=ABC_EXPLAINED_TOKEN_COST,
+    )
+    db.add(entry)
+    case.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(entry)
+
+    # 7. Tracking
+    try:
+        from app.core.usage_tracker import log_usage
+        log_usage(
+            user_id=str(user.id),
+            endpoint="/cases/abc-explained",
+            model=settings.avatar_model,
+            input_tokens=ai_result.input_tokens,
+            output_tokens=ai_result.output_tokens,
+            tokens_charged=ABC_EXPLAINED_TOKEN_COST,
+            success="ok",
+        )
+    except Exception:
+        pass
+
+    return AbcExplainedResponse(
         text=ai_result.text,
         cached=False,
         balance_after=new_balance,

@@ -658,6 +658,99 @@ def export_case_pdf(
     )
 
 
+@router.get("/{case_id}/plan-simple/pdf")
+def export_plan_simple_pdf(
+    case_id: str,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """
+    PDF de la versión accesible del plan (Plan Sencillo · Pet Owners).
+
+    Sin coste en tokens — solo formatea el `CaseEntry.type='plan_simple'`
+    ya generado y persistido. Si todavía no se ha generado, devuelve 404.
+
+    Cabecera: misma que el informe principal — logo TDM + nombre del perro
+    + fecha. Si el usuario es profesional con logo de empresa subido,
+    aparece en el margen opuesto. Sin datos del cliente humano.
+    """
+    from app.services.pdf_export import (
+        build_plan_simple_pdf, build_simple_pdf_filename,
+    )
+
+    case = _get_owned_case(case_id, user, db)
+
+    cached = (
+        db.query(CaseEntry)
+        .filter(CaseEntry.case_id == case.id, CaseEntry.type == "plan_simple")
+        .order_by(CaseEntry.created_at.desc())
+        .first()
+    )
+    if not cached or not cached.content:
+        raise HTTPException(
+            status_code=404,
+            detail="Aún no has generado el plan sencillo de este caso.",
+        )
+
+    pdf_bytes = build_plan_simple_pdf(case, user, db)
+    filename = build_simple_pdf_filename(case, db, kind="plan-simple")
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Length": str(len(pdf_bytes)),
+            "Cache-Control": "private, max-age=0, must-revalidate",
+        },
+    )
+
+
+@router.get("/{case_id}/abc-explained/pdf")
+def export_abc_explained_pdf(
+    case_id: str,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """
+    PDF de la versión accesible del análisis ABC ("Cecilia te explica").
+
+    Sin coste en tokens — solo formatea el `CaseEntry.type='abc_explained'`
+    ya generado y persistido. Si todavía no se ha generado, devuelve 404.
+    Mismas garantías de cabecera que el resto de exports.
+    """
+    from app.services.pdf_export import (
+        build_abc_explained_pdf, build_simple_pdf_filename,
+    )
+
+    case = _get_owned_case(case_id, user, db)
+
+    cached = (
+        db.query(CaseEntry)
+        .filter(CaseEntry.case_id == case.id, CaseEntry.type == "abc_explained")
+        .order_by(CaseEntry.created_at.desc())
+        .first()
+    )
+    if not cached or not cached.content:
+        raise HTTPException(
+            status_code=404,
+            detail="Aún no has generado la explicación accesible de este análisis ABC.",
+        )
+
+    pdf_bytes = build_abc_explained_pdf(case, user, db)
+    filename = build_simple_pdf_filename(case, db, kind="abc-explained")
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Length": str(len(pdf_bytes)),
+            "Cache-Control": "private, max-age=0, must-revalidate",
+        },
+    )
+
+
 @router.post("/{case_id}/entries", response_model=CaseEntryResponse, status_code=status.HTTP_201_CREATED)
 def add_anamnesis_entry(
     case_id: str,

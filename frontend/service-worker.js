@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v34 (fix iOS Safari < 16.4: regex sin lookbehind)
+// Dogs Mind Service Worker — v50 (s-abc-translated + Download PDF en plan-simple y abc-translated, logo empresa en ambos PDFs)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v34';
+const CACHE_NAME = 'dogs-mind-v50';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

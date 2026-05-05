@@ -434,3 +434,104 @@ def build_export_filename(case: Case, db: Session) -> str:
     dog_label = _resolve_dog_label(case, db)
     slug = re.sub(r"[^A-Za-z0-9_-]+", "_", dog_label.strip()) or "caso"
     return f"informe_{slug}_{datetime.utcnow().strftime('%Y%m%d')}.pdf"
+
+
+# ── PDFs para variantes accesibles (Plan Sencillo + ABC explained) ──────────
+#
+# Mismo header/footer que `build_case_pdf` (logo TDM + logo empresa si
+# profesional con logo subido + nombre perro + fecha + disclaimer + paginación).
+# Solo cambia el contenido y el título de sección.
+
+def _build_simple_pdf(
+    case: Case,
+    user: User,
+    db: Session,
+    *,
+    section_title: str,
+    body_md: str,
+    pdf_title_prefix: str,
+) -> bytes:
+    """Builder común para los PDFs accesibles (plan-simple, abc-explained)."""
+    if not body_md or not body_md.strip():
+        raise ValueError("PDF builder llamado sin contenido.")
+
+    styles      = _build_styles()
+    dog_label   = _resolve_dog_label(case, db)
+    report_date = datetime.utcnow().strftime("%d/%m/%Y")
+    company_name  = user.company_name if user.account_type == "professional" else None
+    company_logo  = (
+        _decode_logo_data_url(user.company_logo_base64)
+        if user.account_type == "professional" and user.company_logo_base64
+        else None
+    )
+
+    buf = io.BytesIO()
+    doc = BaseDocTemplate(
+        buf,
+        pagesize=A4,
+        leftMargin=PAGE_MARGIN, rightMargin=PAGE_MARGIN,
+        topMargin=PAGE_MARGIN + LOGO_SIZE + 0.6 * cm,
+        bottomMargin=PAGE_MARGIN + 1.8 * cm,
+        title=f"{pdf_title_prefix} — {dog_label} — {report_date}",
+        author="The Dogs Mind",
+    )
+    frame = Frame(
+        doc.leftMargin, doc.bottomMargin,
+        doc.width, doc.height, id="content",
+    )
+
+    def _on_page(canvas, doc_):
+        _draw_header_footer(
+            canvas, doc_,
+            dog_label=dog_label,
+            report_date=report_date,
+            company_name=company_name,
+            company_logo_image=company_logo,
+        )
+
+    doc.addPageTemplates([PageTemplate(id="default", frames=[frame], onPage=_on_page)])
+
+    story: List = []
+    story.append(Paragraph(section_title, styles["section_title"]))
+    story.append(HRFlowable(width="100%", thickness=0.5, color=TDM_COLOR_GREEN, spaceAfter=8))
+    story.extend(markdown_to_flowables(body_md, styles))
+
+    doc.build(story)
+    return buf.getvalue()
+
+
+def build_plan_simple_pdf(case: Case, user: User, db: Session) -> bytes:
+    """PDF de la versión accesible del plan (Plan Sencillo · Pet Owners)."""
+    body = _latest_entry_content(case.id, "plan_simple", db)
+    if not body:
+        raise ValueError("El caso no tiene aún plan sencillo generado.")
+    return _build_simple_pdf(
+        case, user, db,
+        section_title="Plan sencillo · Pet Owners",
+        body_md=body,
+        pdf_title_prefix="Plan sencillo",
+    )
+
+
+def build_abc_explained_pdf(case: Case, user: User, db: Session) -> bytes:
+    """PDF de la versión accesible del análisis ABC (Cecilia te explica)."""
+    body = _latest_entry_content(case.id, "abc_explained", db)
+    if not body:
+        raise ValueError("El caso no tiene aún explicación accesible del análisis ABC.")
+    return _build_simple_pdf(
+        case, user, db,
+        section_title="Cecilia te explica",
+        body_md=body,
+        pdf_title_prefix="Análisis explicado",
+    )
+
+
+def build_simple_pdf_filename(case: Case, db: Session, *, kind: str) -> str:
+    """Filename para los PDFs accesibles. kind ∈ {'plan-simple','abc-explained'}."""
+    dog_label = _resolve_dog_label(case, db)
+    slug = re.sub(r"[^A-Za-z0-9_-]+", "_", dog_label.strip()) or "caso"
+    prefix = {
+        "plan-simple": "plan_sencillo",
+        "abc-explained": "analisis_explicado",
+    }.get(kind, "informe")
+    return f"{prefix}_{slug}_{datetime.utcnow().strftime('%Y%m%d')}.pdf"

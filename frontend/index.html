@@ -7138,6 +7138,15 @@ async function onPlanSimple() {
   }
   var rec = _resolveActiveRecord('plan');
   if (!rec) {
+    // Diagnóstico explícito en consola — para entender por qué falla en tu navegador.
+    var dbg = {
+      records_count: (typeof getRecords === 'function' ? getRecords().length : -1),
+      _lastInterventionPlan_len: (window._lastInterventionPlan || '').length,
+      _lastAnalysisText_len: (window._lastAnalysisText || '').length,
+      _lastAnamnesisData: !!window._lastAnamnesisData,
+      _seguimientoState: !!(window._seguimientoState && window._seguimientoState.caseId),
+    };
+    console.warn('[plan-simple] No se pudo resolver record activo. Debug:', dbg);
     showToast(_i18nText('pp_err_no_plan', 'Genera primero un plan de intervención.'));
     return;
   }
@@ -7408,6 +7417,13 @@ async function onAbcExplainSimple() {
   }
   var rec = _resolveActiveRecord('analysis');
   if (!rec) {
+    var dbg = {
+      records_count: (typeof getRecords === 'function' ? getRecords().length : -1),
+      _lastInterventionPlan_len: (window._lastInterventionPlan || '').length,
+      _lastAnalysisText_len: (window._lastAnalysisText || '').length,
+      _lastAnamnesisData: !!window._lastAnamnesisData,
+    };
+    console.warn('[abc-explained] No se pudo resolver record activo. Debug:', dbg);
     showToast(_i18nText('at_err_no_abc', 'Genera primero el análisis funcional ABC.'));
     return;
   }

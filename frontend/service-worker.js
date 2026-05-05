@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v52 (fix: Plan Sencillo / ABC explicado funcionan ANTES de aceptar intervención — record virtual + reuse case_id en accept)
+// Dogs Mind Service Worker — v53 (debug: log diagnóstico en consola cuando Plan Sencillo / ABC no resuelven record activo)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v52';
+const CACHE_NAME = 'dogs-mind-v53';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

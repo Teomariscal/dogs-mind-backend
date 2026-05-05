@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v50 (s-abc-translated + Download PDF en plan-simple y abc-translated, logo empresa en ambos PDFs)
+// Dogs Mind Service Worker — v51 (fix: botón atrás del chat de Cecilia vuelve a s-tracking/s-abc cuando viene del flujo clínico)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v50';
+const CACHE_NAME = 'dogs-mind-v51';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

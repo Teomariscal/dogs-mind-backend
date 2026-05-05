@@ -5487,7 +5487,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
         <div class="chat-hdr-status" id="chat-hdr-status"><div class="online-dot"></div><span data-i18n="chat_status_default">Educadora personal · Online</span></div>
       </div>
       <div class="tok-badge" id="tok-chat">5 tok.</div>
-      <div class="back-round" onclick="goTo('s-home')">←</div>
+      <div class="back-round" onclick="chatBack()">←</div>
     </div>
 
     <div class="msgs" id="msgs">
@@ -7090,8 +7090,25 @@ function askCecilia(context) {
   if (typeof selectAv === 'function') selectAv('cecilia');
   else activeAv = 'cecilia';
   confirmAvatar();
+  // Tras confirmAvatar() (sincrónico, ya navegamos a s-chat), registramos la
+  // pantalla origen para que el botón "atrás" del chat devuelva al usuario al
+  // plan / análisis y no a s-home — si entró aquí desde el flujo clínico, no
+  // ha aceptado todavía la intervención y debe poder volver al botón "Aceptar".
+  if (context === 'plan')          window._chat_return_to = 's-tracking';
+  else if (context === 'analysis') window._chat_return_to = 's-abc';
 }
 window.askCecilia = askCecilia;
+
+// Botón "atrás" del chat. Si venimos del flujo clínico (askCecilia con
+// contexto plan/análisis), volvemos al sitio del que vinimos — sin esto, el
+// usuario que pulsa "Chat con Cecilia" para resolver una duda antes de aceptar
+// el plan acaba devuelto a s-home y pierde el caso.
+function chatBack() {
+  var ret = window._chat_return_to;
+  window._chat_return_to = null;  // consumir, no afectar futuras visitas
+  goTo(ret || 's-home');
+}
+window.chatBack = chatBack;
 
 // ── Botón "¿De qué se trata?" → pantalla educativa estática ─────────────────
 function _proximamenteToast() {

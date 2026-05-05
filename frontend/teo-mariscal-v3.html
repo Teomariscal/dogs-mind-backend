@@ -7136,19 +7136,7 @@ async function onPlanSimple() {
     goTo('s-splash');
     return;
   }
-  // Encontrar el record activo (último que tenga r.plan)
-  var records = (typeof getRecords === 'function') ? getRecords() : [];
-  // Heurística: usar el record con backend_case_id activo según _seguimientoState,
-  // o el primer record con plan generado si abrimos desde s-tracking del flujo nuevo.
-  var rec = null;
-  if (window._seguimientoState && window._seguimientoState.caseId) {
-    // Caso ya migrado al backend
-    rec = records.find(function(r) { return r.backend_case_id === window._seguimientoState.caseId; }) || null;
-  }
-  if (!rec) {
-    // Tomar el más reciente con plan
-    rec = records.find(function(r) { return r.plan && r.plan.length > 50; });
-  }
+  var rec = _resolveActiveRecord('plan');
   if (!rec) {
     showToast(_i18nText('pp_err_no_plan', 'Genera primero un plan de intervención.'));
     return;
@@ -7156,6 +7144,54 @@ async function onPlanSimple() {
   await _planSimpleFlow(rec, { force: false });
 }
 window.onPlanSimple = onPlanSimple;
+
+// Encuentra el record activo para los flows accesibles (Plan Sencillo /
+// ABC explicado). El caso PUEDE no estar todavía en localStorage si el
+// usuario no ha pulsado "Aceptar intervención" — en ese caso construimos
+// un record virtual a partir de los globales de la pantalla actual y
+// dejamos que _planSimpleFlow / _abcExplainedFlow hagan la lazy-migration
+// al backend (el case_id resultante se reusa luego en acceptIntervention
+// vía window._inflightBackendCaseId, sin duplicar cases).
+//   kind: 'plan' (necesita _lastInterventionPlan) o 'analysis' (necesita _lastAnalysisText)
+function _resolveActiveRecord(kind) {
+  var records = (typeof getRecords === 'function') ? getRecords() : [];
+  var rec = null;
+
+  // 1. Caso ya migrado y reflejado en localStorage (flujo seguimiento)
+  if (window._seguimientoState && window._seguimientoState.caseId) {
+    rec = records.find(function(r) { return r.backend_case_id === window._seguimientoState.caseId; }) || null;
+  }
+
+  // 2. Record persistido más reciente con el contenido pedido
+  if (!rec) {
+    rec = records.find(function(r) {
+      if (kind === 'analysis') return r.analysis && r.analysis.length > 50;
+      return r.plan && r.plan.length > 50;
+    }) || null;
+  }
+  if (rec) return rec;
+
+  // 3. Caso aún no aceptado: construir record virtual desde los globales de la pantalla
+  var hasPlan      = window._lastInterventionPlan && window._lastInterventionPlan.length > 50;
+  var hasAnalysis  = window._lastAnalysisText && window._lastAnalysisText.length > 50;
+  if (kind === 'plan' && !hasPlan) return null;
+  if (kind === 'analysis' && !hasAnalysis) return null;
+
+  var anam = window._lastAnamnesisData || {};
+  return {
+    id:               Date.now(),
+    date:             new Date().toLocaleDateString('es-ES'),
+    dog_name:         anam.dog_name || window._lastDogName || '',
+    breed:            anam.breed || '',
+    dog_age:          anam.dog_age || '',
+    problem:          anam.problem_description || '',
+    analysis:         window._lastAnalysisText || '',
+    plan:             window._lastInterventionPlan || '',
+    status:           'active',
+    backend_case_id:  window._inflightBackendCaseId || null,
+    _virtual:         true,  // marca interna — no está aún en localStorage
+  };
+}
 
 async function _planSimpleFlow(rec, opts) {
   opts = opts || {};
@@ -7196,6 +7232,10 @@ async function _planSimpleFlow(rec, opts) {
       if (idx >= 0) {
         recs[idx].backend_case_id = caseId;
         if (typeof setRecords === 'function') setRecords(recs);
+      } else if (rec && rec._virtual) {
+        // Caso aún no aceptado: guardar el case_id en global para que
+        // acceptIntervention lo reuse y no duplique el caso en backend.
+        window._inflightBackendCaseId = caseId;
       }
     } catch (e) {
       showToast(_i18nText('pp_err_sync', 'No se pudo sincronizar el caso.'));
@@ -7366,15 +7406,7 @@ async function onAbcExplainSimple() {
     goTo('s-splash');
     return;
   }
-  // Encontrar el record activo (último que tenga r.analysis)
-  var records = (typeof getRecords === 'function') ? getRecords() : [];
-  var rec = null;
-  if (window._seguimientoState && window._seguimientoState.caseId) {
-    rec = records.find(function(r) { return r.backend_case_id === window._seguimientoState.caseId; }) || null;
-  }
-  if (!rec) {
-    rec = records.find(function(r) { return r.analysis && r.analysis.length > 50; });
-  }
+  var rec = _resolveActiveRecord('analysis');
   if (!rec) {
     showToast(_i18nText('at_err_no_abc', 'Genera primero el análisis funcional ABC.'));
     return;
@@ -7422,6 +7454,9 @@ async function _abcExplainedFlow(rec, opts) {
       if (idx >= 0) {
         recs[idx].backend_case_id = caseId;
         if (typeof setRecords === 'function') setRecords(recs);
+      } else if (rec && rec._virtual) {
+        // Caso aún no aceptado: ver comentario equivalente en _planSimpleFlow.
+        window._inflightBackendCaseId = caseId;
       }
     } catch (e) {
       showToast(_i18nText('at_err_sync', 'No se pudo sincronizar el caso.'));
@@ -8692,6 +8727,12 @@ function getVal(id, fallback) {
       plan:     window._lastInterventionPlan || '',
       status:   'active'
     };
+    // Si plan-simple/abc-explained ya migraron el caso al backend antes del
+    // accept, reusar ese case_id para no duplicar el caso en backend.
+    if (window._inflightBackendCaseId) {
+      record.backend_case_id = window._inflightBackendCaseId;
+      window._inflightBackendCaseId = null;
+    }
     try {
       var records = getRecords();
       records.unshift(record);

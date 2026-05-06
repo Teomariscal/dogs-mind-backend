@@ -4472,6 +4472,175 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 #s-pro-area .pro-card-cta[disabled] {
   cursor: default; opacity: 0.7;
 }
+
+/* Precio dentro de la card Profesional, justo encima del CTA */
+#s-pro-area .pro-card-price-row {
+  display:flex;align-items:baseline;gap:10px;
+  margin:14px 0 12px;
+}
+#s-pro-area .pro-card-price {
+  font-family: var(--ff-serif, Georgia, serif);
+  font-size: 26px; font-weight: 600;
+  color: var(--pro-text-strong, #fff);
+  letter-spacing: -0.01em;
+}
+#s-pro-area .pro-card-price-sub {
+  font-size: 11px; font-weight: 500;
+  color: var(--pro-text-muted, rgba(255,255,255,0.65));
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ══════════════════════════════════════
+   S-PRO-ACTIVATE — pre-checkout (membresía + bundle opcional)
+══════════════════════════════════════ */
+#s-pro-activate {
+  background:var(--cm-bg);
+  flex-direction:column;
+}
+#s-pro-activate .pa-header{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:max(env(safe-area-inset-top, 0), 18px) 18px 14px;
+  border-bottom:1px solid var(--cm-divider);
+  background:var(--cm-bg-elevated);
+  position:sticky;top:0;z-index:10;flex-shrink:0;
+}
+#s-pro-activate .pa-back{
+  width:36px;height:36px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:50%;
+  background:#fff;border:1.5px solid var(--cm-border-strong);
+  cursor:pointer;font-size:16px;color:var(--cm-text);
+}
+#s-pro-activate .pa-back:hover{ background:var(--cm-bg-soft); }
+#s-pro-activate .pa-eyebrow{
+  font-family:var(--cm-font-mono);
+  font-size:10px;font-weight:600;
+  letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--cm-cyan);margin:0 0 4px;
+}
+#s-pro-activate .pa-title{
+  font-family:var(--cm-font-display);
+  font-size:22px;font-weight:600;line-height:1.2;
+  letter-spacing:-0.01em;color:var(--cm-text);margin:0;
+}
+#s-pro-activate .pa-body{
+  flex:1;overflow-y:auto;
+  padding:22px 16px 12px;
+}
+#s-pro-activate .pa-summary-card{
+  background:var(--cm-bg-elevated);
+  border:1px solid var(--cm-border);
+  border-radius:var(--cm-r-md);
+  padding:16px 18px;
+  box-shadow:var(--cm-shadow-card);
+  margin-bottom:18px;
+}
+#s-pro-activate .pa-summary-row{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
+}
+#s-pro-activate .pa-summary-label{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;}
+#s-pro-activate .pa-summary-label strong{
+  font-family:var(--cm-font-ui);font-size:14px;font-weight:600;
+  color:var(--cm-text);
+}
+#s-pro-activate .pa-summary-hint{
+  font-size:12px;color:var(--cm-text-muted);line-height:1.5;
+}
+#s-pro-activate .pa-summary-amount{
+  font-family:var(--cm-font-display);font-size:18px;font-weight:600;
+  color:var(--cm-green-deep);white-space:nowrap;flex-shrink:0;
+}
+#s-pro-activate .pa-section-label{
+  font-family:var(--cm-font-mono);
+  font-size:10px;font-weight:600;
+  letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--cm-text-subtle);
+  margin:0 0 8px 4px;
+}
+#s-pro-activate .pa-bundle-card{
+  display:flex;align-items:flex-start;gap:14px;
+  background:var(--cm-bg-elevated);
+  border:1.5px solid var(--cm-border);
+  border-radius:var(--cm-r-md);
+  padding:16px 18px;
+  cursor:pointer;
+  transition:border-color 200ms ease, background 200ms ease;
+  margin-bottom:18px;
+}
+#s-pro-activate .pa-bundle-card:has(input:checked){
+  border-color:var(--cm-cyan);
+  background:var(--cm-cyan-soft);
+}
+#s-pro-activate .pa-bundle-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;}
+#s-pro-activate .pa-bundle-row-top{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:10px;
+}
+#s-pro-activate .pa-bundle-row-top strong{
+  font-family:var(--cm-font-ui);font-size:14px;font-weight:600;
+  color:var(--cm-text);
+}
+#s-pro-activate .pa-bundle-prices{
+  display:flex;flex-direction:column;align-items:flex-end;gap:0;
+}
+#s-pro-activate .pa-bundle-strike{
+  font-size:11px;color:var(--cm-text-muted);
+  text-decoration:line-through;line-height:1;
+}
+#s-pro-activate .pa-bundle-now{
+  font-family:var(--cm-font-display);
+  font-size:16px;font-weight:600;
+  color:var(--cm-cyan);line-height:1.1;
+}
+#s-pro-activate .pa-bundle-tag{
+  display:inline-block;
+  align-self:flex-start;
+  font-family:var(--cm-font-mono);
+  font-size:10px;font-weight:700;
+  letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--cm-cyan);
+  background:var(--cm-cyan-soft);
+  padding:3px 8px;border-radius:6px;
+}
+#s-pro-activate .pa-bundle-hint{
+  font-size:12px;color:var(--cm-text-muted);line-height:1.5;
+}
+#s-pro-activate .pa-total-row{
+  display:flex;align-items:baseline;justify-content:space-between;
+  padding:14px 18px;
+  background:var(--cm-bg-soft);
+  border-radius:var(--cm-r-md);
+  margin-bottom:14px;
+}
+#s-pro-activate .pa-total-label{
+  font-family:var(--cm-font-mono);font-size:11px;font-weight:600;
+  letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--cm-text-subtle);
+}
+#s-pro-activate .pa-total-amount{
+  font-family:var(--cm-font-display);font-size:24px;font-weight:600;
+  color:var(--cm-green-deep);
+}
+#s-pro-activate .pa-disclaimer{
+  font-family:var(--cm-font-ui);
+  font-size:11.5px;line-height:1.55;
+  color:var(--cm-text-subtle);
+  text-align:center;
+  margin:0 8px;font-style:italic;
+}
+#s-pro-activate .pa-msg{
+  font-family:var(--cm-font-ui);
+  font-size:12px;text-align:center;
+  margin:10px 0 0;min-height:16px;
+  color:#a04040;
+}
+#s-pro-activate .pa-actions{
+  display:flex;flex-direction:column;gap:10px;
+  padding:14px 16px max(env(safe-area-inset-bottom, 0), 24px);
+  background:var(--cm-bg-elevated);
+  border-top:1px solid var(--cm-divider);
+  flex-shrink:0;
+}
 @media (prefers-reduced-motion: no-preference) {
   #s-pro-area.active .pro-card {
     opacity: 0;
@@ -6993,7 +7162,11 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
           <li data-i18n="pro_pro_feat_3">Registro completo de casos y seguimientos</li>
           <li data-i18n="pro_pro_feat_4">10 tokens de cortesía al activar la membresía</li>
         </ul>
-        <button class="pro-card-cta" disabled data-i18n="pro_cta_soon">Próximamente</button>
+        <div class="pro-card-price-row">
+          <span class="pro-card-price" data-i18n="pro_pro_price">20&nbsp;€/año</span>
+          <span class="pro-card-price-sub" data-i18n="pro_pro_price_sub">Pago único anual</span>
+        </div>
+        <button class="pro-card-cta" onclick="goTo('s-pro-activate')" data-i18n="pro_cta_activate">Activar Profesional</button>
       </article>
 
       <article class="pro-card pro-card--certified">
@@ -7029,6 +7202,62 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 
     </section>
   </div><!-- /s-pro-area -->
+
+  <!-- ══ S-PRO-ACTIVATE — Activar Profesional (Stripe Checkout) ══ -->
+  <div id="s-pro-activate" class="screen">
+    <div class="pa-header">
+      <button onclick="goTo('s-pro-area')" class="pa-back" aria-label="Volver">&#8592;</button>
+      <div style="flex:1;min-width:0;">
+        <p class="pa-eyebrow" data-i18n="pa_eyebrow">Activación</p>
+        <h1 class="pa-title" data-i18n="pa_title">Membresía Profesional</h1>
+      </div>
+    </div>
+
+    <div class="pa-body">
+      <!-- Resumen membresía -->
+      <div class="pa-summary-card">
+        <div class="pa-summary-row">
+          <div class="pa-summary-label">
+            <strong data-i18n="pa_membership">Membresía Profesional · 1 año</strong>
+            <span class="pa-summary-hint" data-i18n="pa_membership_hint">Acceso a todas las funciones Profesional + 10 tokens de cortesía.</span>
+          </div>
+          <div class="pa-summary-amount">20,00&nbsp;€</div>
+        </div>
+      </div>
+
+      <!-- Bundle promo opcional -->
+      <div class="pa-section-label" data-i18n="pa_addon_section">Añadir al activar (oferta única)</div>
+      <label class="pa-bundle-card" for="pa-bundle-cb">
+        <input type="checkbox" id="pa-bundle-cb" onchange="paUpdateTotal()" style="width:22px;height:22px;cursor:pointer;flex-shrink:0;margin-top:2px;">
+        <div class="pa-bundle-info">
+          <div class="pa-bundle-row-top">
+            <strong data-i18n="pa_bundle_title">Pack Profesional · 60 tokens</strong>
+            <div class="pa-bundle-prices">
+              <span class="pa-bundle-strike">42,00&nbsp;€</span>
+              <span class="pa-bundle-now">37,80&nbsp;€</span>
+            </div>
+          </div>
+          <div class="pa-bundle-tag" data-i18n="pa_bundle_tag">−10 % solo al activar la membresía</div>
+          <div class="pa-bundle-hint" data-i18n="pa_bundle_hint">60 tokens adicionales con descuento exclusivo. Una sola vez.</div>
+        </div>
+      </label>
+
+      <!-- Total -->
+      <div class="pa-total-row">
+        <span class="pa-total-label" data-i18n="pa_total">Total</span>
+        <span class="pa-total-amount" id="pa-total">20,00&nbsp;€</span>
+      </div>
+
+      <p class="pa-disclaimer" data-i18n="pa_disclaimer">Pago único, no se renueva automáticamente. La activación se aplica en cuanto Stripe confirme el pago. Tu cuenta pasará a Profesional y se acreditarán los tokens cortesía.</p>
+
+      <p id="pa-msg" class="pa-msg"></p>
+    </div>
+
+    <div class="pa-actions">
+      <button id="pa-checkout-btn" class="cm-btn-primary cm-btn-block" onclick="paGoToCheckout()" data-i18n="pa_btn_checkout">Continuar al pago</button>
+      <button class="cm-btn-secondary cm-btn-block" onclick="goTo('s-pro-area')" data-i18n="pa_btn_cancel">Cancelar</button>
+    </div>
+  </div><!-- /s-pro-activate -->
 
   <!-- ══ S-ACCOUNT-TYPE — Pantalla intermedia: Particular vs Profesional ══ -->
   <div id="s-account-type" class="screen">
@@ -7188,6 +7417,14 @@ function goTo(id) {
   if (id === 's-tokens') updateTokensScreen();
   if (id === 's-home') fetchBalance();
   if (id === 's-pro-company' && typeof _pcOnEnter === 'function') _pcOnEnter();
+  if (id === 's-pro-activate') {
+    // Reset checkbox + total al entrar (no guardar estado entre visitas)
+    var cb = document.getElementById('pa-bundle-cb');
+    if (cb) cb.checked = false;
+    var msg = document.getElementById('pa-msg');
+    if (msg) msg.textContent = '';
+    if (typeof paUpdateTotal === 'function') paUpdateTotal();
+  }
   // Global nav show/hide
   var noNav = ['s-splash','s-login','s-refine','s-tour-intro'];
   var nav = document.getElementById('global-nav');
@@ -8183,6 +8420,121 @@ async function pcRemoveLogo() {
   }
 }
 window.pcRemoveLogo = pcRemoveLogo;
+
+// ── Activación Profesional (s-pro-activate → Stripe Checkout) ──────────────
+//
+// Flujo completo:
+//   1. Usuario en s-pro-area pulsa "Activar Profesional" → goTo('s-pro-activate').
+//   2. Pre-checkout permite añadir bundle 60 tokens promo (37,80 €, -10%).
+//   3. "Continuar al pago" → POST /payments/pro-checkout → recibe checkout_url
+//      → window.location.href = checkout_url (redirect a Stripe).
+//   4. Stripe procesa el pago. Webhook activa account_type='professional' +
+//      acredita 10 + 60 (si bundle) tokens.
+//   5. Stripe redirige de vuelta a APP_URL?payment=pro_success → al detectar
+//      ese param, refrescamos /me/account + saldo y mostramos toast.
+//
+// Importante: el webhook puede tardar unos segundos en procesarse. La pantalla
+// success refresca cada 2s (hasta 5 intentos) hasta que account_type=='professional'
+// se vea reflejado en /me/account, para que el slot Entidad aparezca al volver.
+
+function paUpdateTotal() {
+  var cb = document.getElementById('pa-bundle-cb');
+  var totalEl = document.getElementById('pa-total');
+  if (!totalEl) return;
+  var withBundle = !!(cb && cb.checked);
+  // 20,00 € + 37,80 € (si bundle) — formato europeo
+  totalEl.textContent = withBundle ? '57,80 €' : '20,00 €';
+}
+window.paUpdateTotal = paUpdateTotal;
+
+async function paGoToCheckout() {
+  var btn = document.getElementById('pa-checkout-btn');
+  var msg = document.getElementById('pa-msg');
+  if (!btn) return;
+  if (!getJWT()) {
+    showToast(_i18nText('seg_login_required', 'Inicia sesión.'));
+    goTo('s-splash');
+    return;
+  }
+  if (msg) msg.textContent = '';
+  var cb = document.getElementById('pa-bundle-cb');
+  var withBundle = !!(cb && cb.checked);
+
+  var prevText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = _i18nText('pa_btn_redirecting', 'Conectando con Stripe…');
+  try {
+    var res = await fetch(API_BASE + '/payments/pro-checkout', {
+      method: 'POST',
+      headers: Object.assign({'Content-Type': 'application/json'}, authHeaders()),
+      body: JSON.stringify({ with_bundle: withBundle }),
+    });
+    if (!res.ok) {
+      var detail = '';
+      try { var ed = await res.json(); detail = ed.detail || ''; } catch(e) {}
+      if (res.status === 401) { showToast(_i18nText('session_expired', 'Sesión caducada.')); goTo('s-splash'); return; }
+      if (res.status === 400) {
+        // Probablemente "ya eres profesional"
+        if (msg) msg.textContent = detail || _i18nText('pa_err_already_pro', 'Tu cuenta ya es Profesional.');
+        return;
+      }
+      if (msg) msg.textContent = detail || _i18nText('pa_err_checkout', 'No se pudo crear la sesión de pago.');
+      return;
+    }
+    var data = await res.json();
+    if (!data.checkout_url) {
+      if (msg) msg.textContent = _i18nText('pa_err_checkout', 'No se pudo crear la sesión de pago.');
+      return;
+    }
+    // Redirigir a Stripe (pantalla externa). La cuenta se activa por webhook.
+    window.location.href = data.checkout_url;
+  } catch (e) {
+    console.error('pa checkout:', e);
+    if (msg) msg.textContent = _i18nText('pa_err_checkout', 'No se pudo crear la sesión de pago.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = prevText;
+  }
+}
+window.paGoToCheckout = paGoToCheckout;
+
+// Detección al cargar: si volvemos de Stripe con success, refrescar account
+// hasta que el webhook haya activado el tier (poll suave ~10s).
+async function _checkProPaymentReturn() {
+  try {
+    var p = new URLSearchParams(window.location.search);
+    var status = p.get('payment');
+    if (!status) return;
+    if (status === 'pro_success') {
+      showToast(_i18nText('pa_success_processing', 'Confirmando tu pago…'));
+      // Limpiar URL para no repetir si recargan
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+      // Poll: hasta 5 intentos cada 2s, parando cuando account_type sea professional
+      for (var i = 0; i < 5; i++) {
+        await new Promise(function(r) { setTimeout(r, 2000); });
+        await loadAccountInfo();
+        await fetchBalance();
+        if (window._myAccount && window._myAccount.account_type === 'professional') {
+          showToast(_i18nText('pa_success_done', '¡Bienvenido a Profesional! Tokens acreditados.'));
+          goTo('s-home');
+          return;
+        }
+      }
+      // Tras 10s sin confirmación, mostrar mensaje suave (el webhook puede
+      // tardar más en raros casos; el usuario verá el cambio al recargar).
+      showToast(_i18nText('pa_success_pending', 'Tu pago está procesándose. Recarga en unos segundos.'));
+      goTo('s-home');
+    } else if (status === 'pro_cancelled') {
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+      showToast(_i18nText('pa_cancelled', 'Activación cancelada.'));
+    }
+  } catch (e) { /* ignorar */ }
+}
+window._checkProPaymentReturn = _checkProPaymentReturn;
 
 // ── Corporativo (área profesional) — abre mailto al contacto TDM ─────────────
 function onCorporateContact() {
@@ -10637,6 +10989,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Pequeño delay para permitir que i18n se aplique antes
   setTimeout(loadMyDogs, 50);
   setTimeout(loadAccountInfo, 60);
+  setTimeout(_checkProPaymentReturn, 80);
   _installDogProfileGuardian();
   _installSeguimientoGuardian();
 });
@@ -10644,6 +10997,7 @@ document.addEventListener('DOMContentLoaded', function() {
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
   setTimeout(loadMyDogs, 50);
   setTimeout(loadAccountInfo, 60);
+  setTimeout(_checkProPaymentReturn, 80);
   _installDogProfileGuardian();
   _installSeguimientoGuardian();
 }
@@ -11232,6 +11586,30 @@ function endTourIntro() {
       pp_meta_dog_default:  'Tu perro',
       pp_loading:           'Generando tu plan en lenguaje sencillo…',
       pp_disclaimer:        'Esta versión sencilla es un resumen accesible del plan técnico. No sustituye consulta presencial con etólogo o veterinario cuando el caso lo requiera.',
+      // Pro card precio + activar
+      pro_pro_price:           '20 €/año',
+      pro_pro_price_sub:       'Pago único anual',
+      pro_cta_activate:        'Activar Profesional',
+      // s-pro-activate (pre-checkout Stripe)
+      pa_eyebrow:              'Activación',
+      pa_title:                'Membresía Profesional',
+      pa_membership:           'Membresía Profesional · 1 año',
+      pa_membership_hint:      'Acceso a todas las funciones Profesional + 10 tokens de cortesía.',
+      pa_addon_section:        'Añadir al activar (oferta única)',
+      pa_bundle_title:         'Pack Profesional · 60 tokens',
+      pa_bundle_tag:           '−10 % solo al activar la membresía',
+      pa_bundle_hint:          '60 tokens adicionales con descuento exclusivo. Una sola vez.',
+      pa_total:                'Total',
+      pa_disclaimer:           'Pago único, no se renueva automáticamente. La activación se aplica en cuanto Stripe confirme el pago. Tu cuenta pasará a Profesional y se acreditarán los tokens cortesía.',
+      pa_btn_checkout:         'Continuar al pago',
+      pa_btn_redirecting:      'Conectando con Stripe…',
+      pa_btn_cancel:           'Cancelar',
+      pa_err_already_pro:      'Tu cuenta ya es Profesional.',
+      pa_err_checkout:         'No se pudo crear la sesión de pago.',
+      pa_success_processing:   'Confirmando tu pago…',
+      pa_success_done:         '¡Bienvenido a Profesional! Tokens acreditados.',
+      pa_success_pending:      'Tu pago está procesándose. Recarga en unos segundos.',
+      pa_cancelled:            'Activación cancelada.',
       pp_btn_pdf:           'Descargar PDF',
       pp_btn_print:         'Imprimir',
       pp_btn_share:         'Compartir',
@@ -11898,6 +12276,30 @@ function endTourIntro() {
       pp_meta_dog_default:  'Your dog',
       pp_loading:           'Generating your plan in plain language…',
       pp_disclaimer:        'This simple version is an accessible summary of the technical plan. It does not replace in-person consultation with an ethologist or vet when the case requires it.',
+      // Pro card price + activate
+      pro_pro_price:           '€20/year',
+      pro_pro_price_sub:       'One-time annual payment',
+      pro_cta_activate:        'Activate Professional',
+      // s-pro-activate (pre-checkout Stripe)
+      pa_eyebrow:              'Activation',
+      pa_title:                'Professional Membership',
+      pa_membership:           'Professional Membership · 1 year',
+      pa_membership_hint:      'Access to all Professional features + 10 courtesy tokens.',
+      pa_addon_section:        'Add at activation (one-time offer)',
+      pa_bundle_title:         'Professional Pack · 60 tokens',
+      pa_bundle_tag:           '−10% only when activating membership',
+      pa_bundle_hint:          '60 extra tokens with exclusive discount. One time only.',
+      pa_total:                'Total',
+      pa_disclaimer:           'One-time payment, does not auto-renew. Activation applies as soon as Stripe confirms the payment. Your account will become Professional and courtesy tokens will be credited.',
+      pa_btn_checkout:         'Continue to payment',
+      pa_btn_redirecting:      'Connecting to Stripe…',
+      pa_btn_cancel:           'Cancel',
+      pa_err_already_pro:      'Your account is already Professional.',
+      pa_err_checkout:         'Could not create the payment session.',
+      pa_success_processing:   'Confirming your payment…',
+      pa_success_done:         'Welcome to Professional! Tokens credited.',
+      pa_success_pending:      'Your payment is being processed. Refresh in a few seconds.',
+      pa_cancelled:            'Activation cancelled.',
       pp_btn_pdf:           'Download PDF',
       pp_btn_print:         'Print',
       pp_btn_share:         'Share',

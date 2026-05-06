@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v54 (slot Entidad en home + pantalla s-pro-company: datos empresa + upload logo, gating professional)
+// Dogs Mind Service Worker — v55 (Stripe Pro checkout: card Profesional activa + s-pro-activate con bundle promo + redirect Stripe + handler return)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v54';
+const CACHE_NAME = 'dogs-mind-v55';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

@@ -182,6 +182,44 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 }
 .menu-line{width:14px;height:1.5px;background:var(--text2);border-radius:1px;}
 
+/* Dropdown del menú hamburguesa (home) */
+.home-menu{
+  position:absolute;
+  top:calc(100% + 8px);
+  right:0;
+  z-index:50;
+  min-width:180px;
+  background:#ffffff;
+  border:1px solid var(--border, rgba(0,0,0,0.08));
+  border-radius:14px;
+  padding:6px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.05);
+  animation: homeMenuIn 160ms cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes homeMenuIn {
+  from { opacity:0; transform:translateY(-4px) scale(0.98); }
+  to   { opacity:1; transform:translateY(0)    scale(1); }
+}
+.home-menu-item{
+  display:block;
+  width:100%;
+  padding:10px 14px;
+  border:none;
+  background:transparent;
+  border-radius:10px;
+  font-family:var(--ff-sans, system-ui);
+  font-size:14px;font-weight:500;
+  color:var(--text, #1a2614);
+  text-align:left;
+  cursor:pointer;
+  transition:background 150ms ease;
+}
+.home-menu-item:hover{ background:var(--cream2, #f4efe2); }
+.home-menu-item--danger{
+  color:#a04040;
+}
+.home-menu-item--danger:hover{ background:#fff0f0; }
+
 /* HERO BANNER */
 .hero-banner{
   margin:0 16px;border-radius:var(--r);overflow:hidden;position:relative;
@@ -5194,11 +5232,15 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
           <div class="brand-by">by Teo Mariscal</div>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <div class="menu-btn">
+      <div style="display:flex;align-items:center;gap:8px;position:relative;">
+        <button class="menu-btn" onclick="toggleHomeMenu(event)" aria-label="Menú" type="button" style="background:none;border:none;cursor:pointer;padding:8px;">
           <div class="menu-line"></div>
           <div class="menu-line"></div>
           <div class="menu-line"></div>
+        </button>
+        <!-- Dropdown menu -->
+        <div id="home-menu" class="home-menu" style="display:none;" role="menu">
+          <button class="home-menu-item home-menu-item--danger" onclick="logout()" type="button" data-i18n="menu_logout">Cerrar sesión</button>
         </div>
       </div>
     </div>
@@ -10746,6 +10788,86 @@ function renderHomeProBadge() {
 }
 window.renderHomeProBadge = renderHomeProBadge;
 
+// ── Menú hamburguesa del home (dropdown) + Cerrar sesión ──────────────────
+function toggleHomeMenu(event) {
+  if (event && event.stopPropagation) event.stopPropagation();
+  var el = document.getElementById('home-menu');
+  if (!el) return;
+  el.style.display = (el.style.display === 'none' || !el.style.display) ? 'block' : 'none';
+}
+window.toggleHomeMenu = toggleHomeMenu;
+
+// Cerrar dropdown al clicar fuera
+document.addEventListener('click', function(e) {
+  var menu = document.getElementById('home-menu');
+  if (!menu || menu.style.display === 'none') return;
+  // Si el click NO viene del propio menú ni del botón hamburguesa, cerrar
+  if (!menu.contains(e.target) && !e.target.closest('.menu-btn')) {
+    menu.style.display = 'none';
+  }
+}, true);
+
+// También cerrar con Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key !== 'Escape') return;
+  var menu = document.getElementById('home-menu');
+  if (menu && menu.style.display !== 'none') menu.style.display = 'none';
+});
+
+// Cerrar sesión: borra TODA la sesión local + caches y vuelve al splash.
+function logout() {
+  if (!confirm(_i18nText('menu_logout_confirm', '¿Seguro que quieres cerrar sesión?'))) return;
+  try {
+    // Auth + role
+    localStorage.removeItem('dm_jwt');
+    localStorage.removeItem('dm_role');
+    localStorage.removeItem('dm_tokens');
+    // Records (los seguimos guardando solo si está logged-in; al cerrar mejor
+    // no dejarlos al alcance del siguiente usuario que use la misma máquina)
+    var keysToRemove = [];
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (!k) continue;
+      // Borrar TODO lo prefijado por 'dm_' (incluido behavioral_records_<userId>)
+      if (k.indexOf('dm_') === 0 || k.indexOf('dogs_mind_') === 0) {
+        keysToRemove.push(k);
+      }
+    }
+    keysToRemove.forEach(function(k) { localStorage.removeItem(k); });
+    // sessionStorage entero por si acaso
+    if (typeof sessionStorage !== 'undefined') sessionStorage.clear();
+  } catch(e) { /* ignorar */ }
+
+  // Reset state global en memoria
+  window._myAccount        = null;
+  window._myCompanyLogo    = null;
+  window._myDogs           = null;
+  window._lastAnalysisText      = '';
+  window._lastInterventionPlan  = '';
+  window._lastAnamnesisData     = null;
+  window._lastDogName           = '';
+  window._loadedFromArchive     = false;
+  window._inflightBackendCaseId = null;
+  window._pcReturnToActivate    = false;
+  window._chat_return_to        = null;
+  window._cecilia_context       = null;
+  window._seguimientoState      = null;
+  window._planSimpleState       = { caseId: null, lastText: null };
+  window._abcExplainedState     = { caseId: null, lastText: null };
+
+  // Cerrar dropdown
+  var menu = document.getElementById('home-menu');
+  if (menu) menu.style.display = 'none';
+
+  // Refresh visual del slot Entidad / badge / dogs row
+  if (typeof renderHomeDogs === 'function')      renderHomeDogs();
+  if (typeof renderHomeProBadge === 'function')  renderHomeProBadge();
+
+  showToast(_i18nText('menu_logout_done', 'Sesión cerrada.'));
+  goTo('s-splash');
+}
+window.logout = logout;
+
 function openCreateDog() {
   if (!getJWT()) {
     showToast(_i18nText('dog_login_required', '⚠️ Inicia sesión para crear un perro.'));
@@ -11949,6 +12071,9 @@ function endTourIntro() {
       home_entity_aria:     'Datos de empresa',
       home_pro_badge_eyebrow: 'Membresía activa',
       home_pro_badge:        'Usuario Profesional',
+      menu_logout:           'Cerrar sesión',
+      menu_logout_confirm:   '¿Seguro que quieres cerrar sesión?',
+      menu_logout_done:      'Sesión cerrada.',
       // s-pro-company (datos empresa + logo)
       pc_eyebrow:                 'Solo profesionales',
       pc_title:                   'Datos de empresa',
@@ -12646,6 +12771,9 @@ function endTourIntro() {
       home_entity_aria:     'Company details',
       home_pro_badge_eyebrow: 'Active membership',
       home_pro_badge:        'Professional User',
+      menu_logout:           'Sign out',
+      menu_logout_confirm:   'Are you sure you want to sign out?',
+      menu_logout_done:      'Signed out.',
       // s-pro-company (company info + logo)
       pc_eyebrow:                 'Professionals only',
       pc_title:                   'Company details',

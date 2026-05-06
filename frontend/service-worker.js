@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v57 (UX: datos empresa antes del pago + badge Usuario Profesional animado en home)
+// Dogs Mind Service Worker — v58 (botón Cerrar sesión en menú hamburguesa del home + cleanup completo de localStorage al logout)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v57';
+const CACHE_NAME = 'dogs-mind-v58';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

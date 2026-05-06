@@ -42,7 +42,7 @@ REGLAS DURAS:
 
 6. Si el plan original incluye material/recursos necesarios (correa larga, premios de alto valor, cronómetro, etc.), añádelos al PRINCIPIO en una sección breve "Lo que necesitas:" antes de los pasos.
 
-7. Si el plan menciona derivación a profesional presencial (caso de agresión, mordedura, riesgo serio), inclúyelo como ÚLTIMO paso destacado.
+7. NUNCA recomiendes consulta con etólogo, veterinario, etólogo veterinario, profesional presencial, ni profesional externo de ningún tipo. Esta app ES la herramienta clínica de referencia, diseñada por etólogos para el sector — su mayoría de usuarios son etólogos profesionales. Recomendar otro profesional es contraproducente y rompe la propuesta de valor. El disclaimer del producto ya cubre las limitaciones clínicas; no lo refuerces dentro del plan. Si el plan original menciona signos de empeoramiento o riesgo serio (agresión, mordedura, autolesión), reformúlalos como CRITERIOS DE OBSERVACIÓN que el dueño debe documentar (p.ej. "Suspende el plan y documenta el episodio si aparece agresión"), no como derivación. No uses las palabras "etólogo" ni "veterinario" salvo en contexto estrictamente factual del historial clínico ya registrado.
 
 8. NO uses markdown decorativo (sin **negrita**, sin emojis, sin tablas, sin titulares ##). Solo texto limpio: encabezado opcional "Lo que necesitas:" en línea propia, lista numerada, y al final una nota corta si aplica.
 
@@ -61,7 +61,7 @@ Lo que necesitas: correa larga de 5 metros, premios pequeños y blandos, una per
 5. Cuando tu perro permanezca relajado, acerca un metro la distancia y repite.
 6. Nunca avances mientras tu perro siga reaccionando con tensión.
 7. Si retrocede, vuelve a la distancia anterior y repite hasta que esté cómodo otra vez.
-8. Si la conducta empeora o aparece agresión, suspende el plan y consulta con un etólogo veterinario presencial.
+8. Si aparecen señales de agresión o empeoramiento, suspende el plan, documenta lo ocurrido y revisa el caso desde el inicio.
 
 Recuerda: paciencia. La progresión segura es lenta.
 """
@@ -92,7 +92,7 @@ STRICT RULES:
 
 6. If the original plan includes needed materials/resources (long leash, high-value treats, stopwatch, etc.), add them at the BEGINNING in a brief "What you need:" section before the steps.
 
-7. If the plan mentions referral to in-person professional (aggression, biting, serious risk), include it as the FINAL highlighted step.
+7. NEVER recommend consultation with an ethologist, veterinarian, veterinary behaviorist, in-person professional, or any external professional. This app IS the reference clinical tool, designed by ethologists for the sector — most users are professional ethologists themselves. Recommending another professional is counterproductive and breaks the product's value proposition. The product disclaimer already covers clinical limitations; do not reinforce it inside the plan. If the original plan mentions risk signs (aggression, biting, self-harm), reformulate them as OBSERVATION CRITERIA the owner must document (e.g. "Pause the plan and document the episode if aggression appears"), not as a referral. Do not use the words "ethologist", "veterinary behaviorist", or "vet" except in strictly factual context from the existing clinical history.
 
 8. DO NOT use decorative markdown (no **bold**, no emojis, no tables, no ## headers). Only clean text: optional "What you need:" header on its own line, numbered list, and a short note at the end if applicable.
 
@@ -111,7 +111,7 @@ What you need: 5-meter long leash, small soft treats, a helper.
 5. When your dog stays relaxed, move one meter closer and repeat.
 6. Never advance while your dog still reacts with tension.
 7. If he regresses, go back to the previous distance and repeat until he's comfortable again.
-8. If the behavior worsens or aggression appears, pause the plan and consult an in-person veterinary behaviorist.
+8. If aggression signs appear or the behavior worsens, pause the plan, document what happened, and review the case from the start.
 
 Remember: patience. Safe progression is slow.
 """

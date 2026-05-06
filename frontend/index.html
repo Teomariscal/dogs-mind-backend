@@ -384,6 +384,68 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 }
 
 /* ══════════════════════════════════════
+   Badge "Usuario Profesional" — home (solo si account_type='professional')
+   Pulso de luz suave coherente con el shine del mapa del mundo profesional.
+   Posición: debajo de Nueva Consulta, centrado, con jerarquía visual mayor
+   que My Dogs / slot Entidad para refrendar status de membresía.
+══════════════════════════════════════ */
+.home-pro-badge{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  margin:22px 16px 14px;
+  text-align:center;
+  /* La animación se aplica al elemento entero para sincronizar eyebrow + texto */
+  position:relative;
+  isolation:isolate;
+}
+.home-pro-badge-eyebrow{
+  font-family:var(--cm-font-mono, var(--ff-sans));
+  font-size:10px;font-weight:700;
+  letter-spacing:0.22em;text-transform:uppercase;
+  color:rgba(74, 103, 65, 0.55);
+}
+.home-pro-badge-text{
+  font-family:var(--ff-serif, Georgia, serif);
+  font-size:30px;font-weight:600;
+  letter-spacing:-0.005em;
+  color:#3d5636;
+  /* Glow base (apagado). La animación lo enciende. */
+  text-shadow:0 0 0 rgba(124, 220, 160, 0);
+  animation: homeProGlow 6s ease-in-out infinite;
+}
+/* Línea decorativa opcional debajo del texto, también respira */
+.home-pro-badge::after{
+  content:'';
+  display:block;
+  margin-top:8px;
+  width:48px;height:1.5px;
+  background:linear-gradient(90deg,
+    rgba(74,103,65,0) 0%,
+    rgba(124,220,160,0.85) 50%,
+    rgba(74,103,65,0) 100%);
+  border-radius:2px;
+  animation: homeProUnderline 6s ease-in-out infinite;
+}
+@keyframes homeProGlow {
+  0%   { color:#3d5636; text-shadow:0 0 0 rgba(124,220,160,0); }
+  /* Primer pulso (2s para iluminarse) */
+  16%  { color:#5d8c5e; text-shadow:0 0 18px rgba(124,220,160,0.55), 0 0 6px rgba(124,220,160,0.45); }
+  33%  { color:#3d5636; text-shadow:0 0 0 rgba(124,220,160,0); }
+  /* Pausa (33% → 66% = 2s) */
+  66%  { color:#3d5636; text-shadow:0 0 0 rgba(124,220,160,0); }
+  /* Segundo pulso (2s para iluminarse) */
+  82%  { color:#5d8c5e; text-shadow:0 0 18px rgba(124,220,160,0.55), 0 0 6px rgba(124,220,160,0.45); }
+  100% { color:#3d5636; text-shadow:0 0 0 rgba(124,220,160,0); }
+}
+@keyframes homeProUnderline {
+  0%, 33%, 66%, 100% { opacity:0.3; transform:scaleX(0.6); }
+  16%, 82%           { opacity:1;   transform:scaleX(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-pro-badge-text { animation:none; color:#5d8c5e; text-shadow:0 0 8px rgba(124,220,160,0.35); }
+  .home-pro-badge::after { animation:none; opacity:0.7; }
+}
+
+/* ══════════════════════════════════════
    S3 — ABC ANALYSIS
 ══════════════════════════════════════ */
 #s-abc{
@@ -894,6 +956,39 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   letter-spacing:0.16em;text-transform:uppercase;
   color:var(--cm-text-subtle);
   margin:14px 0 10px;
+}
+/* Banner de aviso "vienes desde activar profesional" */
+#s-pro-company .pc-from-activate{
+  display:flex;align-items:flex-start;gap:12px;
+  background:var(--cm-cyan-soft);
+  border:1px solid var(--cm-cyan);
+  border-radius:var(--cm-r-md);
+  padding:14px 16px;
+  margin-bottom:18px;
+}
+#s-pro-company .pc-from-activate-icon{
+  flex-shrink:0;
+  width:30px;height:30px;
+  border-radius:50%;
+  background:var(--cm-cyan);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--cm-font-display);
+  font-size:16px;font-weight:700;line-height:1;
+}
+#s-pro-company .pc-from-activate-text{
+  flex:1;min-width:0;
+  display:flex;flex-direction:column;gap:3px;
+}
+#s-pro-company .pc-from-activate-text strong{
+  font-family:var(--cm-font-mono);
+  font-size:10px;font-weight:700;
+  letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--cm-cyan);
+}
+#s-pro-company .pc-from-activate-text span{
+  font-family:var(--cm-font-ui);
+  font-size:13px;line-height:1.55;
+  color:var(--cm-text);
 }
 #s-pro-company .pc-logo-card{
   background:var(--cm-bg-elevated);
@@ -5172,6 +5267,13 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
       </div>
 
       <button class="btn-new-consult" onclick="goTo('s-anamnesis')" data-i18n="new_consultation">Nueva Consulta</button>
+
+      <!-- Badge "Usuario Profesional" — solo visible si account_type='professional'.
+           Display lo controla renderHomeProBadge() leyendo window._myAccount. -->
+      <div id="home-pro-badge" class="home-pro-badge" style="display:none;" aria-live="polite">
+        <span class="home-pro-badge-eyebrow" data-i18n="home_pro_badge_eyebrow">Membresía activa</span>
+        <span class="home-pro-badge-text" data-i18n="home_pro_badge">Usuario Profesional</span>
+      </div>
     </div>
   </div>
 
@@ -5861,6 +5963,15 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 
     <!-- Body scroll -->
     <div class="pc-body">
+      <!-- Banner "vienes desde activar Profesional" — visible solo si flag activo -->
+      <div id="pc-from-activate-banner" class="pc-from-activate" style="display:none;">
+        <div class="pc-from-activate-icon">→</div>
+        <div class="pc-from-activate-text">
+          <strong data-i18n="pc_from_activate_title">Antes del pago</strong>
+          <span data-i18n="pc_from_activate_hint">Rellena el nombre de tu empresa y la web. Estos datos identifican tu cuenta como profesional. Después te llevamos al pago.</span>
+        </div>
+      </div>
+
       <!-- Logo card -->
       <div class="pc-section-label" data-i18n="pc_logo_section">Logo en informes</div>
       <div class="pc-logo-card">
@@ -5933,7 +6044,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
     <div class="pc-actions">
       <p id="pc-msg" class="pc-msg"></p>
       <button id="pc-save-btn" class="cm-btn-primary cm-btn-block" onclick="pcSaveCompany()" data-i18n="pc_btn_save">Guardar cambios</button>
-      <button class="cm-btn-secondary cm-btn-block" onclick="goTo('s-home')" data-i18n="pc_btn_back">Volver al inicio</button>
+      <button id="pc-back-btn" class="cm-btn-secondary cm-btn-block" onclick="pcCancelOrBack()" data-i18n="pc_btn_back">Volver al inicio</button>
     </div>
   </div><!-- /s-pro-company -->
 
@@ -7166,7 +7277,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
           <span class="pro-card-price" data-i18n="pro_pro_price">20&nbsp;€/año</span>
           <span class="pro-card-price-sub" data-i18n="pro_pro_price_sub">Pago único anual</span>
         </div>
-        <button class="pro-card-cta" onclick="goTo('s-pro-activate')" data-i18n="pro_cta_activate">Activar Profesional</button>
+        <button class="pro-card-cta" onclick="onActivateProClick()" data-i18n="pro_cta_activate">Activar Profesional</button>
       </article>
 
       <article class="pro-card pro-card--certified">
@@ -8227,15 +8338,37 @@ async function _pcOnEnter() {
   }
 
   var acc = window._myAccount || null;
-  if (!acc || acc.account_type !== 'professional') {
+  var isProfessional = acc && acc.account_type === 'professional';
+  var fromActivate   = !!window._pcReturnToActivate;
+
+  // Estado del banner "vienes desde activar profesional" + ajustes UI
+  var banner   = document.getElementById('pc-from-activate-banner');
+  var saveBtn  = document.getElementById('pc-save-btn');
+  var backBtn  = document.getElementById('pc-back-btn');
+  if (banner)  banner.style.display = fromActivate ? 'flex' : 'none';
+
+  if (saveBtn) {
+    saveBtn.disabled = false;
+    saveBtn.textContent = fromActivate
+      ? _i18nText('pc_btn_save_continue', 'Guardar y continuar al pago')
+      : _i18nText('pc_btn_save', 'Guardar cambios');
+  }
+  if (backBtn) {
+    backBtn.textContent = fromActivate
+      ? _i18nText('pc_btn_cancel_activation', 'Cancelar activación')
+      : _i18nText('pc_btn_back', 'Volver al inicio');
+  }
+
+  // Si NO es profesional Y NO viene del flujo de activación, esta pantalla
+  // no es para él (probablemente clic accidental). Mensaje suave.
+  if (!isProfessional && !fromActivate) {
     _pcSetMsg(_i18nText('pc_err_not_pro', 'Esta sección es solo para cuentas profesionales.'), 'err');
-    var saveBtn = document.getElementById('pc-save-btn');
     if (saveBtn) saveBtn.disabled = true;
     return;
   }
 
   // Rellenar form desde acc.company (puede ser null si aún no se ha rellenado)
-  var c = acc.company || {};
+  var c = (acc && acc.company) || {};
   var byId = function(id) { return document.getElementById(id); };
   if (byId('pc-name'))           byId('pc-name').value           = c.name || '';
   if (byId('pc-web'))            byId('pc-web').value            = c.web || '';
@@ -8330,6 +8463,13 @@ async function pcSaveCompany() {
     _pcSetMsg(_i18nText('pc_saved_ok', 'Datos guardados ✓'), 'ok');
     renderHomeDogs();  // refresca slot Entidad con el nuevo nombre
     showToast(_i18nText('pc_saved_ok', 'Datos guardados ✓'));
+    // Si veníamos del flujo de activación Profesional → seguir al pre-checkout.
+    // El flag se limpia para que pulsar atrás desde s-pro-activate no
+    // vuelva a forzar este redirect en el siguiente intento.
+    if (window._pcReturnToActivate) {
+      window._pcReturnToActivate = false;
+      goTo('s-pro-activate');
+    }
   } catch (e) {
     console.error('pcSaveCompany:', e);
     _pcSetMsg(_i18nText('pc_err_save', 'Error guardando los datos.'), 'err');
@@ -8516,6 +8656,56 @@ async function pcRemoveLogo() {
   }
 }
 window.pcRemoveLogo = pcRemoveLogo;
+
+// ── Activar Profesional desde s-pro-area ────────────────────────────────────
+//
+// Si el usuario aún no ha rellenado los datos básicos de empresa
+// (nombre + web), lo llevamos antes a s-pro-company con un banner que
+// explica por qué — evita que pague y tenga que buscarse cómo identificarse
+// después (sensación de "estafa"). Una vez guarda los datos, el handler de
+// pcSaveCompany detecta el flag y redirige a s-pro-activate automáticamente.
+window._pcReturnToActivate = false;
+
+async function onActivateProClick() {
+  if (!getJWT()) {
+    showToast(_i18nText('seg_login_required', 'Inicia sesión.'));
+    goTo('s-splash');
+    return;
+  }
+  // Asegurar que tenemos _myAccount cargado
+  if (!window._myAccount) {
+    await loadAccountInfo();
+  }
+  var acc = window._myAccount || null;
+  if (acc && acc.account_type === 'professional') {
+    showToast(_i18nText('pa_err_already_pro', 'Tu cuenta ya es Profesional.'));
+    return;
+  }
+  var company = (acc && acc.company) || null;
+  var hasMinimum = company && company.name && company.web;
+  if (!hasMinimum) {
+    // Falta datos → llevar a s-pro-company con banner. El flag hace que tras
+    // guardar exitosamente vuelva a s-pro-activate (en lugar de a s-home).
+    window._pcReturnToActivate = true;
+    goTo('s-pro-company');
+    return;
+  }
+  // Datos OK → directo al pre-checkout.
+  goTo('s-pro-activate');
+}
+window.onActivateProClick = onActivateProClick;
+
+// Botón "atrás" del s-pro-company. Si veníamos del flujo de activación,
+// cancelar significa volver a s-pro-area (no a home), para no descolocar.
+function pcCancelOrBack() {
+  if (window._pcReturnToActivate) {
+    window._pcReturnToActivate = false;
+    goTo('s-pro-area');
+    return;
+  }
+  goTo('s-home');
+}
+window.pcCancelOrBack = pcCancelOrBack;
 
 // ── Activación Profesional (s-pro-activate → Stripe Checkout) ──────────────
 //
@@ -10496,7 +10686,7 @@ function renderHomeDogs() {
 }
 window.renderHomeDogs = renderHomeDogs;
 
-// ── Cuenta profesional (slot Entidad) ──────────────────────────────────────
+// ── Cuenta profesional (slot Entidad + badge home) ─────────────────────────
 // Carga GET /me/account + GET /me/company/logo (paralelo). Cachea en window
 // para que renderHomeDogs decida si mostrar el slot. Sin sesión / errores
 // degrada con seguridad — el slot simplemente no aparece.
@@ -10505,6 +10695,7 @@ async function loadAccountInfo() {
     window._myAccount = null;
     window._myCompanyLogo = null;
     renderHomeDogs();
+    renderHomeProBadge();
     return;
   }
   try {
@@ -10514,6 +10705,7 @@ async function loadAccountInfo() {
     if (!res.ok) {
       window._myAccount = null;
       renderHomeDogs();
+      renderHomeProBadge();
       return;
     }
     window._myAccount = await res.json();
@@ -10533,13 +10725,26 @@ async function loadAccountInfo() {
       window._myCompanyLogo = null;
     }
     renderHomeDogs();
+    renderHomeProBadge();
   } catch (e) {
     console.warn('loadAccountInfo error:', e);
     window._myAccount = null;
     renderHomeDogs();
+    renderHomeProBadge();
   }
 }
 window.loadAccountInfo = loadAccountInfo;
+
+// Muestra/oculta el badge "Usuario Profesional" en el home según el tier.
+// Solo visible si account_type === 'professional'.
+function renderHomeProBadge() {
+  var el = document.getElementById('home-pro-badge');
+  if (!el) return;
+  var acc = window._myAccount || null;
+  var isPro = !!(acc && acc.account_type === 'professional');
+  el.style.display = isPro ? 'flex' : 'none';
+}
+window.renderHomeProBadge = renderHomeProBadge;
 
 function openCreateDog() {
   if (!getJWT()) {
@@ -11742,6 +11947,8 @@ function endTourIntro() {
       // Slot Entidad (home — solo profesionales)
       home_entity_empty:    'Mi empresa',
       home_entity_aria:     'Datos de empresa',
+      home_pro_badge_eyebrow: 'Membresía activa',
+      home_pro_badge:        'Usuario Profesional',
       // s-pro-company (datos empresa + logo)
       pc_eyebrow:                 'Solo profesionales',
       pc_title:                   'Datos de empresa',
@@ -11769,8 +11976,12 @@ function endTourIntro() {
       pc_field_collaborate_hint:  'Casos formativos, validación clínica, contenidos.',
       pc_disclaimer:              'El logo aparecerá únicamente si tu cuenta es profesional y has subido un archivo válido. Sin logo, el PDF muestra solo The Dogs Mind.',
       pc_btn_save:                'Guardar cambios',
+      pc_btn_save_continue:       'Guardar y continuar al pago',
       pc_btn_saving:              'Guardando…',
       pc_btn_back:                'Volver al inicio',
+      pc_btn_cancel_activation:   'Cancelar activación',
+      pc_from_activate_title:     'Antes del pago',
+      pc_from_activate_hint:      'Rellena el nombre de tu empresa y la web. Estos datos identifican tu cuenta como profesional. Después te llevamos al pago.',
       pc_saved_ok:                'Datos guardados ✓',
       pc_err_name:                'El nombre de la empresa es obligatorio.',
       pc_err_web:                 'La web es obligatoria. Incluye https://',
@@ -12433,6 +12644,8 @@ function endTourIntro() {
       // Entity slot (home — professionals only)
       home_entity_empty:    'My company',
       home_entity_aria:     'Company details',
+      home_pro_badge_eyebrow: 'Active membership',
+      home_pro_badge:        'Professional User',
       // s-pro-company (company info + logo)
       pc_eyebrow:                 'Professionals only',
       pc_title:                   'Company details',
@@ -12460,8 +12673,12 @@ function endTourIntro() {
       pc_field_collaborate_hint:  'Training cases, clinical validation, content.',
       pc_disclaimer:              'The logo appears only if your account is professional and you’ve uploaded a valid file. Without a logo, the PDF shows only The Dogs Mind.',
       pc_btn_save:                'Save changes',
+      pc_btn_save_continue:       'Save and continue to payment',
       pc_btn_saving:              'Saving…',
       pc_btn_back:                'Back to home',
+      pc_btn_cancel_activation:   'Cancel activation',
+      pc_from_activate_title:     'Before payment',
+      pc_from_activate_hint:      'Fill in your company name and website. These details identify your account as professional. Then we’ll take you to the payment.',
       pc_saved_ok:                'Saved ✓',
       pc_err_name:                'Company name is required.',
       pc_err_web:                 'Website is required. Include https://',

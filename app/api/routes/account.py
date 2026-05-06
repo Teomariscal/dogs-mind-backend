@@ -159,9 +159,16 @@ def update_company(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    """Guarda/actualiza el perfil empresa. Requiere account_type = 'professional'."""
-    _require_professional(user)
+    """
+    Guarda/actualiza el perfil empresa.
 
+    Permitido también para usuarios particulares: el flujo de activación
+    Profesional pide al usuario rellenar nombre + web ANTES del pago, para
+    que la cuenta ya esté identificada como profesional cuando vuelva del
+    checkout. Si nunca paga, los datos quedan latentes (no se promueve la
+    cuenta a profesional). El upload del logo sí mantiene gating
+    professional (los particulares no necesitan logo en informes).
+    """
     user.company_name                 = payload.name
     user.company_web                  = str(payload.web)
     user.company_cif                  = payload.cif

@@ -8341,12 +8341,103 @@ async function pcSaveCompany() {
 window.pcSaveCompany = pcSaveCompany;
 
 // File input → leer como data URL → POST /me/company/logo
+// Tamaño aproximado en bytes de un data URL base64.
+function _dataUrlByteSize(dataUrl) {
+  var idx = dataUrl.indexOf(',');
+  if (idx < 0) return dataUrl.length;
+  var b64 = dataUrl.substring(idx + 1);
+  var pad = b64.endsWith('==') ? 2 : (b64.endsWith('=') ? 1 : 0);
+  return Math.floor(b64.length * 3 / 4) - pad;
+}
+
+// Compresión cliente del logo: redimensiona + recomprime hasta que el data
+// URL final sea <= 200 KB (mismo cap que el backend, que actúa de red de
+// seguridad). Mantiene PNG lossless si el input es PNG (preserva
+// transparencia para logos sobre fondo transparente). El usuario puede
+// subir hasta 10 MB; nosotros nos encargamos de dejarlo en buen tamaño.
+async function _compressLogoFile(file) {
+  var MAX_INPUT_BYTES  = 10 * 1024 * 1024;   // 10 MB cap de entrada
+  var MAX_OUTPUT_BYTES = 200 * 1024;         // 200 KB cap de salida
+  var MAX_DIM_INITIAL  = 1024;                // px lado largo inicial
+
+  if (file.size > MAX_INPUT_BYTES) {
+    throw new Error('TOO_BIG');
+  }
+
+  // Cargar como dataURL → Image
+  var dataUrlOriginal = await new Promise(function(resolve, reject) {
+    var r = new FileReader();
+    r.onload = function() { resolve(r.result); };
+    r.onerror = function() { reject(new Error('READ_FAILED')); };
+    r.readAsDataURL(file);
+  });
+
+  var img = await new Promise(function(resolve, reject) {
+    var im = new Image();
+    im.onload = function() { resolve(im); };
+    im.onerror = function() { reject(new Error('IMG_LOAD_FAILED')); };
+    im.src = dataUrlOriginal;
+  });
+
+  var origW = img.naturalWidth;
+  var origH = img.naturalHeight;
+  var origMax = Math.max(origW, origH);
+  var isPNG = /image\/png/i.test(file.type);
+
+  // Atajo: si ya es PNG/JPG pequeño y dentro del cap, no recomprimir (preserva
+  // calidad original).
+  if (origMax <= MAX_DIM_INITIAL && _dataUrlByteSize(dataUrlOriginal) <= MAX_OUTPUT_BYTES) {
+    return dataUrlOriginal;
+  }
+
+  var canvas = document.createElement('canvas');
+  var ctx    = canvas.getContext('2d');
+
+  function _renderAt(maxSide) {
+    var scale = Math.min(1, maxSide / origMax);
+    var w = Math.max(1, Math.round(origW * scale));
+    var h = Math.max(1, Math.round(origH * scale));
+    canvas.width  = w;
+    canvas.height = h;
+    ctx.clearRect(0, 0, w, h);
+    ctx.drawImage(img, 0, 0, w, h);
+  }
+
+  // PNG: lossless. Reducimos dimensiones progresivamente hasta caber.
+  if (isPNG) {
+    var sizes = [MAX_DIM_INITIAL, 768, 600, 480, 360, 256];
+    for (var i = 0; i < sizes.length; i++) {
+      _renderAt(sizes[i]);
+      var url = canvas.toDataURL('image/png');
+      if (_dataUrlByteSize(url) <= MAX_OUTPUT_BYTES) return url;
+    }
+    // Como último recurso: convertir PNG grande a JPEG (perdemos
+    // transparencia pero el logo cabe). Quality 0.9.
+    _renderAt(800);
+    return canvas.toDataURL('image/jpeg', 0.9);
+  }
+
+  // JPEG / WebP: combinamos resize y quality.
+  var sizes2     = [MAX_DIM_INITIAL, 800, 640, 480, 360];
+  var qualities  = [0.92, 0.85, 0.78, 0.7, 0.6];
+  for (var s = 0; s < sizes2.length; s++) {
+    _renderAt(sizes2[s]);
+    for (var q = 0; q < qualities.length; q++) {
+      var url2 = canvas.toDataURL('image/jpeg', qualities[q]);
+      if (_dataUrlByteSize(url2) <= MAX_OUTPUT_BYTES) return url2;
+    }
+  }
+  // Último intento: 280 px / quality 0.5
+  _renderAt(280);
+  return canvas.toDataURL('image/jpeg', 0.5);
+}
+
 function pcOnLogoFile(event) {
   var file = event && event.target && event.target.files && event.target.files[0];
   if (!file) return;
-  // Cap cliente: 200 KB. El backend también valida.
-  if (file.size > 200 * 1024) {
-    _pcSetMsg(_i18nText('pc_err_logo_size', 'El logo supera 200 KB. Comprímelo o redúcelo.'), 'err');
+  // Cap cliente: 10 MB de entrada (la compresión hará el resto).
+  if (file.size > 10 * 1024 * 1024) {
+    _pcSetMsg(_i18nText('pc_err_logo_size', 'El archivo es demasiado grande (máx 10 MB).'), 'err');
     event.target.value = '';
     return;
   }
@@ -8355,10 +8446,21 @@ function pcOnLogoFile(event) {
     event.target.value = '';
     return;
   }
-  var reader = new FileReader();
-  reader.onload = async function() {
+  (async function() {
     try {
-      var dataUrl = reader.result;
+      _pcSetMsg(_i18nText('pc_logo_compressing', 'Optimizando imagen…'), null);
+      var dataUrl;
+      try {
+        dataUrl = await _compressLogoFile(file);
+      } catch (e) {
+        console.error('compress error:', e);
+        if (e && e.message === 'TOO_BIG') {
+          _pcSetMsg(_i18nText('pc_err_logo_size', 'El archivo es demasiado grande (máx 10 MB).'), 'err');
+        } else {
+          _pcSetMsg(_i18nText('pc_err_logo_read', 'No se pudo procesar la imagen.'), 'err');
+        }
+        return;
+      }
       _pcSetMsg(_i18nText('pc_logo_uploading', 'Subiendo logo…'), null);
       var res = await fetch(API_BASE + '/me/company/logo', {
         method: 'POST',
@@ -8378,7 +8480,6 @@ function pcOnLogoFile(event) {
       }
       var data = await res.json();
       window._myCompanyLogo = data.logo_base64 || null;
-      // Marcar has_company_logo en _myAccount también
       if (window._myAccount) window._myAccount.has_company_logo = !!window._myCompanyLogo;
       _pcRenderLogoPreview(window._myCompanyLogo);
       _pcSetMsg(_i18nText('pc_logo_uploaded', 'Logo guardado ✓'), 'ok');
@@ -8387,14 +8488,9 @@ function pcOnLogoFile(event) {
       console.error('pcOnLogoFile:', e);
       _pcSetMsg(_i18nText('pc_err_logo_upload', 'No se pudo subir el logo.'), 'err');
     } finally {
-      event.target.value = '';  // permitir resubir el mismo file
+      event.target.value = '';
     }
-  };
-  reader.onerror = function() {
-    _pcSetMsg(_i18nText('pc_err_logo_read', 'No se pudo leer el archivo.'), 'err');
-    event.target.value = '';
-  };
-  reader.readAsDataURL(file);
+  })();
 }
 window.pcOnLogoFile = pcOnLogoFile;
 
@@ -11653,7 +11749,8 @@ function endTourIntro() {
       pc_logo_btn:                'Subir / cambiar logo',
       pc_logo_remove:             'Quitar logo',
       pc_logo_remove_confirm:     '¿Quitar el logo de empresa? Tus PDFs futuros saldrán sin él.',
-      pc_logo_hint:               'PNG, JPG o WebP · máx. 200 KB. Aparecerá arriba a la derecha en tus PDFs.',
+      pc_logo_hint:               'PNG, JPG o WebP · máx. 10 MB. La app lo optimiza automáticamente para tus PDFs.',
+      pc_logo_compressing:        'Optimizando imagen…',
       pc_logo_uploading:          'Subiendo logo…',
       pc_logo_uploaded:           'Logo guardado ✓',
       pc_logo_removed:            'Logo eliminado.',
@@ -11681,7 +11778,7 @@ function endTourIntro() {
       pc_err_email:               'Email de facturación con formato inválido.',
       pc_err_save:                'Error guardando los datos.',
       pc_err_not_pro:             'Esta sección es solo para cuentas profesionales.',
-      pc_err_logo_size:           'El logo supera 200 KB. Comprímelo o redúcelo.',
+      pc_err_logo_size:           'El archivo es demasiado grande (máx 10 MB).',
       pc_err_logo_format:         'Formato no soportado. Usa PNG, JPG o WebP.',
       pc_err_logo_upload:         'No se pudo subir el logo.',
       pc_err_logo_remove:         'No se pudo quitar el logo.',
@@ -12343,7 +12440,8 @@ function endTourIntro() {
       pc_logo_btn:                'Upload / change logo',
       pc_logo_remove:             'Remove logo',
       pc_logo_remove_confirm:     'Remove the company logo? Your future PDFs will be issued without it.',
-      pc_logo_hint:               'PNG, JPG or WebP · max 200 KB. Will appear top-right on your PDFs.',
+      pc_logo_hint:               'PNG, JPG or WebP · max 10 MB. The app optimizes it automatically for your PDFs.',
+      pc_logo_compressing:        'Optimizing image…',
       pc_logo_uploading:          'Uploading logo…',
       pc_logo_uploaded:           'Logo saved ✓',
       pc_logo_removed:            'Logo removed.',
@@ -12371,7 +12469,7 @@ function endTourIntro() {
       pc_err_email:               'Billing email format is invalid.',
       pc_err_save:                'Error saving the data.',
       pc_err_not_pro:             'This section is only for professional accounts.',
-      pc_err_logo_size:           'Logo exceeds 200 KB. Compress or resize it.',
+      pc_err_logo_size:           'File is too large (max 10 MB).',
       pc_err_logo_format:         'Unsupported format. Use PNG, JPG or WebP.',
       pc_err_logo_upload:         'Could not upload the logo.',
       pc_err_logo_remove:         'Could not remove the logo.',

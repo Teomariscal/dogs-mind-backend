@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v55 (Stripe Pro checkout: card Profesional activa + s-pro-activate con bundle promo + redirect Stripe + handler return)
+// Dogs Mind Service Worker — v56 (logo upload: compresión cliente automática hasta 200 KB; usuario puede subir hasta 10 MB)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v55';
+const CACHE_NAME = 'dogs-mind-v56';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

@@ -236,6 +236,31 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 /* Badge de estado del slot dentro del círculo (ej. "+" para añadir) */
 .dog-circle .dog-add{position:absolute;font-size:30px;color:var(--text2);font-weight:300;line-height:1;}
 
+/* ── Slot Entidad (lado opuesto a perros, solo si profesional) ───────────────
+   Mismo tamaño visual que .dog-item para alineación; círculo cuadrado-redondeado
+   con borde cyan (palette pro) en lugar del verde Bocalán de los perros. */
+.entity-item{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;margin-left:auto;}
+.entity-circle{
+  width:64px;height:64px;border-radius:18px;overflow:hidden;
+  border:2px solid var(--cm-cyan, #1f9b9b);position:relative;
+  background:linear-gradient(135deg, #f4f8f7, #e7eeec);
+  display:flex;align-items:center;justify-content:center;
+}
+.entity-circle.empty{
+  border-style:dashed;
+  border-color:rgba(31,155,155,0.55);
+}
+.entity-circle img{width:100%;height:100%;object-fit:contain;display:block;padding:6px;}
+.entity-circle .entity-add{
+  font-family:var(--cm-font-display, var(--ff-serif));
+  font-size:30px;color:var(--cm-cyan, #1f9b9b);font-weight:300;line-height:1;
+}
+.entity-name{
+  font-size:12px;color:var(--text2);font-weight:500;
+  max-width:88px;text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+
 /* ── S-DOG-PROFILE + S-SEGUIMIENTO (estilos compartidos para forms vibrant) ── */
 #s-dog-profile .form-label,
 #s-seguimiento .form-label{
@@ -823,6 +848,184 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   color:var(--cm-text);
   font-style:italic;
 }
+
+/* ══════════════════════════════════════
+   S-PRO-COMPANY — Datos empresa profesional + upload logo
+   Layout: header sticky + body scroll (logo + form) + footer sticky.
+   Reusa palette cm-* coherente con área profesional.
+══════════════════════════════════════ */
+#s-pro-company{
+  background:var(--cm-bg);
+  flex-direction:column;
+}
+#s-pro-company .pc-header{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:max(env(safe-area-inset-top, 0), 18px) 18px 14px;
+  border-bottom:1px solid var(--cm-divider);
+  background:var(--cm-bg-elevated);
+  position:sticky;top:0;z-index:10;flex-shrink:0;
+}
+#s-pro-company .pc-back{
+  width:36px;height:36px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:50%;
+  background:#fff;border:1.5px solid var(--cm-border-strong);
+  cursor:pointer;font-size:16px;color:var(--cm-text);
+}
+#s-pro-company .pc-back:hover{ background:var(--cm-bg-soft); }
+#s-pro-company .pc-eyebrow{
+  font-family:var(--cm-font-mono);
+  font-size:10px;font-weight:600;
+  letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--cm-cyan);margin:0 0 4px;
+}
+#s-pro-company .pc-title{
+  font-family:var(--cm-font-display);
+  font-size:22px;font-weight:600;line-height:1.2;
+  letter-spacing:-0.01em;color:var(--cm-text);margin:0;
+}
+#s-pro-company .pc-body{
+  flex:1;overflow-y:auto;
+  padding:22px 16px 12px;
+}
+#s-pro-company .pc-section-label{
+  font-family:var(--cm-font-mono);
+  font-size:10px;font-weight:600;
+  letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--cm-text-subtle);
+  margin:14px 0 10px;
+}
+#s-pro-company .pc-logo-card{
+  background:var(--cm-bg-elevated);
+  border:1px solid var(--cm-border);
+  border-radius:var(--cm-r-md);
+  padding:18px;
+  display:flex;align-items:center;gap:18px;
+  box-shadow:var(--cm-shadow-card);
+  margin-bottom:8px;
+}
+#s-pro-company .pc-logo-preview{
+  width:88px;height:88px;border-radius:18px;flex-shrink:0;
+  background:linear-gradient(135deg, #f4f8f7, #e7eeec);
+  border:2px dashed rgba(31,155,155,0.55);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+#s-pro-company .pc-logo-preview.has-logo{
+  border-style:solid;
+  border-color:var(--cm-cyan);
+}
+#s-pro-company .pc-logo-preview img{
+  width:100%;height:100%;object-fit:contain;padding:6px;display:block;
+}
+#s-pro-company .pc-logo-add{
+  font-family:var(--cm-font-display);
+  font-size:36px;color:var(--cm-cyan);font-weight:300;line-height:1;
+}
+#s-pro-company .pc-logo-actions{flex:1;min-width:0;}
+#s-pro-company .pc-logo-actions .pc-btn-upload{
+  width:100%;padding:10px 14px;
+  border:1.5px solid var(--cm-cyan);
+  border-radius:var(--cm-r-pill);
+  background:#fff;color:var(--cm-green-deep);
+  font-family:var(--cm-font-ui);
+  font-size:13px;font-weight:600;
+  cursor:pointer;
+  transition:background 200ms ease;
+}
+#s-pro-company .pc-logo-actions .pc-btn-upload:hover{
+  background:var(--cm-cyan-soft);
+}
+#s-pro-company .pc-logo-actions .pc-btn-remove{
+  width:100%;padding:8px 14px;margin-top:8px;
+  border:1px solid var(--cm-divider);
+  border-radius:var(--cm-r-pill);
+  background:transparent;color:var(--cm-text-subtle);
+  font-family:var(--cm-font-ui);font-size:12px;font-weight:500;
+  cursor:pointer;
+}
+#s-pro-company .pc-logo-actions .pc-btn-remove:hover{
+  color:#a04040;border-color:rgba(160,64,64,0.4);
+}
+#s-pro-company .pc-logo-hint{
+  font-size:11px;color:var(--cm-text-muted);
+  margin:6px 0 0;line-height:1.5;font-style:italic;
+}
+#s-pro-company .pc-form{
+  background:var(--cm-bg-elevated);
+  border:1px solid var(--cm-border);
+  border-radius:var(--cm-r-md);
+  padding:18px;
+  box-shadow:var(--cm-shadow-card);
+  display:flex;flex-direction:column;gap:14px;
+  margin-bottom:14px;
+}
+#s-pro-company .pc-field{display:flex;flex-direction:column;gap:6px;}
+#s-pro-company .pc-field label{
+  font-family:var(--cm-font-ui);
+  font-size:12px;font-weight:600;
+  color:var(--cm-text);
+  letter-spacing:0.01em;
+}
+#s-pro-company .pc-field label .pc-req{ color:var(--cm-cyan); }
+#s-pro-company .pc-field input,
+#s-pro-company .pc-field select{
+  padding:11px 13px;
+  border:1.5px solid var(--cm-border);
+  border-radius:10px;
+  background:#fff;
+  font-family:var(--cm-font-ui);
+  font-size:14px;
+  color:var(--cm-text);
+  transition:border-color 200ms ease;
+}
+#s-pro-company .pc-field input:focus,
+#s-pro-company .pc-field select:focus{
+  outline:none;
+  border-color:var(--cm-cyan);
+  box-shadow:0 0 0 3px var(--cm-cyan-soft);
+}
+#s-pro-company .pc-field-hint{
+  font-size:11px;color:var(--cm-text-muted);
+  margin-top:2px;line-height:1.4;
+}
+#s-pro-company .pc-field-row{
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;
+}
+#s-pro-company .pc-toggle-row{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:14px;padding:12px 14px;
+  background:var(--cm-bg-soft);
+  border-radius:10px;
+}
+#s-pro-company .pc-toggle-row label{margin:0;cursor:pointer;flex:1;min-width:0;}
+#s-pro-company .pc-toggle-row .pc-toggle-hint{
+  display:block;font-weight:400;
+  font-size:11px;color:var(--cm-text-muted);
+  margin-top:2px;
+}
+#s-pro-company .pc-disclaimer{
+  font-family:var(--cm-font-ui);
+  font-size:11.5px;line-height:1.55;
+  color:var(--cm-text-subtle);
+  text-align:center;
+  margin:8px 8px 0;font-style:italic;
+}
+#s-pro-company .pc-actions{
+  display:flex;flex-direction:column;gap:10px;
+  padding:14px 16px max(env(safe-area-inset-bottom, 0), 24px);
+  background:var(--cm-bg-elevated);
+  border-top:1px solid var(--cm-divider);
+  flex-shrink:0;
+}
+#s-pro-company .pc-msg{
+  font-family:var(--cm-font-ui);
+  font-size:12px;text-align:center;
+  margin:0 0 4px;min-height:16px;
+}
+#s-pro-company .pc-msg.ok{ color:var(--cm-green-deep); }
+#s-pro-company .pc-msg.err{ color:#a04040; }
+
 .btn-outline{
   width:100%;padding:14px;border:1px solid var(--border2);border-radius:100px;
   background:rgba(255,255,255,0.8);color:var(--text2);
@@ -5476,6 +5679,95 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
     </div>
   </div><!-- /s-abc-translated -->
 
+  <!-- ══ S-PRO-COMPANY: datos empresa + logo (solo profesionales) ══ -->
+  <div id="s-pro-company" class="screen">
+    <!-- Header sticky -->
+    <div class="pc-header">
+      <button onclick="goTo('s-home')" class="pc-back" aria-label="Volver">&#8592;</button>
+      <div style="flex:1;min-width:0;">
+        <p class="pc-eyebrow" data-i18n="pc_eyebrow">Solo profesionales</p>
+        <h1 class="pc-title" data-i18n="pc_title">Datos de empresa</h1>
+      </div>
+    </div>
+
+    <!-- Body scroll -->
+    <div class="pc-body">
+      <!-- Logo card -->
+      <div class="pc-section-label" data-i18n="pc_logo_section">Logo en informes</div>
+      <div class="pc-logo-card">
+        <div id="pc-logo-preview" class="pc-logo-preview">
+          <span class="pc-logo-add">+</span>
+        </div>
+        <div class="pc-logo-actions">
+          <button class="pc-btn-upload" onclick="document.getElementById('pc-logo-file').click()" data-i18n="pc_logo_btn">Subir / cambiar logo</button>
+          <button id="pc-logo-remove-btn" class="pc-btn-remove" onclick="pcRemoveLogo()" style="display:none;" data-i18n="pc_logo_remove">Quitar logo</button>
+          <p class="pc-logo-hint" data-i18n="pc_logo_hint">PNG, JPG o WebP · máx. 200&nbsp;KB. Aparecerá arriba a la derecha en tus PDFs.</p>
+          <input type="file" id="pc-logo-file" accept="image/png,image/jpeg,image/webp" onchange="pcOnLogoFile(event)" style="display:none;">
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div class="pc-section-label" data-i18n="pc_form_section">Información de la entidad</div>
+      <div class="pc-form">
+        <div class="pc-field">
+          <label for="pc-name" data-i18n="pc_field_name">Nombre de la empresa <span class="pc-req">*</span></label>
+          <input id="pc-name" type="text" maxlength="120" autocomplete="organization">
+        </div>
+
+        <div class="pc-field">
+          <label for="pc-web" data-i18n="pc_field_web">Web <span class="pc-req">*</span></label>
+          <input id="pc-web" type="url" placeholder="https://" autocomplete="url">
+        </div>
+
+        <div class="pc-field">
+          <label for="pc-cif" data-i18n="pc_field_cif">CIF / Tax ID</label>
+          <input id="pc-cif" type="text" maxlength="40">
+          <div class="pc-field-hint" data-i18n="pc_field_cif_hint">Solo si quieres factura mensual.</div>
+        </div>
+
+        <div class="pc-field">
+          <label for="pc-clients" data-i18n="pc_field_clients">Nº de clientes al año</label>
+          <input id="pc-clients" type="number" min="0" max="1000000" inputmode="numeric">
+          <div class="pc-field-hint" data-i18n="pc_field_clients_hint">Estimación. Ayuda al equipo a entender tu volumen.</div>
+        </div>
+
+        <div class="pc-field-row">
+          <div class="pc-field">
+            <label for="pc-city" data-i18n="pc_field_city">Ciudad</label>
+            <input id="pc-city" type="text" maxlength="80" autocomplete="address-level2">
+          </div>
+          <div class="pc-field">
+            <label for="pc-country" data-i18n="pc_field_country">País</label>
+            <input id="pc-country" type="text" maxlength="80" autocomplete="country-name">
+          </div>
+        </div>
+
+        <div class="pc-field">
+          <label for="pc-billing-email" data-i18n="pc_field_billing_email">Email de facturación</label>
+          <input id="pc-billing-email" type="email" maxlength="120" autocomplete="email">
+          <div class="pc-field-hint" data-i18n="pc_field_billing_email_hint">Donde recibirás factura mensual si solicitaste CIF.</div>
+        </div>
+
+        <div class="pc-toggle-row">
+          <label for="pc-collaborate">
+            <span data-i18n="pc_field_collaborate">¿Te gustaría colaborar con The Dogs Mind?</span>
+            <span class="pc-toggle-hint" data-i18n="pc_field_collaborate_hint">Casos formativos, validación clínica, contenidos.</span>
+          </label>
+          <input id="pc-collaborate" type="checkbox" style="width:22px;height:22px;cursor:pointer;flex-shrink:0;">
+        </div>
+      </div>
+
+      <p class="pc-disclaimer" data-i18n="pc_disclaimer">El logo aparecerá únicamente si tu cuenta es profesional y has subido un archivo válido. Sin logo, el PDF muestra solo The Dogs Mind.</p>
+    </div>
+
+    <!-- Footer actions -->
+    <div class="pc-actions">
+      <p id="pc-msg" class="pc-msg"></p>
+      <button id="pc-save-btn" class="cm-btn-primary cm-btn-block" onclick="pcSaveCompany()" data-i18n="pc_btn_save">Guardar cambios</button>
+      <button class="cm-btn-secondary cm-btn-block" onclick="goTo('s-home')" data-i18n="pc_btn_back">Volver al inicio</button>
+    </div>
+  </div><!-- /s-pro-company -->
+
   <!-- ══ S5: CHAT NIAZ ══ -->
   <div id="s-chat" class="screen">
     <div class="chat-hdr">
@@ -6895,6 +7187,7 @@ function goTo(id) {
   if (id === 's-records') renderRecords();
   if (id === 's-tokens') updateTokensScreen();
   if (id === 's-home') fetchBalance();
+  if (id === 's-pro-company' && typeof _pcOnEnter === 'function') _pcOnEnter();
   // Global nav show/hide
   var noNav = ['s-splash','s-login','s-refine','s-tour-intro'];
   var nav = document.getElementById('global-nav');
@@ -6982,6 +7275,7 @@ function registerUser() {
     if (res.data.role) localStorage.setItem('dm_role', res.data.role);
     // Precargar lista de perros tras registro exitoso
     if (typeof loadMyDogs === 'function') loadMyDogs();
+    if (typeof loadAccountInfo === 'function') loadAccountInfo();
 
     // Actualizar nombres de perros si se rellenaron
     if (dog1) {
@@ -7648,6 +7942,248 @@ async function _downloadAccessiblePdf(opts) {
   }
 }
 
+// ── Pantalla s-pro-company: datos empresa + logo ───────────────────────────
+// Backend: GET /me/account, PUT /me/company, GET/POST/DELETE /me/company/logo
+//
+// Reglas backend:
+//   - account_type debe ser 'professional' para PUT /me/company y POST logo
+//   - name + web son obligatorios; resto opcional
+//   - logo: data URL base64 ≤ 200 KB (image/jpeg|png|webp)
+//
+// Estado interno: window._myAccount + window._myCompanyLogo (se cargan en
+// loadAccountInfo y se refrescan tras guardar para actualizar slot Entidad).
+
+function _pcSetMsg(text, kind) {
+  var el = document.getElementById('pc-msg');
+  if (!el) return;
+  el.textContent = text || '';
+  el.className = 'pc-msg' + (kind ? ' ' + kind : '');
+}
+
+function _pcRenderLogoPreview(dataUrl) {
+  var box = document.getElementById('pc-logo-preview');
+  var rmBtn = document.getElementById('pc-logo-remove-btn');
+  if (!box) return;
+  if (dataUrl) {
+    box.classList.add('has-logo');
+    box.innerHTML = '<img src="' + _escapeAttr(dataUrl) + '" alt="">';
+    if (rmBtn) rmBtn.style.display = 'block';
+  } else {
+    box.classList.remove('has-logo');
+    box.innerHTML = '<span class="pc-logo-add">+</span>';
+    if (rmBtn) rmBtn.style.display = 'none';
+  }
+}
+
+// Hook en goTo: cuando se entra a s-pro-company, precarga el form desde backend.
+async function _pcOnEnter() {
+  if (!getJWT()) {
+    showToast(_i18nText('seg_login_required', 'Inicia sesión.'));
+    goTo('s-splash');
+    return;
+  }
+  _pcSetMsg('', null);
+
+  // Si _myAccount no está cargado, cargarlo ahora
+  if (!window._myAccount) {
+    await loadAccountInfo();
+  }
+
+  var acc = window._myAccount || null;
+  if (!acc || acc.account_type !== 'professional') {
+    _pcSetMsg(_i18nText('pc_err_not_pro', 'Esta sección es solo para cuentas profesionales.'), 'err');
+    var saveBtn = document.getElementById('pc-save-btn');
+    if (saveBtn) saveBtn.disabled = true;
+    return;
+  }
+
+  // Rellenar form desde acc.company (puede ser null si aún no se ha rellenado)
+  var c = acc.company || {};
+  var byId = function(id) { return document.getElementById(id); };
+  if (byId('pc-name'))           byId('pc-name').value           = c.name || '';
+  if (byId('pc-web'))            byId('pc-web').value            = c.web || '';
+  if (byId('pc-cif'))            byId('pc-cif').value            = c.cif || '';
+  if (byId('pc-clients'))        byId('pc-clients').value        = (c.clients_per_year != null) ? c.clients_per_year : '';
+  if (byId('pc-city'))           byId('pc-city').value           = c.city || '';
+  if (byId('pc-country'))        byId('pc-country').value        = c.country || '';
+  if (byId('pc-billing-email'))  byId('pc-billing-email').value  = c.billing_email || '';
+  if (byId('pc-collaborate'))    byId('pc-collaborate').checked  = !!c.collaborate_interest;
+
+  _pcRenderLogoPreview(window._myCompanyLogo || null);
+}
+window._pcOnEnter = _pcOnEnter;
+
+async function pcSaveCompany() {
+  var btn = document.getElementById('pc-save-btn');
+  if (!btn) return;
+  if (!getJWT()) {
+    showToast(_i18nText('seg_login_required', 'Inicia sesión.'));
+    goTo('s-splash');
+    return;
+  }
+  _pcSetMsg('', null);
+
+  var name = (document.getElementById('pc-name').value || '').trim();
+  var web  = (document.getElementById('pc-web').value || '').trim();
+  if (!name) {
+    _pcSetMsg(_i18nText('pc_err_name', 'El nombre de la empresa es obligatorio.'), 'err');
+    return;
+  }
+  if (!web) {
+    _pcSetMsg(_i18nText('pc_err_web', 'La web es obligatoria. Incluye https://'), 'err');
+    return;
+  }
+  // Auto-prefijar https:// si el usuario solo escribió el dominio
+  if (!/^https?:\/\//i.test(web)) {
+    web = 'https://' + web;
+    document.getElementById('pc-web').value = web;
+  }
+
+  var clientsRaw = document.getElementById('pc-clients').value;
+  var clients = clientsRaw === '' ? null : parseInt(clientsRaw, 10);
+  if (clientsRaw !== '' && (isNaN(clients) || clients < 0)) {
+    _pcSetMsg(_i18nText('pc_err_clients', 'Nº de clientes debe ser un número válido.'), 'err');
+    return;
+  }
+
+  var billingEmail = (document.getElementById('pc-billing-email').value || '').trim();
+  if (billingEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(billingEmail)) {
+    _pcSetMsg(_i18nText('pc_err_email', 'Email de facturación con formato inválido.'), 'err');
+    return;
+  }
+
+  var payload = {
+    name:                  name,
+    web:                   web,
+    cif:                   (document.getElementById('pc-cif').value || '').trim() || null,
+    clients_per_year:      clients,
+    city:                  (document.getElementById('pc-city').value || '').trim() || null,
+    country:               (document.getElementById('pc-country').value || '').trim() || null,
+    billing_email:         billingEmail || null,
+    collaborate_interest:  !!document.getElementById('pc-collaborate').checked,
+  };
+
+  var prevText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = _i18nText('pc_btn_saving', 'Guardando…');
+  try {
+    var res = await fetch(API_BASE + '/me/company', {
+      method: 'PUT',
+      headers: Object.assign({'Content-Type': 'application/json'}, authHeaders()),
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      var detail = '';
+      try {
+        var errBody = await res.json();
+        detail = Array.isArray(errBody.detail)
+          ? errBody.detail.map(function(e){ return (e.loc ? e.loc.join('→') + ': ' : '') + e.msg; }).join(' · ')
+          : (errBody.detail || '');
+      } catch(e) {}
+      if (res.status === 401) { showToast(_i18nText('session_expired', 'Sesión caducada.')); goTo('s-splash'); return; }
+      if (res.status === 403) {
+        _pcSetMsg(_i18nText('pc_err_not_pro', 'Esta sección es solo para cuentas profesionales.'), 'err');
+        return;
+      }
+      _pcSetMsg(detail || _i18nText('pc_err_save', 'Error guardando los datos.'), 'err');
+      return;
+    }
+    var data = await res.json();
+    window._myAccount = data;
+    _pcSetMsg(_i18nText('pc_saved_ok', 'Datos guardados ✓'), 'ok');
+    renderHomeDogs();  // refresca slot Entidad con el nuevo nombre
+    showToast(_i18nText('pc_saved_ok', 'Datos guardados ✓'));
+  } catch (e) {
+    console.error('pcSaveCompany:', e);
+    _pcSetMsg(_i18nText('pc_err_save', 'Error guardando los datos.'), 'err');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = prevText;
+  }
+}
+window.pcSaveCompany = pcSaveCompany;
+
+// File input → leer como data URL → POST /me/company/logo
+function pcOnLogoFile(event) {
+  var file = event && event.target && event.target.files && event.target.files[0];
+  if (!file) return;
+  // Cap cliente: 200 KB. El backend también valida.
+  if (file.size > 200 * 1024) {
+    _pcSetMsg(_i18nText('pc_err_logo_size', 'El logo supera 200 KB. Comprímelo o redúcelo.'), 'err');
+    event.target.value = '';
+    return;
+  }
+  if (!/^image\/(png|jpeg|jpg|webp)$/i.test(file.type)) {
+    _pcSetMsg(_i18nText('pc_err_logo_format', 'Formato no soportado. Usa PNG, JPG o WebP.'), 'err');
+    event.target.value = '';
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = async function() {
+    try {
+      var dataUrl = reader.result;
+      _pcSetMsg(_i18nText('pc_logo_uploading', 'Subiendo logo…'), null);
+      var res = await fetch(API_BASE + '/me/company/logo', {
+        method: 'POST',
+        headers: Object.assign({'Content-Type': 'application/json'}, authHeaders()),
+        body: JSON.stringify({ logo_base64: dataUrl }),
+      });
+      if (!res.ok) {
+        if (res.status === 401) { showToast(_i18nText('session_expired', 'Sesión caducada.')); goTo('s-splash'); return; }
+        if (res.status === 403) {
+          _pcSetMsg(_i18nText('pc_err_not_pro', 'Esta sección es solo para cuentas profesionales.'), 'err');
+          return;
+        }
+        var detail = '';
+        try { var ed = await res.json(); detail = ed.detail || ''; } catch(e) {}
+        _pcSetMsg(detail || _i18nText('pc_err_logo_upload', 'No se pudo subir el logo.'), 'err');
+        return;
+      }
+      var data = await res.json();
+      window._myCompanyLogo = data.logo_base64 || null;
+      // Marcar has_company_logo en _myAccount también
+      if (window._myAccount) window._myAccount.has_company_logo = !!window._myCompanyLogo;
+      _pcRenderLogoPreview(window._myCompanyLogo);
+      _pcSetMsg(_i18nText('pc_logo_uploaded', 'Logo guardado ✓'), 'ok');
+      renderHomeDogs();
+    } catch (e) {
+      console.error('pcOnLogoFile:', e);
+      _pcSetMsg(_i18nText('pc_err_logo_upload', 'No se pudo subir el logo.'), 'err');
+    } finally {
+      event.target.value = '';  // permitir resubir el mismo file
+    }
+  };
+  reader.onerror = function() {
+    _pcSetMsg(_i18nText('pc_err_logo_read', 'No se pudo leer el archivo.'), 'err');
+    event.target.value = '';
+  };
+  reader.readAsDataURL(file);
+}
+window.pcOnLogoFile = pcOnLogoFile;
+
+async function pcRemoveLogo() {
+  if (!confirm(_i18nText('pc_logo_remove_confirm', '¿Quitar el logo de empresa? Tus PDFs futuros saldrán sin él.'))) return;
+  try {
+    var res = await fetch(API_BASE + '/me/company/logo', {
+      method: 'DELETE', headers: authHeaders(),
+    });
+    if (!res.ok) {
+      if (res.status === 401) { showToast(_i18nText('session_expired', 'Sesión caducada.')); goTo('s-splash'); return; }
+      _pcSetMsg(_i18nText('pc_err_logo_remove', 'No se pudo quitar el logo.'), 'err');
+      return;
+    }
+    window._myCompanyLogo = null;
+    if (window._myAccount) window._myAccount.has_company_logo = false;
+    _pcRenderLogoPreview(null);
+    _pcSetMsg(_i18nText('pc_logo_removed', 'Logo eliminado.'), 'ok');
+    renderHomeDogs();
+  } catch (e) {
+    console.error('pcRemoveLogo:', e);
+    _pcSetMsg(_i18nText('pc_err_logo_remove', 'No se pudo quitar el logo.'), 'err');
+  }
+}
+window.pcRemoveLogo = pcRemoveLogo;
+
 // ── Corporativo (área profesional) — abre mailto al contacto TDM ─────────────
 function onCorporateContact() {
   var lang = (typeof window.getCurrentLang === 'function') ? window.getCurrentLang() : 'es';
@@ -8310,6 +8846,7 @@ function getVal(id, fallback) {
       localStorage.setItem('dm_last_email', email);
       // Precargar lista de perros tras login exitoso
       if (typeof loadMyDogs === 'function') loadMyDogs();
+    if (typeof loadAccountInfo === 'function') loadAccountInfo();
       showToast('👋 ¡Bienvenido!');
       var dest = localStorage.getItem('dm_login_dest') || 's-home';
       localStorage.removeItem('dm_login_dest');
@@ -9462,7 +9999,7 @@ function renderHomeDogs() {
     slots = [{ dog: dogs[0] }, { dog: dogs[1] }];
   }
 
-  row.innerHTML = slots.map(function(slot, idx) {
+  var dogsHtml = slots.map(function(slot, idx) {
     var d = slot.dog;
     var isDemo = !!d._demo;
     var imgSrc = d.photo_base64 || d.photoUrl || '';
@@ -9484,8 +10021,77 @@ function renderHomeDogs() {
       '</div>'
     );
   }).join('');
+
+  // Slot Entidad: solo si el usuario es profesional. Va en el lado opuesto
+  // (margin-left:auto) y abre s-pro-company al pulsar.
+  var entityHtml = '';
+  var acc = window._myAccount || null;
+  if (acc && acc.account_type === 'professional') {
+    var company = acc.company || null;
+    var logoData = window._myCompanyLogo || null;  // data URL del logo (cargado aparte)
+    var entLabel = (company && company.name)
+      ? company.name
+      : _i18nText('home_entity_empty', 'Mi empresa');
+    var entImgHtml = logoData
+      ? '<img src="' + _escapeAttr(logoData) + '" alt="">'
+      : '<span class="entity-add">+</span>';
+    var entCircleClass = logoData ? 'entity-circle' : 'entity-circle empty';
+    entityHtml =
+      '<div class="entity-item" onclick="goTo(\'s-pro-company\')" role="listitem" aria-label="' +
+        _escapeAttr(_i18nText('home_entity_aria', 'Datos de empresa')) + '">' +
+        '<div class="' + entCircleClass + '">' + entImgHtml + '</div>' +
+        '<div class="entity-name">' + _escapeText(entLabel) + '</div>' +
+      '</div>';
+  }
+
+  row.innerHTML = dogsHtml + entityHtml;
 }
 window.renderHomeDogs = renderHomeDogs;
+
+// ── Cuenta profesional (slot Entidad) ──────────────────────────────────────
+// Carga GET /me/account + GET /me/company/logo (paralelo). Cachea en window
+// para que renderHomeDogs decida si mostrar el slot. Sin sesión / errores
+// degrada con seguridad — el slot simplemente no aparece.
+async function loadAccountInfo() {
+  if (!getJWT()) {
+    window._myAccount = null;
+    window._myCompanyLogo = null;
+    renderHomeDogs();
+    return;
+  }
+  try {
+    var res = await fetch(API_BASE + '/me/account', {
+      headers: authHeaders(), cache: 'no-store',
+    });
+    if (!res.ok) {
+      window._myAccount = null;
+      renderHomeDogs();
+      return;
+    }
+    window._myAccount = await res.json();
+
+    // Logo aparte: solo cargar si has_company_logo (evita request inútil)
+    if (window._myAccount.has_company_logo && window._myAccount.account_type === 'professional') {
+      try {
+        var lr = await fetch(API_BASE + '/me/company/logo', {
+          headers: authHeaders(), cache: 'no-store',
+        });
+        if (lr.ok) {
+          var ldata = await lr.json();
+          window._myCompanyLogo = ldata.logo_base64 || null;
+        }
+      } catch(e) { /* ignorar */ }
+    } else {
+      window._myCompanyLogo = null;
+    }
+    renderHomeDogs();
+  } catch (e) {
+    console.warn('loadAccountInfo error:', e);
+    window._myAccount = null;
+    renderHomeDogs();
+  }
+}
+window.loadAccountInfo = loadAccountInfo;
 
 function openCreateDog() {
   if (!getJWT()) {
@@ -10030,12 +10636,14 @@ function _installSeguimientoGuardian() {
 document.addEventListener('DOMContentLoaded', function() {
   // Pequeño delay para permitir que i18n se aplique antes
   setTimeout(loadMyDogs, 50);
+  setTimeout(loadAccountInfo, 60);
   _installDogProfileGuardian();
   _installSeguimientoGuardian();
 });
 // Si el documento ya está cargado (script al final del body), llamamos sin esperar evento.
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
   setTimeout(loadMyDogs, 50);
+  setTimeout(loadAccountInfo, 60);
   _installDogProfileGuardian();
   _installSeguimientoGuardian();
 }
@@ -10657,6 +11265,49 @@ function endTourIntro() {
       at_err_not_found:     'Caso no encontrado.',
       at_share_title:       'Tu análisis explicado · The Dogs Mind',
       at_regen_confirm:     '¿Regenerar la explicación? Cobrará 0,1 tokens más.',
+      // Slot Entidad (home — solo profesionales)
+      home_entity_empty:    'Mi empresa',
+      home_entity_aria:     'Datos de empresa',
+      // s-pro-company (datos empresa + logo)
+      pc_eyebrow:                 'Solo profesionales',
+      pc_title:                   'Datos de empresa',
+      pc_logo_section:            'Logo en informes',
+      pc_logo_btn:                'Subir / cambiar logo',
+      pc_logo_remove:             'Quitar logo',
+      pc_logo_remove_confirm:     '¿Quitar el logo de empresa? Tus PDFs futuros saldrán sin él.',
+      pc_logo_hint:               'PNG, JPG o WebP · máx. 200 KB. Aparecerá arriba a la derecha en tus PDFs.',
+      pc_logo_uploading:          'Subiendo logo…',
+      pc_logo_uploaded:           'Logo guardado ✓',
+      pc_logo_removed:            'Logo eliminado.',
+      pc_form_section:            'Información de la entidad',
+      pc_field_name:              'Nombre de la empresa',
+      pc_field_web:               'Web',
+      pc_field_cif:               'CIF / Tax ID',
+      pc_field_cif_hint:          'Solo si quieres factura mensual.',
+      pc_field_clients:           'Nº de clientes al año',
+      pc_field_clients_hint:      'Estimación. Ayuda al equipo a entender tu volumen.',
+      pc_field_city:              'Ciudad',
+      pc_field_country:           'País',
+      pc_field_billing_email:     'Email de facturación',
+      pc_field_billing_email_hint:'Donde recibirás factura mensual si solicitaste CIF.',
+      pc_field_collaborate:       '¿Te gustaría colaborar con The Dogs Mind?',
+      pc_field_collaborate_hint:  'Casos formativos, validación clínica, contenidos.',
+      pc_disclaimer:              'El logo aparecerá únicamente si tu cuenta es profesional y has subido un archivo válido. Sin logo, el PDF muestra solo The Dogs Mind.',
+      pc_btn_save:                'Guardar cambios',
+      pc_btn_saving:              'Guardando…',
+      pc_btn_back:                'Volver al inicio',
+      pc_saved_ok:                'Datos guardados ✓',
+      pc_err_name:                'El nombre de la empresa es obligatorio.',
+      pc_err_web:                 'La web es obligatoria. Incluye https://',
+      pc_err_clients:             'Nº de clientes debe ser un número válido.',
+      pc_err_email:               'Email de facturación con formato inválido.',
+      pc_err_save:                'Error guardando los datos.',
+      pc_err_not_pro:             'Esta sección es solo para cuentas profesionales.',
+      pc_err_logo_size:           'El logo supera 200 KB. Comprímelo o redúcelo.',
+      pc_err_logo_format:         'Formato no soportado. Usa PNG, JPG o WebP.',
+      pc_err_logo_upload:         'No se pudo subir el logo.',
+      pc_err_logo_remove:         'No se pudo quitar el logo.',
+      pc_err_logo_read:           'No se pudo leer el archivo.',
       // ABC explained (s-abc-explained)
       ae_eyebrow:           'Análisis funcional ABC',
       ae_title:             '¿De qué se trata?',
@@ -11280,6 +11931,49 @@ function endTourIntro() {
       at_err_not_found:     'Case not found.',
       at_share_title:       'Your analysis explained · The Dogs Mind',
       at_regen_confirm:     'Regenerate the explanation? It will charge 0.1 extra tokens.',
+      // Entity slot (home — professionals only)
+      home_entity_empty:    'My company',
+      home_entity_aria:     'Company details',
+      // s-pro-company (company info + logo)
+      pc_eyebrow:                 'Professionals only',
+      pc_title:                   'Company details',
+      pc_logo_section:            'Logo on reports',
+      pc_logo_btn:                'Upload / change logo',
+      pc_logo_remove:             'Remove logo',
+      pc_logo_remove_confirm:     'Remove the company logo? Your future PDFs will be issued without it.',
+      pc_logo_hint:               'PNG, JPG or WebP · max 200 KB. Will appear top-right on your PDFs.',
+      pc_logo_uploading:          'Uploading logo…',
+      pc_logo_uploaded:           'Logo saved ✓',
+      pc_logo_removed:            'Logo removed.',
+      pc_form_section:            'Entity information',
+      pc_field_name:              'Company name',
+      pc_field_web:               'Website',
+      pc_field_cif:               'Tax ID / VAT',
+      pc_field_cif_hint:          'Only if you want a monthly invoice.',
+      pc_field_clients:           'Clients per year',
+      pc_field_clients_hint:      'Estimate. Helps the team understand your volume.',
+      pc_field_city:              'City',
+      pc_field_country:           'Country',
+      pc_field_billing_email:     'Billing email',
+      pc_field_billing_email_hint:'Where you’ll receive monthly invoices if you provided a Tax ID.',
+      pc_field_collaborate:       'Would you like to collaborate with The Dogs Mind?',
+      pc_field_collaborate_hint:  'Training cases, clinical validation, content.',
+      pc_disclaimer:              'The logo appears only if your account is professional and you’ve uploaded a valid file. Without a logo, the PDF shows only The Dogs Mind.',
+      pc_btn_save:                'Save changes',
+      pc_btn_saving:              'Saving…',
+      pc_btn_back:                'Back to home',
+      pc_saved_ok:                'Saved ✓',
+      pc_err_name:                'Company name is required.',
+      pc_err_web:                 'Website is required. Include https://',
+      pc_err_clients:             'Clients per year must be a valid number.',
+      pc_err_email:               'Billing email format is invalid.',
+      pc_err_save:                'Error saving the data.',
+      pc_err_not_pro:             'This section is only for professional accounts.',
+      pc_err_logo_size:           'Logo exceeds 200 KB. Compress or resize it.',
+      pc_err_logo_format:         'Unsupported format. Use PNG, JPG or WebP.',
+      pc_err_logo_upload:         'Could not upload the logo.',
+      pc_err_logo_remove:         'Could not remove the logo.',
+      pc_err_logo_read:           'Could not read the file.',
       // ABC explained (s-abc-explained)
       ae_eyebrow:           'Functional Behavioral Analysis',
       ae_title:             'What is this about?',

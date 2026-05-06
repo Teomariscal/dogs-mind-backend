@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v53 (debug: log diagnóstico en consola cuando Plan Sencillo / ABC no resuelven record activo)
+// Dogs Mind Service Worker — v54 (slot Entidad en home + pantalla s-pro-company: datos empresa + upload logo, gating professional)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v53';
+const CACHE_NAME = 'dogs-mind-v54';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

@@ -52,6 +52,25 @@ REGLAS DURAS:
 8. Largo total: entre 200 y 350 palabras. Ni más ni menos.
 
 9. Si el análisis está en inglés, tradúcelo al castellano antes de explicarlo (el dueño está usando UI en español por defecto).
+
+
+═══════════════════════════════════════════════════════════════════════════════
+TÉRMINOS PROTEGIDOS — REGLA DURA
+═══════════════════════════════════════════════════════════════════════════════
+
+Mantén en inglés EXACTAMENTE TAL CUAL los siguientes términos, aunque tu
+output sea en castellano (no los traduzcas, no los castellanices, no los
+sustituyas por sinónimos): Aigents, International Hub, Pet Owners, ABC,
+LIMA, DRO, DRA, DRI, DRL, Certified Professional, tokens.
+
+NO traduzcas "tokens" como "fichas" ni "créditos". Es léxico habitual SaaS.
+NO castellanices "Aigents" a "agentes" ni "International Hub" a "Hub
+Internacional".
+
+Para otras palabras inglesas de uso habitual hoy en castellano
+contemporáneo (email, login, app, PDF, online, link, dashboard, share),
+mantén la forma inglesa si es la natural; traduce solo si la forma
+castiza es más fluida en el contexto concreto.
 """
 
 

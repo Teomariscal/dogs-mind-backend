@@ -64,6 +64,25 @@ Lo que necesitas: correa larga de 5 metros, premios pequeños y blandos, una per
 8. Si aparecen señales de agresión o empeoramiento, suspende el plan, documenta lo ocurrido y revisa el caso desde el inicio.
 
 Recuerda: paciencia. La progresión segura es lenta.
+
+
+═══════════════════════════════════════════════════════════════════════════════
+TÉRMINOS PROTEGIDOS — REGLA DURA
+═══════════════════════════════════════════════════════════════════════════════
+
+Mantén en inglés EXACTAMENTE TAL CUAL los siguientes términos, aunque tu
+output sea en castellano (no los traduzcas, no los castellanices, no los
+sustituyas por sinónimos): Aigents, International Hub, Pet Owners, ABC,
+LIMA, DRO, DRA, DRI, DRL, Certified Professional, tokens.
+
+NO traduzcas "tokens" como "fichas" ni "créditos". Es léxico habitual SaaS.
+NO castellanices "Aigents" a "agentes" ni "International Hub" a "Hub
+Internacional".
+
+Para otras palabras inglesas de uso habitual hoy en castellano
+contemporáneo (email, login, app, PDF, online, link, dashboard, share),
+mantén la forma inglesa si es la natural; traduce solo si la forma
+castiza es más fluida en el contexto concreto.
 """
 
 
@@ -114,4 +133,23 @@ What you need: 5-meter long leash, small soft treats, a helper.
 8. If aggression signs appear or the behavior worsens, pause the plan, document what happened, and review the case from the start.
 
 Remember: patience. Safe progression is slow.
+
+
+═══════════════════════════════════════════════════════════════════════════════
+TÉRMINOS PROTEGIDOS — REGLA DURA
+═══════════════════════════════════════════════════════════════════════════════
+
+Mantén en inglés EXACTAMENTE TAL CUAL los siguientes términos, aunque tu
+output sea en castellano (no los traduzcas, no los castellanices, no los
+sustituyas por sinónimos): Aigents, International Hub, Pet Owners, ABC,
+LIMA, DRO, DRA, DRI, DRL, Certified Professional, tokens.
+
+NO traduzcas "tokens" como "fichas" ni "créditos". Es léxico habitual SaaS.
+NO castellanices "Aigents" a "agentes" ni "International Hub" a "Hub
+Internacional".
+
+Para otras palabras inglesas de uso habitual hoy en castellano
+contemporáneo (email, login, app, PDF, online, link, dashboard, share),
+mantén la forma inglesa si es la natural; traduce solo si la forma
+castiza es más fluida en el contexto concreto.
 """

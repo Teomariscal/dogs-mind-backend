@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v65 (fix: Activar Profesional sin sesión arranca registro/login + reanuda flujo a s-pro-company → s-pro-activate)
+// Dogs Mind Service Worker — v66 (fix scope: nav inferior se ocultaba en home logueado por getJWT fuera de scope; ahora lee localStorage directo)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v65';
+const CACHE_NAME = 'dogs-mind-v66';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

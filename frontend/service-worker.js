@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v62 (s-account-type: Profesional ahora lleva directo al login con tipo pro preseleccionado, no a la página informativa)
+// Dogs Mind Service Worker — v63 (s-pro-area: CTA Iniciar sesión entre mapa y cards de membresía + s-account-type vuelve a llevar Pro a la informativa)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v62';
+const CACHE_NAME = 'dogs-mind-v63';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

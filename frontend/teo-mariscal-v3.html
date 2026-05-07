@@ -4615,6 +4615,47 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   cursor: default; opacity: 0.7;
 }
 
+/* CTA de Log In intercalado entre el mapa y las cards de membresía.
+   Más compacto que la card final: una sola línea con label + botón. */
+#s-pro-area .pro-mid-auth {
+  padding: var(--pro-s-2) var(--pro-s-4);
+}
+#s-pro-area .pro-mid-auth-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  background: linear-gradient(180deg, rgba(94,200,230,0.10), rgba(94,200,230,0.03));
+  border: 1px solid rgba(94,200,230,0.32);
+  border-radius: 100px;
+  padding: 10px 18px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+#s-pro-area .pro-mid-auth-label {
+  font-family: var(--pro-font-ui);
+  font-size: 13px;
+  color: var(--pro-text-muted, rgba(255,255,255,0.78));
+  letter-spacing: 0.01em;
+}
+#s-pro-area .pro-mid-auth-btn {
+  border: none;
+  background: linear-gradient(180deg, #6dd6ee, #4ab5d4);
+  color: #0e1f1a;
+  font-family: var(--pro-font-ui);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 8px 16px;
+  border-radius: 100px;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(94,200,230,0.28);
+  transition: filter 150ms ease, transform 100ms ease;
+}
+#s-pro-area .pro-mid-auth-btn:hover { filter: brightness(1.08); }
+#s-pro-area .pro-mid-auth-btn:active { transform: scale(0.97); }
+
 /* Login/signup CTA al final del área profesional — mantén estilo cyan. */
 #s-pro-area .pro-auth-cta {
   padding: var(--pro-s-2) var(--pro-s-4) var(--pro-s-8);
@@ -7401,6 +7442,15 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
       </div>
     </section>
 
+    <!-- CTA de Log In tras el mapa, antes de las cards. Solo visible si NO hay sesión.
+         Estilo cyan, alineado con el accent del área pro. -->
+    <section id="pro-mid-auth" class="pro-mid-auth" style="display:none;">
+      <div class="pro-mid-auth-inner">
+        <span class="pro-mid-auth-label" data-i18n="pro_mid_auth_label">¿Ya eres usuario?</span>
+        <button class="pro-mid-auth-btn" onclick="goToProLogin()" data-i18n="pro_mid_auth_btn">Iniciar sesión</button>
+      </div>
+    </section>
+
     <section class="pro-section">
       <p class="pro-section-eyebrow" data-i18n="pro_section_eyebrow">Tipos de membresía</p>
       <h2 class="pro-section-title" data-i18n="pro_section_title">Elige tu nivel</h2>
@@ -7547,7 +7597,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
         <p class="at-card-pitch" data-i18n="at_particular_pitch">Para dueños de perro. Análisis funcional y plan de intervención para tus propios perros.</p>
       </button>
 
-      <button class="at-card at-card--professional" onclick="goToProLogin()">
+      <button class="at-card at-card--professional" onclick="goTo('s-pro-area')">
         <span class="at-tag" data-i18n="at_tag_professional">International Hub</span>
         <h3 class="at-card-title">
           <span data-i18n="at_professional_title">Profesional</span>
@@ -8862,10 +8912,13 @@ window.goToProLogin = goToProLogin;
 function renderProAreaAuthCTA() {
   var hasJWT = (typeof getJWT === 'function') ? !!getJWT() : false;
   var cta        = document.getElementById('pro-auth-cta');
+  var midAuth    = document.getElementById('pro-mid-auth');
   var loginLink  = document.getElementById('pro-login-link');
   var logoutLink = document.getElementById('pro-logout-link');
   // Card final solo aparece sin sesión
-  if (cta) cta.style.display = hasJWT ? 'none' : 'block';
+  if (cta)     cta.style.display     = hasJWT ? 'none' : 'block';
+  // CTA intermedio (entre mapa y cards) — solo sin sesión
+  if (midAuth) midAuth.style.display = hasJWT ? 'none' : 'block';
   // Header link — uno u otro según haya sesión
   if (loginLink)  loginLink.style.display  = hasJWT ? 'none' : 'inline-block';
   if (logoutLink) logoutLink.style.display = hasJWT ? 'inline-block' : 'none';
@@ -12185,6 +12238,8 @@ function endTourIntro() {
       // Login en área profesional
       pro_login_link:          'Iniciar sesión',
       pro_logout_link:         'Cerrar sesión',
+      pro_mid_auth_label:      '¿Ya eres usuario?',
+      pro_mid_auth_btn:        'Iniciar sesión',
       pro_auth_eyebrow:        '¿Ya eres usuario?',
       pro_auth_title:          'Inicia sesión o crea tu cuenta',
       pro_auth_sub:            'Accede a tu área profesional con tu email y contraseña.',
@@ -12896,6 +12951,8 @@ function endTourIntro() {
       // Login in professional area
       pro_login_link:          'Sign in',
       pro_logout_link:         'Sign out',
+      pro_mid_auth_label:      'Already a user?',
+      pro_mid_auth_btn:        'Sign in',
       pro_auth_eyebrow:        'Already a user?',
       pro_auth_title:          'Sign in or create your account',
       pro_auth_sub:            'Access your professional area with your email and password.',

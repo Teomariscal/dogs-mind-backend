@@ -4655,6 +4655,16 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 }
 #s-pro-area .pro-mid-auth-btn:hover { filter: brightness(1.08); }
 #s-pro-area .pro-mid-auth-btn:active { transform: scale(0.97); }
+#s-pro-area .pro-mid-auth-hint {
+  margin: 10px auto 0;
+  text-align: center;
+  font-family: var(--pro-font-ui);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--pro-text-muted, rgba(255,255,255,0.62));
+  font-style: italic;
+  max-width: 480px;
+}
 
 /* Login/signup CTA al final del área profesional — mantén estilo cyan. */
 #s-pro-area .pro-auth-cta {
@@ -7443,12 +7453,14 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
     </section>
 
     <!-- CTA de Log In tras el mapa, antes de las cards. Solo visible si NO hay sesión.
-         Estilo cyan, alineado con el accent del área pro. -->
+         Estilo cyan, alineado con el accent del área pro.
+         Debajo, hint pequeño que invita a explorar las cards de abajo si no tiene cuenta. -->
     <section id="pro-mid-auth" class="pro-mid-auth" style="display:none;">
       <div class="pro-mid-auth-inner">
         <span class="pro-mid-auth-label" data-i18n="pro_mid_auth_label">¿Ya eres usuario?</span>
         <button class="pro-mid-auth-btn" onclick="goToProLogin()" data-i18n="pro_mid_auth_btn">Iniciar sesión</button>
       </div>
+      <p class="pro-mid-auth-hint" data-i18n="pro_mid_auth_hint">¿No estás registrado todavía? Descubre los tipos de membresía.</p>
     </section>
 
     <section class="pro-section">
@@ -12240,6 +12252,7 @@ function endTourIntro() {
       pro_logout_link:         'Cerrar sesión',
       pro_mid_auth_label:      '¿Ya eres usuario?',
       pro_mid_auth_btn:        'Iniciar sesión',
+      pro_mid_auth_hint:       '¿No estás registrado todavía? Descubre los tipos de membresía.',
       pro_auth_eyebrow:        '¿Ya eres usuario?',
       pro_auth_title:          'Inicia sesión o crea tu cuenta',
       pro_auth_sub:            'Accede a tu área profesional con tu email y contraseña.',
@@ -12953,6 +12966,7 @@ function endTourIntro() {
       pro_logout_link:         'Sign out',
       pro_mid_auth_label:      'Already a user?',
       pro_mid_auth_btn:        'Sign in',
+      pro_mid_auth_hint:       'Not registered yet? Discover the membership tiers below.',
       pro_auth_eyebrow:        'Already a user?',
       pro_auth_title:          'Sign in or create your account',
       pro_auth_sub:            'Access your professional area with your email and password.',

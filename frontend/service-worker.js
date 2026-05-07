@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v66 (fix scope: nav inferior se ocultaba en home logueado por getJWT fuera de scope; ahora lee localStorage directo)
+// Dogs Mind Service Worker — v67 (fix scope: renderProAreaAuthCTA con mismo bug que el nav; lee localStorage directo)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.

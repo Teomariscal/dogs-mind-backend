@@ -8930,7 +8930,9 @@ function goToProLogin() {
 window.goToProLogin = goToProLogin;
 
 function renderProAreaAuthCTA() {
-  var hasJWT = (typeof getJWT === 'function') ? !!getJWT() : false;
+  // Leer JWT directo de localStorage; getJWT() vive en otra IIFE y no es accesible desde este scope.
+  var hasJWT = false;
+  try { hasJWT = !!localStorage.getItem('dm_jwt'); } catch(e) {}
   var cta        = document.getElementById('pro-auth-cta');
   var midAuth    = document.getElementById('pro-mid-auth');
   var loginLink  = document.getElementById('pro-login-link');

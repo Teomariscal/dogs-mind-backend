@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v64 (s-pro-area: CTA Iniciar sesión + hint "no registrado? descubre tipos de membresía" debajo)
+// Dogs Mind Service Worker — v65 (fix: Activar Profesional sin sesión arranca registro/login + reanuda flujo a s-pro-company → s-pro-activate)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v64';
+const CACHE_NAME = 'dogs-mind-v65';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

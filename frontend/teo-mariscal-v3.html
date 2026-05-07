@@ -7875,7 +7875,13 @@ function registerUser() {
     if (role === 'ambassador') showToast('¡Bienvenido embajador! Tienes 15 tokens');
     else if (role === 'tech') showToast('¡Bienvenido Dogs Mind Tech! Tienes 50 tokens');
     else showToast('¡Bienvenido! Tienes 5 tokens listos');
-    goTo('s-home');
+    // Si veníamos del flujo "Activar Profesional" sin sesión, reanudamos
+    // automáticamente (registro → datos empresa → checkout). Si no, home.
+    if (window._pendingActivatePro && typeof _consumePendingActivatePro === 'function') {
+      _consumePendingActivatePro();
+    } else {
+      goTo('s-home');
+    }
   })
   .catch(function() { alert('Error de conexión. Inténtalo de nuevo.'); });
 }
@@ -8948,8 +8954,13 @@ window._pcReturnToActivate = false;
 
 async function onActivateProClick() {
   if (!getJWT()) {
-    showToast(_i18nText('seg_login_required', 'Inicia sesión.'));
-    goTo('s-splash');
+    // Sin sesión: el usuario quiere REGISTRARSE como profesional. Flujo completo:
+    //   1) registro/login con tipo pro preseleccionado
+    //   2) tras crear cuenta → s-pro-company con banner "Antes del pago"
+    //   3) tras guardar datos empresa → s-pro-activate (Stripe checkout)
+    // Para conectar esos pasos, dejamos un flag que se consume tras login/registro.
+    window._pendingActivatePro = true;
+    goToProLogin();
     return;
   }
   // Asegurar que tenemos _myAccount cargado
@@ -8974,6 +8985,24 @@ async function onActivateProClick() {
   goTo('s-pro-activate');
 }
 window.onActivateProClick = onActivateProClick;
+
+// Cuando el usuario inicia sesión / se registra y venía del flujo "Activar
+// Profesional" (flag _pendingActivatePro), retomamos automáticamente:
+// home → s-pro-company → s-pro-activate. Así el flujo no se pierde.
+async function _consumePendingActivatePro() {
+  if (!window._pendingActivatePro) return false;
+  window._pendingActivatePro = false;
+  if (!getJWT()) return false;
+  try {
+    if (typeof loadAccountInfo === 'function') await loadAccountInfo();
+  } catch(e) {}
+  // Re-ejecutamos el flujo normal con sesión ya activa.
+  if (typeof onActivateProClick === 'function') {
+    await onActivateProClick();
+  }
+  return true;
+}
+window._consumePendingActivatePro = _consumePendingActivatePro;
 
 // Botón "atrás" del s-pro-company. Si veníamos del flujo de activación,
 // cancelar significa volver a s-pro-area (no a home), para no descolocar.
@@ -9766,6 +9795,11 @@ function getVal(id, fallback) {
       if (typeof loadMyDogs === 'function') loadMyDogs();
     if (typeof loadAccountInfo === 'function') loadAccountInfo();
       showToast('¡Bienvenido!');
+      // Si veníamos del flujo "Activar Profesional" sin sesión, reanudar.
+      if (window._pendingActivatePro && typeof _consumePendingActivatePro === 'function') {
+        _consumePendingActivatePro();
+        return;
+      }
       var dest = localStorage.getItem('dm_login_dest') || 's-home';
       localStorage.removeItem('dm_login_dest');
       goTo(dest);

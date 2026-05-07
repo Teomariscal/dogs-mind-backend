@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v67 (fix scope: renderProAreaAuthCTA con mismo bug que el nav; lee localStorage directo)
+// Dogs Mind Service Worker — v68 (copy mid-auth CTA s-pro-area: ¿Estás registrado? Log in / ¿No estás registrado? Elige tu plan)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v66';
+const CACHE_NAME = 'dogs-mind-v68';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

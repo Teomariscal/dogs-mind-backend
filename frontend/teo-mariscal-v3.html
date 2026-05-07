@@ -4615,6 +4615,82 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   cursor: default; opacity: 0.7;
 }
 
+/* Login/signup CTA al final del área profesional — mantén estilo cyan. */
+#s-pro-area .pro-auth-cta {
+  padding: var(--pro-s-2) var(--pro-s-4) var(--pro-s-8);
+}
+#s-pro-area .pro-auth-card {
+  background: linear-gradient(180deg, rgba(94,200,230,0.08), rgba(94,200,230,0.02));
+  border: 1px solid rgba(94,200,230,0.32);
+  border-radius: var(--pro-r-card);
+  padding: 22px 22px 20px;
+  text-align: center;
+  box-shadow: 0 0 28px rgba(94,200,230,0.10) inset;
+}
+#s-pro-area .pro-auth-eyebrow {
+  font-family: var(--pro-font-mono);
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--pro-cyan, #5ec8e6);
+  margin: 0 0 6px;
+}
+#s-pro-area .pro-auth-title {
+  font-family: var(--pro-font-display);
+  font-size: 20px; font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--pro-text-strong, #f7fbff);
+  margin: 0 0 4px;
+}
+#s-pro-area .pro-auth-sub {
+  font-family: var(--pro-font-ui);
+  font-size: 13px; line-height: 1.55;
+  color: var(--pro-text-muted, rgba(255,255,255,0.72));
+  margin: 0;
+}
+#s-pro-area .pro-auth-btn {
+  display: inline-block;
+  width: 100%;
+  margin-top: 14px;
+  padding: 14px 20px;
+  border: none;
+  border-radius: var(--pro-r-button);
+  background: linear-gradient(180deg, #6dd6ee, #4ab5d4);
+  color: #0e1f1a;
+  font-family: var(--pro-font-ui);
+  font-size: 15px; font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(94,200,230,0.32);
+  transition: filter 150ms ease, transform 100ms ease;
+}
+#s-pro-area .pro-auth-btn:hover { filter: brightness(1.07); }
+#s-pro-area .pro-auth-btn:active { transform: scale(0.98); }
+
+/* Acceso de login flotante en header del área profesional (alto en jerarquía,
+   complementario al back button). Solo visible si NO hay sesión activa. */
+#s-pro-area .pro-login-link {
+  position: absolute;
+  top: max(env(safe-area-inset-top, 0px), 14px);
+  right: 16px;
+  z-index: 8;
+  background: rgba(0, 24, 32, 0.55);
+  border: 1.5px solid rgba(94,200,230,0.55);
+  color: var(--pro-cyan, #5ec8e6);
+  padding: 8px 14px;
+  border-radius: 100px;
+  font-family: var(--pro-font-mono);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: background 200ms ease, color 200ms ease;
+}
+#s-pro-area .pro-login-link:hover {
+  background: rgba(94,200,230,0.15);
+  color: #fff;
+}
+
 /* Precio dentro de la card Profesional, justo encima del CTA */
 #s-pro-area .pro-card-price-row {
   display:flex;align-items:baseline;gap:10px;
@@ -7036,6 +7112,8 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   <!-- ══ S-PRO-AREA — Área Profesional (cards informativos sin precio aún) ══ -->
   <div id="s-pro-area" class="screen">
     <button class="pro-back" onclick="goTo('s-splash')" aria-label="Volver">&#8592;</button>
+    <!-- Login link flotante — solo visible si NO hay sesión. JS lo oculta si getJWT(). -->
+    <button id="pro-login-link" class="pro-login-link" type="button" onclick="goToProLogin()" data-i18n="pro_login_link" style="display:none;">Iniciar sesión</button>
 
     <section class="pro-hero">
       <p class="pro-eyebrow" data-i18n="pro_hero_eyebrow">The Dogs Mind International Hub</p>
@@ -7370,6 +7448,18 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
       </article>
 
     </section>
+
+    <!-- Login / signup CTA — solo visible si NO hay sesión activa.
+         renderProAreaAuthCTA() lo oculta automáticamente si getJWT() devuelve un token.
+         Estilo: cyan, coherente con el accent del área profesional. -->
+    <section id="pro-auth-cta" class="pro-auth-cta" style="display:none;">
+      <div class="pro-auth-card">
+        <p class="pro-auth-eyebrow" data-i18n="pro_auth_eyebrow">¿Ya eres usuario?</p>
+        <h3 class="pro-auth-title" data-i18n="pro_auth_title">Inicia sesión o crea tu cuenta</h3>
+        <p class="pro-auth-sub" data-i18n="pro_auth_sub">Accede a tu área profesional con tu email y contraseña.</p>
+        <button class="pro-auth-btn" onclick="goToProLogin()" data-i18n="pro_auth_btn">Iniciar sesión / Crear cuenta</button>
+      </div>
+    </section>
   </div><!-- /s-pro-area -->
 
   <!-- ══ S-PRO-ACTIVATE — Activar Profesional (Stripe Checkout) ══ -->
@@ -7586,6 +7676,7 @@ function goTo(id) {
   if (id === 's-tokens') updateTokensScreen();
   if (id === 's-home') fetchBalance();
   if (id === 's-pro-company' && typeof _pcOnEnter === 'function') _pcOnEnter();
+  if (id === 's-pro-area' && typeof renderProAreaAuthCTA === 'function') renderProAreaAuthCTA();
   if (id === 's-pro-activate') {
     // Reset checkbox + total al entrar (no guardar estado entre visitas)
     var cb = document.getElementById('pa-bundle-cb');
@@ -8732,6 +8823,41 @@ async function pcRemoveLogo() {
   }
 }
 window.pcRemoveLogo = pcRemoveLogo;
+
+// ── Login / signup desde el área profesional ────────────────────────────────
+//
+// Si el usuario llega a s-pro-area sin sesión, debe poder loguearse o
+// registrarse sin tener que volver al splash. Mostramos:
+//   - botón flotante "Iniciar sesión" en header (alto en jerarquía visual)
+//   - card al final con CTA "Iniciar sesión / Crear cuenta"
+// Ambos ocultos si ya hay JWT.
+//
+// Al pulsar, vamos a s-login y pre-seleccionamos el tipo de cuenta a
+// "professional" para que el formulario de registro arranque en el tier
+// correcto. Si el usuario solo se loguea (no se registra), eso no afecta.
+
+function goToProLogin() {
+  goTo('s-login');
+  // Tras el render, presetear el select de tipo de cuenta a "pro" si existe.
+  setTimeout(function() {
+    var sel = document.getElementById('reg-type');
+    if (sel) {
+      sel.value = 'pro';
+      // Disparar onchange para que toggleProfessional() actualice el form
+      try { sel.dispatchEvent(new Event('change', { bubbles: true })); } catch(e) {}
+    }
+  }, 60);
+}
+window.goToProLogin = goToProLogin;
+
+function renderProAreaAuthCTA() {
+  var hasJWT = (typeof getJWT === 'function') ? !!getJWT() : false;
+  var cta    = document.getElementById('pro-auth-cta');
+  var link   = document.getElementById('pro-login-link');
+  if (cta)  cta.style.display  = hasJWT ? 'none' : 'block';
+  if (link) link.style.display = hasJWT ? 'none' : 'inline-block';
+}
+window.renderProAreaAuthCTA = renderProAreaAuthCTA;
 
 // ── Activar Profesional desde s-pro-area ────────────────────────────────────
 //
@@ -12043,6 +12169,12 @@ function endTourIntro() {
       pp_meta_dog_default:  'Tu perro',
       pp_loading:           'Generando tu plan en lenguaje sencillo…',
       pp_disclaimer:        'Esta versión sencilla es un resumen accesible del plan técnico. No sustituye consulta presencial con etólogo o veterinario cuando el caso lo requiera.',
+      // Login en área profesional
+      pro_login_link:          'Iniciar sesión',
+      pro_auth_eyebrow:        '¿Ya eres usuario?',
+      pro_auth_title:          'Inicia sesión o crea tu cuenta',
+      pro_auth_sub:            'Accede a tu área profesional con tu email y contraseña.',
+      pro_auth_btn:            'Iniciar sesión / Crear cuenta',
       // Pro card precio + activar
       pro_pro_price:           '20 €/año',
       pro_pro_price_sub:       'Pago único anual',
@@ -12747,6 +12879,12 @@ function endTourIntro() {
       pp_meta_dog_default:  'Your dog',
       pp_loading:           'Generating your plan in plain language…',
       pp_disclaimer:        'This simple version is an accessible summary of the technical plan. It does not replace in-person consultation with an ethologist or vet when the case requires it.',
+      // Login in professional area
+      pro_login_link:          'Sign in',
+      pro_auth_eyebrow:        'Already a user?',
+      pro_auth_title:          'Sign in or create your account',
+      pro_auth_sub:            'Access your professional area with your email and password.',
+      pro_auth_btn:            'Sign in / Create account',
       // Pro card price + activate
       pro_pro_price:           '€20/year',
       pro_pro_price_sub:       'One-time annual payment',

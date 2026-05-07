@@ -4690,6 +4690,14 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   background: rgba(94,200,230,0.15);
   color: #fff;
 }
+#s-pro-area .pro-login-link.pro-login-link--danger {
+  border-color: rgba(220, 130, 130, 0.55);
+  color: rgba(255, 200, 200, 0.92);
+}
+#s-pro-area .pro-login-link.pro-login-link--danger:hover {
+  background: rgba(220, 80, 80, 0.18);
+  color: #fff;
+}
 
 /* Precio dentro de la card Profesional, justo encima del CTA */
 #s-pro-area .pro-card-price-row {
@@ -7112,8 +7120,9 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   <!-- ══ S-PRO-AREA — Área Profesional (cards informativos sin precio aún) ══ -->
   <div id="s-pro-area" class="screen">
     <button class="pro-back" onclick="goTo('s-splash')" aria-label="Volver">&#8592;</button>
-    <!-- Login link flotante — solo visible si NO hay sesión. JS lo oculta si getJWT(). -->
-    <button id="pro-login-link" class="pro-login-link" type="button" onclick="goToProLogin()" data-i18n="pro_login_link" style="display:none;">Iniciar sesión</button>
+    <!-- Header link flotante: muestra "Iniciar sesión" sin sesión, "Cerrar sesión" con sesión. JS controla qué se ve. -->
+    <button id="pro-login-link"  class="pro-login-link" type="button" onclick="goToProLogin()" data-i18n="pro_login_link" style="display:none;">Iniciar sesión</button>
+    <button id="pro-logout-link" class="pro-login-link pro-login-link--danger" type="button" onclick="logout()" data-i18n="pro_logout_link" style="display:none;">Cerrar sesión</button>
 
     <section class="pro-hero">
       <p class="pro-eyebrow" data-i18n="pro_hero_eyebrow">The Dogs Mind International Hub</p>
@@ -8852,10 +8861,14 @@ window.goToProLogin = goToProLogin;
 
 function renderProAreaAuthCTA() {
   var hasJWT = (typeof getJWT === 'function') ? !!getJWT() : false;
-  var cta    = document.getElementById('pro-auth-cta');
-  var link   = document.getElementById('pro-login-link');
-  if (cta)  cta.style.display  = hasJWT ? 'none' : 'block';
-  if (link) link.style.display = hasJWT ? 'none' : 'inline-block';
+  var cta        = document.getElementById('pro-auth-cta');
+  var loginLink  = document.getElementById('pro-login-link');
+  var logoutLink = document.getElementById('pro-logout-link');
+  // Card final solo aparece sin sesión
+  if (cta) cta.style.display = hasJWT ? 'none' : 'block';
+  // Header link — uno u otro según haya sesión
+  if (loginLink)  loginLink.style.display  = hasJWT ? 'none' : 'inline-block';
+  if (logoutLink) logoutLink.style.display = hasJWT ? 'inline-block' : 'none';
 }
 window.renderProAreaAuthCTA = renderProAreaAuthCTA;
 
@@ -12171,6 +12184,7 @@ function endTourIntro() {
       pp_disclaimer:        'Esta versión sencilla es un resumen accesible del plan técnico. No sustituye consulta presencial con etólogo o veterinario cuando el caso lo requiera.',
       // Login en área profesional
       pro_login_link:          'Iniciar sesión',
+      pro_logout_link:         'Cerrar sesión',
       pro_auth_eyebrow:        '¿Ya eres usuario?',
       pro_auth_title:          'Inicia sesión o crea tu cuenta',
       pro_auth_sub:            'Accede a tu área profesional con tu email y contraseña.',
@@ -12881,6 +12895,7 @@ function endTourIntro() {
       pp_disclaimer:        'This simple version is an accessible summary of the technical plan. It does not replace in-person consultation with an ethologist or vet when the case requires it.',
       // Login in professional area
       pro_login_link:          'Sign in',
+      pro_logout_link:         'Sign out',
       pro_auth_eyebrow:        'Already a user?',
       pro_auth_title:          'Sign in or create your account',
       pro_auth_sub:            'Access your professional area with your email and password.',

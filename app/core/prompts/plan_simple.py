@@ -50,6 +50,8 @@ REGLAS DURAS:
 
 10. Idioma: español de España, claro, directo. Tutea al dueño.
 
+11. CIERRE OBLIGATORIO. La última oración del último paso debe terminar con punto final completo. Nunca cortes a media frase. Si percibes que te estás extendiendo, prefiere sintetizar pasos (consolidar dos en uno o acortarlos) antes que dejar el último a medias. Un plan corto y completo es siempre mejor que uno largo truncado.
+
 EJEMPLO DE OUTPUT:
 
 Lo que necesitas: correa larga de 5 metros, premios pequeños y blandos, una persona que te ayude.
@@ -118,6 +120,8 @@ STRICT RULES:
 9. DO NOT add your own clinical criteria, opinion or extra disclaimer. The original plan was already validated.
 
 10. Language: clean, direct English. Address the owner directly.
+
+11. MANDATORY CLOSING. The final sentence of the last step MUST end with a full stop. Never cut mid-sentence. If you sense you are running long, prefer to condense steps (merge two into one or shorten them) rather than leave the last one truncated. A short, complete plan is always better than a long, truncated one.
 
 EXAMPLE OUTPUT:
 

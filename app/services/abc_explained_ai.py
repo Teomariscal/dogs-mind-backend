@@ -19,9 +19,11 @@ from app.core.prompts.abc_explained import (
 )
 
 
-# Output cap: 4 párrafos × ~80 palabras × ~1.4 tokens/palabra ≈ 450 tokens.
-# 600 deja margen para inglés (más palabras por idea) sin descontrolarse.
-MAX_OUTPUT_TOKENS = 600
+# Output cap: 4 párrafos × ~90 palabras × ~1.6 tokens/palabra ≈ 580 tokens.
+# Subido a 850 tras detectar que con 600 el modelo a veces se cortaba a
+# media frase (Teo audit 2026-05-09). Margen para inglés y para que el
+# modelo cierre con punto final cómodo, sin permitir desbordes.
+MAX_OUTPUT_TOKENS = 850
 
 
 @dataclass
@@ -73,8 +75,29 @@ def run_abc_explained(*, original_abc_text: str, lang: str = "es") -> AbcExplain
         if getattr(block, "type", None) == "text":
             text += block.text
 
+    # Defensa contra cortes a media frase: si el modelo se aproximó al
+    # max_tokens y dejó la última frase incompleta, recortamos al último
+    # cierre limpio (., !, ?, …) preservando los párrafos previos.
+    text = _trim_to_clean_close(text.strip())
+
     return AbcExplainedResult(
-        text=text.strip(),
+        text=text,
         input_tokens=response.usage.input_tokens,
         output_tokens=response.usage.output_tokens,
     )
+
+
+def _trim_to_clean_close(text: str) -> str:
+    """Si el texto termina sin signo de cierre, recortar a la última frase
+    completa. Preserva todos los párrafos que estaban bien cerrados."""
+    if not text:
+        return text
+    # ya termina bien
+    if text.rstrip().endswith((".", "!", "?", "…", "»", '"', ":", ")")):
+        return text
+    # buscar el último signo de cierre fuerte
+    closers = (".", "!", "?", "…")
+    cut = max(text.rfind(c) for c in closers)
+    if cut <= 0:
+        return text  # no hay un buen sitio para cortar; devolver tal cual
+    return text[: cut + 1].rstrip()

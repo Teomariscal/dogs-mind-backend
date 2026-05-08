@@ -72,8 +72,28 @@ def run_plan_simple(*, original_plan_text: str, lang: str = "es") -> PlanSimpleR
         if getattr(block, "type", None) == "text":
             text += block.text
 
+    # Defensa contra cortes a media frase: si el modelo se aproximó al
+    # max_tokens y dejó la última frase incompleta, recortamos al último
+    # cierre limpio (., !, ?, …) preservando los pasos previos. Mismo
+    # patrón que abc_explained_ai (audit Teo 2026-05-09).
+    text = _trim_to_clean_close(text.strip())
+
     return PlanSimpleResult(
-        text=text.strip(),
+        text=text,
         input_tokens=response.usage.input_tokens,
         output_tokens=response.usage.output_tokens,
     )
+
+
+def _trim_to_clean_close(text: str) -> str:
+    """Si el texto termina sin signo de cierre, recortar a la última frase
+    completa. Preserva todos los párrafos que estaban bien cerrados."""
+    if not text:
+        return text
+    if text.rstrip().endswith((".", "!", "?", "…", "»", '"', ":", ")")):
+        return text
+    closers = (".", "!", "?", "…")
+    cut = max(text.rfind(c) for c in closers)
+    if cut <= 0:
+        return text
+    return text[: cut + 1].rstrip()

@@ -53,6 +53,8 @@ REGLAS DURAS:
 
 9. Si el análisis está en inglés, tradúcelo al castellano antes de explicarlo (el dueño está usando UI en español por defecto).
 
+10. CIERRE OBLIGATORIO. La última frase del texto debe ser una síntesis con punto final. Nunca cortes a media frase ni acabes con coma o conector. Si percibes que te estás extendiendo, prefiere sintetizar el párrafo 4 (hacerlo más corto) antes que cortarlo. Una respuesta de 220 palabras con cierre limpio es siempre mejor que una de 350 palabras truncada. NO inventes contenido para "rellenar" el cierre — solo asegúrate de que la última oración del texto es una afirmación completa con punto final.
+
 
 ═══════════════════════════════════════════════════════════════════════════════
 TÉRMINOS PROTEGIDOS — REGLA DURA
@@ -117,4 +119,6 @@ STRICT RULES:
 8. Total length: between 200 and 350 words. No more, no less.
 
 9. If the analysis is in Spanish, translate to English before explaining (owner is using UI in English).
+
+10. MANDATORY CLOSING. The last sentence of the text MUST be a synthesis with a final period. Never cut mid-sentence or end with a comma or connector. If you sense you are running long, prefer to condense paragraph 4 (make it shorter) rather than truncate it. A 220-word response with a clean close is always better than a 350-word response that cuts off. DO NOT invent filler content to "wrap up" — just ensure the final sentence is a complete statement ending with a period.
 """

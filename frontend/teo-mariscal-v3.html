@@ -4810,24 +4810,26 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
    Scoped completamente a #s-pro-signup. NO reutiliza vars del resto.
 ══════════════════════════════════════ */
 #s-pro-signup {
-  /* Variables locales cyan profesional */
-  --ps-bg: #f4fafd;
+  /* Variables locales cyan profesional — tono más vivo para que se note el accent */
+  --ps-bg: #e6f2f6;
   --ps-surface: #ffffff;
   --ps-cyan: #0891b2;
   --ps-cyan-hover: #0e7e9b;
-  --ps-cyan-soft: #e0f6fb;
+  --ps-cyan-soft: #d1eaf2;
   --ps-text: #0f1f29;
   --ps-text-muted: #4a6573;
   --ps-text-soft: #6b7f8a;
-  --ps-border: rgba(8,145,178,0.18);
-  --ps-border-strong: rgba(8,145,178,0.32);
+  --ps-border: rgba(8,145,178,0.22);
+  --ps-border-strong: rgba(8,145,178,0.38);
   --ps-error: #b42318;
 
   flex-direction: column;
   background: var(--ps-bg);
   color: var(--ps-text);
-  padding: 0 0 calc(env(safe-area-inset-bottom, 0px) + 132px);
+  /* SIN padding-bottom: el footer es sticky y crea su propio espacio. */
+  padding: 0;
   font-family: var(--ff-sans);
+  position: relative;
 }
 #s-pro-signup .ps-header,
 #s-pro-login .ps-header {
@@ -4900,7 +4902,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 #s-pro-login .ps-field label {
   font-size: 12px; font-weight: 600; color: var(--ps-text-muted);
 }
-#s-pro-signup .ps-field input,,
+#s-pro-signup .ps-field input,
 #s-pro-login .ps-field input,
 #s-pro-signup .ps-field select,
 #s-pro-login .ps-field select {
@@ -4914,12 +4916,26 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   transition: border-color 120ms ease, box-shadow 120ms ease;
   min-height: 44px; /* touch target accessibility */
 }
-#s-pro-signup .ps-field input:focus,,
+#s-pro-signup .ps-field input:focus,
 #s-pro-login .ps-field input:focus,
 #s-pro-signup .ps-field select:focus,
 #s-pro-login .ps-field select:focus {
   border-color: var(--ps-cyan);
   box-shadow: 0 0 0 3px rgba(8,145,178,0.15);
+}
+/* Override autofill Chrome/Safari: por defecto pintan background azul-lavanda
+   y texto azul oscuro que rompe el theme cyan profesional. */
+#s-pro-signup .ps-field input:-webkit-autofill,
+#s-pro-login .ps-field input:-webkit-autofill,
+#s-pro-signup .ps-field input:-webkit-autofill:hover,
+#s-pro-login .ps-field input:-webkit-autofill:hover,
+#s-pro-signup .ps-field input:-webkit-autofill:focus,
+#s-pro-login .ps-field input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--ps-text);
+  -webkit-box-shadow: 0 0 0 1000px var(--ps-surface) inset;
+  caret-color: var(--ps-text);
+  border-color: var(--ps-border);
+  transition: background-color 99999s ease-in-out 0s;
 }
 #s-pro-signup .ps-field-hint,
 #s-pro-login .ps-field-hint {
@@ -5032,8 +5048,12 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 
 #s-pro-signup .ps-footer,
 #s-pro-login .ps-footer {
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
+  /* sticky → ancla al fondo del scroll del screen sin escapar al viewport
+     (evita que el botón Pagar/Sign in salga del frame en preview desktop
+     y queda igual en iPhone real porque ya no usa position:fixed). */
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
   z-index: 30;
   background: var(--ps-surface);
   border-top: 1px solid var(--ps-border);
@@ -5041,7 +5061,6 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   display: flex; flex-direction: column; gap: 8px;
   box-shadow: 0 -4px 16px rgba(8,145,178,0.08);
 }
-#s-pro-signup.active ~ .ps-footer-spacer { display: block; height: 132px; }
 #s-pro-signup .ps-total-row,
 #s-pro-login .ps-total-row {
   display: flex; align-items: baseline; justify-content: space-between;
@@ -9430,8 +9449,9 @@ function _plSetBusy(busy) {
   var btn = document.getElementById('pl-submit-btn');
   if (!btn) return;
   btn.disabled = !!busy;
+  var _lang = (typeof window.getCurrentLang === 'function') ? window.getCurrentLang() : 'es';
   if (busy) {
-    btn.textContent = (currentLang === 'en' ? 'Signing in…' : 'Iniciando sesión…');
+    btn.textContent = (_lang === 'en' ? 'Signing in…' : 'Iniciando sesión…');
   } else {
     btn.textContent = _i18nText('pl_submit', 'Iniciar sesión');
   }
@@ -9644,11 +9664,8 @@ function psUpdateTotal() {
   var btnEl = document.getElementById('ps-pay-btn');
   if (totalEl) totalEl.textContent = _psFmtEur(total);
   if (btnEl) {
-    var key = withBundle ? 'ps_pay_bundle' : 'ps_pay';
-    var label = (window.I18N && I18N[currentLang] && I18N[currentLang][key])
-      || (withBundle ? 'Pagar ' + _psFmtEur(total) : 'Pagar ' + _psFmtEur(total));
-    // Asegurar que la cifra dinámica refleja el total real (no la del diccionario)
-    btnEl.textContent = (currentLang === 'en' ? 'Pay ' : 'Pagar ') + _psFmtEur(total);
+    var _lang = (typeof window.getCurrentLang === 'function') ? window.getCurrentLang() : 'es';
+    btnEl.textContent = (_lang === 'en' ? 'Pay ' : 'Pagar ') + _psFmtEur(total);
   }
 }
 window.psUpdateTotal = psUpdateTotal;
@@ -9667,7 +9684,8 @@ function _psSetBusy(busy) {
   btn.disabled = !!busy;
   btn.dataset.origLabel = btn.dataset.origLabel || btn.textContent;
   if (busy) {
-    btn.textContent = (currentLang === 'en' ? 'Processing…' : 'Procesando…');
+    var _lang = (typeof window.getCurrentLang === 'function') ? window.getCurrentLang() : 'es';
+    btn.textContent = (_lang === 'en' ? 'Processing…' : 'Procesando…');
   } else if (btn.dataset.origLabel) {
     psUpdateTotal();
   }

@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v73 (fix CSS roto: 33 reglas #s-pro-signup multilínea con `{,` inválido cortaban parser → splash-pro-link y otras reglas posteriores no aplicaban)
+// Dogs Mind Service Worker — v74 (fixes área pro: ReferenceError currentLang en psUpdateTotal/_psSetBusy/_plSetBusy; sticky footer en lugar de fixed; autofill override; bg cyan más visible; doble coma CSS legacy)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v73';
+const CACHE_NAME = 'dogs-mind-v74';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

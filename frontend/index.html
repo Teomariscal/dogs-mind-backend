@@ -6943,7 +6943,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 
       <!-- el perro -->
       <div>
-        <div style="font-size:10px;font-weight:700;color:var(--green2);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;" data-i18n="anam_sec_dog">&#x1F415; El perro</div>
+        <div style="font-size:10px;font-weight:700;color:var(--green2);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;" data-i18n="anam_sec_dog">El perro</div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
           <div>
@@ -7008,7 +7008,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 
       <!-- entorno familiar -->
       <div>
-        <div style="font-size:10px;font-weight:700;color:var(--green2);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;" data-i18n="anam_sec_family">&#x1F3E0; Entorno familiar</div>
+        <div style="font-size:10px;font-weight:700;color:var(--green2);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;" data-i18n="anam_sec_family">Entorno familiar</div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px;align-items:start;">
           <div>
@@ -7165,10 +7165,12 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
     <div id="video-token-modal" style="display:none;position:absolute;inset:0;z-index:9998;background:rgba(0,0,0,0.55);backdrop-filter:blur(2px);align-items:flex-end;justify-content:center;">
       <div style="background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 32px;width:100%;box-sizing:border-box;">
         <div style="width:36px;height:4px;background:rgba(0,0,0,0.12);border-radius:2px;margin:0 auto 20px;"></div>
-        <div style="font-size:20px;margin-bottom:8px;text-align:center;">&#x26A1;</div>
+        <div style="margin-bottom:12px;text-align:center;">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="var(--green2)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+        </div>
         <div style="font-size:16px;font-weight:700;color:var(--dark);text-align:center;margin-bottom:6px;" data-i18n="anam_modal_title">Tokens insuficientes</div>
         <div style="font-size:13px;color:var(--grey);text-align:center;margin-bottom:20px;line-height:1.5;" data-i18n="anam_modal_text">Necesitas al menos <strong>10 tokens</strong> para adjuntar un video. Actualmente tienes <strong id="modal-token-count">0</strong> tokens.</div>
-        <button onclick="goTo('s-splash')" style="width:100%;padding:13px;background:var(--green2);color:#fff;border:none;border-radius:100px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px;" data-i18n="anam_modal_btn_recharge">&#x1F4B3; Recargar tokens</button>
+        <button onclick="goTo('s-splash')" style="width:100%;padding:13px;background:var(--green2);color:#fff;border:none;border-radius:100px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px;" data-i18n="anam_modal_btn_recharge">Recargar tokens</button>
         <button onclick="closeVideoModal()" style="width:100%;padding:13px;background:transparent;color:var(--dark);border:1.5px solid rgba(0,0,0,0.15);border-radius:100px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;" data-i18n="anam_modal_btn_skip">Continuar sin video</button>
       </div>
     </div>
@@ -12684,6 +12686,8 @@ function endTourIntro() {
       pp_l4_4:                 '<strong style="color:var(--text);">Plausible Analytics</strong> — analítica web sin cookies y sin datos personales. <a href="https://plausible.io/privacy" target="_blank" style="color:var(--green);">Su política →</a>',
       pp_h5:                   '5. Cuánto tiempo guardamos tus datos',
       pp_p5:                   'Conservamos tus datos personales (email, teléfono, contraseña) mientras tu cuenta esté activa. Puedes eliminar tu cuenta directamente en la app desde <em>Mis Tokens → Eliminar mi cuenta</em>, o exportar todos tus datos en JSON desde <em>Mis Tokens → Descargar mis datos</em>. Tras eliminar la cuenta, los registros de pago se conservan anonimizados durante 4 años por requisito fiscal español (Ley 58/2003 General Tributaria).',
+      pp_h_lawful:             '4b. Base legal del tratamiento (RGPD)',
+      pp_p_lawful:             'Tratamos tus datos personales basándonos en (a) <strong>tu consentimiento</strong> al registrarte y aceptar esta política, (b) <strong>la ejecución del contrato</strong> de servicio (gestión de la cuenta, entrega de análisis y planes), y (c) <strong>interés legítimo</strong> en mejorar la calidad del servicio, prevenir fraudes y mantener la seguridad. Puedes retirar tu consentimiento en cualquier momento eliminando tu cuenta.',
       pp_h6:                   '6. Tus derechos (RGPD)',
       pp_p6_lead:              'Si resides en la UE tienes derecho a:',
       pp_l6_1:                 'Acceder a tus datos.',
@@ -12692,6 +12696,8 @@ function endTourIntro() {
       pp_l6_4:                 'Oponerte a su tratamiento.',
       pp_l6_5:                 'Presentar una reclamación ante la autoridad de protección de datos de tu país.',
       pp_p6_end:               'Para ejercer cualquiera de estos derechos escríbenos a <a href="mailto:info@thedogsmind.net" style="color:var(--green);">info@thedogsmind.net</a>.',
+      pp_h_ccpa:               '6b. Residentes de California (CCPA/CPRA)',
+      pp_p_ccpa:               'Si resides en California (EE. UU.) tienes derechos adicionales: (a) saber qué información personal recogemos sobre ti y con quién la compartimos, (b) eliminar tu información personal, (c) corregir información inexacta, (d) limitar el uso de información sensible, y (e) no ser discriminado por ejercer estos derechos. <strong>NO vendemos ni compartimos tu información personal con fines publicitarios.</strong> Para ejercer estos derechos contacta con <a href="mailto:privacy@thedogsmind.net" style="color:var(--green);">privacy@thedogsmind.net</a>.',
       pp_h7:                   '7. Seguridad',
       pp_p7:                   'Todas las conexiones van cifradas con HTTPS. Las contraseñas se almacenan con hash bcrypt. Nunca vendemos ni compartimos tus datos con terceros con fines comerciales.',
       pp_h8:                   '8. Cambios en esta política',

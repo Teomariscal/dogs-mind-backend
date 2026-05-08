@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v70 (s-pro-login: pantalla dedicada login profesional cyan reusando design system ps-*; goToProLogin redirige aquí en vez de s-login genérico)
+// Dogs Mind Service Worker — v71 (App Store cleanup: quita 4 emojis HTML decorativos; añade i18n ES para pp_h_lawful/pp_p_lawful/pp_h_ccpa/pp_p_ccpa)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v70';
+const CACHE_NAME = 'dogs-mind-v71';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

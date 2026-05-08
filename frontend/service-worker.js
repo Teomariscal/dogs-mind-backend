@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v72 (fix crítico s-pro-signup: backend devuelve checkout_url no url; psSubmit acepta ambos y prioriza checkout_url)
+// Dogs Mind Service Worker — v73 (fix CSS roto: 33 reglas #s-pro-signup multilínea con `{,` inválido cortaban parser → splash-pro-link y otras reglas posteriores no aplicaban)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v72';
+const CACHE_NAME = 'dogs-mind-v73';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

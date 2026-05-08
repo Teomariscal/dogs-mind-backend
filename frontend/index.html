@@ -7512,8 +7512,8 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   <!-- ══ S-PRO-AREA — Área Profesional (cards informativos sin precio aún) ══ -->
   <div id="s-pro-area" class="screen">
     <button class="pro-back" onclick="goTo('s-splash')" aria-label="Volver">&#8592;</button>
-    <!-- Header link flotante: muestra "Iniciar sesión" sin sesión, "Cerrar sesión" con sesión. JS controla qué se ve. -->
-    <button id="pro-login-link"  class="pro-login-link" type="button" onclick="goToProLogin()" data-i18n="pro_login_link" style="display:none;">Iniciar sesión</button>
+    <!-- Header link flotante: el "Iniciar sesión" arriba se quitó (duplicaba el CTA mid-auth bajo el mapa).
+         Mantenemos solo "Cerrar sesión" para usuarios logueados — JS lo activa con renderProAreaAuthCTA. -->
     <button id="pro-logout-link" class="pro-login-link pro-login-link--danger" type="button" onclick="logout()" data-i18n="pro_logout_link" style="display:none;">Cerrar sesión</button>
 
     <section class="pro-hero">
@@ -9541,14 +9541,13 @@ function renderProAreaAuthCTA() {
   try { hasJWT = !!localStorage.getItem('dm_jwt'); } catch(e) {}
   var cta        = document.getElementById('pro-auth-cta');
   var midAuth    = document.getElementById('pro-mid-auth');
-  var loginLink  = document.getElementById('pro-login-link');
   var logoutLink = document.getElementById('pro-logout-link');
   // Card final solo aparece sin sesión
   if (cta)     cta.style.display     = hasJWT ? 'none' : 'block';
   // CTA intermedio (entre mapa y cards) — solo sin sesión
   if (midAuth) midAuth.style.display = hasJWT ? 'none' : 'block';
-  // Header link — uno u otro según haya sesión
-  if (loginLink)  loginLink.style.display  = hasJWT ? 'none' : 'inline-block';
+  // El "Iniciar sesión" arriba se eliminó (duplicaba el CTA mid-auth).
+  // "Cerrar sesión" se mantiene solo para usuarios logueados.
   if (logoutLink) logoutLink.style.display = hasJWT ? 'inline-block' : 'none';
 }
 window.renderProAreaAuthCTA = renderProAreaAuthCTA;

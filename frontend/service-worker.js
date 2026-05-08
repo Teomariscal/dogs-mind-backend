@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v69 (s-pro-signup: pantalla unificada activación profesional cyan + form + bundle + Stripe Checkout; backend legal_rep + web optional)
+// Dogs Mind Service Worker — v70 (s-pro-login: pantalla dedicada login profesional cyan reusando design system ps-*; goToProLogin redirige aquí en vez de s-login genérico)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v69';
+const CACHE_NAME = 'dogs-mind-v70';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

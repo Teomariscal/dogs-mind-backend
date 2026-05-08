@@ -4769,6 +4769,43 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 }
 
 /* ══════════════════════════════════════
+   S-PRO-LOGIN — login dedicado del área pro (cyan)
+   Reusa las clases ps-* (mismo design system) y añade pl-* específicos.
+══════════════════════════════════════ */
+#s-pro-login {
+  --ps-bg: #f4fafd;
+  --ps-surface: #ffffff;
+  --ps-cyan: #0891b2;
+  --ps-cyan-hover: #0e7e9b;
+  --ps-cyan-soft: #e0f6fb;
+  --ps-text: #0f1f29;
+  --ps-text-muted: #4a6573;
+  --ps-text-soft: #6b7f8a;
+  --ps-border: rgba(8,145,178,0.18);
+  --ps-border-strong: rgba(8,145,178,0.32);
+  --ps-error: #b42318;
+  flex-direction: column;
+  background: var(--ps-bg);
+  color: var(--ps-text);
+  padding: 0 0 calc(env(safe-area-inset-bottom, 0px) + 132px);
+  font-family: var(--ff-sans);
+}
+#s-pro-login .pl-forgot {
+  background: none; border: none; padding: 4px 0;
+  color: var(--ps-cyan); font-family: inherit; font-size: 13px;
+  text-align: left; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 3px;
+  align-self: flex-start;
+}
+#s-pro-login .pl-noaccount {
+  background: none; border: none; padding: 8px 0;
+  color: var(--ps-text-muted); font-family: inherit; font-size: 13px;
+  text-align: center; cursor: pointer;
+  width: 100%;
+}
+#s-pro-login .pl-noaccount:hover { color: var(--ps-cyan); }
+
+/* ══════════════════════════════════════
    S-PRO-SIGNUP — pantalla unificada activación profesional (cyan)
    Scoped completamente a #s-pro-signup. NO reutiliza vars del resto.
 ══════════════════════════════════════ */
@@ -4792,13 +4829,15 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   padding: 0 0 calc(env(safe-area-inset-bottom, 0px) + 132px);
   font-family: var(--ff-sans);
 }
-#s-pro-signup .ps-header {
+#s-pro-signup .ps-header {,
+#s-pro-login .ps-header {
   display: flex; align-items: flex-start; gap: 12px;
   padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px 12px;
   border-bottom: 1px solid var(--ps-border);
   background: var(--ps-surface);
 }
-#s-pro-signup .ps-back {
+#s-pro-signup .ps-back {,
+#s-pro-login .ps-back {
   width: 40px; height: 40px; min-width: 40px;
   border-radius: 50%; border: 1px solid var(--ps-border);
   background: var(--ps-surface); color: var(--ps-cyan);
@@ -4806,51 +4845,65 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   display: flex; align-items: center; justify-content: center;
   transition: background 120ms ease, transform 120ms ease;
 }
-#s-pro-signup .ps-back:hover { background: var(--ps-cyan-soft); }
-#s-pro-signup .ps-back:active { transform: scale(0.96); }
-#s-pro-signup .ps-header-text { flex: 1; min-width: 0; padding-top: 2px; }
-#s-pro-signup .ps-eyebrow {
+#s-pro-signup .ps-back:hover { background: var(--ps-cyan-soft); },
+#s-pro-login .ps-back:hover { background: var(--ps-cyan-soft); }
+#s-pro-signup .ps-back:active { transform: scale(0.96); },
+#s-pro-login .ps-back:active { transform: scale(0.96); }
+#s-pro-signup .ps-header-text { flex: 1; min-width: 0; padding-top: 2px; },
+#s-pro-login .ps-header-text { flex: 1; min-width: 0; padding-top: 2px; }
+#s-pro-signup .ps-eyebrow {,
+#s-pro-login .ps-eyebrow {
   font-size: 11px; font-weight: 600; letter-spacing: 0.12em;
   text-transform: uppercase; color: var(--ps-cyan);
   margin: 0 0 4px;
 }
-#s-pro-signup .ps-title {
+#s-pro-signup .ps-title {,
+#s-pro-login .ps-title {
   font-family: var(--ff-serif, 'Cormorant Garamond', serif);
   font-size: 24px; font-weight: 600; line-height: 1.15;
   color: var(--ps-text); margin: 0; letter-spacing: -0.01em;
 }
 @media (min-width: 380px) {
-  #s-pro-signup .ps-title { font-size: 26px; }
+  #s-pro-signup .ps-title { font-size: 26px; },
+  #s-pro-login .ps-title { font-size: 26px; }
 }
-#s-pro-signup .ps-intro {
+#s-pro-signup .ps-intro {,
+#s-pro-login .ps-intro {
   font-size: 14px; line-height: 1.55;
   color: var(--ps-text-muted);
   padding: 14px 20px 8px;
   margin: 0;
 }
 
-#s-pro-signup .ps-form {
+#s-pro-signup .ps-form {,
+#s-pro-login .ps-form {
   display: flex; flex-direction: column; gap: 18px;
   padding: 12px 20px 24px;
 }
-#s-pro-signup .ps-section {
+#s-pro-signup .ps-section {,
+#s-pro-login .ps-section {
   background: var(--ps-surface);
   border: 1px solid var(--ps-border);
   border-radius: 14px;
   padding: 18px 16px;
   display: flex; flex-direction: column; gap: 14px;
 }
-#s-pro-signup .ps-section-title {
+#s-pro-signup .ps-section-title {,
+#s-pro-login .ps-section-title {
   font-size: 13px; font-weight: 700; letter-spacing: 0.04em;
   text-transform: uppercase; color: var(--ps-cyan);
   margin: 0 0 2px;
 }
-#s-pro-signup .ps-field { display: flex; flex-direction: column; gap: 6px; }
-#s-pro-signup .ps-field label {
+#s-pro-signup .ps-field { display: flex; flex-direction: column; gap: 6px; },
+#s-pro-login .ps-field { display: flex; flex-direction: column; gap: 6px; }
+#s-pro-signup .ps-field label {,
+#s-pro-login .ps-field label {
   font-size: 12px; font-weight: 600; color: var(--ps-text-muted);
 }
-#s-pro-signup .ps-field input,
-#s-pro-signup .ps-field select {
+#s-pro-signup .ps-field input,,
+#s-pro-login .ps-field input,
+#s-pro-signup .ps-field select {,
+#s-pro-login .ps-field select {
   font-family: inherit; font-size: 16px; /* 16px evita auto-zoom iOS */
   padding: 12px 14px;
   border: 1px solid var(--ps-border);
@@ -4861,91 +4914,113 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   transition: border-color 120ms ease, box-shadow 120ms ease;
   min-height: 44px; /* touch target accessibility */
 }
-#s-pro-signup .ps-field input:focus,
-#s-pro-signup .ps-field select:focus {
+#s-pro-signup .ps-field input:focus,,
+#s-pro-login .ps-field input:focus,
+#s-pro-signup .ps-field select:focus {,
+#s-pro-login .ps-field select:focus {
   border-color: var(--ps-cyan);
   box-shadow: 0 0 0 3px rgba(8,145,178,0.15);
 }
-#s-pro-signup .ps-field-hint {
+#s-pro-signup .ps-field-hint {,
+#s-pro-login .ps-field-hint {
   font-size: 11px; color: var(--ps-text-soft);
   margin: 2px 0 0;
 }
-#s-pro-signup .ps-row { display: flex; gap: 10px; }
-#s-pro-signup .ps-field-half { flex: 1; min-width: 0; }
-#s-pro-signup .ps-check {
+#s-pro-signup .ps-row { display: flex; gap: 10px; },
+#s-pro-login .ps-row { display: flex; gap: 10px; }
+#s-pro-signup .ps-field-half { flex: 1; min-width: 0; },
+#s-pro-login .ps-field-half { flex: 1; min-width: 0; }
+#s-pro-signup .ps-check {,
+#s-pro-login .ps-check {
   display: flex; gap: 10px; align-items: flex-start;
   font-size: 13px; line-height: 1.5; color: var(--ps-text-muted);
   cursor: pointer;
   padding: 4px 0;
   min-height: 44px;
 }
-#s-pro-signup .ps-check input[type="checkbox"] {
+#s-pro-signup .ps-check input[type="checkbox"] {,
+#s-pro-login .ps-check input[type="checkbox"] {
   margin-top: 3px; min-width: 18px; min-height: 18px;
   accent-color: var(--ps-cyan); cursor: pointer;
 }
-#s-pro-signup .ps-check a {
+#s-pro-signup .ps-check a {,
+#s-pro-login .ps-check a {
   color: var(--ps-cyan); text-decoration: underline;
   text-underline-offset: 2px;
 }
 
-#s-pro-signup .ps-logo-section .ps-logo-locked {
+#s-pro-signup .ps-logo-section .ps-logo-locked {,
+#s-pro-login .ps-logo-section .ps-logo-locked {
   display: flex; gap: 12px; align-items: flex-start;
   background: var(--ps-cyan-soft);
   border: 1px dashed var(--ps-border-strong);
   border-radius: 10px;
   padding: 14px;
 }
-#s-pro-signup .ps-logo-lock {
+#s-pro-signup .ps-logo-lock {,
+#s-pro-login .ps-logo-lock {
   flex: 0 0 auto; display: flex; align-items: center; justify-content: center;
   width: 44px; height: 44px; border-radius: 50%;
   background: var(--ps-surface);
   color: var(--ps-cyan);
   border: 1px solid var(--ps-border);
 }
-#s-pro-signup .ps-logo-locked-text {
+#s-pro-signup .ps-logo-locked-text {,
+#s-pro-login .ps-logo-locked-text {
   font-size: 13px; line-height: 1.5;
   color: var(--ps-text-muted);
   margin: 0;
 }
 
-#s-pro-signup .ps-plan-row {
+#s-pro-signup .ps-plan-row {,
+#s-pro-login .ps-plan-row {
   display: flex; align-items: baseline; justify-content: space-between;
   gap: 12px;
   padding: 4px 0 8px;
   border-bottom: 1px solid var(--ps-border);
 }
-#s-pro-signup .ps-plan-name {
+#s-pro-signup .ps-plan-name {,
+#s-pro-login .ps-plan-name {
   font-size: 14px; font-weight: 600; color: var(--ps-text);
 }
-#s-pro-signup .ps-plan-price {
+#s-pro-signup .ps-plan-price {,
+#s-pro-login .ps-plan-price {
   font-size: 18px; font-weight: 700; color: var(--ps-cyan);
   font-variant-numeric: tabular-nums;
 }
-#s-pro-signup .ps-bundle {
+#s-pro-signup .ps-bundle {,
+#s-pro-login .ps-bundle {
   display: flex; gap: 12px; align-items: flex-start;
   padding: 12px 0 4px;
   cursor: pointer;
   min-height: 44px;
 }
-#s-pro-signup .ps-bundle input[type="checkbox"] {
+#s-pro-signup .ps-bundle input[type="checkbox"] {,
+#s-pro-login .ps-bundle input[type="checkbox"] {
   margin-top: 4px; min-width: 18px; min-height: 18px;
   accent-color: var(--ps-cyan); cursor: pointer;
 }
-#s-pro-signup .ps-bundle-content { flex: 1; display: flex; flex-direction: column; gap: 3px; }
-#s-pro-signup .ps-bundle-title { font-size: 14px; font-weight: 600; color: var(--ps-text); }
-#s-pro-signup .ps-bundle-sub { font-size: 12px; color: var(--ps-text-soft); }
-#s-pro-signup .ps-bundle-price {
+#s-pro-signup .ps-bundle-content { flex: 1; display: flex; flex-direction: column; gap: 3px; },
+#s-pro-login .ps-bundle-content { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+#s-pro-signup .ps-bundle-title { font-size: 14px; font-weight: 600; color: var(--ps-text); },
+#s-pro-login .ps-bundle-title { font-size: 14px; font-weight: 600; color: var(--ps-text); }
+#s-pro-signup .ps-bundle-sub { font-size: 12px; color: var(--ps-text-soft); },
+#s-pro-login .ps-bundle-sub { font-size: 12px; color: var(--ps-text-soft); }
+#s-pro-signup .ps-bundle-price {,
+#s-pro-login .ps-bundle-price {
   font-size: 14px; font-weight: 700; color: var(--ps-cyan);
   flex: 0 0 auto;
   font-variant-numeric: tabular-nums;
 }
-#s-pro-signup .ps-courtesy {
+#s-pro-signup .ps-courtesy {,
+#s-pro-login .ps-courtesy {
   font-size: 12px; color: var(--ps-text-soft);
   margin: 0; padding-top: 4px;
   border-top: 1px solid var(--ps-border);
 }
 
-#s-pro-signup .ps-error {
+#s-pro-signup .ps-error {,
+#s-pro-login .ps-error {
   background: rgba(180,35,24,0.06);
   border: 1px solid rgba(180,35,24,0.25);
   color: var(--ps-error);
@@ -4955,7 +5030,8 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   margin: 0 20px;
 }
 
-#s-pro-signup .ps-footer {
+#s-pro-signup .ps-footer {,
+#s-pro-login .ps-footer {
   position: fixed;
   bottom: 0; left: 0; right: 0;
   z-index: 30;
@@ -4966,18 +5042,22 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   box-shadow: 0 -4px 16px rgba(8,145,178,0.08);
 }
 #s-pro-signup.active ~ .ps-footer-spacer { display: block; height: 132px; }
-#s-pro-signup .ps-total-row {
+#s-pro-signup .ps-total-row {,
+#s-pro-login .ps-total-row {
   display: flex; align-items: baseline; justify-content: space-between;
 }
-#s-pro-signup .ps-total-label {
+#s-pro-signup .ps-total-label {,
+#s-pro-login .ps-total-label {
   font-size: 12px; font-weight: 600; letter-spacing: 0.06em;
   text-transform: uppercase; color: var(--ps-text-muted);
 }
-#s-pro-signup .ps-total-amount {
+#s-pro-signup .ps-total-amount {,
+#s-pro-login .ps-total-amount {
   font-size: 22px; font-weight: 700; color: var(--ps-text);
   font-variant-numeric: tabular-nums;
 }
-#s-pro-signup .ps-pay-btn {
+#s-pro-signup .ps-pay-btn {,
+#s-pro-login .ps-pay-btn {
   width: 100%; min-height: 52px;
   border: none; border-radius: 100px;
   background: var(--ps-cyan); color: #fff;
@@ -4985,13 +5065,17 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   cursor: pointer;
   transition: background 120ms ease, transform 120ms ease;
 }
-#s-pro-signup .ps-pay-btn:hover { background: var(--ps-cyan-hover); }
-#s-pro-signup .ps-pay-btn:active { transform: scale(0.99); }
-#s-pro-signup .ps-pay-btn:disabled {
+#s-pro-signup .ps-pay-btn:hover { background: var(--ps-cyan-hover); },
+#s-pro-login .ps-pay-btn:hover { background: var(--ps-cyan-hover); }
+#s-pro-signup .ps-pay-btn:active { transform: scale(0.99); },
+#s-pro-login .ps-pay-btn:active { transform: scale(0.99); }
+#s-pro-signup .ps-pay-btn:disabled {,
+#s-pro-login .ps-pay-btn:disabled {
   background: #c2d8e0; color: #fff;
   cursor: not-allowed;
 }
-#s-pro-signup .ps-secure {
+#s-pro-signup .ps-secure {,
+#s-pro-login .ps-secure {
   font-size: 11px; color: var(--ps-text-soft);
   text-align: center; margin: 0;
 }
@@ -7761,6 +7845,45 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
     </section>
   </div><!-- /s-pro-area -->
 
+  <!-- ══ S-PRO-LOGIN — Login dedicado del área profesional (cyan) ══
+       El usuario llega aquí pulsando "Log in" en el mid-auth de s-pro-area
+       o "Sign in" en el header. Usa el mismo endpoint /auth/login que
+       el login genérico, pero con estilo cyan coherente con el área pro.
+       Si no tiene cuenta, se le redirige a s-pro-area para "Elige tu plan".
+  -->
+  <div id="s-pro-login" class="screen" style="background:var(--ps-bg);overflow-y:auto;">
+    <header class="ps-header">
+      <button class="ps-back" type="button" onclick="goTo('s-pro-area')" aria-label="Volver">&#8592;</button>
+      <div class="ps-header-text">
+        <p class="ps-eyebrow" data-i18n="pl_eyebrow">Área Profesional</p>
+        <h1 class="ps-title" data-i18n="pl_title">Inicia sesión</h1>
+      </div>
+    </header>
+
+    <p class="ps-intro" data-i18n="pl_intro">Accede a tu cuenta profesional con tu email y contraseña.</p>
+
+    <form id="pl-form" class="ps-form" onsubmit="event.preventDefault(); plSubmit();" novalidate>
+      <section class="ps-section">
+        <div class="ps-field">
+          <label for="pl-email" data-i18n="pl_email">Email</label>
+          <input type="email" id="pl-email" autocomplete="email" inputmode="email" required>
+        </div>
+        <div class="ps-field">
+          <label for="pl-password" data-i18n="pl_password">Contraseña</label>
+          <input type="password" id="pl-password" autocomplete="current-password" required>
+        </div>
+        <button type="button" class="pl-forgot" onclick="plForgotPassword()" data-i18n="pl_forgot">¿Olvidaste tu contraseña?</button>
+      </section>
+
+      <p id="pl-error" class="ps-error" role="alert" style="display:none;"></p>
+    </form>
+
+    <div class="ps-footer">
+      <button id="pl-submit-btn" class="ps-pay-btn" type="button" onclick="plSubmit()" data-i18n="pl_submit">Iniciar sesión</button>
+      <button type="button" class="pl-noaccount" onclick="goTo('s-pro-area')" data-i18n="pl_noaccount">¿No tienes cuenta? Elige tu plan</button>
+    </div>
+  </div><!-- /s-pro-login -->
+
   <!-- ══ S-PRO-SIGNUP — Pantalla unificada activación Profesional ══
        Reemplaza el flujo s-login → s-pro-company → s-pro-activate cuando
        el usuario pulsa "Activar Profesional" en s-pro-area.
@@ -9281,18 +9404,106 @@ window.pcRemoveLogo = pcRemoveLogo;
 // correcto. Si el usuario solo se loguea (no se registra), eso no afecta.
 
 function goToProLogin() {
-  goTo('s-login');
-  // Tras el render, presetear el select de tipo de cuenta a "pro" si existe.
+  // Pantalla dedicada cyan del área pro (Commit D). Reemplaza el redirect al
+  // s-login genérico verde, que rompía la coherencia visual del flujo Pro.
+  goTo('s-pro-login');
   setTimeout(function() {
-    var sel = document.getElementById('reg-type');
-    if (sel) {
-      sel.value = 'pro';
-      // Disparar onchange para que toggleProfessional() actualice el form
-      try { sel.dispatchEvent(new Event('change', { bubbles: true })); } catch(e) {}
-    }
-  }, 60);
+    var err = document.getElementById('pl-error');
+    if (err) { err.style.display = 'none'; err.textContent = ''; }
+    var emailEl = document.getElementById('pl-email');
+    if (emailEl && !emailEl.value) emailEl.focus();
+  }, 80);
 }
 window.goToProLogin = goToProLogin;
+
+// ── S-PRO-LOGIN handlers ──────────────────────────────────────────────────────
+function _plShowError(text) {
+  var el = document.getElementById('pl-error');
+  if (!el) return;
+  el.textContent = text;
+  el.style.display = 'block';
+  try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) {}
+}
+function _plSetBusy(busy) {
+  var btn = document.getElementById('pl-submit-btn');
+  if (!btn) return;
+  btn.disabled = !!busy;
+  if (busy) {
+    btn.textContent = (currentLang === 'en' ? 'Signing in…' : 'Iniciando sesión…');
+  } else {
+    btn.textContent = _i18nText('pl_submit', 'Iniciar sesión');
+  }
+}
+async function plSubmit() {
+  var email = (document.getElementById('pl-email') || {}).value || '';
+  var pass  = (document.getElementById('pl-password') || {}).value || '';
+  email = email.trim();
+  if (!email || !/.+@.+\..+/.test(email)) {
+    _plShowError(_i18nText('ps_err_email', 'Introduce un email válido.'));
+    return;
+  }
+  if (!pass) {
+    _plShowError(_i18nText('pl_err_password_empty', 'Introduce tu contraseña.'));
+    return;
+  }
+  _plSetBusy(true);
+  try {
+    var res = await fetch(API_BASE + '/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, password: pass })
+    });
+    if (!res.ok) {
+      var msg = '';
+      try { msg = await res.text(); } catch(e) {}
+      if (res.status === 401 || /invalid|incorrect|wrong/i.test(msg)) {
+        _plShowError(_i18nText('pl_err_invalid', 'Email o contraseña incorrectos.'));
+      } else {
+        _plShowError(_i18nText('pl_err_generic', 'No se pudo iniciar sesión.') + ' ' + (msg || ''));
+      }
+      _plSetBusy(false);
+      return;
+    }
+    var data = null;
+    try { data = await res.json(); } catch(e) {}
+    if (!data || !data.token) {
+      _plShowError(_i18nText('pl_err_generic', 'No se pudo iniciar sesión.'));
+      _plSetBusy(false);
+      return;
+    }
+    try { localStorage.setItem('dm_jwt', data.token); } catch(e) {}
+    try { if (typeof loadAccountInfo === 'function') await loadAccountInfo(); } catch(e) {}
+    if (window._pendingActivatePro && typeof _consumePendingActivatePro === 'function') {
+      var consumed = await _consumePendingActivatePro();
+      if (consumed) return;
+    }
+    goTo('s-home');
+  } catch(e) {
+    _plShowError(_i18nText('pl_err_generic', 'No se pudo iniciar sesión.'));
+    _plSetBusy(false);
+  }
+}
+window.plSubmit = plSubmit;
+
+async function plForgotPassword() {
+  var email = (document.getElementById('pl-email') || {}).value || '';
+  email = email.trim();
+  if (!email || !/.+@.+\..+/.test(email)) {
+    _plShowError(_i18nText('pl_forgot_need_email', 'Introduce primero tu email y vuelve a pulsar "¿Olvidaste tu contraseña?".'));
+    return;
+  }
+  try {
+    await fetch(API_BASE + '/auth/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    });
+    showToast(_i18nText('pl_forgot_sent', 'Si el email existe, te hemos enviado un enlace para restablecer la contraseña.'));
+  } catch(e) {
+    showToast(_i18nText('pl_err_generic', 'No se pudo iniciar sesión.'));
+  }
+}
+window.plForgotPassword = plForgotPassword;
 
 function renderProAreaAuthCTA() {
   // Leer JWT directo de localStorage; getJWT() vive en otra IIFE y no es accesible desde este scope.
@@ -12936,6 +13147,21 @@ function endTourIntro() {
       ps_err_company:          'No se pudieron guardar los datos de empresa.',
       ps_err_checkout:         'No se pudo iniciar el pago.',
       ps_err_unexpected:       'Error inesperado. Inténtalo de nuevo.',
+
+      // ── S-PRO-LOGIN ──
+      pl_eyebrow:              'Área Profesional',
+      pl_title:                'Inicia sesión',
+      pl_intro:                'Accede a tu cuenta profesional con tu email y contraseña.',
+      pl_email:                'Email',
+      pl_password:             'Contraseña',
+      pl_forgot:               '¿Olvidaste tu contraseña?',
+      pl_submit:               'Iniciar sesión',
+      pl_noaccount:            '¿No tienes cuenta? Elige tu plan',
+      pl_err_password_empty:   'Introduce tu contraseña.',
+      pl_err_invalid:          'Email o contraseña incorrectos.',
+      pl_err_generic:          'No se pudo iniciar sesión.',
+      pl_forgot_need_email:    'Introduce primero tu email y vuelve a pulsar "¿Olvidaste tu contraseña?".',
+      pl_forgot_sent:          'Si el email existe, te hemos enviado un enlace para restablecer la contraseña.',
       pro_auth_eyebrow:        '¿Ya eres usuario?',
       pro_auth_title:          'Inicia sesión o crea tu cuenta',
       pro_auth_sub:            'Accede a tu área profesional con tu email y contraseña.',
@@ -13695,6 +13921,21 @@ function endTourIntro() {
       ps_err_company:          'Could not save the company details.',
       ps_err_checkout:         'Could not start the payment.',
       ps_err_unexpected:       'Unexpected error. Please try again.',
+
+      // ── S-PRO-LOGIN ──
+      pl_eyebrow:              'Professional Area',
+      pl_title:                'Sign in',
+      pl_intro:                'Access your professional account with your email and password.',
+      pl_email:                'Email',
+      pl_password:             'Password',
+      pl_forgot:               'Forgot your password?',
+      pl_submit:               'Sign in',
+      pl_noaccount:            'Don’t have an account? Choose your plan',
+      pl_err_password_empty:   'Enter your password.',
+      pl_err_invalid:          'Invalid email or password.',
+      pl_err_generic:          'Could not sign in.',
+      pl_forgot_need_email:    'Enter your email above first, then tap "Forgot your password?" again.',
+      pl_forgot_sent:          'If the email exists, we have sent you a reset link.',
       pro_auth_eyebrow:        'Already a user?',
       pro_auth_title:          'Sign in or create your account',
       pro_auth_sub:            'Access your professional area with your email and password.',

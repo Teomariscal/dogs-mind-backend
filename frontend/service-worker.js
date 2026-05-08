@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v74 (fixes área pro: ReferenceError currentLang en psUpdateTotal/_psSetBusy/_plSetBusy; sticky footer en lugar de fixed; autofill override; bg cyan más visible; doble coma CSS legacy)
+// Dogs Mind Service Worker — v75 (restaura hero del cachorro en bañera rosa: forzar background-image con !important sobre .hero-banner — CSS roto previo permitía override silencioso)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v74';
+const CACHE_NAME = 'dogs-mind-v75';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

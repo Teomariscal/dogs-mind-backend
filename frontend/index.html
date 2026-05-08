@@ -224,7 +224,15 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 .hero-banner{
   margin:0 16px;border-radius:var(--r);overflow:hidden;position:relative;
   height:190px;flex-shrink:0;
-  background:url('https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-01.webp') center 25% / cover no-repeat;
+  /* Forzar background-image con !important: alguna regla CSS posterior con
+     mayor especificidad lo estaba sobrescribiendo a verde plano (commit
+     7593206 introdujo CSS roto que pudo cortar el parser y acumular
+     overrides). Mantener URL CDN: jsdelivr cachea el WebP a edge, mismo
+     comportamiento que el resto de imágenes hero del proyecto. */
+  background-image:url('https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-01.webp') !important;
+  background-position:center 25% !important;
+  background-size:cover !important;
+  background-repeat:no-repeat !important;
 }
 .hero-img-label{
   position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);

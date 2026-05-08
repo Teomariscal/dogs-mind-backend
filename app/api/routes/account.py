@@ -47,22 +47,26 @@ class AccountTypeUpdate(BaseModel):
 
 class CompanyUpdate(BaseModel):
     """
-    Datos del perfil empresa/entidad. Nombre y web son obligatorios; el resto opcional.
+    Datos del perfil empresa/entidad. Solo `name` es obligatorio.
+    El resto de campos son opcionales (incluida `web`, que el usuario puede
+    completar más tarde desde el perfil cuando ya esté pagada la membresía).
+
     Se guarda completo en cada PUT (no PATCH parcial) para mantener el form-save simple.
     """
     name: str = Field(..., min_length=1, max_length=120, description="Nombre empresa o autónomo")
-    web: HttpUrl = Field(..., description="Web de la empresa (URL completa con http(s)://)")
+    legal_rep: Optional[str] = Field(None, max_length=120, description="Nombre del representante legal (form Activación Profesional)")
+    web: Optional[HttpUrl] = Field(None, description="Web de la empresa (URL completa con http(s)://)")
     cif: Optional[str] = Field(None, max_length=40, description="CIF/Tax ID — opcional, solo si quiere factura mensual")
     clients_per_year: Optional[int] = Field(
         None, ge=0, le=1_000_000,
-        description="Número medio de clientes al año (informativo)",
+        description="Número medio de clientes/casos al año (informativo)",
     )
     city: Optional[str] = Field(None, max_length=80)
     country: Optional[str] = Field(None, max_length=80)
     billing_email: Optional[EmailStr] = Field(None, description="Email para facturación (si quiere factura mensual)")
     collaborate_interest: Optional[bool] = Field(None, description="¿Te gustaría colaborar con The Dogs Mind?")
 
-    @field_validator("cif", "city", "country")
+    @field_validator("legal_rep", "cif", "city", "country")
     @classmethod
     def strip_optional(cls, v: Optional[str]) -> Optional[str]:
         if v is None:
@@ -103,6 +107,7 @@ def _company_to_dict(user: User) -> Optional[dict]:
         return None
     return {
         "name":                  user.company_name,
+        "legal_rep":             user.company_legal_rep,
         "web":                   user.company_web,
         "cif":                   user.company_cif,
         "clients_per_year":      user.company_clients_per_year,
@@ -170,7 +175,8 @@ def update_company(
     professional (los particulares no necesitan logo en informes).
     """
     user.company_name                 = payload.name
-    user.company_web                  = str(payload.web)
+    user.company_legal_rep            = payload.legal_rep
+    user.company_web                  = str(payload.web) if payload.web else None
     user.company_cif                  = payload.cif
     user.company_clients_per_year     = payload.clients_per_year
     user.company_city                 = payload.city

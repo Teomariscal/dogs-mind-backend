@@ -4769,6 +4769,234 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 }
 
 /* ══════════════════════════════════════
+   S-PRO-SIGNUP — pantalla unificada activación profesional (cyan)
+   Scoped completamente a #s-pro-signup. NO reutiliza vars del resto.
+══════════════════════════════════════ */
+#s-pro-signup {
+  /* Variables locales cyan profesional */
+  --ps-bg: #f4fafd;
+  --ps-surface: #ffffff;
+  --ps-cyan: #0891b2;
+  --ps-cyan-hover: #0e7e9b;
+  --ps-cyan-soft: #e0f6fb;
+  --ps-text: #0f1f29;
+  --ps-text-muted: #4a6573;
+  --ps-text-soft: #6b7f8a;
+  --ps-border: rgba(8,145,178,0.18);
+  --ps-border-strong: rgba(8,145,178,0.32);
+  --ps-error: #b42318;
+
+  flex-direction: column;
+  background: var(--ps-bg);
+  color: var(--ps-text);
+  padding: 0 0 calc(env(safe-area-inset-bottom, 0px) + 132px);
+  font-family: var(--ff-sans);
+}
+#s-pro-signup .ps-header {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px 12px;
+  border-bottom: 1px solid var(--ps-border);
+  background: var(--ps-surface);
+}
+#s-pro-signup .ps-back {
+  width: 40px; height: 40px; min-width: 40px;
+  border-radius: 50%; border: 1px solid var(--ps-border);
+  background: var(--ps-surface); color: var(--ps-cyan);
+  font-size: 18px; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 120ms ease, transform 120ms ease;
+}
+#s-pro-signup .ps-back:hover { background: var(--ps-cyan-soft); }
+#s-pro-signup .ps-back:active { transform: scale(0.96); }
+#s-pro-signup .ps-header-text { flex: 1; min-width: 0; padding-top: 2px; }
+#s-pro-signup .ps-eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ps-cyan);
+  margin: 0 0 4px;
+}
+#s-pro-signup .ps-title {
+  font-family: var(--ff-serif, 'Cormorant Garamond', serif);
+  font-size: 24px; font-weight: 600; line-height: 1.15;
+  color: var(--ps-text); margin: 0; letter-spacing: -0.01em;
+}
+@media (min-width: 380px) {
+  #s-pro-signup .ps-title { font-size: 26px; }
+}
+#s-pro-signup .ps-intro {
+  font-size: 14px; line-height: 1.55;
+  color: var(--ps-text-muted);
+  padding: 14px 20px 8px;
+  margin: 0;
+}
+
+#s-pro-signup .ps-form {
+  display: flex; flex-direction: column; gap: 18px;
+  padding: 12px 20px 24px;
+}
+#s-pro-signup .ps-section {
+  background: var(--ps-surface);
+  border: 1px solid var(--ps-border);
+  border-radius: 14px;
+  padding: 18px 16px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+#s-pro-signup .ps-section-title {
+  font-size: 13px; font-weight: 700; letter-spacing: 0.04em;
+  text-transform: uppercase; color: var(--ps-cyan);
+  margin: 0 0 2px;
+}
+#s-pro-signup .ps-field { display: flex; flex-direction: column; gap: 6px; }
+#s-pro-signup .ps-field label {
+  font-size: 12px; font-weight: 600; color: var(--ps-text-muted);
+}
+#s-pro-signup .ps-field input,
+#s-pro-signup .ps-field select {
+  font-family: inherit; font-size: 16px; /* 16px evita auto-zoom iOS */
+  padding: 12px 14px;
+  border: 1px solid var(--ps-border);
+  border-radius: 10px;
+  background: var(--ps-surface);
+  color: var(--ps-text);
+  outline: none;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+  min-height: 44px; /* touch target accessibility */
+}
+#s-pro-signup .ps-field input:focus,
+#s-pro-signup .ps-field select:focus {
+  border-color: var(--ps-cyan);
+  box-shadow: 0 0 0 3px rgba(8,145,178,0.15);
+}
+#s-pro-signup .ps-field-hint {
+  font-size: 11px; color: var(--ps-text-soft);
+  margin: 2px 0 0;
+}
+#s-pro-signup .ps-row { display: flex; gap: 10px; }
+#s-pro-signup .ps-field-half { flex: 1; min-width: 0; }
+#s-pro-signup .ps-check {
+  display: flex; gap: 10px; align-items: flex-start;
+  font-size: 13px; line-height: 1.5; color: var(--ps-text-muted);
+  cursor: pointer;
+  padding: 4px 0;
+  min-height: 44px;
+}
+#s-pro-signup .ps-check input[type="checkbox"] {
+  margin-top: 3px; min-width: 18px; min-height: 18px;
+  accent-color: var(--ps-cyan); cursor: pointer;
+}
+#s-pro-signup .ps-check a {
+  color: var(--ps-cyan); text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+#s-pro-signup .ps-logo-section .ps-logo-locked {
+  display: flex; gap: 12px; align-items: flex-start;
+  background: var(--ps-cyan-soft);
+  border: 1px dashed var(--ps-border-strong);
+  border-radius: 10px;
+  padding: 14px;
+}
+#s-pro-signup .ps-logo-lock {
+  flex: 0 0 auto; display: flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--ps-surface);
+  color: var(--ps-cyan);
+  border: 1px solid var(--ps-border);
+}
+#s-pro-signup .ps-logo-locked-text {
+  font-size: 13px; line-height: 1.5;
+  color: var(--ps-text-muted);
+  margin: 0;
+}
+
+#s-pro-signup .ps-plan-row {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0 8px;
+  border-bottom: 1px solid var(--ps-border);
+}
+#s-pro-signup .ps-plan-name {
+  font-size: 14px; font-weight: 600; color: var(--ps-text);
+}
+#s-pro-signup .ps-plan-price {
+  font-size: 18px; font-weight: 700; color: var(--ps-cyan);
+  font-variant-numeric: tabular-nums;
+}
+#s-pro-signup .ps-bundle {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 12px 0 4px;
+  cursor: pointer;
+  min-height: 44px;
+}
+#s-pro-signup .ps-bundle input[type="checkbox"] {
+  margin-top: 4px; min-width: 18px; min-height: 18px;
+  accent-color: var(--ps-cyan); cursor: pointer;
+}
+#s-pro-signup .ps-bundle-content { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+#s-pro-signup .ps-bundle-title { font-size: 14px; font-weight: 600; color: var(--ps-text); }
+#s-pro-signup .ps-bundle-sub { font-size: 12px; color: var(--ps-text-soft); }
+#s-pro-signup .ps-bundle-price {
+  font-size: 14px; font-weight: 700; color: var(--ps-cyan);
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+}
+#s-pro-signup .ps-courtesy {
+  font-size: 12px; color: var(--ps-text-soft);
+  margin: 0; padding-top: 4px;
+  border-top: 1px solid var(--ps-border);
+}
+
+#s-pro-signup .ps-error {
+  background: rgba(180,35,24,0.06);
+  border: 1px solid rgba(180,35,24,0.25);
+  color: var(--ps-error);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px; line-height: 1.45;
+  margin: 0 20px;
+}
+
+#s-pro-signup .ps-footer {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 30;
+  background: var(--ps-surface);
+  border-top: 1px solid var(--ps-border);
+  padding: 12px 20px calc(env(safe-area-inset-bottom, 0px) + 14px);
+  display: flex; flex-direction: column; gap: 8px;
+  box-shadow: 0 -4px 16px rgba(8,145,178,0.08);
+}
+#s-pro-signup.active ~ .ps-footer-spacer { display: block; height: 132px; }
+#s-pro-signup .ps-total-row {
+  display: flex; align-items: baseline; justify-content: space-between;
+}
+#s-pro-signup .ps-total-label {
+  font-size: 12px; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--ps-text-muted);
+}
+#s-pro-signup .ps-total-amount {
+  font-size: 22px; font-weight: 700; color: var(--ps-text);
+  font-variant-numeric: tabular-nums;
+}
+#s-pro-signup .ps-pay-btn {
+  width: 100%; min-height: 52px;
+  border: none; border-radius: 100px;
+  background: var(--ps-cyan); color: #fff;
+  font-family: inherit; font-size: 16px; font-weight: 700;
+  cursor: pointer;
+  transition: background 120ms ease, transform 120ms ease;
+}
+#s-pro-signup .ps-pay-btn:hover { background: var(--ps-cyan-hover); }
+#s-pro-signup .ps-pay-btn:active { transform: scale(0.99); }
+#s-pro-signup .ps-pay-btn:disabled {
+  background: #c2d8e0; color: #fff;
+  cursor: not-allowed;
+}
+#s-pro-signup .ps-secure {
+  font-size: 11px; color: var(--ps-text-soft);
+  text-align: center; margin: 0;
+}
+
+/* ══════════════════════════════════════
    S-PRO-ACTIVATE — pre-checkout (membresía + bundle opcional)
 ══════════════════════════════════════ */
 #s-pro-activate {
@@ -7533,6 +7761,142 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
     </section>
   </div><!-- /s-pro-area -->
 
+  <!-- ══ S-PRO-SIGNUP — Pantalla unificada activación Profesional ══
+       Reemplaza el flujo s-login → s-pro-company → s-pro-activate cuando
+       el usuario pulsa "Activar Profesional" en s-pro-area.
+
+       Estado renderizado según sesión:
+       • Sin sesión  → muestra sección "Datos de tu cuenta" (email + pass + ToS)
+       • Con sesión  → oculta cuenta y prellena empresa con _myAccount.company
+       • Ya pro      → onActivateProClick() ya redirige con toast antes de llegar aquí
+
+       Al pulsar Pagar, según plataforma:
+       • Web/Android → POST /payments/pro-checkout → Stripe Checkout
+       • iOS         → IAP (StoreKit) via Capacitor plugin (futuro)
+
+       Estilo cyan scoped a #s-pro-signup. NO afecta ningún otro screen.
+  -->
+  <div id="s-pro-signup" class="screen" style="background:var(--ps-bg);overflow-y:auto;">
+    <header class="ps-header">
+      <button class="ps-back" type="button" onclick="psBack()" aria-label="Volver">&#8592;</button>
+      <div class="ps-header-text">
+        <p class="ps-eyebrow" data-i18n="ps_eyebrow">Membresía Profesional</p>
+        <h1 class="ps-title" data-i18n="ps_title">Tu marca junto a la nuestra</h1>
+      </div>
+    </header>
+
+    <p class="ps-intro" data-i18n="ps_intro">Activa tu cuenta profesional, sube el logo de tu empresa y comparte informes co-marcados con tus clientes desde el primer caso.</p>
+
+    <form id="ps-form" class="ps-form" onsubmit="event.preventDefault(); psSubmit();" novalidate>
+
+      <!-- ── Sección 1: Datos de tu cuenta (solo sin sesión) ── -->
+      <section id="ps-account-section" class="ps-section">
+        <h2 class="ps-section-title" data-i18n="ps_account_title">Datos de tu cuenta</h2>
+        <div class="ps-field">
+          <label for="ps-email" data-i18n="ps_email">Email</label>
+          <input type="email" id="ps-email" autocomplete="email" inputmode="email" required>
+        </div>
+        <div class="ps-field">
+          <label for="ps-password" data-i18n="ps_password">Contraseña</label>
+          <input type="password" id="ps-password" autocomplete="new-password" minlength="8" required>
+          <p class="ps-field-hint" data-i18n="ps_password_hint">Mínimo 8 caracteres.</p>
+        </div>
+        <label class="ps-check">
+          <input type="checkbox" id="ps-tos" required>
+          <span class="ps-check-text" data-i18n="ps_tos_text">Acepto los <a href="#" onclick="event.preventDefault(); goTo('s-terms');" data-i18n="ps_tos_link_terms">Términos</a> y la <a href="#" onclick="event.preventDefault(); goTo('s-privacy');" data-i18n="ps_tos_link_privacy">Política de Privacidad</a>.</span>
+        </label>
+      </section>
+
+      <!-- ── Sección 2: Datos de tu empresa ── -->
+      <section class="ps-section">
+        <h2 class="ps-section-title" data-i18n="ps_company_title">Datos de tu empresa</h2>
+        <div class="ps-field">
+          <label for="ps-company-name" data-i18n="ps_company_name">Nombre de la empresa</label>
+          <input type="text" id="ps-company-name" autocomplete="organization" required>
+        </div>
+        <div class="ps-field">
+          <label for="ps-legal-rep" data-i18n="ps_legal_rep">Nombre del representante legal</label>
+          <input type="text" id="ps-legal-rep" autocomplete="name" required>
+        </div>
+        <div class="ps-field">
+          <label for="ps-cif" data-i18n="ps_cif">CIF / NIF / Tax ID</label>
+          <input type="text" id="ps-cif" autocomplete="off">
+          <p class="ps-field-hint" data-i18n="ps_cif_hint">Opcional. Necesario solo para facturación.</p>
+        </div>
+        <div class="ps-field">
+          <label for="ps-billing-email" data-i18n="ps_billing_email">Email de facturación</label>
+          <input type="email" id="ps-billing-email" autocomplete="email" inputmode="email" required>
+        </div>
+        <div class="ps-row">
+          <div class="ps-field ps-field-half">
+            <label for="ps-city" data-i18n="ps_city">Ciudad</label>
+            <input type="text" id="ps-city" autocomplete="address-level2" required>
+          </div>
+          <div class="ps-field ps-field-half">
+            <label for="ps-country" data-i18n="ps_country">País</label>
+            <input type="text" id="ps-country" autocomplete="country-name" required>
+          </div>
+        </div>
+        <div class="ps-field">
+          <label for="ps-cases" data-i18n="ps_cases">Número aproximado de casos al año</label>
+          <select id="ps-cases">
+            <option value="">—</option>
+            <option value="0-20">0 – 20</option>
+            <option value="20-50">20 – 50</option>
+            <option value="50-100">50 – 100</option>
+            <option value="100-300">100 – 300</option>
+            <option value="300+">+300</option>
+          </select>
+        </div>
+        <label class="ps-check">
+          <input type="checkbox" id="ps-collab">
+          <span class="ps-check-text" data-i18n="ps_collab">Quiero colaborar con The Dogs Mind International (estudios, formaciones, derivaciones).</span>
+        </label>
+      </section>
+
+      <!-- ── Sección 3: Logo (bloqueado hasta pago) ── -->
+      <section class="ps-section ps-logo-section">
+        <h2 class="ps-section-title" data-i18n="ps_logo_title">Logo de tu empresa</h2>
+        <div class="ps-logo-locked" aria-disabled="true">
+          <span class="ps-logo-lock" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" width="28" height="28"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
+          <p class="ps-logo-locked-text" data-i18n="ps_logo_locked">Disponible tras el pago. Podrás subirlo (máx. 2 MB) desde tu perfil cuando se confirme la membresía.</p>
+        </div>
+      </section>
+
+      <!-- ── Sección 4: Tu membresía ── -->
+      <section class="ps-section">
+        <h2 class="ps-section-title" data-i18n="ps_plan_title">Tu membresía</h2>
+        <div class="ps-plan-row">
+          <span class="ps-plan-name" data-i18n="ps_plan_name">Membresía Profesional · 1 año</span>
+          <span class="ps-plan-price" id="ps-plan-base-price">20,00 €</span>
+        </div>
+        <label class="ps-bundle">
+          <input type="checkbox" id="ps-bundle" onchange="psUpdateTotal()">
+          <span class="ps-bundle-content">
+            <span class="ps-bundle-title" data-i18n="ps_bundle_title">Añadir 60 tokens de cortesía</span>
+            <span class="ps-bundle-sub" data-i18n="ps_bundle_sub">Pack promocional 37,80 € (en vez de 42 €).</span>
+          </span>
+          <span class="ps-bundle-price" id="ps-bundle-price">+37,80 €</span>
+        </label>
+        <p class="ps-courtesy" data-i18n="ps_courtesy">Incluye 10 tokens de cortesía al activar la membresía.</p>
+      </section>
+
+      <p id="ps-error" class="ps-error" role="alert" style="display:none;"></p>
+    </form>
+
+    <!-- Sticky footer con CTA pagar -->
+    <div class="ps-footer">
+      <div class="ps-total-row">
+        <span class="ps-total-label" data-i18n="ps_total">Total</span>
+        <span class="ps-total-amount" id="ps-total-amount">20,00 €</span>
+      </div>
+      <button id="ps-pay-btn" class="ps-pay-btn" type="button" onclick="psSubmit()" data-i18n="ps_pay">Pagar 20,00 €</button>
+      <p class="ps-secure" data-i18n="ps_secure">Pago seguro vía Stripe.</p>
+    </div>
+  </div><!-- /s-pro-signup -->
+
   <!-- ══ S-PRO-ACTIVATE — Activar Profesional (Stripe Checkout) ══ -->
   <div id="s-pro-activate" class="screen">
     <div class="pa-header">
@@ -7748,6 +8112,7 @@ function goTo(id) {
   if (id === 's-home') fetchBalance();
   if (id === 's-pro-company' && typeof _pcOnEnter === 'function') _pcOnEnter();
   if (id === 's-pro-area' && typeof renderProAreaAuthCTA === 'function') renderProAreaAuthCTA();
+  if (id === 's-pro-signup' && typeof psHydrate === 'function') psHydrate();
   if (id === 's-pro-activate') {
     // Reset checkbox + total al entrar (no guardar estado entre visitas)
     var cb = document.getElementById('pa-bundle-cb');
@@ -8957,36 +9322,20 @@ window.renderProAreaAuthCTA = renderProAreaAuthCTA;
 window._pcReturnToActivate = false;
 
 async function onActivateProClick() {
-  if (!getJWT()) {
-    // Sin sesión: el usuario quiere REGISTRARSE como profesional. Flujo completo:
-    //   1) registro/login con tipo pro preseleccionado
-    //   2) tras crear cuenta → s-pro-company con banner "Antes del pago"
-    //   3) tras guardar datos empresa → s-pro-activate (Stripe checkout)
-    // Para conectar esos pasos, dejamos un flag que se consume tras login/registro.
-    window._pendingActivatePro = true;
-    goToProLogin();
-    return;
+  // Si hay sesión, comprobar que la cuenta no sea ya profesional (para evitar
+  // que la pantalla unificada permita activar dos veces). Si ya es pro → toast.
+  if (getJWT()) {
+    if (!window._myAccount) {
+      try { await loadAccountInfo(); } catch(e) {}
+    }
+    var acc = window._myAccount || null;
+    if (acc && acc.account_type === 'professional') {
+      showToast(_i18nText('pa_err_already_pro', 'Tu cuenta ya es Profesional.'));
+      return;
+    }
   }
-  // Asegurar que tenemos _myAccount cargado
-  if (!window._myAccount) {
-    await loadAccountInfo();
-  }
-  var acc = window._myAccount || null;
-  if (acc && acc.account_type === 'professional') {
-    showToast(_i18nText('pa_err_already_pro', 'Tu cuenta ya es Profesional.'));
-    return;
-  }
-  var company = (acc && acc.company) || null;
-  var hasMinimum = company && company.name && company.web;
-  if (!hasMinimum) {
-    // Falta datos → llevar a s-pro-company con banner. El flag hace que tras
-    // guardar exitosamente vuelva a s-pro-activate (en lugar de a s-home).
-    window._pcReturnToActivate = true;
-    goTo('s-pro-company');
-    return;
-  }
-  // Datos OK → directo al pre-checkout.
-  goTo('s-pro-activate');
+  // Pantalla unificada: maneja sesión/no-sesión, datos prerellenados, pago.
+  goTo('s-pro-signup');
 }
 window.onActivateProClick = onActivateProClick;
 
@@ -9007,6 +9356,257 @@ async function _consumePendingActivatePro() {
   return true;
 }
 window._consumePendingActivatePro = _consumePendingActivatePro;
+
+// ── S-PRO-SIGNUP — pantalla unificada activación profesional ──────────────────
+// Reemplaza el flujo s-login → s-pro-company → s-pro-activate.
+// La pantalla recoge:
+//   • Datos de cuenta (solo si NO hay sesión)
+//   • Datos de empresa (siempre)
+//   • Toggle bundle 60 tokens
+//   • Sticky pago (Stripe Checkout en Web/Android; IAP en iOS futuro)
+//
+// Ojo scope IIFE: leemos JWT directo de localStorage (mismo motivo que el fix
+// del nav inferior y el de renderProAreaAuthCTA).
+
+function psHasSession() {
+  try { return !!localStorage.getItem('dm_jwt'); } catch(e) { return false; }
+}
+
+// Sincroniza visibilidad de la sección de cuenta + prellenado de empresa
+// según haya o no sesión. Se llama en cada goTo('s-pro-signup').
+function psHydrate() {
+  var hasSession = psHasSession();
+  var accountSection = document.getElementById('ps-account-section');
+  if (accountSection) accountSection.style.display = hasSession ? 'none' : 'flex';
+
+  // Reset error
+  var err = document.getElementById('ps-error');
+  if (err) { err.style.display = 'none'; err.textContent = ''; }
+
+  // Prerellenar empresa si tenemos _myAccount.company
+  if (hasSession && window._myAccount && window._myAccount.company) {
+    var c = window._myAccount.company;
+    function _setVal(id, v) {
+      var el = document.getElementById(id);
+      if (el && v) el.value = v;
+    }
+    _setVal('ps-company-name', c.name);
+    _setVal('ps-legal-rep', c.legal_rep);
+    _setVal('ps-cif', c.cif);
+    _setVal('ps-billing-email', c.billing_email || (window._myAccount.email || ''));
+    _setVal('ps-city', c.city);
+    _setVal('ps-country', c.country);
+    // clients_per_year viene como int (e.g. 35); el select usa rangos.
+    // No prerellenamos el rango — el usuario lo elige si aún no está marcado.
+    var collab = document.getElementById('ps-collab');
+    if (collab && typeof c.collaborate_interest === 'boolean') collab.checked = !!c.collaborate_interest;
+  }
+
+  // Total inicial (sin bundle)
+  psUpdateTotal();
+}
+window.psHydrate = psHydrate;
+
+function psBack() {
+  goTo('s-pro-area');
+}
+window.psBack = psBack;
+
+// Constantes pricing (mantener sincronizadas con backend Railway env vars
+// STRIPE_PRICE_PRO_MEMBERSHIP / STRIPE_PRICE_PRO_TOKEN_BUNDLE).
+// Visualización local SOLO; el cargo real lo hace Stripe Checkout con los
+// price IDs del backend, no estos números.
+var PS_PRICE_BASE = 20.00;
+var PS_PRICE_BUNDLE = 37.80;
+
+function _psFmtEur(n) {
+  return n.toFixed(2).replace('.', ',') + ' €';
+}
+
+function psUpdateTotal() {
+  var bundle = document.getElementById('ps-bundle');
+  var withBundle = !!(bundle && bundle.checked);
+  var total = PS_PRICE_BASE + (withBundle ? PS_PRICE_BUNDLE : 0);
+  var totalEl = document.getElementById('ps-total-amount');
+  var btnEl = document.getElementById('ps-pay-btn');
+  if (totalEl) totalEl.textContent = _psFmtEur(total);
+  if (btnEl) {
+    var key = withBundle ? 'ps_pay_bundle' : 'ps_pay';
+    var label = (window.I18N && I18N[currentLang] && I18N[currentLang][key])
+      || (withBundle ? 'Pagar ' + _psFmtEur(total) : 'Pagar ' + _psFmtEur(total));
+    // Asegurar que la cifra dinámica refleja el total real (no la del diccionario)
+    btnEl.textContent = (currentLang === 'en' ? 'Pay ' : 'Pagar ') + _psFmtEur(total);
+  }
+}
+window.psUpdateTotal = psUpdateTotal;
+
+function _psShowError(text) {
+  var el = document.getElementById('ps-error');
+  if (!el) return;
+  el.textContent = text;
+  el.style.display = 'block';
+  try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) {}
+}
+
+function _psSetBusy(busy) {
+  var btn = document.getElementById('ps-pay-btn');
+  if (!btn) return;
+  btn.disabled = !!busy;
+  btn.dataset.origLabel = btn.dataset.origLabel || btn.textContent;
+  if (busy) {
+    btn.textContent = (currentLang === 'en' ? 'Processing…' : 'Procesando…');
+  } else if (btn.dataset.origLabel) {
+    psUpdateTotal();
+  }
+}
+
+// Validación cliente. Errores estructurados con clave i18n.
+function _psValidate(hasSession) {
+  function _v(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+  var errors = [];
+
+  if (!hasSession) {
+    var email = _v('ps-email');
+    var pass = _v('ps-password');
+    var tos = document.getElementById('ps-tos');
+    if (!email || !/.+@.+\..+/.test(email)) errors.push(_i18nText('ps_err_email', 'Introduce un email válido.'));
+    if (!pass || pass.length < 8) errors.push(_i18nText('ps_err_password', 'La contraseña debe tener al menos 8 caracteres.'));
+    if (!tos || !tos.checked) errors.push(_i18nText('ps_err_tos', 'Debes aceptar los Términos y la Política de Privacidad.'));
+  }
+
+  if (!_v('ps-company-name')) errors.push(_i18nText('ps_err_company_name', 'Indica el nombre de la empresa.'));
+  if (!_v('ps-legal-rep')) errors.push(_i18nText('ps_err_legal_rep', 'Indica el nombre del representante legal.'));
+  var billing = _v('ps-billing-email');
+  if (!billing || !/.+@.+\..+/.test(billing)) errors.push(_i18nText('ps_err_billing_email', 'Introduce un email de facturación válido.'));
+  if (!_v('ps-city')) errors.push(_i18nText('ps_err_city', 'Indica la ciudad.'));
+  if (!_v('ps-country')) errors.push(_i18nText('ps_err_country', 'Indica el país.'));
+
+  return errors;
+}
+
+// Mapea el rango "20-50", "300+", etc. a un entero aproximado para
+// clients_per_year (el backend espera int 0..1_000_000). null si no eligió.
+function _psCasesToInt(v) {
+  if (!v) return null;
+  var map = { '0-20': 10, '20-50': 35, '50-100': 75, '100-300': 200, '300+': 350 };
+  return (v in map) ? map[v] : null;
+}
+
+// Construye el payload para PUT /me/company a partir de los inputs.
+// Nombres alineados con CompanyUpdate (app/api/routes/account.py).
+function _psBuildCompanyPayload() {
+  function _v(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+  return {
+    name:                 _v('ps-company-name'),
+    legal_rep:            _v('ps-legal-rep') || null,
+    cif:                  _v('ps-cif') || null,
+    billing_email:        _v('ps-billing-email') || null,
+    city:                 _v('ps-city') || null,
+    country:              _v('ps-country') || null,
+    clients_per_year:     _psCasesToInt(_v('ps-cases')),
+    collaborate_interest: !!(document.getElementById('ps-collab') && document.getElementById('ps-collab').checked)
+  };
+}
+
+async function psSubmit() {
+  var hasSession = psHasSession();
+  var errors = _psValidate(hasSession);
+  if (errors.length) {
+    _psShowError(errors.join(' '));
+    return;
+  }
+
+  _psSetBusy(true);
+  try {
+    // Paso 1 — Si no hay sesión, registrar cuenta tipo profesional.
+    if (!hasSession) {
+      var email = document.getElementById('ps-email').value.trim();
+      var pass  = document.getElementById('ps-password').value;
+      // Reusar el endpoint de registro existente (POST /auth/register).
+      // POST /auth/register acepta email/password/phone?/invite_code? (Pydantic
+      // RegisterRequest). NO acepta name/account_type — el account_type pasa a
+      // 'professional' en el webhook Stripe tras el pago confirmado.
+      var regRes = await fetch(API_BASE + '/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, password: pass })
+      });
+      if (!regRes.ok) {
+        var msg = '';
+        try { msg = await regRes.text(); } catch(e) {}
+        // Si el email ya existe, sugerimos login (backend devuelve 400 con detail)
+        if (regRes.status === 409 || /exist|already|registr/i.test(msg)) {
+          _psShowError(_i18nText('ps_err_email_exists', 'Este email ya está registrado. Inicia sesión y vuelve a Activar Profesional.'));
+        } else {
+          _psShowError(_i18nText('ps_err_register', 'No se pudo crear la cuenta.') + ' ' + (msg || ''));
+        }
+        _psSetBusy(false);
+        return;
+      }
+      // AuthResponse devuelve {token, user_id, email, tokens, role, account_type}
+      var regData = null;
+      try { regData = await regRes.json(); } catch(e) {}
+      if (regData && regData.token) {
+        try { localStorage.setItem('dm_jwt', regData.token); } catch(e) {}
+      } else {
+        _psShowError(_i18nText('ps_err_register', 'No se pudo crear la cuenta.'));
+        _psSetBusy(false);
+        return;
+      }
+      // Cargar account fresca tras login implícito.
+      try { if (typeof loadAccountInfo === 'function') await loadAccountInfo(); } catch(e) {}
+    }
+
+    // Paso 2 — Guardar datos de empresa (PUT /me/company).
+    var companyPayload = _psBuildCompanyPayload();
+    var jwt = localStorage.getItem('dm_jwt');
+    var compRes = await fetch(API_BASE + '/me/company', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + jwt
+      },
+      body: JSON.stringify(companyPayload)
+    });
+    if (!compRes.ok) {
+      var compMsg = await compRes.text();
+      _psShowError(_i18nText('ps_err_company', 'No se pudieron guardar los datos de empresa.') + ' ' + (compMsg || ''));
+      _psSetBusy(false);
+      return;
+    }
+
+    // Paso 3 — Crear sesión de Stripe Checkout.
+    // (En iOS, este paso conmutará a IAP StoreKit cuando integremos Capacitor.
+    //  Mientras tanto, Web/Android siguen Stripe.)
+    var withBundle = !!(document.getElementById('ps-bundle') && document.getElementById('ps-bundle').checked);
+    var coRes = await fetch(API_BASE + '/payments/pro-checkout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + jwt
+      },
+      body: JSON.stringify({ include_bundle: withBundle })
+    });
+    if (!coRes.ok) {
+      var coMsg = await coRes.text();
+      _psShowError(_i18nText('ps_err_checkout', 'No se pudo iniciar el pago.') + ' ' + (coMsg || ''));
+      _psSetBusy(false);
+      return;
+    }
+    var coData = await coRes.json();
+    if (!coData || !coData.url) {
+      _psShowError(_i18nText('ps_err_checkout', 'No se pudo iniciar el pago.'));
+      _psSetBusy(false);
+      return;
+    }
+    // Redirige al Checkout de Stripe (la app vuelve con ?payment=pro_success o pro_cancelled).
+    window.location.href = coData.url;
+  } catch(e) {
+    _psShowError(_i18nText('ps_err_unexpected', 'Error inesperado. Inténtalo de nuevo.'));
+    _psSetBusy(false);
+  }
+}
+window.psSubmit = psSubmit;
 
 // Botón "atrás" del s-pro-company. Si veníamos del flujo de activación,
 // cancelar significa volver a s-pro-area (no a home), para no descolocar.
@@ -12291,6 +12891,51 @@ function endTourIntro() {
       pro_mid_auth_label:      '¿Estás registrado?',
       pro_mid_auth_btn:        'Log in',
       pro_mid_auth_hint:       '¿No estás registrado? Elige tu plan',
+
+      // ── S-PRO-SIGNUP ──
+      ps_eyebrow:              'Membresía Profesional',
+      ps_title:                'Tu marca junto a la nuestra',
+      ps_intro:                'Activa tu cuenta profesional, sube el logo de tu empresa y comparte informes co-marcados con tus clientes desde el primer caso.',
+      ps_account_title:        'Datos de tu cuenta',
+      ps_email:                'Email',
+      ps_password:             'Contraseña',
+      ps_password_hint:        'Mínimo 8 caracteres.',
+      ps_tos_text:             'Acepto los Términos y la Política de Privacidad.',
+      ps_tos_link_terms:       'Términos',
+      ps_tos_link_privacy:     'Política de Privacidad',
+      ps_company_title:        'Datos de tu empresa',
+      ps_company_name:         'Nombre de la empresa',
+      ps_legal_rep:            'Nombre del representante legal',
+      ps_cif:                  'CIF / NIF / Tax ID',
+      ps_cif_hint:             'Opcional. Necesario solo para facturación.',
+      ps_billing_email:        'Email de facturación',
+      ps_city:                 'Ciudad',
+      ps_country:              'País',
+      ps_cases:                'Número aproximado de casos al año',
+      ps_collab:               'Quiero colaborar con The Dogs Mind International (estudios, formaciones, derivaciones).',
+      ps_logo_title:           'Logo de tu empresa',
+      ps_logo_locked:          'Disponible tras el pago. Podrás subirlo (máx. 2 MB) desde tu perfil cuando se confirme la membresía.',
+      ps_plan_title:           'Tu membresía',
+      ps_plan_name:            'Membresía Profesional · 1 año',
+      ps_bundle_title:         'Añadir 60 tokens de cortesía',
+      ps_bundle_sub:           'Pack promocional 37,80 € (en vez de 42 €).',
+      ps_courtesy:             'Incluye 10 tokens de cortesía al activar la membresía.',
+      ps_total:                'Total',
+      ps_pay:                  'Pagar 20,00 €',
+      ps_secure:               'Pago seguro vía Stripe.',
+      ps_err_email:            'Introduce un email válido.',
+      ps_err_password:         'La contraseña debe tener al menos 8 caracteres.',
+      ps_err_tos:              'Debes aceptar los Términos y la Política de Privacidad.',
+      ps_err_company_name:     'Indica el nombre de la empresa.',
+      ps_err_legal_rep:        'Indica el nombre del representante legal.',
+      ps_err_billing_email:    'Introduce un email de facturación válido.',
+      ps_err_city:             'Indica la ciudad.',
+      ps_err_country:          'Indica el país.',
+      ps_err_email_exists:     'Este email ya está registrado. Inicia sesión y vuelve a Activar Profesional.',
+      ps_err_register:         'No se pudo crear la cuenta.',
+      ps_err_company:          'No se pudieron guardar los datos de empresa.',
+      ps_err_checkout:         'No se pudo iniciar el pago.',
+      ps_err_unexpected:       'Error inesperado. Inténtalo de nuevo.',
       pro_auth_eyebrow:        '¿Ya eres usuario?',
       pro_auth_title:          'Inicia sesión o crea tu cuenta',
       pro_auth_sub:            'Accede a tu área profesional con tu email y contraseña.',
@@ -13005,6 +13650,51 @@ function endTourIntro() {
       pro_mid_auth_label:      'Are you registered?',
       pro_mid_auth_btn:        'Log in',
       pro_mid_auth_hint:       'Not registered? Choose your plan',
+
+      // ── S-PRO-SIGNUP ──
+      ps_eyebrow:              'Professional Membership',
+      ps_title:                'Your brand alongside ours',
+      ps_intro:                'Activate your professional account, upload your company logo and share co-branded reports with your clients from the first case.',
+      ps_account_title:        'Your account details',
+      ps_email:                'Email',
+      ps_password:             'Password',
+      ps_password_hint:        'Minimum 8 characters.',
+      ps_tos_text:             'I accept the Terms and the Privacy Policy.',
+      ps_tos_link_terms:       'Terms',
+      ps_tos_link_privacy:     'Privacy Policy',
+      ps_company_title:        'Your company details',
+      ps_company_name:         'Company name',
+      ps_legal_rep:            'Legal representative name',
+      ps_cif:                  'Tax ID / VAT / CIF',
+      ps_cif_hint:             'Optional. Required only for invoicing.',
+      ps_billing_email:        'Billing email',
+      ps_city:                 'City',
+      ps_country:              'Country',
+      ps_cases:                'Approximate cases per year',
+      ps_collab:               'I want to collaborate with The Dogs Mind International (studies, training, referrals).',
+      ps_logo_title:           'Your company logo',
+      ps_logo_locked:          'Available after payment. You will be able to upload it (max 2 MB) from your profile once the membership is confirmed.',
+      ps_plan_title:           'Your membership',
+      ps_plan_name:            'Professional Membership · 1 year',
+      ps_bundle_title:         'Add 60 courtesy tokens',
+      ps_bundle_sub:           'Promo pack €37.80 (instead of €42).',
+      ps_courtesy:             'Includes 10 courtesy tokens when the membership is activated.',
+      ps_total:                'Total',
+      ps_pay:                  'Pay €20.00',
+      ps_secure:               'Secure payment via Stripe.',
+      ps_err_email:            'Enter a valid email.',
+      ps_err_password:         'Password must be at least 8 characters.',
+      ps_err_tos:              'You must accept the Terms and the Privacy Policy.',
+      ps_err_company_name:     'Enter the company name.',
+      ps_err_legal_rep:        'Enter the legal representative name.',
+      ps_err_billing_email:    'Enter a valid billing email.',
+      ps_err_city:             'Enter the city.',
+      ps_err_country:          'Enter the country.',
+      ps_err_email_exists:     'This email is already registered. Sign in and try Activate Professional again.',
+      ps_err_register:         'Could not create the account.',
+      ps_err_company:          'Could not save the company details.',
+      ps_err_checkout:         'Could not start the payment.',
+      ps_err_unexpected:       'Unexpected error. Please try again.',
       pro_auth_eyebrow:        'Already a user?',
       pro_auth_title:          'Sign in or create your account',
       pro_auth_sub:            'Access your professional area with your email and password.',

@@ -29,6 +29,7 @@ class User(Base):
     # Validados en endpoint, NO en modelo. Nullable porque un profesional puede no haber
     # configurado todavía su empresa (slot Entidad vacío en home → primer tap abre form).
     company_name                 = Column(String(120), nullable=True)
+    company_legal_rep            = Column(String(120), nullable=True)  # representante legal (form Profesional)
     company_web                  = Column(String(255), nullable=True)
     company_cif                  = Column(String(40), nullable=True)   # opcional, solo si quiere factura
     company_clients_per_year     = Column(Integer, nullable=True)

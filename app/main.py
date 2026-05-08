@@ -67,6 +67,7 @@ async def lifespan(app: FastAPI):
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS account_type VARCHAR(20) NOT NULL DEFAULT 'particular'",
             "CREATE INDEX IF NOT EXISTS ix_users_account_type ON users(account_type)",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS company_name VARCHAR(120)",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS company_legal_rep VARCHAR(120)",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS company_web VARCHAR(255)",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS company_cif VARCHAR(40)",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS company_clients_per_year INTEGER",

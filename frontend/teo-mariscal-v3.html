@@ -8780,12 +8780,16 @@ window.ppShare = ppShare;
 async function ppRegenerate() {
   var caseId = window._planSimpleState && window._planSimpleState.caseId;
   if (!caseId) return;
-  // Reusar _planSimpleFlow pero con force=true. Necesitamos el record para meta.
+  // Reusar _planSimpleFlow pero con force=true.
+  // Si el record ya está en localStorage lo usamos; si no (cache limpia, otro
+  // device, sesión nueva) construimos un rec mínimo con el caseId — el caso
+  // ya existe en backend, no requiere migración. Tomamos el dog_name del meta
+  // pintado en la pantalla actual para preservar el header visual.
   var records = (typeof getRecords === 'function') ? getRecords() : [];
   var rec = records.find(function(r) { return r.backend_case_id === caseId; });
   if (!rec) {
-    showToast(_i18nText('pp_err_no_plan', 'Caso no encontrado.'));
-    return;
+    var metaTxt = (document.getElementById('pp-meta') || {}).textContent || '';
+    rec = { backend_case_id: caseId, dog_name: (metaTxt.split('·')[0] || '').trim() };
   }
   if (!confirm(_i18nText('pp_regen_confirm', '¿Regenerar plan sencillo? Cobrará 0,1 tokens más.'))) return;
   await _planSimpleFlow(rec, { force: true });
@@ -8989,11 +8993,15 @@ window.atShare = atShare;
 async function atRegenerate() {
   var caseId = window._abcExplainedState && window._abcExplainedState.caseId;
   if (!caseId) return;
+  // Si el record ya está en localStorage lo usamos; si no (cache limpia, otro
+  // device, sesión nueva), construimos un rec mínimo con el caseId — el caso
+  // ya existe en backend (de hecho lo estamos viendo), no requiere migración.
+  // Tomamos dog_name del meta pintado en la pantalla actual para no perder header.
   var records = (typeof getRecords === 'function') ? getRecords() : [];
   var rec = records.find(function(r) { return r.backend_case_id === caseId; });
   if (!rec) {
-    showToast(_i18nText('at_err_not_found', 'Caso no encontrado.'));
-    return;
+    var metaTxt = (document.getElementById('at-meta') || {}).textContent || '';
+    rec = { backend_case_id: caseId, dog_name: (metaTxt.split('·')[0] || '').trim() };
   }
   if (!confirm(_i18nText('at_regen_confirm', '¿Regenerar la explicación? Cobrará 0,1 tokens más.'))) return;
   await _abcExplainedFlow(rec, { force: true });

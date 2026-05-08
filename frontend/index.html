@@ -9807,13 +9807,16 @@ async function psSubmit() {
       return;
     }
     var coData = await coRes.json();
-    if (!coData || !coData.url) {
+    // El backend devuelve `checkout_url` (Stripe session.url). Aceptamos también
+    // `url` por defensa en caso de cambio de contrato futuro.
+    var checkoutUrl = (coData && (coData.checkout_url || coData.url)) || null;
+    if (!checkoutUrl) {
       _psShowError(_i18nText('ps_err_checkout', 'No se pudo iniciar el pago.'));
       _psSetBusy(false);
       return;
     }
     // Redirige al Checkout de Stripe (la app vuelve con ?payment=pro_success o pro_cancelled).
-    window.location.href = coData.url;
+    window.location.href = checkoutUrl;
   } catch(e) {
     _psShowError(_i18nText('ps_err_unexpected', 'Error inesperado. Inténtalo de nuevo.'));
     _psSetBusy(false);

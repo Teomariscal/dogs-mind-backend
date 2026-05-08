@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v71 (App Store cleanup: quita 4 emojis HTML decorativos; añade i18n ES para pp_h_lawful/pp_p_lawful/pp_h_ccpa/pp_p_ccpa)
+// Dogs Mind Service Worker — v72 (fix crítico s-pro-signup: backend devuelve checkout_url no url; psSubmit acepta ambos y prioriza checkout_url)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v71';
+const CACHE_NAME = 'dogs-mind-v72';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

@@ -122,7 +122,7 @@ behavioral rehearsal. These start on DAY 1 before formal training begins.]
 [3–4 bullet points of measurable weekly indicators the owner can track.
 Each indicator should be observable without equipment.]
 
-## ⚠️ SEÑALES DE ALARMA
+## SEÑALES DE ALARMA
 [2–3 bullet points: specific OBSERVABLE behaviors that indicate the plan
 needs to be paused and the case re-assessed from the start. Frame each
 point as an observation criterion the owner must document, NOT as a

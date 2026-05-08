@@ -328,7 +328,7 @@ def _send_password_email(to_email: str, temp_password: str) -> None:
       <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Has solicitado recuperar tu contraseña. Aquí tienes una nueva, generada al azar:</p>
       <div style="background: #f7f5ee; border: 1.5px solid rgba(184,146,42,0.45); border-radius: 12px; padding: 18px; text-align: center; font-size: 22px; font-weight: 700; letter-spacing: 2px; color: #1a1f17; font-family: 'Courier New', monospace; margin: 16px 0 24px;">{temp_password}</div>
       <div style="background: #fff8e6; border: 1.5px solid #e8c46c; border-radius: 10px; padding: 14px 16px; margin: 0 0 20px; font-size: 14px; line-height: 1.6; color: #6a4f10;">
-        ⚠️ <strong>Importante:</strong> escribe esta contraseña <strong>a mano</strong> al iniciar sesión.<br>
+        <strong>Importante:</strong> escribe esta contraseña <strong>a mano</strong> al iniciar sesión.<br>
         Si la copias y pegas, algunos clientes de email añaden caracteres invisibles (espacios o saltos de línea) que impiden el inicio de sesión y dan el mensaje &quot;Email o contraseña incorrectos&quot;.
       </div>
       <p style="font-size: 14px; line-height: 1.6; color: #555; margin-bottom: 8px;">Una vez dentro, te recomendamos cambiarla por una contraseña tuya en <em>Mis Tokens → Cambiar contraseña</em>.</p>

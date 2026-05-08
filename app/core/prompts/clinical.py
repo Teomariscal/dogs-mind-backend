@@ -248,9 +248,10 @@ if known. No mentalistic language.]
 whether they are POSITIVE (access to something: attention, food, play,
 social contact) or NEGATIVE (escape/avoidance of something: aversive
 stimulus, fear, discomfort). State the maintaining contingency explicitly.
-Format each bullet as: "🔴 Reforzamiento [positivo/negativo]: [explanation]"
-or "🟢 Reforzamiento [positivo/negativo]: [explanation]" depending on
-whether it amplifies or reduces the behavior.]
+Format each bullet as plain text without any emoji or icon. Start the bullet
+with the label "Reforzamiento positivo:" or "Reforzamiento negativo:" followed
+by the explanation. Do NOT prepend coloured circles, warning signs, or any
+other Unicode emoji — the rendering layer adds visual cues if needed.]
 
 ════════════════════════════ ANÁLISIS COMPLETO ════════════════════════════
 

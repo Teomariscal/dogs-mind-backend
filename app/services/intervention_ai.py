@@ -45,7 +45,7 @@ def run_intervention_plan(request: InterventionRequest) -> InterventionResponse:
         anamnesis_lines.append(f"Daily walks: {a.walks_per_day or '?'}/day")
     if a.involves_aggression:
         anamnesis_lines.append(
-            f"⚠️ Aggression involved (threshold: {a.aggression_distance_cm or '?'} cm)"
+            f"AGGRESSION INVOLVED — clinical priority. Threshold: {a.aggression_distance_cm or '?'} cm"
         )
     if a.previous_attempts:
         anamnesis_lines.append(f"Previous attempts: {a.previous_attempts}")

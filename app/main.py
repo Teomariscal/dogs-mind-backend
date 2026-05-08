@@ -241,7 +241,7 @@ def serve_admin():
 
 <!-- LOGIN -->
 <div class="card" id="login-section">
-  <h1>🐕 Dogs Mind · Admin</h1>
+  <h1>Dogs Mind · Admin</h1>
   <p>Inicia sesión con tu cuenta de administrador</p>
   <input type="email" id="adm-email" placeholder="Email" onkeydown="if(event.key==='Enter')adminLogin()">
   <input type="password" id="adm-pass" placeholder="Contraseña" onkeydown="if(event.key==='Enter')adminLogin()">
@@ -251,7 +251,7 @@ def serve_admin():
 
 <div id="admin-content">
 <div class="card">
-  <h1>🐕 Dogs Mind · Admin RAG</h1>
+  <h1>Dogs Mind · Admin RAG</h1>
   <p>Sube PDFs para alimentar la base de conocimiento conductual</p>
 
   <div id="drop-zone" onclick="document.getElementById('file-input').click()"

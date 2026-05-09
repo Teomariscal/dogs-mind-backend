@@ -24,7 +24,7 @@ OUTPUT: exactamente 30 líneas, una por día, formato estricto:
 
 REGLAS DURAS:
 
-1. Cada task: una sola frase, máximo 25 palabras. Lenguaje del dueño común (12-14 años de lectura), no técnico. Acción concreta y observable.
+1. Cada task: una sola frase, **máximo 20 palabras**. Lenguaje del dueño común (12-14 años de lectura), no técnico. Acción concreta y observable. Frase completa con punto final (nunca cortes a mitad).
 
 2. Escalado progresivo: días 1-7 son de calibración suave (observación, primera exposición controlada, refuerzo positivo básico). Días 8-20 son el grueso de la intervención (exposiciones graduales, contracondicionamiento). Días 21-30 son consolidación y generalización (mismo ejercicio en contextos nuevos, sin guía explícita).
 
@@ -64,7 +64,7 @@ OUTPUT: exactly 30 lines, one per day, strict format:
 
 STRICT RULES:
 
-1. Each task: one sentence, max 25 words. Plain owner language (teen reading level), not technical. Concrete observable action.
+1. Each task: one sentence, **max 20 words**. Plain owner language (teen reading level), not technical. Concrete observable action. Complete sentence with a final period (never cut mid-sentence).
 
 2. Progressive scaling: days 1-7 are gentle calibration (observation, first controlled exposure, basic positive reinforcement). Days 8-20 are the bulk of the intervention (graded exposures, counterconditioning). Days 21-30 are consolidation and generalization (same exercise in new contexts, without explicit guidance).
 

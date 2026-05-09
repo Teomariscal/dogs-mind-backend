@@ -9,6 +9,7 @@ from app.api.routes import auth, payments as payments_router
 from app.api.routes import dogs as dogs_router
 from app.api.routes import cases as cases_router
 from app.api.routes import account as account_router
+from app.api.routes import daily_followup as daily_followup_router
 
 # Path to the frontend HTML — override via FRONTEND_HTML env var
 FRONTEND_HTML = os.environ.get(
@@ -82,6 +83,20 @@ async def lifespan(app: FastAPI):
             "ALTER TABLE cases ADD COLUMN IF NOT EXISTS client_dog_name VARCHAR(80)",
             "ALTER TABLE cases ADD COLUMN IF NOT EXISTS client_dog_breed VARCHAR(120)",
             "ALTER TABLE cases ADD COLUMN IF NOT EXISTS client_dog_age VARCHAR(80)",
+
+            # Daily Follow-up — feature seguimiento diario tipo Duolingo.
+            # Spec en memoria: project_dogs_mind_daily_followup.md (9-may-2026).
+            # init_db() crea las tablas vía Base.metadata.create_all(); estos
+            # ALTER son los que SQLAlchemy NO añadirá si la tabla ya existe.
+            "ALTER TABLE cases ADD COLUMN IF NOT EXISTS daily_followup_enabled BOOLEAN NOT NULL DEFAULT FALSE",
+            "ALTER TABLE cases ADD COLUMN IF NOT EXISTS current_streak INTEGER NOT NULL DEFAULT 0",
+            "ALTER TABLE cases ADD COLUMN IF NOT EXISTS longest_streak INTEGER NOT NULL DEFAULT 0",
+            "ALTER TABLE cases ADD COLUMN IF NOT EXISTS last_filled_at TIMESTAMP",
+            "ALTER TABLE cases ADD COLUMN IF NOT EXISTS current_badge VARCHAR(10)",
+            "ALTER TABLE cases ADD COLUMN IF NOT EXISTS gold_token_reward_granted BOOLEAN NOT NULL DEFAULT FALSE",
+            "ALTER TABLE cases ADD COLUMN IF NOT EXISTS in_recovery BOOLEAN NOT NULL DEFAULT FALSE",
+            "CREATE INDEX IF NOT EXISTS ix_daily_followup_case_chrono ON daily_followup_entries(case_id, day_local_date DESC)",
+            "CREATE INDEX IF NOT EXISTS ix_case_daily_tasks_case_round ON case_daily_tasks(case_id, generation_round, day_index)",
         ]
         for sql in migrations:
             try:
@@ -175,6 +190,7 @@ app.include_router(documents.router)
 app.include_router(dogs_router.router)
 app.include_router(cases_router.router)
 app.include_router(account_router.router)
+app.include_router(daily_followup_router.router)
 
 
 @app.get("/", include_in_schema=False)

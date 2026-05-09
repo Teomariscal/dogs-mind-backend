@@ -34,17 +34,30 @@ Tarifas tokens por entry (invariante financiera):
 import uuid
 from datetime import datetime
 from sqlalchemy import (
-    Column, String, DateTime, Integer, Text, ForeignKey, Index, Numeric,
+    Column, String, DateTime, Integer, SmallInteger, Text, ForeignKey, Index,
+    Numeric, Boolean, Date, UniqueConstraint, CheckConstraint,
 )
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from app.database import Base
 
 
 # Tipos válidos de entry. Mantener en sync con el schema Pydantic del router.
-ENTRY_TYPES = ("anamnesis", "abc", "intervention", "seguimiento", "chat_aigent")
+ENTRY_TYPES = ("anamnesis", "abc", "intervention", "seguimiento", "chat_aigent", "daily_followup")
 
 # Estados válidos del caso.
 CASE_STATUSES = ("open", "archived")
+
+# Estados de badge en seguimiento diario.
+BADGE_TIERS = (None, "silver", "gold")
+
+# Estado conductual reportado en el wizard diario (5 opciones).
+DOG_STATES = ("calm", "active", "nervous", "reactive", "other")
+
+# Calificación de ejecución de la tarea diaria.
+EXECUTION_QUALITIES = (None, "better", "expected", "hard")
+
+# Motivos de no-ejecución de la tarea diaria.
+SKIP_REASONS = (None, "no_time", "not_dog_moment", "forgot", "other")
 
 
 class Case(Base):
@@ -75,6 +88,18 @@ class Case(Base):
     summary_abc     = Column(Text, nullable=True)
     summary_plan    = Column(Text, nullable=True)
     summary_full    = Column(Text, nullable=True)
+
+    # ── Daily Follow-up (feature seguimiento diario tipo Duolingo) ─────────────
+    # Activado por defecto al aceptar un plan de intervención sobre el caso.
+    # Toggle desactivable desde s-records. Spec completa en
+    # ~/.claude/projects/.../memory/project_dogs_mind_daily_followup.md.
+    daily_followup_enabled  = Column(Boolean, nullable=False, default=False)
+    current_streak          = Column(Integer, nullable=False, default=0)
+    longest_streak          = Column(Integer, nullable=False, default=0)
+    last_filled_at          = Column(DateTime, nullable=True)
+    current_badge           = Column(String(10), nullable=True)  # None | 'silver' | 'gold'
+    gold_token_reward_granted = Column(Boolean, nullable=False, default=False)
+    in_recovery             = Column(Boolean, nullable=False, default=False)
 
     # Audit / GDPR
     created_at      = Column(DateTime, nullable=False, default=datetime.utcnow)
@@ -113,3 +138,65 @@ class CaseEntry(Base):
 
 # Índice compuesto: "entries de un caso ordenadas cronológicamente".
 Index("ix_case_entries_case_chrono", CaseEntry.case_id, CaseEntry.created_at)
+
+
+class DailyFollowupEntry(Base):
+    """
+    Una entrada del seguimiento diario por caso, una por día local.
+    El UNIQUE constraint (case_id, day_local_date) impide rellenar el mismo
+    día dos veces. La lógica de streak / badge / recovery vive en el endpoint
+    de inserción.
+    """
+    __tablename__ = "daily_followup_entries"
+
+    id                 = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    case_id            = Column(UUID(as_uuid=True), ForeignKey("cases.id"), nullable=False, index=True)
+    user_id            = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
+    day_local_date     = Column(Date, nullable=False)  # día local del usuario (YYYY-MM-DD)
+
+    task_completed     = Column(Boolean, nullable=False)
+    execution_quality  = Column(String(16), nullable=True)  # None | better/expected/hard
+    skip_reason        = Column(String(20), nullable=True)  # None | no_time/not_dog_moment/forgot/other
+    dog_state          = Column(String(16), nullable=False) # calm/active/nervous/reactive/other
+    observation        = Column(Text, nullable=True)        # opcional, max 280 chars (validar en Pydantic)
+
+    created_at         = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+    __table_args__ = (
+        UniqueConstraint("case_id", "day_local_date", name="uq_daily_followup_case_day"),
+        CheckConstraint(
+            "dog_state IN ('calm','active','nervous','reactive','other')",
+            name="ck_daily_followup_dog_state",
+        ),
+    )
+
+
+# Índice para "últimas N entries de un caso ordenadas".
+Index("ix_daily_followup_case_chrono", DailyFollowupEntry.case_id, DailyFollowupEntry.day_local_date.desc())
+
+
+class CaseDailyTask(Base):
+    """
+    Tareas diarias pre-generadas por Sonnet 4.6 cuando se acepta el plan de
+    intervención. 30 tasks por caso (day_index 1..30), cada una de 1-2 frases.
+    Si el usuario llega al día 31 sin cerrar el caso, se regenera una nueva
+    serie con leve variación (~$0.003 por regeneración).
+    """
+    __tablename__ = "case_daily_tasks"
+
+    id          = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    case_id     = Column(UUID(as_uuid=True), ForeignKey("cases.id"), nullable=False, index=True)
+    day_index   = Column(SmallInteger, nullable=False)  # 1..30
+    task_text   = Column(Text, nullable=False)
+    generation_round = Column(SmallInteger, nullable=False, default=1)  # 1, 2, ... si se regeneran ciclos
+
+    created_at  = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+    __table_args__ = (
+        UniqueConstraint("case_id", "day_index", "generation_round",
+                         name="uq_case_daily_tasks_case_day_round"),
+        CheckConstraint("day_index BETWEEN 1 AND 30", name="ck_case_daily_tasks_day_range"),
+    )
+
+
+Index("ix_case_daily_tasks_case_round", CaseDailyTask.case_id, CaseDailyTask.generation_round, CaseDailyTask.day_index)

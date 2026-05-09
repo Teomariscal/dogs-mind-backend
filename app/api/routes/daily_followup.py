@@ -430,6 +430,28 @@ def submit_daily_followup(
     )
 
 
+@router.get("/{case_id}/daily-followup/tasks")
+def list_daily_tasks(
+    case_id: str,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """Lista las 30 tasks generadas (round 1) de un caso. Útil para preview
+    en frontend (commit B) y para que el usuario sepa qué viene los próximos días."""
+    case = _ownership_or_404(case_id, user, db)
+    tasks = db.query(CaseDailyTask).filter(
+        CaseDailyTask.case_id == case.id,
+        CaseDailyTask.generation_round == 1,
+    ).order_by(CaseDailyTask.day_index).all()
+    return {
+        "case_id": str(case.id),
+        "tasks": [
+            {"day_index": t.day_index, "task_text": t.task_text}
+            for t in tasks
+        ],
+    }
+
+
 @router.put("/{case_id}/daily-followup/enable")
 def enable_daily_followup(
     case_id: str,

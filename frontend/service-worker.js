@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v77 (regenerar análisis/plan no requiere record en localStorage: si solo hay caseId, construye rec mínimo desde el meta de pantalla)
+// Dogs Mind Service Worker — v78 (s-pro-area: position:relative + ajuste top de pro-logout-link para no solaparse con status bar simulada)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v77';
+const CACHE_NAME = 'dogs-mind-v78';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

@@ -4285,6 +4285,10 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
    Spec consolidada por premium-design-reviewer (2026-05-03).
    ═══════════════════════════════════════════════════════════════════════════ */
 #s-pro-area {
+  /* position:relative anchora .pro-login-link absolute al screen, no al
+     .phone wrapper. Sin esto, el botón se solapa con la .status-bar
+     simulada (top:0, z-index:10) en preview desktop. */
+  position: relative;
   --pro-bg-deep: #0e1f1a;
   --pro-bg-elevated: #14302a;
   --pro-bg-surface: #1a3b34;
@@ -4729,7 +4733,9 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
    complementario al back button). Solo visible si NO hay sesión activa. */
 #s-pro-area .pro-login-link {
   position: absolute;
-  top: max(env(safe-area-inset-top, 0px), 14px);
+  /* anclado a #s-pro-area (que tiene position:relative) — ya empieza
+     después del status bar simulada/real, así que top relativo al screen */
+  top: calc(env(safe-area-inset-top, 0px) + 14px);
   right: 16px;
   z-index: 8;
   background: rgba(0, 24, 32, 0.55);

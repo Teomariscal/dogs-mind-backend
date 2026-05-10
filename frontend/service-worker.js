@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v91 (rediseno vibrant extendido a s-tracking: plan de intervencion con header sticky vibrant + hero img-16 con glow cyan + plan body card blanca; mismo patron que s-abc/s-records)
+// Dogs Mind Service Worker — v92 (rediseno vibrant extendido a s-full-analysis: gradient verde-deep + halos + grid radial; informe tecnico en card blanca con borde cyan; coherente con s-abc/s-tracking/s-records)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v91';
+const CACHE_NAME = 'dogs-mind-v92';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

@@ -6120,6 +6120,76 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   backdrop-filter:saturate(140%) blur(8px);
   -webkit-backdrop-filter:saturate(140%) blur(8px);
 }
+
+/* ── E extendido: rediseño vibrant de #s-full-analysis ────────────────── */
+#s-full-analysis{
+  background:linear-gradient(180deg, #0e1f1a 0%, #14302a 100%) !important;
+  position:relative;
+}
+#s-full-analysis::before{
+  content:''; position:absolute; left:0; right:0; top:0; height:55%;
+  background:
+    radial-gradient(ellipse 600px 300px at 25% -2%, rgba(94,200,230,0.22), transparent 64%),
+    radial-gradient(ellipse 540px 240px at 80% 4%, rgba(74,103,65,0.30), transparent 62%);
+  pointer-events:none; z-index:0;
+}
+#s-full-analysis::after{
+  content:''; position:absolute; inset:0;
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.045) 1px, transparent 1px);
+  background-size:24px 24px;
+  -webkit-mask-image:radial-gradient(ellipse 75% 55% at 50% 22%, black, transparent 78%);
+          mask-image:radial-gradient(ellipse 75% 55% at 50% 22%, black, transparent 78%);
+  pointer-events:none; z-index:0;
+}
+#s-full-analysis > *{ position:relative; z-index:1; }
+
+/* Header sticky vibrant */
+#s-full-analysis > div:first-child{
+  background:rgba(14,31,26,0.62) !important;
+  backdrop-filter:saturate(140%) blur(14px);
+  -webkit-backdrop-filter:saturate(140%) blur(14px);
+  border-bottom:1px solid rgba(94,200,230,0.18) !important;
+  padding-top:calc(env(safe-area-inset-top, 0px) + 18px) !important;
+}
+#s-full-analysis #full-analysis-title{ color:#f3f1ea !important; }
+#s-full-analysis > div:first-child > div:nth-child(2) > div:last-child{
+  color:rgba(243,241,234,0.62) !important;
+}
+#s-full-analysis > div:first-child > button{
+  background:rgba(255,255,255,0.10) !important;
+  border-color:rgba(255,255,255,0.18) !important;
+  color:#f3f1ea !important;
+}
+#s-full-analysis #full-dog-photo{
+  border:2px solid rgba(94,200,230,0.40) !important;
+  box-shadow:0 4px 14px rgba(0,0,0,0.28);
+}
+
+/* Texto completo: card blanca premium clinical sobre vibrant — todo el
+   informe técnico se lee dentro de un container con borde cyan y sombra
+   elevada para que destaque sin perder legibility. */
+#s-full-analysis #full-analysis-body{
+  margin:14px;
+  padding:20px 18px !important;
+  background:#fff;
+  border-radius:18px;
+  border:1px solid rgba(94,200,230,0.20);
+  box-shadow:0 12px 36px rgba(0,0,0,0.28);
+  color:var(--dark) !important;
+}
+#s-full-analysis #full-analysis-body strong,
+#s-full-analysis #full-analysis-body b{ color:var(--dark); }
+#s-full-analysis #full-analysis-body [data-i18n="full_empty"]{
+  color:var(--grey) !important;
+}
+
+/* CTA inferior amber gradient para coherencia con s-abc */
+#s-full-analysis .btn-orange{
+  background:linear-gradient(135deg, #c8962a 0%, #a87b1f 100%) !important;
+  box-shadow:0 6px 24px rgba(200,150,42,0.32) !important;
+}
 </style>
 </head>
 <body>

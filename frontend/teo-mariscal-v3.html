@@ -5590,6 +5590,12 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   box-shadow:0 4px 14px rgba(0,0,0,0.16);
   z-index:1;
 }
+/* En recovery, cambiamos el avatar del ejercicio 1 a Katja (voz neutra).
+   Mantiene la coherencia con el banner Katja arriba — la pantalla pasa a
+   "modo Katja" mientras el caso está en recovery. */
+.df-exercise-aigent.df-exercise-aigent-recovery{
+  background:#0e1f1a url(aig-katja.webp) center/cover no-repeat;
+}
 .df-exercise-wellness{
   background:linear-gradient(180deg, #fff 0%, #f0f7ed 100%);
   border-color:rgba(74,103,65,0.18);
@@ -5727,6 +5733,34 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   border-radius:14px;
   font-size:13px; font-weight:600; color:var(--green);
   text-align:center;
+}
+
+/* ── F: recovery banner voz Katja (commit F) ──────────────────────────── */
+.df-recovery-banner{
+  display:flex; align-items:center; gap:12px;
+  padding:14px 16px;
+  background:linear-gradient(135deg, rgba(154,161,168,0.14) 0%, rgba(94,200,230,0.08) 100%);
+  border:1px solid rgba(154,161,168,0.32);
+  border-radius:16px;
+  margin-bottom:4px;
+}
+.df-recovery-avatar{
+  width:52px; height:52px; border-radius:50%;
+  flex-shrink:0;
+  background:#0e1f1a url(aig-katja.webp) center/cover no-repeat;
+  border:2px solid #fff;
+  box-shadow:0 4px 12px rgba(0,0,0,0.18);
+}
+.df-recovery-text{
+  flex:1; min-width:0;
+  font-size:13px; line-height:1.5;
+  color:var(--dark);
+}
+.df-recovery-name{
+  font-size:11px; font-weight:700;
+  color:#5a6770; letter-spacing:0.06em;
+  text-transform:uppercase;
+  margin-bottom:2px;
 }
 
 /* ── Botón "Seguimiento diario" bajo cada card en s-records (commit E) ── */
@@ -6853,6 +6887,15 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 
     <!-- Content (renderizado dinámico) -->
     <div id="df-content" class="df-content" style="display:none;">
+
+      <!-- Recovery banner (commit F) — solo si data.in_recovery=true -->
+      <div id="df-recovery-banner" class="df-recovery-banner" style="display:none;">
+        <div class="df-recovery-avatar" role="img" aria-label="Katja"></div>
+        <div class="df-recovery-text">
+          <div class="df-recovery-name">Katja</div>
+          <div id="df-recovery-msg" data-i18n="df_recovery_msg_short">Lleva dos días seguidos rellenando y recuperarás tu Tutor Responsable.</div>
+        </div>
+      </div>
 
       <!-- Saludo del Aigent (commit C llenará esto) -->
       <div class="df-greeting" id="df-greeting" style="display:none;">
@@ -13428,6 +13471,8 @@ function endTourIntro() {
       df_invite_sub_template: '¿Cómo va con {dog} hoy? Hagamos juntos el seguimiento del día.',
       df_invite_cta_now:      'Hacer ahora',
       df_invite_cta_later:    'Más tarde',
+      df_recovery_msg_short:  'Lleva dos días seguidos rellenando el seguimiento y recuperarás tu Tutor Responsable.',
+      df_recovery_msg_streak1:'Llevas un día. Rellena uno más y recuperas tu Tutor Responsable.',
       // Splash
       splash_title:           'Canine Behavior<br>Consultancy',
       splash_sub:             'Análisis funcional experto para entender<br>y mejorar el comportamiento de tu perro',
@@ -14226,6 +14271,8 @@ function endTourIntro() {
       df_invite_sub_template: "How is {dog} doing today? Let's check in for the day.",
       df_invite_cta_now:      'Start now',
       df_invite_cta_later:    'Later',
+      df_recovery_msg_short:  'Check in two days in a row and you\'ll recover your Responsible Caretaker.',
+      df_recovery_msg_streak1:"You've checked in one day. One more and your Responsible Caretaker is back.",
       // Splash
       splash_title:           'Canine Behavior<br>Consultancy',
       splash_sub:             "Expert functional analysis to understand<br>and improve your dog's behavior",
@@ -15098,6 +15145,8 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
       df_invite_sub_template: '¿Cómo va con {dog} hoy? Hagamos juntos el seguimiento del día.',
       df_invite_cta_now:      'Hacer ahora',
       df_invite_cta_later:    'Más tarde',
+      df_recovery_msg_short:  'Lleva dos días seguidos rellenando el seguimiento y recuperarás tu Tutor Responsable.',
+      df_recovery_msg_streak1:'Llevas un día. Rellena uno más y recuperas tu Tutor Responsable.',
     },
     en: {
       df_day_label:        'Day',
@@ -15117,6 +15166,8 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
       df_invite_sub_template: "How is {dog} doing today? Let's check in for the day.",
       df_invite_cta_now:      'Start now',
       df_invite_cta_later:    'Later',
+      df_recovery_msg_short:  'Check in two days in a row and you\'ll recover your Responsible Caretaker.',
+      df_recovery_msg_streak1:"You've checked in one day. One more and your Responsible Caretaker is back.",
     },
   };
   function _t(k, fb){
@@ -15255,6 +15306,25 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
 
     renderBadge(data);
 
+    // Recovery banner voz Katja (commit F): visible solo si el caso está
+    // en recovery. El backend marca data.in_recovery=true cuando han pasado
+    // más de MAX_GAP_DAYS_TO_KEEP_STREAK días sin entry is_complete=true.
+    var recBanner = _q('df-recovery-banner');
+    if (recBanner) {
+      if (data.in_recovery) {
+        var msgEl = _q('df-recovery-msg');
+        if (msgEl) {
+          // Si el usuario lleva ya 1 día rellenando dentro del recovery,
+          // mensaje "falta uno más"; si 0, "rellena 2 seguidos".
+          var key = (data.current_streak === 1) ? 'df_recovery_msg_streak1' : 'df_recovery_msg_short';
+          msgEl.textContent = _t(key);
+        }
+        recBanner.style.display = '';
+      } else {
+        recBanner.style.display = 'none';
+      }
+    }
+
     // Saludo aún sin contenido (commit C añade rotativo Niaz/Mario/Ale/...).
     _show('df-greeting', false);
 
@@ -15350,17 +15420,16 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
     var card = document.createElement('div');
     card.className = 'df-exercise' + (ex.is_wellness ? ' df-exercise-wellness' : '');
 
-    // Aigent decorativo (Niaz) en la esquina superior derecha del ejercicio 1.
-    // Niaz es la Aigent principal del producto y queda libre porque Cecilia
-    // ya tiene rol pedagógico en s-tracking y Katja está reservada para el
-    // recovery flow del seguimiento diario (commit F).
-    // Usamos div con background-image (no img) para poder controlar el
-    // encuadre de la cara con background-position + background-size.
+    // Aigent decorativo en la esquina superior derecha del ejercicio 1.
+    // Default Niaz (Aigent principal). Si el caso está en recovery, lo
+    // sustituimos por Katja para coherencia con el banner del recovery
+    // flow (commit F).
     if (idx === 0 && !ex.is_wellness){
       var aig = document.createElement('div');
-      aig.className = 'df-exercise-aigent';
+      var inRec = !!(_state.today && _state.today.in_recovery);
+      aig.className = 'df-exercise-aigent' + (inRec ? ' df-exercise-aigent-recovery' : '');
       aig.setAttribute('role', 'img');
-      aig.setAttribute('aria-label', 'Niaz');
+      aig.setAttribute('aria-label', inRec ? 'Katja' : 'Niaz');
       card.appendChild(aig);
     }
 

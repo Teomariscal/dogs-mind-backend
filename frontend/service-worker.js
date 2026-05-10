@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v87 (Fase 1 design system: añade variables :root premium (navy, bronze, success, warning, danger, text-primary, text-secondary + 7 colores Aigents) y preload Google Fonts Playfair+Inter. Cero cambios visuales — zero risk pre-App Store)
+// Dogs Mind Service Worker — v88 (commit F: recovery flow voz Katja en s-daily-followup cuando in_recovery=true — banner con avatar Katja + mensaje neutro + avatar del ejercicio 1 cambia a Katja)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v87';
+const CACHE_NAME = 'dogs-mind-v88';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

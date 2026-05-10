@@ -5956,6 +5956,82 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 #s-records #records-list > div:has(> div[style*="text-align:center"]){
   /* No tocar las cards reales (que tienen contenido) */
 }
+
+/* ── E extendido: rediseño vibrant de #s-abc (análisis funcional) ─────── */
+#s-abc{
+  background:linear-gradient(180deg, #0e1f1a 0%, #14302a 100%) !important;
+  position:relative;
+}
+#s-abc::before{
+  content:''; position:absolute; left:0; right:0; top:0; height:55%;
+  background:
+    radial-gradient(ellipse 600px 300px at 25% -2%, rgba(94,200,230,0.22), transparent 64%),
+    radial-gradient(ellipse 540px 240px at 80% 4%, rgba(74,103,65,0.30), transparent 62%);
+  pointer-events:none; z-index:0;
+}
+#s-abc::after{
+  content:''; position:absolute; inset:0;
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.045) 1px, transparent 1px);
+  background-size:24px 24px;
+  -webkit-mask-image:radial-gradient(ellipse 75% 55% at 50% 22%, black, transparent 78%);
+          mask-image:radial-gradient(ellipse 75% 55% at 50% 22%, black, transparent 78%);
+  pointer-events:none; z-index:0;
+}
+#s-abc > *{ position:relative; z-index:1; }
+#s-abc .abc-bg-blur{ display:none; }
+
+/* Back button: glassmorphic vibrant */
+#s-abc > div[style*="position:absolute"][style*="top:52px"] > button{
+  background:rgba(14,31,26,0.55) !important;
+  border:1px solid rgba(255,255,255,0.18) !important;
+  color:#f3f1ea !important;
+  backdrop-filter:saturate(140%) blur(14px);
+  -webkit-backdrop-filter:saturate(140%) blur(14px);
+}
+
+/* Hero foto ABC: la imagen mantiene su fondo blanco original; la rodeamos
+   con un marco/glow cyan para que "flote" sobre el vibrant en vez de
+   parecer un poster pegado. */
+#s-abc .abc-scroll > div:first-child{
+  margin:14px 14px 16px !important;
+  border-radius:20px !important;
+  border:1px solid rgba(94,200,230,0.40);
+  box-shadow:
+    0 12px 40px rgba(0,0,0,0.40),
+    0 0 0 1px rgba(255,255,255,0.04),
+    0 0 50px rgba(94,200,230,0.18);
+}
+
+/* Cards: sobre vibrant, mantenemos blanco para legibility del texto
+   técnico clínico, pero con borde cyan sutil + sombra mayor que las
+   levanta como elementos premium. */
+#s-abc .abc-summary-card,
+#s-abc .abc-section-card,
+#s-abc .cm-card{
+  border:1px solid rgba(94,200,230,0.20) !important;
+  box-shadow:0 8px 28px rgba(0,0,0,0.28) !important;
+}
+
+/* Botones inferiores: el btn-orange amber actual rompe coherencia con
+   vibrant. Lo dejamos pero le subimos contraste. El primary verde y el
+   outline siguen funcionando bien. */
+#s-abc .btn-orange{
+  background:linear-gradient(135deg, #c8962a 0%, #a87b1f 100%) !important;
+  box-shadow:0 6px 24px rgba(200,150,42,0.32) !important;
+}
+#s-abc #btn-full-analysis{
+  background:linear-gradient(135deg, #c8962a 0%, #a87b1f 100%) !important;
+  box-shadow:0 6px 24px rgba(200,150,42,0.32);
+}
+#s-abc .btn-outline{
+  background:rgba(255,255,255,0.08) !important;
+  border:1.5px solid rgba(255,255,255,0.32) !important;
+  color:#f3f1ea !important;
+  backdrop-filter:saturate(140%) blur(8px);
+  -webkit-backdrop-filter:saturate(140%) blur(8px);
+}
 </style>
 </head>
 <body>

@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v89 (fixes: contraste del boton 'Seguimiento diario' sobre fondo vibrant; openDailyFollowup acepta planText y lo pasa a /init para casos legacy sin CaseEntry intervention en backend)
+// Dogs Mind Service Worker — v90 (rediseno vibrant extendido a s-abc: gradient verde-deep + halos cyan/green + grid radial; foto ABC con marco glow cyan; cards mantienen blanco para legibility del texto clinico)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v89';
+const CACHE_NAME = 'dogs-mind-v90';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

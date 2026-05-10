@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v82 (commit E: boton 'Seguimiento diario' bajo cada ficha de perro en s-records + hook acceptIntervention que activa daily-followup en backend tras aceptar plan)
+// Dogs Mind Service Worker — v83 (s-daily-followup fix: loadToday llama POST /init idempotente antes de GET /today para activar daily-followup en casos previos al hook acceptIntervention)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v82';
+const CACHE_NAME = 'dogs-mind-v83';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

@@ -14961,6 +14961,19 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
     if (!jwt){ setError(_t('df_error_title')); return; }
     setLoading();
     try {
+      // Activación idempotente: si el caso aún no tiene daily_followup_enabled
+      // (porque se aceptó el plan antes del commit E), POST /init lo activa
+      // sin romper nada si ya estaba activo. Coste: 1 Haiku ~$0.0001 al
+      // primer load por sesión. No bloqueamos si /init falla — /today
+      // dará un error específico que mostraremos al usuario.
+      try {
+        await fetch(API + '/cases/' + encodeURIComponent(_state.caseId) + '/daily-followup/init', {
+          method: 'POST',
+          headers: { 'Content-Type':'application/json', 'Authorization':'Bearer ' + jwt },
+          body: JSON.stringify({ lang: _lang() }),
+        });
+      } catch(e) { /* ignorar — /today reportará el problema real si lo hay */ }
+
       var url = API + '/cases/' + encodeURIComponent(_state.caseId)
               + '/daily-followup/today?lang=' + encodeURIComponent(_lang());
       var res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + jwt } });

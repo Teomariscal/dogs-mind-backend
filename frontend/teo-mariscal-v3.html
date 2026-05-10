@@ -5739,6 +5739,75 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 .rec-df-cta-arrow{
   color:#5ec8e6; font-size:18px; flex-shrink:0; font-weight:700;
 }
+
+/* ── df-invite-modal: invitación 1×día al check-in (commit C) ─────────── */
+.df-invite-modal{
+  position:fixed; inset:0; z-index:9998;
+  background:rgba(14,31,26,0.55);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  display:flex; align-items:center; justify-content:center;
+  padding:24px;
+  padding-top:calc(env(safe-area-inset-top, 0px) + 24px);
+  padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 24px);
+}
+.df-invite-card{
+  background:#fff;
+  border-radius:24px;
+  padding:24px 22px 18px;
+  width:100%; max-width:340px;
+  position:relative;
+  display:flex; flex-direction:column; align-items:center;
+  box-shadow:0 20px 60px rgba(0,0,0,0.35);
+  font-family:inherit;
+}
+.df-invite-close{
+  position:absolute; top:10px; right:10px;
+  width:32px; height:32px; border-radius:50%;
+  background:rgba(0,0,0,0.04); border:none;
+  font-size:20px; color:#666; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  font-family:inherit; line-height:1;
+}
+.df-invite-close:hover{ background:rgba(0,0,0,0.08); }
+.df-invite-avatar{
+  width:96px; height:96px;
+  margin-bottom:14px;
+  border-radius:50%;
+  background:#0e1f1a url(aig-niaz.webp) center/cover no-repeat;
+  border:3px solid #fff;
+  box-shadow:0 6px 24px rgba(0,0,0,0.22);
+}
+.df-invite-title{
+  font-size:18px; font-weight:700; color:var(--dark);
+  text-align:center; margin-bottom:6px;
+  letter-spacing:-0.3px;
+}
+.df-invite-sub{
+  font-size:13.5px; color:var(--grey);
+  text-align:center; line-height:1.5;
+  margin-bottom:18px;
+  padding:0 8px;
+}
+.df-invite-cta{
+  width:100%; padding:14px;
+  background:#4a6741; color:#fff;
+  border:none; border-radius:100px;
+  font-size:15px; font-weight:700;
+  cursor:pointer; font-family:inherit;
+  letter-spacing:0.02em;
+  box-shadow:0 4px 16px rgba(74,103,65,0.25);
+  margin-bottom:6px;
+  min-height:48px;
+}
+.df-invite-cta:active{ transform:translateY(1px); }
+.df-invite-later{
+  width:100%; padding:11px;
+  background:transparent; color:var(--grey);
+  border:none; font-size:13px; font-weight:600;
+  cursor:pointer; font-family:inherit;
+  min-height:36px;
+}
 </style>
 </head>
 <body>
@@ -13247,6 +13316,10 @@ function endTourIntro() {
       df_textarea_ph:         'Una frase sobre lo que pasó…',
       df_records_btn_title:   'Seguimiento diario',
       df_records_btn_sub:     'Cumple todos los días con las tareas recomendadas para sacar el máximo provecho.',
+      df_invite_title:        'Hola, ¿cómo va el día?',
+      df_invite_sub_template: '¿Cómo va con {dog} hoy? Hagamos juntos el seguimiento del día.',
+      df_invite_cta_now:      'Hacer ahora',
+      df_invite_cta_later:    'Más tarde',
       // Splash
       splash_title:           'Canine Behavior<br>Consultancy',
       splash_sub:             'Análisis funcional experto para entender<br>y mejorar el comportamiento de tu perro',
@@ -14041,6 +14114,10 @@ function endTourIntro() {
       df_textarea_ph:         'One sentence on what happened…',
       df_records_btn_title:   'Daily follow-up',
       df_records_btn_sub:     'Stick with the recommended daily tasks to get the most out of the plan.',
+      df_invite_title:        'Hi, how is the day going?',
+      df_invite_sub_template: "How is {dog} doing today? Let's check in for the day.",
+      df_invite_cta_now:      'Start now',
+      df_invite_cta_later:    'Later',
       // Splash
       splash_title:           'Canine Behavior<br>Consultancy',
       splash_sub:             "Expert functional analysis to understand<br>and improve your dog's behavior",
@@ -14857,6 +14934,18 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
     </div>
   </div><!-- /s-terms -->
 
+  <!-- ══ df-invite-modal: invitación 1×día al check-in (commit C) ══ -->
+  <div id="df-invite-modal" class="df-invite-modal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="df-invite-title">
+    <div class="df-invite-card">
+      <button class="df-invite-close" type="button" onclick="dfInviteClose()" aria-label="Cerrar">&times;</button>
+      <div class="df-invite-avatar" role="img" aria-label="Niaz"></div>
+      <div class="df-invite-title" id="df-invite-title" data-i18n="df_invite_title">Hola, ¿cómo va el día?</div>
+      <div class="df-invite-sub" id="df-invite-sub">Hagamos juntos el seguimiento del día.</div>
+      <button class="df-invite-cta" id="df-invite-cta-now" type="button" data-i18n="df_invite_cta_now">Hacer ahora</button>
+      <button class="df-invite-later" type="button" onclick="dfInviteClose()" data-i18n="df_invite_cta_later">Más tarde</button>
+    </div>
+  </div>
+
 <script>
 // ── S-DAILY-FOLLOWUP: client del check-in diario (commit B) ───────────────
 (function(){
@@ -14897,6 +14986,10 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
       df_silver_earned:    '¡Has ganado el badge Tutor Responsable!',
       df_gold_earned:      '¡Has ganado el badge Tutor Excelente! +2 tokens',
       df_textarea_ph:      'Una frase sobre lo que pasó…',
+      df_invite_title:        'Hola, ¿cómo va el día?',
+      df_invite_sub_template: '¿Cómo va con {dog} hoy? Hagamos juntos el seguimiento del día.',
+      df_invite_cta_now:      'Hacer ahora',
+      df_invite_cta_later:    'Más tarde',
     },
     en: {
       df_day_label:        'Day',
@@ -14912,6 +15005,10 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
       df_silver_earned:    'You earned the Responsible Caretaker badge!',
       df_gold_earned:      'You earned the Excellent Caretaker badge! +2 tokens',
       df_textarea_ph:      'One sentence on what happened…',
+      df_invite_title:        'Hi, how is the day going?',
+      df_invite_sub_template: "How is {dog} doing today? Let's check in for the day.",
+      df_invite_cta_now:      'Start now',
+      df_invite_cta_later:    'Later',
     },
   };
   function _t(k, fb){
@@ -15268,6 +15365,130 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
       '</svg>' +
       '<div class="df-badge-text">' + _esc(label) + '</div>';
   }
+
+  // ── INVITACIÓN 1×DÍA AL CHECK-IN (commit C) ────────────────────────────
+  // Al llegar a s-home tras autenticación, comprobar si el usuario tiene un
+  // caso con daily-followup activo SIN entry hoy y mostrar un modal con
+  // avatar Niaz invitando a hacer el check-in. Si elige "Más tarde" o cierra,
+  // no se vuelve a abrir hoy (flag localStorage por fecha local UTC).
+  var _dfInviteSessionChecked = false;
+
+  function _dfTodayKey(){
+    var d = new Date();
+    var y = d.getUTCFullYear();
+    var m = String(d.getUTCMonth() + 1).padStart(2, '0');
+    var dd = String(d.getUTCDate()).padStart(2, '0');
+    return 'dm_df_invite_dismissed_' + y + '-' + m + '-' + dd;
+  }
+
+  function _dfDismissToday(){
+    try { localStorage.setItem(_dfTodayKey(), '1'); } catch(e){}
+  }
+
+  function _dfCollectLocalRecords(){
+    var out = [];
+    try {
+      var keys = Object.keys(localStorage).filter(function(k){
+        return k.indexOf('dm_records_') === 0 || k === 'dm_behavioral_records';
+      });
+      keys.forEach(function(k){
+        try {
+          var arr = JSON.parse(localStorage.getItem(k) || '[]');
+          if (Array.isArray(arr)) out = out.concat(arr);
+        } catch(e){}
+      });
+    } catch(e){}
+    return out;
+  }
+
+  async function _dfInviteCheck(){
+    if (_dfInviteSessionChecked) return;
+    _dfInviteSessionChecked = true;
+    try {
+      try { if (localStorage.getItem(_dfTodayKey())) return; } catch(e){}
+      var jwt = _jwt();
+      if (!jwt) return;
+      var records = _dfCollectLocalRecords();
+      var candidate = null;
+      for (var i = 0; i < records.length; i++) {
+        var r = records[i];
+        if (r && r.backend_case_id && (r.status === 'active' || r.status === undefined)) {
+          candidate = r; break;
+        }
+      }
+      if (!candidate) return;
+
+      var url = API + '/cases/' + encodeURIComponent(candidate.backend_case_id)
+              + '/daily-followup/today?lang=' + encodeURIComponent(_lang());
+      var res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + jwt } });
+      if (!res.ok) return; // si /today falla (caso sin DF, sin plan, etc.) no molestamos
+      var data = await res.json();
+      if (!data.daily_followup_enabled) return;
+      if (data.already_completed_today) return;
+
+      _dfInviteShow(candidate.backend_case_id, candidate.dog_name || (_lang() === 'en' ? 'your dog' : 'tu perro'));
+    } catch(e){}
+  }
+
+  function _dfInviteShow(caseId, dogName){
+    var modal = _q('df-invite-modal');
+    if (!modal) return;
+    var titleEl = _q('df-invite-title');
+    if (titleEl) titleEl.textContent = _t('df_invite_title');
+    var subEl = _q('df-invite-sub');
+    if (subEl) {
+      var template = _t('df_invite_sub_template',
+        '¿Cómo va con {dog} hoy? Hagamos juntos el seguimiento del día.');
+      subEl.textContent = template.replace('{dog}', dogName);
+    }
+    var cta = _q('df-invite-cta-now');
+    if (cta) {
+      cta.textContent = _t('df_invite_cta_now');
+      cta.onclick = function(){
+        _dfDismissToday();
+        modal.style.display = 'none';
+        if (typeof window.openDailyFollowup === 'function') {
+          window.openDailyFollowup(caseId);
+        }
+      };
+    }
+    var later = modal.querySelector('.df-invite-later');
+    if (later) later.textContent = _t('df_invite_cta_later');
+    modal.style.display = 'flex';
+    modal.onclick = function(e){
+      if (e.target === modal) {
+        _dfDismissToday();
+        modal.style.display = 'none';
+      }
+    };
+  }
+
+  window.dfInviteClose = function(){
+    _dfDismissToday();
+    var m = _q('df-invite-modal');
+    if (m) m.style.display = 'none';
+  };
+
+  // Patch goTo para disparar el check al entrar en s-home. goTo vive en otra
+  // IIFE; esperamos a que esté en window con un poll corto.
+  (function patchGoToForInvite(){
+    var attempts = 0;
+    var iv = setInterval(function(){
+      attempts++;
+      if (typeof window.goTo === 'function' && !window.goTo._dfPatched) {
+        var orig = window.goTo;
+        window.goTo = function(id){
+          var r = orig.apply(this, arguments);
+          if (id === 's-home') setTimeout(_dfInviteCheck, 700);
+          return r;
+        };
+        window.goTo._dfPatched = true;
+        clearInterval(iv);
+      } else if (attempts > 40) {
+        clearInterval(iv);
+      }
+    }, 200);
+  })();
 })();
 </script>
 

@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v84 (s-daily-followup UX: revelar respuesta auto-marca la opcion correcta para liberar submit; copy ES 'Guardar el dia' -> 'Guarda el dia')
+// Dogs Mind Service Worker — v85 (commit C: modal 'df-invite-modal' invita 1x dia al check-in en s-home si hay caso con DF activo + sin entry hoy; flag localStorage dm_df_invite_dismissed_<YYYY-MM-DD>)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v84';
+const CACHE_NAME = 'dogs-mind-v85';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

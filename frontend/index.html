@@ -5808,6 +5808,87 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   cursor:pointer; font-family:inherit;
   min-height:36px;
 }
+
+/* ── E completo: rediseño vibrant de #s-records (commit E) ───────────── */
+#s-records{
+  background:linear-gradient(180deg, #0e1f1a 0%, #14302a 100%) !important;
+  position:relative;
+}
+#s-records::before{
+  content:''; position:absolute; left:0; right:0; top:0; height:60%;
+  background:
+    radial-gradient(ellipse 600px 280px at 28% -2%, rgba(94,200,230,0.20), transparent 62%),
+    radial-gradient(ellipse 540px 240px at 82% 4%, rgba(74,103,65,0.26), transparent 62%);
+  pointer-events:none; z-index:0;
+}
+#s-records::after{
+  content:''; position:absolute; inset:0;
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.045) 1px, transparent 1px);
+  background-size:24px 24px;
+  -webkit-mask-image:radial-gradient(ellipse 75% 55% at 50% 22%, black, transparent 78%);
+          mask-image:radial-gradient(ellipse 75% 55% at 50% 22%, black, transparent 78%);
+  pointer-events:none; z-index:0;
+}
+#s-records > *{ position:relative; z-index:1; }
+
+/* Header sticky sobre fondo oscuro */
+#s-records > div:first-child{
+  background:rgba(14,31,26,0.62) !important;
+  backdrop-filter:saturate(140%) blur(14px);
+  -webkit-backdrop-filter:saturate(140%) blur(14px);
+  border-bottom:1px solid rgba(94,200,230,0.18) !important;
+  position:sticky; top:0; z-index:10;
+  padding-top:calc(env(safe-area-inset-top, 0px) + 18px) !important;
+}
+#s-records [data-i18n="records_title"]{ color:#f3f1ea !important; }
+#s-records [data-i18n="records_sub"]{ color:rgba(243,241,234,0.62) !important; }
+#s-records > div:first-child > button{
+  background:rgba(255,255,255,0.10) !important;
+  border-color:rgba(255,255,255,0.18) !important;
+  color:#f3f1ea !important;
+}
+#s-records > div:first-child > button:hover{
+  background:rgba(255,255,255,0.18) !important;
+}
+
+/* Filter pills inactivos sobre fondo oscuro (el activo lo marca dataset.active) */
+#s-records [id^="filter-"]:not([data-active="1"]){
+  background:rgba(255,255,255,0.08) !important;
+  color:rgba(243,241,234,0.68) !important;
+  border:1.5px solid rgba(255,255,255,0.18) !important;
+}
+
+/* Cards blancas con borde cyan sutil sobre el fondo oscuro */
+#s-records #records-list > div{
+  border:1px solid rgba(94,200,230,0.20) !important;
+  box-shadow:0 6px 24px rgba(0,0,0,0.22);
+}
+
+/* Badge top-right en el header de s-records */
+.records-badge-top{
+  width:46px; height:46px; flex-shrink:0;
+  position:relative; margin-left:auto;
+  display:flex; align-items:center; justify-content:center;
+}
+.records-badge-top svg{ display:block; }
+.records-badge-top-bg{ stroke:rgba(255,255,255,0.18); fill:none; }
+.records-badge-top-fg{ stroke:#5ec8e6; fill:none; transition:stroke-dashoffset 0.6s ease; }
+.records-badge-top.silver .records-badge-top-fg{ stroke:#c8d0d6; }
+.records-badge-top.gold .records-badge-top-fg{ stroke:#d6b762; }
+.records-badge-top.recovery .records-badge-top-fg{ stroke:#9aa1a8; }
+.records-badge-top.empty{ opacity:0.4; }
+.records-badge-top-text{
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:700; color:#f3f1ea; letter-spacing:-0.5px;
+}
+
+/* Empty state sobre fondo oscuro */
+#s-records #records-list > div:has(> div[style*="text-align:center"]){
+  /* No tocar las cards reales (que tienen contenido) */
+}
 </style>
 </head>
 <body>
@@ -7598,22 +7679,23 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 
 
   <!-- s-records: Behavioral Records -->
-  <div id="s-records" class="screen" style="background:var(--cream);overflow-y:auto;">
+  <div id="s-records" class="screen" style="overflow-y:auto;">
 
     <!-- header -->
     <div style="display:flex;align-items:center;gap:12px;padding:18px 16px 14px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;">
       <button onclick="goTo('s-home')" style="width:36px;height:36px;border-radius:50%;background:#fff;border:1.5px solid rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">&#8592;</button>
-      <div>
+      <div style="flex:1;min-width:0;">
         <div style="font-size:18px;font-weight:700;color:var(--dark);letter-spacing:-0.3px;" data-i18n="records_title">Behavioral Records</div>
         <div style="font-size:11px;color:var(--grey);margin-top:1px;" data-i18n="records_sub">Casos archivados · Teo Mariscal</div>
       </div>
+      <div id="records-badge-top" class="records-badge-top empty" aria-hidden="true"></div>
     </div>
 
     <div style="padding:16px 16px 32px;display:flex;flex-direction:column;gap:10px;">
 
       <!-- filter pills -->
       <div style="display:flex;gap:8px;margin-bottom:6px;overflow-x:auto;padding-bottom:2px;">
-        <span id="filter-todos" onclick="filterRecords('todos')" style="font-size:11px;background:var(--green2);color:#fff;border-radius:100px;padding:5px 14px;white-space:nowrap;font-weight:600;flex-shrink:0;cursor:pointer;" data-i18n="filter_all">Todos</span>
+        <span id="filter-todos" data-active="1" onclick="filterRecords('todos')" style="font-size:11px;background:var(--green2);color:#fff;border-radius:100px;padding:5px 14px;white-space:nowrap;font-weight:600;flex-shrink:0;cursor:pointer;" data-i18n="filter_all">Todos</span>
         <span id="filter-active" onclick="filterRecords('active')" style="font-size:11px;background:#fff;color:var(--grey);border:1.5px solid rgba(0,0,0,0.12);border-radius:100px;padding:5px 14px;white-space:nowrap;flex-shrink:0;cursor:pointer;" data-i18n="filter_active">En seguimiento</span>
         <span id="filter-resolved" onclick="filterRecords('resolved')" style="font-size:11px;background:#fff;color:var(--grey);border:1.5px solid rgba(0,0,0,0.12);border-radius:100px;padding:5px 14px;white-space:nowrap;flex-shrink:0;cursor:pointer;" data-i18n="filter_resolved">Resueltos</span>
         <span id="filter-closed" onclick="filterRecords('closed')" style="font-size:11px;background:#fff;color:var(--grey);border:1.5px solid rgba(0,0,0,0.12);border-radius:100px;padding:5px 14px;white-space:nowrap;flex-shrink:0;cursor:pointer;" data-i18n="filter_closed">Cerrados</span>
@@ -10827,11 +10909,15 @@ function getVal(id, fallback) {
       var el = document.getElementById('filter-' + k);
       if (!el) return;
       if (k === f) {
+        // Marca data-active para que el CSS vibrant del rediseño deje el
+        // estilo activo intacto y solo sobrescriba los inactivos.
+        el.dataset.active = '1';
         el.style.background = 'var(--green2)';
         el.style.color = '#fff';
         el.style.border = 'none';
         el.style.fontWeight = '600';
       } else {
+        delete el.dataset.active;
         el.style.background = '#fff';
         el.style.color = 'var(--grey)';
         el.style.border = '1.5px solid rgba(0,0,0,0.12)';
@@ -15469,8 +15555,9 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
     if (m) m.style.display = 'none';
   };
 
-  // Patch goTo para disparar el check al entrar en s-home. goTo vive en otra
-  // IIFE; esperamos a que esté en window con un poll corto.
+  // Patch goTo para disparar el check al entrar en s-home y el badge top
+  // de s-records. goTo vive en otra IIFE; esperamos a que esté en window
+  // con un poll corto.
   (function patchGoToForInvite(){
     var attempts = 0;
     var iv = setInterval(function(){
@@ -15480,6 +15567,7 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
         window.goTo = function(id){
           var r = orig.apply(this, arguments);
           if (id === 's-home') setTimeout(_dfInviteCheck, 700);
+          if (id === 's-records') setTimeout(_dfRecordsBadgeLoad, 200);
           return r;
         };
         window.goTo._dfPatched = true;
@@ -15489,6 +15577,59 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
       }
     }, 200);
   })();
+
+  // ── Badge top-right en s-records (commit E) ────────────────────────────
+  // Carga el progreso del primer caso con backend_case_id y daily-followup
+  // activo, y lo pinta como anillo SVG en la esquina superior derecha del
+  // header. Si no hay datos, deja el badge "empty" (placeholder gris).
+  async function _dfRecordsBadgeLoad(){
+    var el = document.getElementById('records-badge-top');
+    if (!el) return;
+    el.className = 'records-badge-top empty';
+    el.innerHTML = '';
+    try {
+      var jwt = _jwt();
+      if (!jwt) return;
+      var records = _dfCollectLocalRecords();
+      var candidate = null;
+      for (var i = 0; i < records.length; i++) {
+        var r = records[i];
+        if (r && r.backend_case_id && (r.status === 'active' || r.status === undefined)) {
+          candidate = r; break;
+        }
+      }
+      if (!candidate) return;
+      var url = API + '/cases/' + encodeURIComponent(candidate.backend_case_id)
+              + '/daily-followup/today?lang=' + encodeURIComponent(_lang());
+      var res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + jwt } });
+      if (!res.ok) return;
+      var data = await res.json();
+      if (!data.daily_followup_enabled) return;
+      _dfRecordsBadgePaint(el, data);
+    } catch(e){}
+  }
+
+  function _dfRecordsBadgePaint(el, data){
+    var streak = data.current_streak || 0;
+    var badge = data.current_badge || null;
+    var inRec = !!data.in_recovery;
+    var pct = badge === 'gold' ? 1 : Math.max(0, Math.min(streak / 10, 1));
+    var R = 19; var C = 2 * Math.PI * R;
+    var off = C * (1 - pct);
+    var cls = 'records-badge-top';
+    if (inRec) cls += ' recovery';
+    else if (badge === 'gold') cls += ' gold';
+    else if (badge === 'silver') cls += ' silver';
+    var label = streak > 0 ? String(streak) : '0';
+    el.className = cls;
+    el.innerHTML =
+      '<svg width="46" height="46" viewBox="0 0 46 46" style="position:absolute;inset:0;transform:rotate(-90deg);">' +
+        '<circle class="records-badge-top-bg" cx="23" cy="23" r="' + R + '" stroke-width="3"/>' +
+        '<circle class="records-badge-top-fg" cx="23" cy="23" r="' + R + '" stroke-width="3"' +
+        ' stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + off.toFixed(1) + '" stroke-linecap="round"/>' +
+      '</svg>' +
+      '<div class="records-badge-top-text">' + _esc(label) + '</div>';
+  }
 })();
 </script>
 

@@ -3,6 +3,12 @@ Avatar AI service — Claude Haiku 4.5.
 
 Each avatar has its own personality system prompt.
 The client maintains and sends the full conversation history on each request.
+
+2026-05-10 — Web search tool habilitado para los Aigents lifestyle (Mario,
+Ale, Niaz, Borja, Leo, Katja). Cecilia e Iris quedan EXCLUIDAS porque
+sus boundaries ya derivan al flujo clínico (Cecilia) o al apoyo emocional
+sin datos externos (Iris). Coste: ~$10/1k searches en Anthropic; max 3
+por turno acota el riesgo.
 """
 
 import random
@@ -11,6 +17,12 @@ from app.config import get_settings
 from app.core.anthropic_client import get_anthropic_client
 from app.core.prompts.avatar import AVATAR_PROMPTS, AVATAR_SYSTEM_PROMPT
 from app.models.avatar import AvatarChatRequest, AvatarChatResponse
+
+
+# Aigents que NO deben usar web_search:
+#   • cecilia: tiene RAG clínica + boundary clínico, no debe redirigir a web.
+#   • iris:    rol de apoyo emocional, no datos externos.
+_AIGENTS_WITHOUT_WEB_SEARCH = {"cecilia", "iris"}
 
 
 def chat(request: AvatarChatRequest) -> AvatarChatResponse:
@@ -56,16 +68,29 @@ def chat(request: AvatarChatRequest) -> AvatarChatResponse:
 
     messages = [{"role": m.role, "content": m.content} for m in request.messages]
 
-    response = client.messages.create(
-        model=settings.avatar_model,
-        # Bajado de 600 → 350: el prompt del avatar ya pide calibración a la
-        # pregunta. 350 tokens ≈ 250 palabras castellanas, suficiente para
-        # un párrafo profundo cuando lo amerita; los saludos cortos no
-        # rozan el techo. Red de seguridad por si el modelo se desborda.
-        max_tokens=350,
-        system=system_prompt,
-        messages=messages,
-    )
+    # web_search tool habilitado para Aigents lifestyle. Server-managed por
+    # Anthropic (no necesitamos manejar los turnos manualmente — el SDK
+    # devuelve text blocks finales con el resumen). Margen de tokens más
+    # alto para dar espacio al modelo a resumir 1-3 resultados con detalle.
+    use_web_search = request.avatar_id not in _AIGENTS_WITHOUT_WEB_SEARCH
+
+    create_kwargs = {
+        "model": settings.avatar_model,
+        # 350 para Aigents sin web_search (calibración estricta del prompt).
+        # 500 para Aigents con web_search (margen para listar resultados
+        # concretos con nombre + ciudad/precio sin truncar).
+        "max_tokens": 500 if use_web_search else 350,
+        "system": system_prompt,
+        "messages": messages,
+    }
+    if use_web_search:
+        create_kwargs["tools"] = [{
+            "type": "web_search_20250305",
+            "name": "web_search",
+            "max_uses": 3,
+        }]
+
+    response = client.messages.create(**create_kwargs)
 
     reply_text = ""
     for block in response.content:

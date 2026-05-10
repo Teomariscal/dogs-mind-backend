@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v78 (s-pro-area: position:relative + ajuste top de pro-logout-link para no solaparse con status bar simulada)
+// Dogs Mind Service Worker — v79 (s-daily-followup commit B: pantalla check-in diario con render dinamico de ejercicios + pregunta educativa + badge anillo de progreso + avatar Niaz en ejercicio 1)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v78';
+const CACHE_NAME = 'dogs-mind-v79';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

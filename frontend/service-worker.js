@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v88 (commit F: recovery flow voz Katja en s-daily-followup cuando in_recovery=true — banner con avatar Katja + mensaje neutro + avatar del ejercicio 1 cambia a Katja)
+// Dogs Mind Service Worker — v89 (fixes: contraste del boton 'Seguimiento diario' sobre fondo vibrant; openDailyFollowup acepta planText y lo pasa a /init para casos legacy sin CaseEntry intervention en backend)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v88';
+const CACHE_NAME = 'dogs-mind-v89';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

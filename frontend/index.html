@@ -5764,36 +5764,47 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 }
 
 /* ── Botón "Seguimiento diario" bajo cada card en s-records (commit E) ── */
+/* Sobre el fondo verde-deep vibrant del rediseño, este CTA necesita
+   alto contraste para ser visible. Texto claro + glow cyan + fondo
+   más opaco. */
 .rec-df-cta{
   margin:0 0 14px;
-  padding:12px 14px;
+  padding:13px 16px;
   border-radius:14px;
-  background:linear-gradient(135deg, rgba(74,103,65,0.10) 0%, rgba(94,200,230,0.10) 100%);
-  border:1.5px solid rgba(94,200,230,0.32);
+  background:linear-gradient(135deg, rgba(74,103,65,0.55) 0%, rgba(45,90,110,0.42) 100%);
+  border:1.5px solid rgba(94,200,230,0.62);
   display:flex; align-items:center; gap:12px;
   cursor:pointer; transition:all 0.15s ease;
   font-family:inherit; width:100%; text-align:left;
-  color:var(--dark);
-  min-height:44px;
+  color:#f3f1ea;
+  min-height:48px;
+  box-shadow:0 4px 16px rgba(0,0,0,0.22), 0 0 0 0 rgba(94,200,230,0.0);
 }
 .rec-df-cta:hover, .rec-df-cta:active{
-  background:linear-gradient(135deg, rgba(74,103,65,0.18) 0%, rgba(94,200,230,0.18) 100%);
-  border-color:rgba(94,200,230,0.52);
+  background:linear-gradient(135deg, rgba(74,103,65,0.72) 0%, rgba(45,90,110,0.55) 100%);
+  border-color:rgba(94,200,230,0.85);
+  box-shadow:0 6px 22px rgba(0,0,0,0.28), 0 0 0 4px rgba(94,200,230,0.10);
 }
 .rec-df-cta-icon{
-  width:36px; height:36px; border-radius:50%;
-  background:rgba(94,200,230,0.18);
+  width:38px; height:38px; border-radius:50%;
+  background:rgba(94,200,230,0.30);
   display:flex; align-items:center; justify-content:center;
-  flex-shrink:0; color:#2a4a8a;
+  flex-shrink:0; color:#a8e2f0;
+  box-shadow:0 0 0 1px rgba(94,200,230,0.40) inset;
 }
 .rec-df-cta-text{ flex:1; min-width:0; }
-.rec-df-cta-title{ font-size:13.5px; font-weight:700; color:var(--dark); letter-spacing:-0.1px; }
+.rec-df-cta-title{
+  font-size:14px; font-weight:700;
+  color:#f3f1ea;
+  letter-spacing:-0.1px;
+}
 .rec-df-cta-sub{
-  font-size:11.5px; color:var(--grey);
+  font-size:11.5px;
+  color:rgba(243,241,234,0.78);
   margin-top:2px; line-height:1.4;
 }
 .rec-df-cta-arrow{
-  color:#5ec8e6; font-size:18px; flex-shrink:0; font-weight:700;
+  color:#a8e2f0; font-size:18px; flex-shrink:0; font-weight:700;
 }
 
 /* ── df-invite-modal: invitación 1×día al check-in (commit C) ─────────── */
@@ -11054,10 +11065,13 @@ function getVal(id, fallback) {
 
       // Botón "Seguimiento diario" bajo la card (solo si el caso está en
       // backend; los casos legacy sin backend_case_id no pueden activar
-      // daily-followup hasta que se migren).
+      // daily-followup hasta que se migren). El plan local del record se
+      // cachea en window._dfPlanCache para que openDailyFollowup pueda
+      // pasarlo a /init si el backend no tiene CaseEntry intervention.
       if (r.backend_case_id) {
         var bcid = String(r.backend_case_id).replace(/'/g, "\\'");
-        html += '<button type="button" class="rec-df-cta" onclick="openDailyFollowup(\'' + bcid + '\')" style="border-top-left-radius:0;border-top-right-radius:0;border-top:none;">' +
+        try { window._dfPlanCache = window._dfPlanCache || {}; window._dfPlanCache[r.backend_case_id] = r.plan || ''; } catch(e){}
+        html += '<button type="button" class="rec-df-cta" onclick="event.stopPropagation();_dfOpenFromBtn(\'' + bcid + '\')" style="border-top-left-radius:0;border-top-right-radius:0;border-top:none;">' +
           '<div class="rec-df-cta-icon">' +
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">' +
               '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>' +
@@ -15185,10 +15199,13 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
   }
 
   // ── Punto de entrada público ────────────────────────────────────────────
-  // Llamar con: openDailyFollowup('<case_uuid>')
-  window.openDailyFollowup = function(caseId){
+  // Llamar con: openDailyFollowup('<case_uuid>', '<plan_text>')
+  // El segundo argumento opcional permite activar daily-followup en casos
+  // legacy (sin CaseEntry intervention en backend) pasando el plan local.
+  window.openDailyFollowup = function(caseId, planText){
     if (!caseId) return;
     _state.caseId = caseId;
+    _state.planText = (typeof planText === 'string' && planText.trim()) ? planText : null;
     _state.results = [];
     _state.theoryAnswer = null;
     _state.revealed = false;
@@ -15196,6 +15213,16 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
     setTimeout(loadToday, 50);
   };
   window.dfReload = loadToday;
+
+  // Helper invocado desde el botón "Seguimiento diario" en cards de
+  // s-records. Lee el plan local del cache (poblado por renderRecords)
+  // y se lo pasa a openDailyFollowup para activar daily-followup en
+  // casos legacy sin CaseEntry intervention en backend.
+  window._dfOpenFromBtn = function(caseId){
+    var plan = '';
+    try { plan = (window._dfPlanCache && window._dfPlanCache[caseId]) || ''; } catch(e){}
+    window.openDailyFollowup(caseId, plan);
+  };
 
   // ── Estado UI ───────────────────────────────────────────────────────────
   function setLoading(){
@@ -15222,11 +15249,15 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
       // sin romper nada si ya estaba activo. Coste: 1 Haiku ~$0.0001 al
       // primer load por sesión. No bloqueamos si /init falla — /today
       // dará un error específico que mostraremos al usuario.
+      // Si el caller pasó un plan local (record legacy sin CaseEntry
+      // intervention en backend), lo enviamos para evitar 400 "no hay plan".
       try {
+        var initBody = { lang: _lang() };
+        if (_state.planText) initBody.intervention_plan_text = _state.planText;
         await fetch(API + '/cases/' + encodeURIComponent(_state.caseId) + '/daily-followup/init', {
           method: 'POST',
           headers: { 'Content-Type':'application/json', 'Authorization':'Bearer ' + jwt },
-          body: JSON.stringify({ lang: _lang() }),
+          body: JSON.stringify(initBody),
         });
       } catch(e) { /* ignorar — /today reportará el problema real si lo hay */ }
 

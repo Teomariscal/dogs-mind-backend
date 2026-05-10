@@ -6702,7 +6702,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 
       <!-- Submit / completado -->
       <div id="df-completed-badge" class="df-completed-badge" style="display:none;" data-i18n="df_completed">Ya completaste el seguimiento de hoy</div>
-      <button class="df-submit" id="df-submit" type="button" disabled data-i18n="df_save_day">Guardar el día</button>
+      <button class="df-submit" id="df-submit" type="button" disabled data-i18n="df_save_day">Guarda el día</button>
     </div>
 
   </div>
@@ -13236,7 +13236,7 @@ function endTourIntro() {
       df_theory_tag:          'Pregunta del día',
       df_reveal:              'Mostrar la respuesta correcta',
       df_reveal_done:         'Respuesta revelada',
-      df_save_day:            'Guardar el día',
+      df_save_day:            'Guarda el día',
       df_save_in_progress:    'Guardando…',
       df_save_error:          'No se pudo guardar. Inténtalo de nuevo.',
       df_completed:           'Ya completaste el seguimiento de hoy',
@@ -14889,7 +14889,7 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
       df_theory_tag:       'Pregunta del día',
       df_reveal:           'Mostrar la respuesta correcta',
       df_reveal_done:      'Respuesta revelada',
-      df_save_day:         'Guardar el día',
+      df_save_day:         'Guarda el día',
       df_save_in_progress: 'Guardando…',
       df_save_error:       'No se pudo guardar. Inténtalo de nuevo.',
       df_exercise:         'Ejercicio',
@@ -15103,6 +15103,13 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
         rev.textContent = _state.revealed ? _t('df_reveal_done') : _t('df_reveal');
         rev.onclick = function(){
           _state.revealed = true;
+          // Auto-marcar la opción correcta como respuesta del usuario al
+          // revelar: la app es educativa (la IA dice cuál es), no evaluativa.
+          // Pulsar revelar es el equivalente a "lo entiendo, vamos a guardar".
+          // El usuario aún puede cambiar la opción manualmente después.
+          if (theory && typeof theory.correct_index === 'number') {
+            _state.theoryAnswer = theory.correct_index;
+          }
           _q('df-explanation').style.display = '';
           rev.setAttribute('aria-expanded', 'true');
           rev.textContent = _t('df_reveal_done');

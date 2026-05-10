@@ -27,6 +27,9 @@
 <!-- Fonts: async load to avoid render blocking -->
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"></noscript>
+  <!-- Fase 1 design system premium (2026-05-10): preload fonts NUEVAS para uso post-launch. No reemplazan las actuales (Cormorant + Jost siguen siendo las activas). -->
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet"></noscript>
 <!-- Privacy-friendly analytics by Plausible -->
 <script async src="https://plausible.io/js/pa-_uMr0EkQI9WtZ555JvUAA.js"></script>
 <script>
@@ -94,6 +97,25 @@
   --cm-font-display: 'Times New Roman', Georgia, serif;
   --cm-font-ui:      -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
   --cm-font-mono:    'SF Mono', 'JetBrains Mono', Menlo, monospace;
+
+  /* === FASE 1 DESIGN SYSTEM PREMIUM (2026-05-10) ====================== */
+  /* Variables NUEVAS preparadas para futuras refactorizaciones post-launch.
+     NO se usan en ninguna regla CSS existente — son additive puro. */
+  --navy:           #1a1a2e;
+  --bronze:         #8B6F47;
+  --success:        #10B981;
+  --warning:        #F59E0B;
+  --danger:         #F87171;
+  --text-primary:   #0F172A;
+  --text-secondary: #64748B;
+  /* Aigents premium colors (cuando se introduzca diferenciación visual) */
+  --aigent-cecilia: #6366F1;
+  --aigent-niaz:    #EC4899;
+  --aigent-leo:     #F97316;
+  --aigent-ale:     #22C55E;
+  --aigent-mario:   #06B6D4;
+  --aigent-borja:   #8B5CF6;
+  --aigent-iris:    #14B8A6;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html{height:100%;background:#d8d0c4;overscroll-behavior:none;}

@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v80 (s-daily-followup commit B fix: encuadre de Niaz cambiado a background-image center 65% / size 170% para mostrar la cara entera con barbilla)
+// Dogs Mind Service Worker — v81 (s-daily-followup commit B fix: avatar usa aig-niaz.webp (cuerpo completo + perro) con background cover, en vez del crop pixar de cara)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v80';
+const CACHE_NAME = 'dogs-mind-v81';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

@@ -5558,11 +5558,12 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 .df-exercise-aigent{
   position:absolute; top:-14px; right:14px;
   width:44px; height:44px; border-radius:50%;
-  /* Encuadre de la cara de Niaz: la imagen original (280x280) tiene la cara
-     en la mitad inferior (~y=65%). Usamos background-image con position
-     "center 65%" + size 170% para zoom y centrar la cara en el círculo,
-     mostrando ojos, boca y barbilla sin que el pelo de arriba la tape. */
-  background:#f5f4ed url(aig-niaz-pixar.webp) center 65% / 170% 170% no-repeat;
+  /* Asset `aig-niaz.webp`: Niaz cuerpo completo + su perro sobre fondo
+     verde-deep. Encajamos el retrato dentro del círculo con object-fit
+     equivalente a cover (background-size:cover). El fondo verde del
+     asset se mezcla con el verde del padding del círculo para evitar
+     bordes planos cuando el ratio no encaja exactamente. */
+  background:#0e1f1a url(aig-niaz.webp) center/cover no-repeat;
   border:2.5px solid #fff;
   box-shadow:0 4px 14px rgba(0,0,0,0.16);
   z-index:1;

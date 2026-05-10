@@ -97,6 +97,34 @@ async def lifespan(app: FastAPI):
             "ALTER TABLE cases ADD COLUMN IF NOT EXISTS in_recovery BOOLEAN NOT NULL DEFAULT FALSE",
             "CREATE INDEX IF NOT EXISTS ix_daily_followup_case_chrono ON daily_followup_entries(case_id, day_local_date DESC)",
             "CREATE INDEX IF NOT EXISTS ix_case_daily_tasks_case_round ON case_daily_tasks(case_id, generation_round, day_index)",
+
+            # ── Daily Follow-up — wizard ampliado 2026-05-09 ─────────────────
+            # Cambio de mecánica: 30 tasks batch → check-in on-demand con 2-5
+            # ejercicios (último wellness) + 1 pregunta educativa. Schema:
+            # spec en project_dogs_mind_daily_followup.md.
+            #
+            # Cols nuevas en daily_followup_entries:
+            "ALTER TABLE daily_followup_entries ADD COLUMN IF NOT EXISTS exercises_generated JSONB",
+            "ALTER TABLE daily_followup_entries ADD COLUMN IF NOT EXISTS exercises_results JSONB",
+            "ALTER TABLE daily_followup_entries ADD COLUMN IF NOT EXISTS theory_question_id UUID",
+            "ALTER TABLE daily_followup_entries ADD COLUMN IF NOT EXISTS theory_answer_index SMALLINT",
+            "ALTER TABLE daily_followup_entries ADD COLUMN IF NOT EXISTS is_complete BOOLEAN NOT NULL DEFAULT FALSE",
+            # Cols viejas pasan a nullable (entries pre-existentes los conservan;
+            # el flujo nuevo los deja en NULL).
+            "ALTER TABLE daily_followup_entries ALTER COLUMN task_completed DROP NOT NULL",
+            "ALTER TABLE daily_followup_entries ALTER COLUMN dog_state DROP NOT NULL",
+            # CheckConstraint dog_state se vuelve incompatible con NULL — drop si existe.
+            "ALTER TABLE daily_followup_entries DROP CONSTRAINT IF EXISTS ck_daily_followup_dog_state",
+            # Diagnóstico clínico del caso (clave de caché de preguntas).
+            "ALTER TABLE cases ADD COLUMN IF NOT EXISTS diagnosis_type VARCHAR(40)",
+            "CREATE INDEX IF NOT EXISTS ix_cases_diagnosis_type ON cases(diagnosis_type)",
+            # Tabla theory_questions — caché por diagnosis_type + question_type + lang.
+            # init_db() crea la tabla via Base.metadata.create_all(); aquí garantizamos
+            # los índices y constraints adicionales.
+            "CREATE INDEX IF NOT EXISTS ix_theory_questions_lookup ON theory_questions(diagnosis_type, question_type, lang)",
+            # FK opcional de daily_followup_entries.theory_question_id → theory_questions(id).
+            # No lo añadimos como FK constraint hard porque queremos preservar entries
+            # incluso si se purga la caché (improbable pero defensivo).
         ]
         for sql in migrations:
             try:

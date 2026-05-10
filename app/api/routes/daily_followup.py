@@ -1,131 +1,130 @@
 """
 Daily Follow-up router — feature de seguimiento diario tipo Duolingo.
 
+Wizard ampliado 2026-05-09: 30 tasks batch (commit A) → check-in on-demand
+con 2-5 ejercicios (último wellness) + 1 pregunta educativa por día.
+
 Endpoints (todos requieren JWT, todos verifican Case.user_id == current_user.id):
 
-    POST   /cases/{id}/daily-followup/init      → generar 30 tasks (tras aceptar plan)
-    GET    /cases/{id}/daily-followup/today     → task del día + estado
-    POST   /cases/{id}/daily-followup           → registrar entry del día (wizard 4 pasos)
-    PUT    /cases/{id}/daily-followup/enable    → toggle ON
-    PUT    /cases/{id}/daily-followup/disable   → toggle OFF
+  POST  /cases/{id}/daily-followup/init      → activa daily_followup + classify diagnosis (sin batch)
+  GET   /cases/{id}/daily-followup/today     → check-in del día (genera on-demand si no existe)
+  POST  /cases/{id}/daily-followup           → submit (exercises_results + theory_answer_index)
+  PUT   /cases/{id}/daily-followup/enable    → toggle ON
+  PUT   /cases/{id}/daily-followup/disable   → toggle OFF
+  GET   /cases/{id}/daily-followup/tasks     → DEPRECATED (array vacío)
 
-Lógica de streak / badge / recovery vive en el handler POST.
+Streak rule:
+  - Día "rellenado" = is_complete=True (todos los ejercicios + pregunta tienen respuesta).
+  - 2 días seguidos NO rellenados rompen el streak.
+  - 1 día suelto no rompe.
+  - Acertar/fallar la pregunta no afecta (la app muestra la correcta — es educativa).
 
-Spec completa: ~/.claude/projects/.../memory/project_dogs_mind_daily_followup.md
+Spec: ~/.claude/projects/.../memory/project_dogs_mind_daily_followup.md.
 """
 
 from __future__ import annotations
 import uuid
 import logging
 from datetime import datetime, date, timedelta
-from typing import Optional, Literal
+from typing import Optional, Literal, Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import func, desc
-from pydantic import BaseModel, Field, field_validator
+from sqlalchemy import desc
+from pydantic import BaseModel, Field
 
 from app.database import get_db
 from app.models.user import User
 from app.models.case import (
-    Case, CaseEntry, DailyFollowupEntry, CaseDailyTask,
-    DOG_STATES, EXECUTION_QUALITIES, SKIP_REASONS,
+    Case, CaseEntry, DailyFollowupEntry,
 )
 from app.api.routes.auth import get_current_user
-from app.services.daily_tasks_ai import generate_daily_tasks
-from app.config import get_settings
+from app.services.daily_followup_ai import (
+    classify_diagnosis, generate_daily_checkin,
+    DailyCheckin, ExerciseSpec, TheoryQuestionSpec,
+)
+
 
 logger = logging.getLogger(__name__)
-
 router = APIRouter(prefix="/cases", tags=["daily-followup"])
 
 
 # ── Constantes (invariantes del seguimiento diario) ─────────────────────────
-SILVER_THRESHOLD = 3   # días consecutivos para badge plata
-GOLD_THRESHOLD = 10    # días consecutivos para badge oro
-GOLD_TOKEN_REWARD = 2.0  # tokens regalo al ganar oro (una vez por caso)
-RECOVERY_GAP_HOURS = 48  # >48h sin rellenar → entra en recovery
-TOTAL_TASKS_PER_CYCLE = 30
-MAX_OBSERVATION_CHARS = 280
+SILVER_THRESHOLD = 3
+GOLD_THRESHOLD = 10
+GOLD_TOKEN_REWARD = 2.0
+MAX_GAP_DAYS_TO_KEEP_STREAK = 2  # 1 día suelto no rompe; 2 saltos seguidos sí
 
 
 # ── Schemas Pydantic ────────────────────────────────────────────────────────
 class DailyFollowupInit(BaseModel):
-    """Body opcional para init: si no se envía, intenta tomar el plan del caso."""
-    intervention_plan_text: Optional[str] = Field(
-        None,
-        description="Texto del plan a convertir en 30 tasks. Si vacío, se busca en case_entries type=intervention.",
-        max_length=20000,
-    )
+    intervention_plan_text: Optional[str] = Field(None, max_length=20000)
     lang: Literal["es", "en"] = "es"
 
 
 class DailyFollowupInitResponse(BaseModel):
     case_id: str
-    tasks_generated: int
     daily_followup_enabled: bool
+    diagnosis_type: Optional[str]
 
 
-class DailyFollowupTaskToday(BaseModel):
+class ExerciseDTO(BaseModel):
+    title: str
+    instruction: str
+    result_type: Literal["chips", "text"]
+    result_chips: Optional[list[str]]
+    is_wellness: bool
+
+
+class TheoryQuestionDTO(BaseModel):
+    question_type: Literal["theory", "compliance"]
+    question: str
+    options: list[str]
+    correct_index: int
+    explanation: str
+    question_id: Optional[str]  # UUID de la TheoryQuestion en caché (None si freshly generated y aún sin persistir, pero el servicio siempre persiste)
+
+
+class DailyFollowupTodayResponse(BaseModel):
     case_id: str
     daily_followup_enabled: bool
-    already_filled_today: bool
-    day_index: Optional[int]  # 1..30
-    task_text: Optional[str]
+    day_index: int
+    already_completed_today: bool
+    in_recovery: bool
     current_streak: int
     longest_streak: int
-    current_badge: Optional[str]  # None | 'silver' | 'gold'
-    in_recovery: bool
+    current_badge: Optional[str]
+    exercises: list[ExerciseDTO]
+    theory_question: TheoryQuestionDTO
+
+
+class ExerciseResultIn(BaseModel):
+    """Una respuesta del usuario por ejercicio (mismo orden que exercises_generated)."""
+    result_chip_index: Optional[int] = Field(None, ge=0, le=2)
+    result_text: Optional[str] = Field(None, max_length=400)
 
 
 class DailyFollowupSubmit(BaseModel):
-    task_completed: bool = Field(..., description="Marca de paso 1: hecha vs no esta vez")
-    execution_quality: Optional[Literal["better", "expected", "hard"]] = Field(
-        None, description="Solo si task_completed=True (paso 2 chips)"
-    )
-    skip_reason: Optional[Literal["no_time", "not_dog_moment", "forgot", "other"]] = Field(
-        None, description="Solo si task_completed=False (paso 2 chips)"
-    )
-    dog_state: Literal["calm", "active", "nervous", "reactive", "other"] = Field(
-        ..., description="Paso 3: estado del perro hoy"
-    )
-    observation: Optional[str] = Field(
-        None, max_length=MAX_OBSERVATION_CHARS,
-        description="Paso 4: observación libre opcional",
-    )
-
-    @field_validator("execution_quality")
-    @classmethod
-    def _eq_only_if_completed(cls, v, info):
-        # No podemos cross-validar contra task_completed aquí (Pydantic v2 ValidationInfo);
-        # se hará en el handler. Solo strip aquí.
-        return v
-
-    @field_validator("observation")
-    @classmethod
-    def _strip_obs(cls, v):
-        if v is None:
-            return None
-        s = v.strip()
-        return s or None
+    exercises_results: list[ExerciseResultIn] = Field(..., min_length=2, max_length=5)
+    theory_answer_index: int = Field(..., ge=0, le=2)
 
 
 class DailyFollowupSubmitResponse(BaseModel):
     case_id: str
     saved: bool
+    is_complete: bool
     current_streak: int
     longest_streak: int
     current_badge: Optional[str]
     in_recovery: bool
     silver_just_earned: bool
     gold_just_earned: bool
-    tokens_credited: float  # 0 o 2.0
+    tokens_credited: float
     new_token_balance: Optional[float]
 
 
 # ── Helpers ─────────────────────────────────────────────────────────────────
 def _ownership_or_404(case_id: str, user: User, db: Session) -> Case:
-    """Carga el caso si pertenece al usuario y no está soft-deleted."""
     try:
         case_uuid = uuid.UUID(case_id)
     except (ValueError, TypeError):
@@ -141,7 +140,6 @@ def _ownership_or_404(case_id: str, user: User, db: Session) -> Case:
 
 
 def _get_dog_name(case: Case, db: Session) -> str:
-    """Devuelve el nombre del perro del caso (Dog propio o client_dog_name)."""
     if case.client_dog_name:
         return case.client_dog_name
     if case.dog_id:
@@ -152,45 +150,85 @@ def _get_dog_name(case: Case, db: Session) -> str:
     return "tu perro"
 
 
-def _next_day_index(case_id: uuid.UUID, db: Session) -> int:
-    """Próximo day_index (1..30+) basado en cuántas entries hay hoy o antes."""
-    count = db.query(func.count(DailyFollowupEntry.id)).filter(
-        DailyFollowupEntry.case_id == case_id
-    ).scalar() or 0
-    # day_index 1-based: si hay 0 entries, mañana es el 1.
-    return count + 1
-
-
-def _task_for_day(case_id: uuid.UUID, day_index: int, db: Session) -> Optional[str]:
-    """Devuelve el texto de la task para day_index. Si supera 30, cicla
-    al ronda siguiente (regeneración aún no implementada en v1, usa ronda 1)."""
-    if day_index < 1:
-        return None
-    # Versión v1: día 31+ → cicla a la ronda 1 con (day_index-1) % 30 + 1.
-    # Regeneración ronda 2+ se añade post-launch si los datos lo justifican.
-    cycle_day = ((day_index - 1) % TOTAL_TASKS_PER_CYCLE) + 1
-    task = db.query(CaseDailyTask).filter(
-        CaseDailyTask.case_id == case_id,
-        CaseDailyTask.day_index == cycle_day,
-        CaseDailyTask.generation_round == 1,
-    ).first()
-    return task.task_text if task else None
-
-
 def _today_local() -> date:
-    """Fecha local del servidor. Para v1 asumimos UTC-day-bucket. v1.1 se
-    pasará el timezone del usuario para evitar drift en zonas extremas."""
+    """v1: UTC-day-bucket. v1.1 timezone explícito del usuario."""
     return datetime.utcnow().date()
 
 
-def _has_entry_today(case_id: uuid.UUID, db: Session) -> bool:
-    today = _today_local()
-    return db.query(
-        db.query(DailyFollowupEntry).filter(
-            DailyFollowupEntry.case_id == case_id,
-            DailyFollowupEntry.day_local_date == today,
-        ).exists()
-    ).scalar()
+def _get_plan_text(case: Case, db: Session) -> str:
+    """Última intervención del caso, o cadena vacía si no hay."""
+    intv = db.query(CaseEntry).filter(
+        CaseEntry.case_id == case.id,
+        CaseEntry.type == "intervention",
+    ).order_by(desc(CaseEntry.created_at)).first()
+    return (intv.content or "").strip() if intv else ""
+
+
+def _build_history(case_id, db: Session, exclude_today: date) -> list[dict[str, Any]]:
+    """Histórico de entries previas (excluyendo today) en orden cronológico."""
+    rows = db.query(DailyFollowupEntry).filter(
+        DailyFollowupEntry.case_id == case_id,
+        DailyFollowupEntry.day_local_date < exclude_today,
+        DailyFollowupEntry.is_complete.is_(True),
+    ).order_by(DailyFollowupEntry.day_local_date.asc()).all()
+    out = []
+    # Calcular day_n relativo a la primera entry del histórico.
+    first_date = rows[0].day_local_date if rows else None
+    for r in rows:
+        day_n = (r.day_local_date - first_date).days + 1 if first_date else 1
+        out.append({
+            "day_n": day_n,
+            "exercises_generated": r.exercises_generated or [],
+            "exercises_results": r.exercises_results or [],
+            "observation": r.observation,
+        })
+    return out
+
+
+def _compute_day_index(case_id, db: Session, today: date) -> int:
+    """Día N actual = (today - primera_entry.day_local_date) + 1. Si no hay entries, día 1."""
+    first = db.query(DailyFollowupEntry).filter(
+        DailyFollowupEntry.case_id == case_id,
+    ).order_by(DailyFollowupEntry.day_local_date.asc()).first()
+    if not first:
+        return 1
+    delta = (today - first.day_local_date).days + 1
+    return max(1, delta)
+
+
+def _recompute_streak(case_id, db: Session, today: date) -> tuple[int, bool]:
+    """
+    Recalcula streak walking back desde today con la regla
+    "1 día suelto no rompe; 2 saltos seguidos rompen".
+
+    Retorna (streak_count, is_in_recovery).
+    is_in_recovery = True si la entry más reciente is_complete=true tiene gap > MAX desde today
+                     o si hay un gap actual al borde.
+    """
+    completes = db.query(DailyFollowupEntry).filter(
+        DailyFollowupEntry.case_id == case_id,
+        DailyFollowupEntry.is_complete.is_(True),
+    ).order_by(DailyFollowupEntry.day_local_date.desc()).all()
+
+    if not completes:
+        return 0, False
+
+    # Si la entry más reciente es de hace > MAX_GAP_DAYS_TO_KEEP_STREAK días desde today,
+    # el streak está muerto y estamos en recovery.
+    gap_to_today = (today - completes[0].day_local_date).days
+    if gap_to_today > MAX_GAP_DAYS_TO_KEEP_STREAK:
+        return 0, True
+
+    # Walk back: contar consecutivas con gap <= MAX entre entradas.
+    streak = 1
+    for i in range(1, len(completes)):
+        gap = (completes[i - 1].day_local_date - completes[i].day_local_date).days
+        if gap <= MAX_GAP_DAYS_TO_KEEP_STREAK:
+            streak += 1
+        else:
+            break
+
+    return streak, False
 
 
 # ── Endpoints ───────────────────────────────────────────────────────────────
@@ -205,105 +243,237 @@ def init_daily_followup(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    """Genera 30 tasks con Sonnet a partir del plan y activa daily_followup.
-    Idempotente: si ya hay tasks generadas para este caso (round 1), no las regenera.
+    """Activa daily_followup y clasifica el diagnóstico (Haiku, ~$0.0001).
+
+    Idempotente: si ya está activo y tiene diagnosis_type, no reclasifica.
     """
     case = _ownership_or_404(case_id, user, db)
 
-    # Si ya hay tasks generadas, idempotente: solo activar follow-up.
-    existing_count = db.query(func.count(CaseDailyTask.id)).filter(
-        CaseDailyTask.case_id == case.id,
-        CaseDailyTask.generation_round == 1,
-    ).scalar() or 0
-
-    if existing_count >= TOTAL_TASKS_PER_CYCLE:
-        if not case.daily_followup_enabled:
-            case.daily_followup_enabled = True
-            db.commit()
+    # Si ya está activo y clasificado, idempotente
+    if case.daily_followup_enabled and case.diagnosis_type:
         return DailyFollowupInitResponse(
             case_id=str(case.id),
-            tasks_generated=existing_count,
-            daily_followup_enabled=case.daily_followup_enabled,
+            daily_followup_enabled=True,
+            diagnosis_type=case.diagnosis_type,
         )
 
-    # Buscar el plan: si no se pasa explícito, lo tomamos del último entry
-    # type='intervention' del caso.
     plan_text = (payload.intervention_plan_text or "").strip()
     if not plan_text:
-        latest_intervention = db.query(CaseEntry).filter(
-            CaseEntry.case_id == case.id,
-            CaseEntry.type == "intervention",
-        ).order_by(desc(CaseEntry.created_at)).first()
-        if latest_intervention and latest_intervention.content:
-            plan_text = latest_intervention.content
+        plan_text = _get_plan_text(case, db)
     if not plan_text:
         raise HTTPException(
             status_code=400,
-            detail="No hay plan de intervención disponible para este caso. Acepta el plan antes de activar el seguimiento.",
+            detail="No hay plan de intervención disponible para este caso.",
         )
 
-    dog_name = _get_dog_name(case, db)
-
-    try:
-        result = generate_daily_tasks(
-            intervention_plan_text=plan_text,
-            dog_name=dog_name,
-            lang=payload.lang,
-        )
-    except Exception as e:
-        logger.error(f"[daily-followup-init] LLM error case={case.id}: {e}")
-        raise HTTPException(status_code=500, detail="No se pudieron generar las tareas.")
-
-    # Persistir las 30 tasks (round=1).
-    for i, task_text in enumerate(result.tasks, start=1):
-        db.add(CaseDailyTask(
-            case_id=case.id,
-            day_index=i,
-            task_text=task_text,
-            generation_round=1,
-        ))
+    # Clasificar (idempotente: solo si no hay clasificación previa)
+    if not case.diagnosis_type:
+        try:
+            case.diagnosis_type = classify_diagnosis(plan_text)
+        except Exception as e:
+            logger.warning(f"[daily-followup-init] classify_diagnosis failed case={case.id}: {e}")
+            case.diagnosis_type = "other"
 
     case.daily_followup_enabled = True
     db.commit()
+    db.refresh(case)
 
     logger.info(
-        f"[daily-followup-init] case={case.id} tasks=30 "
-        f"in={result.input_tokens} out={result.output_tokens}"
+        f"[daily-followup-init] case={case.id} diagnosis={case.diagnosis_type} enabled=True"
     )
 
     return DailyFollowupInitResponse(
         case_id=str(case.id),
-        tasks_generated=len(result.tasks),
         daily_followup_enabled=True,
+        diagnosis_type=case.diagnosis_type,
     )
 
 
 @router.get(
     "/{case_id}/daily-followup/today",
-    response_model=DailyFollowupTaskToday,
+    response_model=DailyFollowupTodayResponse,
 )
 def get_daily_followup_today(
     case_id: str,
+    lang: Literal["es", "en"] = "es",
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    """Devuelve la task del día y el estado del seguimiento."""
+    """Devuelve el check-in del día. Genera on-demand con el coach si no
+    existe entry hoy (placeholder con is_complete=False). Si ya hay
+    placeholder o entry completa hoy, devuelve los mismos ejercicios sin
+    regenerar (idempotencia por día)."""
     case = _ownership_or_404(case_id, user, db)
+    today = _today_local()
 
-    already_filled = _has_entry_today(case.id, db)
-    day_idx = _next_day_index(case.id, db)
-    task_text = _task_for_day(case.id, day_idx, db) if case.daily_followup_enabled else None
+    # Streak / recovery snapshot (solo lectura).
+    streak, in_recovery = _recompute_streak(case.id, db, today)
+    # Si ha cambiado respecto a lo persistido, sincronizar. Solo lectura, así
+    # que actualizamos cols del case para que el frontend vea coherente.
+    if case.current_streak != streak or bool(case.in_recovery) != in_recovery:
+        case.current_streak = streak
+        case.in_recovery = in_recovery
+        db.commit()
 
-    return DailyFollowupTaskToday(
+    today_entry = db.query(DailyFollowupEntry).filter(
+        DailyFollowupEntry.case_id == case.id,
+        DailyFollowupEntry.day_local_date == today,
+    ).first()
+
+    # Si ya completó hoy, no regenera; devuelve los mismos.
+    if today_entry and today_entry.is_complete:
+        return _today_response_from_entry(case, today_entry, today, db)
+
+    # Si hay placeholder pendiente, devolver lo que ya generamos.
+    if today_entry and today_entry.exercises_generated:
+        return _today_response_from_entry(case, today_entry, today, db)
+
+    # Necesitamos generar el check-in. Validar prerequisites.
+    if not case.daily_followup_enabled:
+        raise HTTPException(
+            status_code=400,
+            detail="El seguimiento diario está desactivado para este caso.",
+        )
+    plan_text = _get_plan_text(case, db)
+    if not plan_text:
+        raise HTTPException(
+            status_code=400,
+            detail="No hay plan de intervención disponible para este caso.",
+        )
+    if not case.diagnosis_type:
+        # Reclasificación defensiva si por alguna razón init no la hizo.
+        try:
+            case.diagnosis_type = classify_diagnosis(plan_text)
+            db.commit()
+        except Exception:
+            case.diagnosis_type = "other"
+
+    dog_name = _get_dog_name(case, db)
+    day_index = _compute_day_index(case.id, db, today)
+    history = _build_history(case.id, db, exclude_today=today)
+
+    try:
+        checkin = generate_daily_checkin(
+            db=db,
+            case_id=case.id,
+            plan_text=plan_text,
+            dog_name=dog_name,
+            diagnosis_type=case.diagnosis_type,
+            day_index=day_index,
+            history=history,
+            lang=lang,
+        )
+    except ValueError as e:
+        logger.error(f"[daily-followup-today] coach validation error case={case.id}: {e}")
+        raise HTTPException(status_code=502, detail="No se pudo generar el check-in del día.")
+    except Exception as e:
+        logger.error(f"[daily-followup-today] coach error case={case.id}: {e}")
+        raise HTTPException(status_code=502, detail="Error al generar el check-in del día.")
+
+    # Persistir placeholder (entry con exercises_generated, is_complete=false).
+    if not today_entry:
+        today_entry = DailyFollowupEntry(
+            case_id=case.id,
+            user_id=user.id,
+            day_local_date=today,
+            is_complete=False,
+        )
+        db.add(today_entry)
+    today_entry.exercises_generated = [
+        {
+            "title": e.title,
+            "instruction": e.instruction,
+            "result_type": e.result_type,
+            "result_chips": e.result_chips,
+            "is_wellness": e.is_wellness,
+        }
+        for e in checkin.exercises
+    ]
+    today_entry.theory_question_id = (
+        uuid.UUID(checkin.theory_question_cache_id) if checkin.theory_question_cache_id else None
+    )
+    db.commit()
+    db.refresh(today_entry)
+
+    return DailyFollowupTodayResponse(
         case_id=str(case.id),
-        daily_followup_enabled=case.daily_followup_enabled,
-        already_filled_today=already_filled,
-        day_index=day_idx if (case.daily_followup_enabled and task_text) else None,
-        task_text=task_text,
+        daily_followup_enabled=True,
+        day_index=day_index,
+        already_completed_today=False,
+        in_recovery=bool(case.in_recovery),
         current_streak=case.current_streak or 0,
         longest_streak=case.longest_streak or 0,
         current_badge=case.current_badge,
+        exercises=[
+            ExerciseDTO(
+                title=e.title, instruction=e.instruction,
+                result_type=e.result_type, result_chips=e.result_chips,
+                is_wellness=e.is_wellness,
+            )
+            for e in checkin.exercises
+        ],
+        theory_question=TheoryQuestionDTO(
+            question_type=checkin.theory_question.question_type,
+            question=checkin.theory_question.question,
+            options=checkin.theory_question.options,
+            correct_index=checkin.theory_question.correct_index,
+            explanation=checkin.theory_question.explanation,
+            question_id=checkin.theory_question_cache_id,
+        ),
+    )
+
+
+def _today_response_from_entry(
+    case: Case, entry: DailyFollowupEntry, today: date, db: Session,
+) -> DailyFollowupTodayResponse:
+    """Construye la response a partir de una entry existente (placeholder o completa)."""
+    from app.models.case import TheoryQuestion
+    exercises_data = entry.exercises_generated or []
+    exercises = [
+        ExerciseDTO(
+            title=str(ex.get("title", "")),
+            instruction=str(ex.get("instruction", "")),
+            result_type=str(ex.get("result_type", "chips")),
+            result_chips=ex.get("result_chips"),
+            is_wellness=bool(ex.get("is_wellness", False)),
+        )
+        for ex in exercises_data
+    ]
+    theory: TheoryQuestionDTO
+    if entry.theory_question_id:
+        tq = db.query(TheoryQuestion).filter(TheoryQuestion.id == entry.theory_question_id).first()
+        if tq:
+            theory = TheoryQuestionDTO(
+                question_type=tq.question_type,
+                question=tq.question_text,
+                options=list(tq.options) if tq.options else [],
+                correct_index=tq.correct_index,
+                explanation=tq.explanation,
+                question_id=str(tq.id),
+            )
+        else:
+            theory = TheoryQuestionDTO(
+                question_type="theory", question="", options=[],
+                correct_index=0, explanation="", question_id=None,
+            )
+    else:
+        theory = TheoryQuestionDTO(
+            question_type="theory", question="", options=[],
+            correct_index=0, explanation="", question_id=None,
+        )
+
+    day_index = _compute_day_index(case.id, db, today)
+    return DailyFollowupTodayResponse(
+        case_id=str(case.id),
+        daily_followup_enabled=bool(case.daily_followup_enabled),
+        day_index=day_index,
+        already_completed_today=bool(entry.is_complete),
         in_recovery=bool(case.in_recovery),
+        current_streak=case.current_streak or 0,
+        longest_streak=case.longest_streak or 0,
+        current_badge=case.current_badge,
+        exercises=exercises,
+        theory_question=theory,
     )
 
 
@@ -318,100 +488,101 @@ def submit_daily_followup(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    """Registra la entry del día y aplica la lógica de streak/badge/recovery.
+    """Marca la entry del día como completa y aplica streak/badge/recovery.
 
-    Lógica:
-    - UNIQUE (case_id, today_local) impide doble registro.
-    - Si gap > 48h desde last_filled_at: streak resetea, badge a None,
-      in_recovery = True.
-    - El nuevo registro suma 1 al streak.
-    - Si streak alcanza 3 → badge silver. Si entra en recovery, "alcanzar 3"
-      también restaura silver tras 2 días consecutivos en recovery (3 incl. hoy).
-    - Si streak alcanza 10 y gold_token_reward_granted=False: badge gold,
-      acreditar 2 tokens, gold_token_reward_granted=True.
+    Requiere haber llamado antes a GET /today (que crea el placeholder con
+    exercises_generated). El número de exercises_results debe coincidir con
+    el número de exercises_generated.
     """
     case = _ownership_or_404(case_id, user, db)
-
     if not case.daily_followup_enabled:
         raise HTTPException(
             status_code=400,
             detail="El seguimiento diario está desactivado para este caso.",
         )
 
-    # Validación cross-field: execution_quality solo si completed; skip_reason solo si NOT completed
-    if payload.task_completed and payload.skip_reason is not None:
-        raise HTTPException(status_code=422, detail="skip_reason no aplica si la tarea fue completada.")
-    if (not payload.task_completed) and payload.execution_quality is not None:
-        raise HTTPException(status_code=422, detail="execution_quality no aplica si la tarea no fue completada.")
-
     today = _today_local()
-
-    # UNIQUE check defensivo (la BD tiene constraint, pero damos error claro)
-    if _has_entry_today(case.id, db):
+    entry = db.query(DailyFollowupEntry).filter(
+        DailyFollowupEntry.case_id == case.id,
+        DailyFollowupEntry.day_local_date == today,
+    ).first()
+    if not entry:
+        raise HTTPException(
+            status_code=400,
+            detail="No hay check-in para hoy. Llama primero a GET /daily-followup/today.",
+        )
+    if entry.is_complete:
         raise HTTPException(
             status_code=409,
-            detail="Ya registraste el seguimiento de hoy.",
+            detail="Ya completaste el seguimiento de hoy.",
+        )
+    generated = entry.exercises_generated or []
+    if len(payload.exercises_results) != len(generated):
+        raise HTTPException(
+            status_code=422,
+            detail=f"El número de respuestas ({len(payload.exercises_results)}) no "
+                   f"coincide con el de ejercicios ({len(generated)}).",
         )
 
-    # ── Lógica de streak / badge / recovery ────────────────────────────────
-    now = datetime.utcnow()
+    # Validar correspondencia chip vs text contra exercises_generated.
+    for i, (gen, res) in enumerate(zip(generated, payload.exercises_results)):
+        rtype = gen.get("result_type", "chips")
+        if rtype == "chips":
+            if res.result_chip_index is None:
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"Ejercicio {i+1}: result_chip_index requerido.",
+                )
+        elif rtype == "text":
+            if not (res.result_text and res.result_text.strip()):
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"Ejercicio {i+1}: result_text requerido.",
+                )
+
+    # Persistir respuestas + marcar completa.
+    entry.exercises_results = [
+        {
+            "result_chip_index": r.result_chip_index,
+            "result_text": r.result_text.strip() if r.result_text else None,
+        }
+        for r in payload.exercises_results
+    ]
+    entry.theory_answer_index = payload.theory_answer_index
+    entry.is_complete = True
+    db.commit()
+    db.refresh(entry)
+
+    # Recalcular streak / badge / recovery con regla nueva.
+    new_streak, in_recovery = _recompute_streak(case.id, db, today)
     silver_just_earned = False
     gold_just_earned = False
     tokens_credited = 0.0
 
-    # Detectar gap > 48h ANTES de incrementar.
-    if case.last_filled_at:
-        gap = now - case.last_filled_at
-        if gap > timedelta(hours=RECOVERY_GAP_HOURS):
-            # Reset por gap (recovery)
-            case.current_streak = 0
-            case.current_badge = None
-            case.in_recovery = True
-
-    # Incrementar streak
-    new_streak = (case.current_streak or 0) + 1
-    case.current_streak = new_streak
-    if new_streak > (case.longest_streak or 0):
-        case.longest_streak = new_streak
-
-    # Badge silver: al alcanzar 3
-    if new_streak == SILVER_THRESHOLD:
-        if case.current_badge != "silver":
-            silver_just_earned = True
-        case.current_badge = "silver"
-        # Si estaba en recovery, ya recuperó plata.
-        case.in_recovery = False
-
-    # Badge gold: al alcanzar 10
+    prev_badge = case.current_badge
+    new_badge = prev_badge
     if new_streak >= GOLD_THRESHOLD:
-        if case.current_badge != "gold":
-            case.current_badge = "gold"
-        # Reward 2 tokens UNA vez por caso
+        new_badge = "gold"
         if not case.gold_token_reward_granted:
             tokens_credited = GOLD_TOKEN_REWARD
             case.gold_token_reward_granted = True
             user.tokens = float(user.tokens or 0) + GOLD_TOKEN_REWARD
             gold_just_earned = True
             logger.info(
-                f"[daily-followup-gold] case={case.id} user={user.email} "
-                f"+{GOLD_TOKEN_REWARD} tokens"
+                f"[daily-followup-gold] case={case.id} user={user.email} +{GOLD_TOKEN_REWARD} tokens"
             )
+    elif new_streak >= SILVER_THRESHOLD:
+        if prev_badge != "silver" and prev_badge != "gold":
+            silver_just_earned = True
+        new_badge = "silver" if prev_badge != "gold" else prev_badge
 
-    case.last_filled_at = now
-    case.in_recovery = False if new_streak >= SILVER_THRESHOLD else case.in_recovery
+    case.current_streak = new_streak
+    case.current_badge = new_badge
+    case.in_recovery = in_recovery
+    if new_streak > (case.longest_streak or 0):
+        case.longest_streak = new_streak
+    case.last_filled_at = datetime.utcnow()
 
-    # Persist entry
-    entry = DailyFollowupEntry(
-        case_id=case.id,
-        user_id=user.id,
-        day_local_date=today,
-        task_completed=payload.task_completed,
-        execution_quality=payload.execution_quality,
-        skip_reason=payload.skip_reason,
-        dog_state=payload.dog_state,
-        observation=payload.observation,
-    )
-    db.add(entry)
     db.commit()
     db.refresh(case)
     db.refresh(user)
@@ -419,6 +590,7 @@ def submit_daily_followup(
     return DailyFollowupSubmitResponse(
         case_id=str(case.id),
         saved=True,
+        is_complete=True,
         current_streak=case.current_streak,
         longest_streak=case.longest_streak,
         current_badge=case.current_badge,
@@ -428,28 +600,6 @@ def submit_daily_followup(
         tokens_credited=tokens_credited,
         new_token_balance=float(user.tokens) if user.tokens is not None else None,
     )
-
-
-@router.get("/{case_id}/daily-followup/tasks")
-def list_daily_tasks(
-    case_id: str,
-    db: Session = Depends(get_db),
-    user: User = Depends(get_current_user),
-):
-    """Lista las 30 tasks generadas (round 1) de un caso. Útil para preview
-    en frontend (commit B) y para que el usuario sepa qué viene los próximos días."""
-    case = _ownership_or_404(case_id, user, db)
-    tasks = db.query(CaseDailyTask).filter(
-        CaseDailyTask.case_id == case.id,
-        CaseDailyTask.generation_round == 1,
-    ).order_by(CaseDailyTask.day_index).all()
-    return {
-        "case_id": str(case.id),
-        "tasks": [
-            {"day_index": t.day_index, "task_text": t.task_text}
-            for t in tasks
-        ],
-    }
 
 
 @router.put("/{case_id}/daily-followup/enable")
@@ -476,3 +626,16 @@ def disable_daily_followup(
         case.daily_followup_enabled = False
         db.commit()
     return {"case_id": str(case.id), "daily_followup_enabled": False}
+
+
+@router.get("/{case_id}/daily-followup/tasks")
+def list_daily_tasks_deprecated(
+    case_id: str,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """DEPRECATED — el flujo batch (30 tasks pre-generadas) fue sustituido por
+    generación on-demand del check-in del día. Mantenemos el path por
+    compatibilidad: devolvemos array vacío sin error."""
+    _ownership_or_404(case_id, user, db)
+    return {"case_id": case_id, "tasks": [], "deprecated": True}

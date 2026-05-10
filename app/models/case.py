@@ -101,6 +101,14 @@ class Case(Base):
     gold_token_reward_granted = Column(Boolean, nullable=False, default=False)
     in_recovery             = Column(Boolean, nullable=False, default=False)
 
+    # Tipo de diagnóstico clínico — clave de caché de preguntas de teoría
+    # (p.ej. "leash_reactivity", "separation_anxiety", "recall", "resource_guarding").
+    # Lo clasifica Haiku al activar el seguimiento diario a partir del plan de
+    # intervención. Permite reutilizar preguntas educativas entre perros con el
+    # mismo problema sin perder relevancia. Nullable: casos abiertos antes de
+    # esta feature no la tienen rellenada.
+    diagnosis_type          = Column(String(40), nullable=True, index=True)
+
     # Audit / GDPR
     created_at      = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at      = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -146,6 +154,12 @@ class DailyFollowupEntry(Base):
     El UNIQUE constraint (case_id, day_local_date) impide rellenar el mismo
     día dos veces. La lógica de streak / badge / recovery vive en el endpoint
     de inserción.
+
+    Cambio 2026-05-09 (wizard ampliado): el check-in pasa de wizard 4 pasos
+    (task_completed/dog_state/observation) a un set de 2-5 ejercicios + pregunta
+    educativa generados on-demand por la IA. Los campos viejos quedan nullable
+    para soportar entries pre-existentes; las nuevas se rellenan con
+    exercises_generated/exercises_results/theory_*.
     """
     __tablename__ = "daily_followup_entries"
 
@@ -154,20 +168,42 @@ class DailyFollowupEntry(Base):
     user_id            = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
     day_local_date     = Column(Date, nullable=False)  # día local del usuario (YYYY-MM-DD)
 
-    task_completed     = Column(Boolean, nullable=False)
-    execution_quality  = Column(String(16), nullable=True)  # None | better/expected/hard
-    skip_reason        = Column(String(20), nullable=True)  # None | no_time/not_dog_moment/forgot/other
-    dog_state          = Column(String(16), nullable=False) # calm/active/nervous/reactive/other
-    observation        = Column(Text, nullable=True)        # opcional, max 280 chars (validar en Pydantic)
+    # Campos legacy (wizard 4 pasos) — quedan nullable para no romper entries
+    # ya persistidas. El nuevo flujo los deja en NULL.
+    task_completed     = Column(Boolean, nullable=True)
+    execution_quality  = Column(String(16), nullable=True)
+    skip_reason        = Column(String(20), nullable=True)
+    dog_state          = Column(String(16), nullable=True)
+    observation        = Column(Text, nullable=True)
+
+    # Wizard ampliado 2026-05-09: ejercicios + pregunta del día
+    # exercises_generated: snapshot de los N ejercicios que la IA propuso ese
+    # día. Schema: [{title, instruction, result_type, result_chips?, is_wellness}, ...].
+    # exercises_results: respuestas del usuario por ejercicio. Schema:
+    # [{result_chip_index?, result_text?}, ...] mismo orden que generated.
+    exercises_generated   = Column(JSONB, nullable=True)
+    exercises_results     = Column(JSONB, nullable=True)
+
+    # Pregunta educativa del día (mix theory/compliance, decidido por IA).
+    # theory_question_id apunta a TheoryQuestion (caché por diagnosis_type).
+    # theory_answer_index es la opción que pulsó el usuario; al ser educativa
+    # (la app le muestra la correcta), siempre coincide con la correcta. No se
+    # persiste "answer_correct" porque no aplica a una experiencia formativa.
+    theory_question_id    = Column(UUID(as_uuid=True), ForeignKey("theory_questions.id"), nullable=True)
+    theory_answer_index   = Column(SmallInteger, nullable=True)
+
+    # is_complete = True solo si TODOS los ejercicios tienen respuesta + la
+    # pregunta del día tiene answer_index. La regla de "rellenar el día" para
+    # streak depende de este flag.
+    is_complete           = Column(Boolean, nullable=False, default=False)
 
     created_at         = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     __table_args__ = (
         UniqueConstraint("case_id", "day_local_date", name="uq_daily_followup_case_day"),
-        CheckConstraint(
-            "dog_state IN ('calm','active','nervous','reactive','other')",
-            name="ck_daily_followup_dog_state",
-        ),
+        # CheckConstraint dog_state se elimina porque la columna pasa a nullable
+        # y al ser NULL en el flujo nuevo no aplicaría. La validación enum del
+        # flujo legacy se hace en Pydantic en el endpoint.
     )
 
 
@@ -200,3 +236,56 @@ class CaseDailyTask(Base):
 
 
 Index("ix_case_daily_tasks_case_round", CaseDailyTask.case_id, CaseDailyTask.generation_round, CaseDailyTask.day_index)
+
+
+class TheoryQuestion(Base):
+    """
+    Caché de preguntas educativas del seguimiento diario, indexada por
+    `diagnosis_type` (la clave de cacheo) + `question_type` + `lang`.
+
+    La IA (Sonnet) genera preguntas tipo test (3 opciones, 1 correcta + explicación).
+    En lugar de regenerarlas para cada perro, se guardan aquí: cuando llega un
+    nuevo caso del mismo diagnóstico, hay una probabilidad alta (≥70%) de servir
+    una pregunta de la caché que el usuario aún no haya visto, abaratando coste
+    sin perder relevancia.
+
+    La experiencia es educativa, no evaluativa: el frontend muestra la respuesta
+    correcta (oculta tras desplegable o invertida) antes de que el usuario marque.
+    Por eso se persiste `correct_index` a nivel de pregunta, pero a nivel de
+    entry del usuario solo se guarda qué opción pulsó (que coincide).
+    """
+    __tablename__ = "theory_questions"
+
+    id              = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    diagnosis_type  = Column(String(40), nullable=False, index=True)  # clave de caché
+    question_type   = Column(String(20), nullable=False)              # 'theory' | 'compliance'
+    lang            = Column(String(2), nullable=False)               # 'es' | 'en'
+
+    question_text   = Column(Text, nullable=False)
+    options         = Column(JSONB, nullable=False)                   # array de 3 strings
+    correct_index   = Column(SmallInteger, nullable=False)            # 0/1/2
+    explanation     = Column(Text, nullable=False)
+
+    usage_count     = Column(Integer, nullable=False, default=0)
+    created_at      = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+    __table_args__ = (
+        CheckConstraint(
+            "question_type IN ('theory','compliance')",
+            name="ck_theory_questions_type",
+        ),
+        CheckConstraint(
+            "correct_index BETWEEN 0 AND 2",
+            name="ck_theory_questions_correct_idx",
+        ),
+        CheckConstraint(
+            "lang IN ('es','en')",
+            name="ck_theory_questions_lang",
+        ),
+    )
+
+
+Index(
+    "ix_theory_questions_lookup",
+    TheoryQuestion.diagnosis_type, TheoryQuestion.question_type, TheoryQuestion.lang,
+)

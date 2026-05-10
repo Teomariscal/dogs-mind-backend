@@ -6032,6 +6032,94 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   backdrop-filter:saturate(140%) blur(8px);
   -webkit-backdrop-filter:saturate(140%) blur(8px);
 }
+
+/* ── E extendido: rediseño vibrant de #s-tracking (plan de intervención) */
+#s-tracking{
+  background:linear-gradient(180deg, #0e1f1a 0%, #14302a 100%) !important;
+  position:relative;
+}
+#s-tracking::before{
+  content:''; position:absolute; left:0; right:0; top:0; height:55%;
+  background:
+    radial-gradient(ellipse 600px 300px at 25% -2%, rgba(94,200,230,0.22), transparent 64%),
+    radial-gradient(ellipse 540px 240px at 80% 4%, rgba(74,103,65,0.30), transparent 62%);
+  pointer-events:none; z-index:0;
+}
+#s-tracking::after{
+  content:''; position:absolute; inset:0;
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.045) 1px, transparent 1px);
+  background-size:24px 24px;
+  -webkit-mask-image:radial-gradient(ellipse 75% 55% at 50% 22%, black, transparent 78%);
+          mask-image:radial-gradient(ellipse 75% 55% at 50% 22%, black, transparent 78%);
+  pointer-events:none; z-index:0;
+}
+#s-tracking > *{ position:relative; z-index:1; }
+
+/* Header sticky sobre fondo vibrant */
+#s-tracking > div:first-child{
+  background:rgba(14,31,26,0.62) !important;
+  backdrop-filter:saturate(140%) blur(14px);
+  -webkit-backdrop-filter:saturate(140%) blur(14px);
+  border-bottom:1px solid rgba(94,200,230,0.18) !important;
+  padding-top:calc(env(safe-area-inset-top, 0px) + 18px) !important;
+}
+#s-tracking #interv-title{ color:#f3f1ea !important; }
+#s-tracking > div:first-child > div:nth-child(2) > div:last-child{
+  color:rgba(243,241,234,0.62) !important;
+}
+#s-tracking > div:first-child > button{
+  background:rgba(255,255,255,0.10) !important;
+  border-color:rgba(255,255,255,0.18) !important;
+  color:#f3f1ea !important;
+}
+#s-tracking #interv-dog-photo{
+  border:2px solid rgba(94,200,230,0.40) !important;
+  box-shadow:0 4px 14px rgba(0,0,0,0.28);
+}
+
+/* Hero foto: glow cyan que la separa del fondo deep */
+#s-tracking > div:nth-child(2){
+  margin:0 14px 12px !important;
+  border-radius:18px !important;
+  height:auto !important;
+  border:1px solid rgba(94,200,230,0.32);
+  box-shadow:0 12px 38px rgba(0,0,0,0.42), 0 0 50px rgba(94,200,230,0.16);
+}
+#s-tracking > div:nth-child(2) img{
+  border-radius:18px;
+  height:200px !important;
+}
+
+/* Estados: loading + empty con texto claro sobre vibrant */
+#s-tracking #interv-loading > div:last-child,
+#s-tracking #interv-empty > div{
+  color:#f3f1ea !important;
+}
+#s-tracking #interv-empty > div:nth-child(2){ color:rgba(243,241,234,0.74) !important; }
+
+/* Plan body: card blanca premium clinical sobre vibrant */
+#s-tracking #interv-body{
+  margin:0 14px;
+  padding:18px 16px !important;
+  background:#fff;
+  border-radius:18px;
+  border:1px solid rgba(94,200,230,0.20);
+  box-shadow:0 12px 36px rgba(0,0,0,0.28);
+  color:var(--dark) !important;
+}
+#s-tracking #interv-body strong, #s-tracking #interv-body b{ color:var(--dark); }
+
+/* Acciones inferiores: el grupo de botones queda igual (verde/azul/outline)
+   pero subimos contraste del outline "Pedir segunda opinión" sobre vibrant */
+#s-tracking #interv-actions > button[onclick*="anamnesis"]{
+  background:rgba(255,255,255,0.06) !important;
+  border:2px solid rgba(94,200,230,0.50) !important;
+  color:#f3f1ea !important;
+  backdrop-filter:saturate(140%) blur(8px);
+  -webkit-backdrop-filter:saturate(140%) blur(8px);
+}
 </style>
 </head>
 <body>

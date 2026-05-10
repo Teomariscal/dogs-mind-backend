@@ -5558,13 +5558,11 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 .df-exercise-aigent{
   position:absolute; top:-14px; right:14px;
   width:44px; height:44px; border-radius:50%;
-  object-fit:cover;
-  /* Niaz está dibujada con la cara en el centro de un canvas cuadrado: con
-     object-fit:cover se ve a tamaño real y la cara queda demasiado pequeña.
-     Hacemos zoom 1.35x y subimos 12% para encuadrar la cara en el círculo. */
-  transform:scale(1.35) translateY(-12%);
-  transform-origin:center center;
-  background:#f5f4ed;
+  /* Encuadre de la cara de Niaz: la imagen original (280x280) tiene la cara
+     en la mitad inferior (~y=65%). Usamos background-image con position
+     "center 65%" + size 170% para zoom y centrar la cara en el círculo,
+     mostrando ojos, boca y barbilla sin que el pelo de arriba la tape. */
+  background:#f5f4ed url(aig-niaz-pixar.webp) center 65% / 170% 170% no-repeat;
   border:2.5px solid #fff;
   box-shadow:0 4px 14px rgba(0,0,0,0.16);
   z-index:1;
@@ -15052,11 +15050,13 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
     // Niaz es la Aigent principal del producto y queda libre porque Cecilia
     // ya tiene rol pedagógico en s-tracking y Katja está reservada para el
     // recovery flow del seguimiento diario (commit F).
+    // Usamos div con background-image (no img) para poder controlar el
+    // encuadre de la cara con background-position + background-size.
     if (idx === 0 && !ex.is_wellness){
-      var aig = document.createElement('img');
+      var aig = document.createElement('div');
       aig.className = 'df-exercise-aigent';
-      aig.src = 'aig-niaz-pixar.webp';
-      aig.alt = 'Niaz';
+      aig.setAttribute('role', 'img');
+      aig.setAttribute('aria-label', 'Niaz');
       card.appendChild(aig);
     }
 

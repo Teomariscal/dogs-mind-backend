@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v79 (s-daily-followup commit B: pantalla check-in diario con render dinamico de ejercicios + pregunta educativa + badge anillo de progreso + avatar Niaz en ejercicio 1)
+// Dogs Mind Service Worker — v80 (s-daily-followup commit B fix: encuadre de Niaz cambiado a background-image center 65% / size 170% para mostrar la cara entera con barbilla)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v79';
+const CACHE_NAME = 'dogs-mind-v80';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

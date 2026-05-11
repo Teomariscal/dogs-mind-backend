@@ -6190,6 +6190,59 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   background:linear-gradient(135deg, #c8962a 0%, #a87b1f 100%) !important;
   box-shadow:0 6px 24px rgba(200,150,42,0.32) !important;
 }
+
+/* ── E extendido: rediseño vibrant de #s-anamnesis (formulario nueva consulta) */
+#s-anamnesis{
+  background:linear-gradient(180deg, #0e1f1a 0%, #14302a 100%) !important;
+  position:relative;
+}
+#s-anamnesis::before{
+  content:''; position:absolute; left:0; right:0; top:0; height:55%;
+  background:
+    radial-gradient(ellipse 600px 300px at 25% -2%, rgba(94,200,230,0.22), transparent 64%),
+    radial-gradient(ellipse 540px 240px at 80% 4%, rgba(74,103,65,0.30), transparent 62%);
+  pointer-events:none; z-index:0;
+}
+#s-anamnesis::after{
+  content:''; position:absolute; inset:0;
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.045) 1px, transparent 1px);
+  background-size:24px 24px;
+  -webkit-mask-image:radial-gradient(ellipse 75% 55% at 50% 22%, black, transparent 78%);
+          mask-image:radial-gradient(ellipse 75% 55% at 50% 22%, black, transparent 78%);
+  pointer-events:none; z-index:0;
+}
+#s-anamnesis > *{ position:relative; z-index:1; }
+
+/* Header sticky vibrant */
+#s-anamnesis > div:nth-of-type(1){
+  background:rgba(14,31,26,0.62) !important;
+  backdrop-filter:saturate(140%) blur(14px);
+  -webkit-backdrop-filter:saturate(140%) blur(14px);
+  border-bottom:1px solid rgba(94,200,230,0.18) !important;
+  padding-top:calc(env(safe-area-inset-top, 0px) + 18px) !important;
+  position:sticky; top:0; z-index:10;
+}
+#s-anamnesis [data-i18n="anamnesis_title"]{ color:#f3f1ea !important; }
+#s-anamnesis [data-i18n="anamnesis_sub"]{ color:rgba(243,241,234,0.62) !important; }
+#s-anamnesis > div:nth-of-type(1) > button{
+  background:rgba(255,255,255,0.10) !important;
+  border-color:rgba(255,255,255,0.18) !important;
+  color:#f3f1ea !important;
+}
+
+/* Cuerpo del formulario: card blanca amplia que envuelve TODO el form
+   para preservar la legibility de labels, eyebrows, inputs y botones
+   sin tocar sus inline styles. Premium clinical sobre vibrant. */
+#s-anamnesis > div:nth-of-type(2){
+  margin:14px !important;
+  padding:20px 18px !important;
+  background:#fff !important;
+  border-radius:20px !important;
+  border:1px solid rgba(94,200,230,0.20);
+  box-shadow:0 12px 36px rgba(0,0,0,0.28);
+}
 </style>
 </head>
 <body>

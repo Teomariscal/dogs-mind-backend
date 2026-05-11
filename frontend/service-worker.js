@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v93 (rediseno vibrant extendido a s-anamnesis: gradient verde-deep + halos + grid; formulario completo envuelto en card blanca amplia para preservar legibility de inputs/labels sin tocar inline styles)
+// Dogs Mind Service Worker — v94 (rediseno vibrant extendido a s-home: gradient verde-deep + halos + grid; topbar texto cream + menu glass; cards con borde cyan + sombra premium; section title cream)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v93';
+const CACHE_NAME = 'dogs-mind-v94';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

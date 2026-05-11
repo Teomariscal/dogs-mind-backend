@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v99 URGENTE (fix s-tracking + s-tokens: eliminados overrides 'vibrant cinematic' antiguos que pintaban textos cream/amber palido sobre cards blancas tras el rediseno vibrant emerald nuevo — partners testeando hoy)
+// Dogs Mind Service Worker — v100 (fix pomerania-paracaidas en s-anamnesis: el gag animado se salia por la esquina izquierda porque mi regla `> * { position:relative }` sobrescribia el position:absolute original; excluyo .pomerania-paracaidas del :not)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v99';
+const CACHE_NAME = 'dogs-mind-v100';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

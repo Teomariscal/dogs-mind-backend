@@ -6011,7 +6011,11 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
           mask-image:radial-gradient(ellipse 75% 55% at 50% 22%, black, transparent 78%);
   pointer-events:none; z-index:0;
 }
-#s-anamnesis > *{ position:relative; z-index:1; }
+#s-anamnesis > *:not(.pomerania-paracaidas){ position:relative; z-index:1; }
+/* El pomerania-paracaidas mantiene su position:absolute original y su
+   z-index:80 para seguir cayendo en la esquina superior derecha. La regla
+   genérica > * lo habría hecho position:relative y se habría salido por
+   la izquierda. */
 
 /* Header sticky vibrant */
 #s-anamnesis > div:nth-of-type(1){

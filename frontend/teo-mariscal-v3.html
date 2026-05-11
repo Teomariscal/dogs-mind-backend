@@ -6309,6 +6309,78 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   border-color:rgba(94,200,230,0.20) !important;
   box-shadow:0 6px 22px rgba(0,0,0,0.26);
 }
+
+/* ── E extendido: rediseño vibrant de #s-tokens ────────────────────── */
+#s-tokens{
+  background:linear-gradient(180deg, #0e1f1a 0%, #14302a 100%) !important;
+  position:relative;
+}
+#s-tokens::before{
+  content:''; position:absolute; left:0; right:0; top:0; height:55%;
+  background:
+    radial-gradient(ellipse 600px 300px at 25% -2%, rgba(94,200,230,0.22), transparent 64%),
+    radial-gradient(ellipse 540px 240px at 80% 4%, rgba(74,103,65,0.30), transparent 62%);
+  pointer-events:none; z-index:0;
+}
+#s-tokens::after{
+  content:''; position:absolute; inset:0;
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.045) 1px, transparent 1px);
+  background-size:24px 24px;
+  -webkit-mask-image:radial-gradient(ellipse 75% 55% at 50% 22%, black, transparent 78%);
+          mask-image:radial-gradient(ellipse 75% 55% at 50% 22%, black, transparent 78%);
+  pointer-events:none; z-index:0;
+}
+#s-tokens > *{ position:relative; z-index:1; }
+
+/* Header sticky vibrant */
+#s-tokens > div:first-child{
+  background:rgba(14,31,26,0.62) !important;
+  backdrop-filter:saturate(140%) blur(14px);
+  -webkit-backdrop-filter:saturate(140%) blur(14px);
+  border-bottom:1px solid rgba(94,200,230,0.18) !important;
+  padding-top:calc(env(safe-area-inset-top, 0px) + 18px) !important;
+  position:sticky; top:0; z-index:10;
+}
+#s-tokens [data-i18n="tokens_title"]{ color:#f3f1ea !important; }
+#s-tokens [data-i18n="tokens_sub"]{ color:rgba(243,241,234,0.62) !important; }
+#s-tokens > div:first-child > button{
+  background:rgba(255,255,255,0.10) !important;
+  border-color:rgba(255,255,255,0.18) !important;
+  color:#f3f1ea !important;
+}
+
+/* Donut grande: el SVG ya tiene colores propios; el texto interno cream */
+#s-tokens .token-ring-num{ fill:#f3f1ea !important; }
+#s-tokens .token-ring-num-lbl{ fill:rgba(243,241,234,0.72) !important; }
+
+/* Copy explicativo "Cada análisis consume…" en cream */
+#s-tokens [data-i18n="tokens_note"]{ color:rgba(243,241,234,0.78) !important; }
+#s-tokens [data-i18n="tokens_note"] strong{ color:#f3f1ea !important; }
+
+/* Eyebrows en cream */
+#s-tokens [data-i18n="tokens_recharge"],
+#s-tokens [data-i18n="account_section"]{
+  color:rgba(243,241,234,0.62) !important;
+}
+
+/* Packs (cards blancas con onclick="recargar(N)") + sección cuenta:
+   border cyan + sombra mayor sobre deep. Las cards quedan blancas. */
+#s-tokens [onclick^="recargar"],
+#s-tokens #account-email-display,
+#s-tokens [onclick="downloadMyData()"],
+#s-tokens [onclick="openChangePasswordModal()"],
+#s-tokens [onclick="openSupportEmail()"],
+#s-tokens [onclick="openDeleteAccountModal()"]{
+  border-color:rgba(94,200,230,0.22) !important;
+  box-shadow:0 6px 22px rgba(0,0,0,0.22);
+}
+
+/* Métodos de pago: card blanca con borde cyan */
+#s-tokens [data-i18n="tokens_secure_payment"]{
+  color:rgba(243,241,234,0.78) !important;
+}
 </style>
 </head>
 <body>

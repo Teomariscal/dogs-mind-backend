@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v102 (fix CRITICO s-home: eliminado bloque cinematic antiguo (3491-3729) que pintaba selectores amber/cream/oliva sobre el rediseno vibrant nuevo — mismo bug que s-anamnesis/s-tracking/s-tokens ya fixed; #global-nav conservado)
+// Dogs Mind Service Worker — v103 (fix anti-zoom iOS Safari: 21 inputs/textareas en s-anamnesis + modales change-password + delete-account con font-size 14px -> 16px; cumple Apple HIG y evita zoom automatico al focus)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v102';
+const CACHE_NAME = 'dogs-mind-v103';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

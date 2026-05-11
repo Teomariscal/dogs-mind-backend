@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v104 (Apple Guideline 2.1 + HIG: oculta card 'Certified by TDM International' (CTA 'Proximamente'); touch targets stepper +/- de miembros familia 22x22 -> 44x44; auditor reporte priorizado pre-submit)
+// Dogs Mind Service Worker — v105 (fix bug 'No hay plan' al abrir seguimiento diario en caso legacy: backend /init persiste CaseEntry intervention si recibe plan_text; frontend openDailyFollowup lee del cache _dfPlanCache si no recibe planText explicito; copy mejor del error en /today si vuelve no-plan)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v104';
+const CACHE_NAME = 'dogs-mind-v105';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

@@ -15468,6 +15468,7 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
       df_invite_cta_later:    'Más tarde',
       df_recovery_msg_short:  'Lleva dos días seguidos rellenando el seguimiento y recuperarás tu Tutor Responsable.',
       df_recovery_msg_streak1:'Llevas un día. Rellena uno más y recuperas tu Tutor Responsable.',
+      df_error_noplan:        'Para activar el seguimiento diario primero hace falta aceptar un plan de intervención en el análisis del caso.',
     },
     en: {
       df_day_label:        'Day',
@@ -15489,6 +15490,7 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
       df_invite_cta_later:    'Later',
       df_recovery_msg_short:  'Check in two days in a row and you\'ll recover your Responsible Caretaker.',
       df_recovery_msg_streak1:"You've checked in one day. One more and your Responsible Caretaker is back.",
+      df_error_noplan:        'To start the daily follow-up you first need to accept an intervention plan in the case analysis.',
     },
   };
   function _t(k, fb){
@@ -15512,6 +15514,14 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
   window.openDailyFollowup = function(caseId, planText){
     if (!caseId) return;
     _state.caseId = caseId;
+    // Si no se pasó planText explícitamente, intentar leer del cache global
+    // poblado por renderRecords (cubre callers como el modal de invitación
+    // o navegación directa que solo pasan caseId).
+    if (!planText || (typeof planText === 'string' && !planText.trim())) {
+      try {
+        planText = (window._dfPlanCache && window._dfPlanCache[caseId]) || null;
+      } catch(e){}
+    }
     _state.planText = (typeof planText === 'string' && planText.trim()) ? planText : null;
     _state.results = [];
     _state.theoryAnswer = null;
@@ -15574,7 +15584,16 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
       if (!res.ok){
         var d = {};
         try { d = await res.json(); } catch(e){}
-        throw new Error(d.detail || ('HTTP ' + res.status));
+        var detail = d.detail || '';
+        // Caso especial: el caso no tiene plan de intervención persistido.
+        // Damos un copy útil en lugar del mensaje técnico del backend.
+        if (typeof detail === 'string' &&
+            (detail.indexOf('plan de intervención') !== -1 ||
+             detail.indexOf('intervention plan') !== -1)) {
+          throw new Error(_t('df_error_noplan',
+            'Para activar el seguimiento diario primero hace falta aceptar un plan de intervención en el análisis del caso.'));
+        }
+        throw new Error(detail || ('HTTP ' + res.status));
       }
       var data = await res.json();
       _state.today = data;

@@ -246,8 +246,33 @@ def init_daily_followup(
     """Activa daily_followup y clasifica el diagnóstico (Haiku, ~$0.0001).
 
     Idempotente: si ya está activo y tiene diagnosis_type, no reclasifica.
+
+    Si el cliente pasa `intervention_plan_text` en el body Y no existe
+    aún `CaseEntry type='intervention'` para este caso (típico en casos
+    legacy creados antes del hook acceptIntervention -> /init), creamos
+    la entry con ese contenido. Así /today puede recuperar el plan
+    posteriormente sin error.
     """
     case = _ownership_or_404(case_id, user, db)
+
+    # Persistir CaseEntry intervention si llega plan_text y no existe.
+    # Cubre el caso legacy donde acceptIntervention guardaba el plan solo
+    # en localStorage del usuario, sin persistirlo en backend.
+    body_plan = (payload.intervention_plan_text or "").strip()
+    if body_plan:
+        existing_interv = db.query(CaseEntry).filter(
+            CaseEntry.case_id == case.id,
+            CaseEntry.type == "intervention",
+        ).first()
+        if not existing_interv:
+            db.add(CaseEntry(
+                case_id=case.id,
+                type="intervention",
+                content=body_plan,
+                meta={"source": "daily_followup_init_backfill"},
+            ))
+            db.commit()
+            logger.info(f"[daily-followup-init] case={case.id} CaseEntry intervention creado desde body plan_text (legacy backfill)")
 
     # Si ya está activo y clasificado, idempotente
     if case.daily_followup_enabled and case.diagnosis_type:
@@ -257,9 +282,7 @@ def init_daily_followup(
             diagnosis_type=case.diagnosis_type,
         )
 
-    plan_text = (payload.intervention_plan_text or "").strip()
-    if not plan_text:
-        plan_text = _get_plan_text(case, db)
+    plan_text = body_plan or _get_plan_text(case, db)
     if not plan_text:
         raise HTTPException(
             status_code=400,

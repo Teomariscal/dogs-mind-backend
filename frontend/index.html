@@ -5897,26 +5897,26 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   box-shadow:0 12px 36px rgba(0,0,0,0.28);
 }
 
-/* ── E extendido: rediseño vibrant de #s-home ────────────────────────── */
+/* ── E extendido: rediseño vibrant de #s-home — intensidad subida ────── */
 #s-home{
-  background:linear-gradient(180deg, #0e1f1a 0%, #14302a 100%) !important;
+  background:linear-gradient(180deg, #14302a 0%, #0e1f1a 55%, #0a1814 100%) !important;
   position:relative;
 }
 #s-home::before{
-  content:''; position:absolute; left:0; right:0; top:0; height:55%;
+  content:''; position:absolute; left:0; right:0; top:0; height:65%;
   background:
-    radial-gradient(ellipse 600px 300px at 25% -2%, rgba(94,200,230,0.22), transparent 64%),
-    radial-gradient(ellipse 540px 240px at 80% 4%, rgba(74,103,65,0.30), transparent 62%);
+    radial-gradient(ellipse 640px 340px at 22% -6%, rgba(94,200,230,0.42), transparent 62%),
+    radial-gradient(ellipse 560px 260px at 82% -2%, rgba(74,103,65,0.50), transparent 62%);
   pointer-events:none; z-index:0;
 }
 #s-home::after{
   content:''; position:absolute; inset:0;
   background-image:
-    linear-gradient(to right, rgba(255,255,255,0.045) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255,255,255,0.045) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255,255,255,0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.07) 1px, transparent 1px);
   background-size:24px 24px;
-  -webkit-mask-image:radial-gradient(ellipse 75% 55% at 50% 22%, black, transparent 78%);
-          mask-image:radial-gradient(ellipse 75% 55% at 50% 22%, black, transparent 78%);
+  -webkit-mask-image:radial-gradient(ellipse 80% 60% at 50% 25%, black, transparent 80%);
+          mask-image:radial-gradient(ellipse 80% 60% at 50% 25%, black, transparent 80%);
   pointer-events:none; z-index:0;
 }
 #s-home > *{ position:relative; z-index:1; }

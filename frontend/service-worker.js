@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v105 (fix bug 'No hay plan' al abrir seguimiento diario en caso legacy: backend /init persiste CaseEntry intervention si recibe plan_text; frontend openDailyFollowup lee del cache _dfPlanCache si no recibe planText explicito; copy mejor del error en /today si vuelve no-plan)
+// Dogs Mind Service Worker — v106 (s-home vibrant emerald + intensidad: gradient 3-stops 14302a-0e1f1a-0a1814; halos cyan 22%->42% y green 30%->50%; grid 4.5%->7%; mas presencia visual)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v105';
+const CACHE_NAME = 'dogs-mind-v106';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

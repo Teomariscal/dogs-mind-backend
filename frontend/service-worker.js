@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v101 (rediseno vibrant extendido a s-loading-analysis + s-privacy + s-terms: gradient verde-deep + halos + grid; loading con dot-pulse cyan, legales en card blanca premium para legibility del texto largo)
+// Dogs Mind Service Worker — v102 (fix CRITICO s-home: eliminado bloque cinematic antiguo (3491-3729) que pintaba selectores amber/cream/oliva sobre el rediseno vibrant nuevo — mismo bug que s-anamnesis/s-tracking/s-tokens ya fixed; #global-nav conservado)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v101';
+const CACHE_NAME = 'dogs-mind-v102';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

@@ -6381,6 +6381,64 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 #s-tokens [data-i18n="tokens_secure_payment"]{
   color:rgba(243,241,234,0.78) !important;
 }
+
+/* ── E extendido: rediseño vibrant de #s-plan-simple ──────────────────── */
+#s-plan-simple{
+  background:linear-gradient(180deg, #0e1f1a 0%, #14302a 100%) !important;
+  position:relative;
+}
+#s-plan-simple::before{
+  content:''; position:absolute; left:0; right:0; top:0; height:55%;
+  background:
+    radial-gradient(ellipse 600px 300px at 25% -2%, rgba(94,200,230,0.22), transparent 64%),
+    radial-gradient(ellipse 540px 240px at 80% 4%, rgba(74,103,65,0.30), transparent 62%);
+  pointer-events:none; z-index:0;
+}
+#s-plan-simple::after{
+  content:''; position:absolute; inset:0;
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.045) 1px, transparent 1px);
+  background-size:24px 24px;
+  -webkit-mask-image:radial-gradient(ellipse 75% 55% at 50% 22%, black, transparent 78%);
+          mask-image:radial-gradient(ellipse 75% 55% at 50% 22%, black, transparent 78%);
+  pointer-events:none; z-index:0;
+}
+#s-plan-simple > *{ position:relative; z-index:1; }
+
+/* Header sticky vibrant override */
+#s-plan-simple .pp-header{
+  background:rgba(14,31,26,0.62) !important;
+  backdrop-filter:saturate(140%) blur(14px);
+  -webkit-backdrop-filter:saturate(140%) blur(14px);
+  border-bottom:1px solid rgba(94,200,230,0.18) !important;
+}
+#s-plan-simple .pp-back{
+  background:rgba(255,255,255,0.10) !important;
+  border-color:rgba(255,255,255,0.18) !important;
+  color:#f3f1ea !important;
+}
+#s-plan-simple .pp-back:hover{
+  background:rgba(255,255,255,0.18) !important;
+}
+#s-plan-simple .pp-eyebrow{ color:#5ec8e6 !important; }
+#s-plan-simple .pp-title{ color:#f3f1ea !important; }
+#s-plan-simple .pp-meta{ color:rgba(243,241,234,0.62) !important; }
+
+/* Spinner cream + glow */
+#s-plan-simple .pp-loading-text{ color:rgba(243,241,234,0.78) !important; }
+
+/* Card del plan (pp-card): blanca premium clinical, borde cyan, sombra
+   elevada — ya tiene estructura cm-bg-elevated; reforzamos sombra */
+#s-plan-simple .pp-card{
+  border-color:rgba(94,200,230,0.20) !important;
+  box-shadow:0 12px 36px rgba(0,0,0,0.28) !important;
+}
+
+/* Disclaimer y texto secundario en cream */
+#s-plan-simple .pp-disclaimer{
+  color:rgba(243,241,234,0.65) !important;
+}
 </style>
 </head>
 <body>

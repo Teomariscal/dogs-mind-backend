@@ -4163,6 +4163,12 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
     0 20px 48px rgba(0,0,0,0.40),
     0 0 0 1px rgba(94,200,230,0.20);
 }
+/* Apple Guideline 2.1 — pre-submit: ocultamos la card "Certified by TDM
+   International" porque su CTA es "Próximamente" (feature no implementada
+   visible al usuario y a los reviewers de Apple, riesgo de rechazo).
+   Revertir esta regla cuando la feature esté lista en post-launch. */
+#s-pro-area .pro-card--certified { display:none !important; }
+
 #s-pro-area .pro-card--certified {
   background:
     linear-gradient(135deg, rgba(212,167,106,0.05), transparent 60%),
@@ -7893,9 +7899,9 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
             <div style="border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;background:#fff;display:flex;align-items:center;padding:8px 12px;gap:8px;">
               <span style="flex:1;font-size:13px;color:#aaa;">N&ordm; personas</span>
               <div style="display:flex;align-items:center;gap:6px;">
-                <button onclick="anam_step('miembros',-1)" style="width:22px;height:22px;border-radius:50%;border:1px solid rgba(0,0,0,0.15);background:#fff;cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;">-</button>
-                <span id="miembros-val" style="font-size:15px;font-weight:600;min-width:20px;text-align:center;color:var(--dark);">1</span>
-                <button onclick="anam_step('miembros',1)" style="width:22px;height:22px;border-radius:50%;border:1px solid rgba(0,0,0,0.15);background:#fff;cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;">+</button>
+                <button onclick="anam_step('miembros',-1)" aria-label="Disminuir" style="width:44px;height:44px;border-radius:50%;border:1px solid rgba(0,0,0,0.15);background:#fff;cursor:pointer;font-size:18px;font-weight:600;line-height:1;display:flex;align-items:center;justify-content:center;font-family:inherit;color:var(--dark);">-</button>
+                <span id="miembros-val" style="font-size:16px;font-weight:600;min-width:28px;text-align:center;color:var(--dark);">1</span>
+                <button onclick="anam_step('miembros',1)" aria-label="Aumentar" style="width:44px;height:44px;border-radius:50%;border:1px solid rgba(0,0,0,0.15);background:#fff;cursor:pointer;font-size:18px;font-weight:600;line-height:1;display:flex;align-items:center;justify-content:center;font-family:inherit;color:var(--dark);">+</button>
               </div>
             </div>
           </div>

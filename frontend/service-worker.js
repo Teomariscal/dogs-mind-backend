@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v103 (fix anti-zoom iOS Safari: 21 inputs/textareas en s-anamnesis + modales change-password + delete-account con font-size 14px -> 16px; cumple Apple HIG y evita zoom automatico al focus)
+// Dogs Mind Service Worker — v104 (Apple Guideline 2.1 + HIG: oculta card 'Certified by TDM International' (CTA 'Proximamente'); touch targets stepper +/- de miembros familia 22x22 -> 44x44; auditor reporte priorizado pre-submit)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v103';
+const CACHE_NAME = 'dogs-mind-v104';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

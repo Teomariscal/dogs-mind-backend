@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v98 (fix s-anamnesis: eliminado override 'vibrant cinematic' antiguo que redefinia --green2 a amber #c8a96e — pintaba todos los labels/eyebrows del formulario en amber palido sobre la card blanca, ilegibles)
+// Dogs Mind Service Worker — v99 URGENTE (fix s-tracking + s-tokens: eliminados overrides 'vibrant cinematic' antiguos que pintaban textos cream/amber palido sobre cards blancas tras el rediseno vibrant emerald nuevo — partners testeando hoy)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v98';
+const CACHE_NAME = 'dogs-mind-v99';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

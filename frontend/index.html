@@ -51,8 +51,7 @@
   --green-bg:#edf2eb;
   --sand:    #c4a882;
   --sand2:   #a8886a;
-  --orange:  #c96e3a;
-  --orange2: #e07f48;
+  /* --orange / --orange2 eliminadas 2026-05-12: 0 usos en todo el archivo. */
   --border:  rgba(44,42,36,0.1);
   --border2: rgba(44,42,36,0.16);
   --r:       16px;
@@ -6776,7 +6775,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   </div><!-- /s-cv -->
 
   <!-- ══ S-TOKENS: Token wallet & recharge ══ -->
-  <div id="s-tokens" class="screen" style="background:var(--cream);overflow-y:auto;">
+  <div id="s-tokens" class="screen" style="overflow-y:auto;">
 
     <!-- header -->
     <div style="display:flex;align-items:center;gap:12px;padding:18px 16px 14px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;">
@@ -6979,7 +6978,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   </div>
 
   <!-- ══ S-LOADING-ANALYSIS: pantalla de espera (análisis y plan) ══ -->
-  <div id="s-loading-analysis" class="screen" style="background:var(--cream);overflow:hidden;">
+  <div id="s-loading-analysis" class="screen" style="overflow:hidden;">
     <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 22px;text-align:center;gap:22px;">
       <img src="cecilia-maximus-shihtzu.webp" alt="Cecilia con Maximus y su Shih Tzu" style="height:46vh;max-height:380px;width:auto;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(0,0,0,0.18));">
       <div style="max-width:340px;">
@@ -7097,9 +7096,9 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   </div>
 
   <!-- ══ S-FULL-ANALYSIS: Análisis completo ══ -->
-  <div id="s-full-analysis" class="screen" style="background:var(--cream);overflow-y:auto;">
+  <div id="s-full-analysis" class="screen" style="overflow-y:auto;">
     <!-- header -->
-    <div style="display:flex;align-items:center;gap:12px;padding:18px 16px 14px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;position:sticky;top:0;background:var(--cream);z-index:10;">
+    <div style="display:flex;align-items:center;gap:12px;padding:18px 16px 14px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;position:sticky;top:0;z-index:10;">
       <button onclick="goTo('s-abc')" style="width:44px;height:44px;border-radius:50%;background:#fff;border:1.5px solid rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0;">&#8592;</button>
       <div style="flex:1;">
         <div id="full-analysis-title" style="font-size:17px;font-weight:700;color:var(--dark);letter-spacing:-0.3px;" data-i18n="full_title">Análisis funcional completo</div>
@@ -7122,10 +7121,10 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 
   <!-- ══ S4: TRACKING ══ -->
   <!-- ══ S-TRACKING: Plan de Intervención ══ -->
-  <div id="s-tracking" class="screen" style="background:var(--cream);overflow-y:auto;">
+  <div id="s-tracking" class="screen" style="overflow-y:auto;">
 
     <!-- Sticky header -->
-    <div style="display:flex;align-items:center;gap:12px;padding:18px 16px 14px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;position:sticky;top:0;background:var(--cream);z-index:10;">
+    <div style="display:flex;align-items:center;gap:12px;padding:18px 16px 14px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;position:sticky;top:0;z-index:10;">
       <button onclick="goTo('s-full-analysis')" style="width:44px;height:44px;border-radius:50%;background:#fff;border:1.5px solid rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0;">&#8592;</button>
       <div style="flex:1;">
         <div id="interv-title" style="font-size:17px;font-weight:700;color:var(--dark);letter-spacing:-0.3px;" data-i18n="tracking_title">Plan de Intervención</div>
@@ -7241,7 +7240,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   </div>
 
   <!-- ══ S-PLAN-SIMPLE: Plan accesible Pet Owners (Haiku 4.5) ══ -->
-  <div id="s-plan-simple" class="screen" style="background:var(--cream);overflow-y:auto;">
+  <div id="s-plan-simple" class="screen" style="overflow-y:auto;">
     <!-- Header sticky -->
     <div class="pp-header">
       <button onclick="goTo('s-tracking')" class="pp-back" aria-label="Volver">&#8592;</button>
@@ -7301,7 +7300,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   </div><!-- /s-abc-explained -->
 
   <!-- ══ S-ABC-TRANSLATED: versión accesible del análisis ABC (Cecilia te explica · Haiku 4.5 · 0,1 tok.) ══ -->
-  <div id="s-abc-translated" class="screen" style="background:var(--cream);overflow-y:auto;">
+  <div id="s-abc-translated" class="screen" style="overflow-y:auto;">
     <!-- Header sticky -->
     <div class="pp-header">
       <button onclick="goTo('s-abc')" class="pp-back" aria-label="Volver">&#8592;</button>
@@ -7797,7 +7796,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 
   
   <!-- anamnesis screen -->
-  <div id="s-anamnesis" class="screen" style="background:var(--cream);overflow-y:auto;">
+  <div id="s-anamnesis" class="screen" style="overflow-y:auto;">
     <!-- Pomerania paracaidista (gag animado) -->
     <img class="pomerania-paracaidas" src="pomerania-paracaidas.webp" alt="" aria-hidden="true">
 
@@ -15281,8 +15280,8 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
 
 
   <!-- ══ S-PRIVACY: Política de Privacidad ══ -->
-  <div id="s-privacy" class="screen" style="background:var(--cream);overflow-y:auto;">
-    <div style="display:flex;align-items:center;gap:12px;padding:18px 16px 14px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;position:sticky;top:0;background:var(--cream);z-index:10;">
+  <div id="s-privacy" class="screen" style="overflow-y:auto;">
+    <div style="display:flex;align-items:center;gap:12px;padding:18px 16px 14px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;position:sticky;top:0;z-index:10;">
       <button onclick="history.back()||goTo('s-splash')" style="width:44px;height:44px;border-radius:50%;background:#fff;border:1.5px solid rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0;">&#8592;</button>
       <div>
         <div style="font-size:17px;font-weight:700;color:var(--text);letter-spacing:-0.3px;" data-i18n="pp_title">Política de Privacidad</div>
@@ -15362,8 +15361,8 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
   </div>
 
   <!-- ══ S-TERMS: Términos de Servicio ══ -->
-  <div id="s-terms" class="screen" style="background:var(--cream);overflow-y:auto;">
-    <div style="display:flex;align-items:center;gap:12px;padding:18px 16px 14px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;position:sticky;top:0;background:var(--cream);z-index:10;">
+  <div id="s-terms" class="screen" style="overflow-y:auto;">
+    <div style="display:flex;align-items:center;gap:12px;padding:18px 16px 14px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;position:sticky;top:0;z-index:10;">
       <button onclick="history.back()||goTo('s-splash')" style="width:44px;height:44px;border-radius:50%;background:#fff;border:1.5px solid rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0;">&#8592;</button>
       <div>
         <div style="font-size:17px;font-weight:700;color:var(--text);letter-spacing:-0.3px;" data-i18n="tos_title">Términos de Servicio</div>

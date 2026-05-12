@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v110 (fix s-home solape menu hamburguesa: #s-home .home-topbar z-index:10 (encima del contenedor hero) + #s-home .hero-banner margin-top:12px (separacion visual). Boton hamburguesa libre, dropdown 'Cerrar sesion' clickable encima del hero. Scope-locked a #s-home, cero impacto en otras pantallas. Verificado visualmente con preview MCP local.)
+// Dogs Mind Service Worker — v111 (fix s-home solape menu hamburguesa REFORZADO: topbar position:sticky top:0 z-index:100 con background gradient vibrant + backdrop-blur, menu-btn 44x44 Apple HIG z-index:101, home-menu dropdown z-index:200, hero margin-top:16px. Garantiza visibilidad del boton hamburguesa y clickabilidad del dropdown 'Cerrar sesion' en cualquier device / cache. Verificado visualmente con preview MCP local.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v110';
+const CACHE_NAME = 'dogs-mind-v111';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

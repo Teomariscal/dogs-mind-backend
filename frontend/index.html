@@ -5919,12 +5919,27 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   pointer-events:none; z-index:0;
 }
 #s-home > *{ position:relative; z-index:1; }
-/* Topbar por encima del contenedor del hero para que el dropdown del menu
-   hamburguesa (cerrar sesion) no quede tapado por la card del hero. */
-#s-home .home-topbar{ position:relative; z-index:10 !important; }
-/* Hero separado del topbar verticalmente para que el boton hamburguesa
-   quede libre de cualquier solape de touch area / visual. */
-#s-home .hero-banner{ margin-top:12px !important; }
+/* Topbar sticky con z-index alto: garantiza encima de TODO el contenido
+   del home en cualquier device / cache. */
+#s-home .home-topbar{
+  position:sticky !important;
+  top:0 !important;
+  z-index:100 !important;
+  background:linear-gradient(180deg, #14302a 0%, rgba(20,48,42,0.92) 100%) !important;
+  backdrop-filter:blur(8px) !important;
+  padding:10px 20px 14px !important;
+}
+/* Menu-btn touch area 44x44 (Apple HIG) y z-index encima del topbar. */
+#s-home .menu-btn{
+  width:44px !important;
+  height:44px !important;
+  position:relative;
+  z-index:101 !important;
+}
+/* Dropdown encima de todo. */
+#s-home .home-menu{ z-index:200 !important; }
+/* Hero separado del topbar verticalmente. */
+#s-home .hero-banner{ margin-top:16px !important; }
 
 /* Topbar texto cream + menu glass */
 #s-home .brand-name{ color:#f3f1ea !important; }

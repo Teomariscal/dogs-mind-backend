@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v109 (Fase 1 hardening: localización completa de assets. 15 archivos (img-00..04, 14, 16..21, 2 scenes, 1 icon) copiados desde cdn.jsdelivr.net/gh/Teomariscal/... a frontend/assets/images/ servidos por Netlify directo. Cero dependencias CDN externas para imagenes del producto. Verificado visualmente con preview MCP local en s-home, s-anamnesis, s-aigents-intro: hero photo cachorro labrador, aigents-FINAL cast Pixar, pomerania-paracaidista, todos OK. CSS sin cambios.)
+// Dogs Mind Service Worker — v110 (fix s-home solape menu hamburguesa: #s-home .home-topbar z-index:10 (encima del contenedor hero) + #s-home .hero-banner margin-top:12px (separacion visual). Boton hamburguesa libre, dropdown 'Cerrar sesion' clickable encima del hero. Scope-locked a #s-home, cero impacto en otras pantallas. Verificado visualmente con preview MCP local.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v109';
+const CACHE_NAME = 'dogs-mind-v110';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

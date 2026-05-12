@@ -5919,6 +5919,12 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   pointer-events:none; z-index:0;
 }
 #s-home > *{ position:relative; z-index:1; }
+/* Topbar por encima del contenedor del hero para que el dropdown del menu
+   hamburguesa (cerrar sesion) no quede tapado por la card del hero. */
+#s-home .home-topbar{ position:relative; z-index:10 !important; }
+/* Hero separado del topbar verticalmente para que el boton hamburguesa
+   quede libre de cualquier solape de touch area / visual. */
+#s-home .hero-banner{ margin-top:12px !important; }
 
 /* Topbar texto cream + menu glass */
 #s-home .brand-name{ color:#f3f1ea !important; }

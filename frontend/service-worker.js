@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v106 (s-home vibrant emerald + intensidad: gradient 3-stops 14302a-0e1f1a-0a1814; halos cyan 22%->42% y green 30%->50%; grid 4.5%->7%; mas presencia visual)
+// Dogs Mind Service Worker — v107 (Apple HIG: 9 back buttons 36x36 -> 44x44 + font-size 16->18px. Touch targets correctos pre-submit. Iconos decorativos no clickeables (teo-avatar, menu-btn, icon boxes) conservados a 36)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v106';
+const CACHE_NAME = 'dogs-mind-v107';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

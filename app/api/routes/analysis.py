@@ -14,6 +14,7 @@ from app.database import get_db
 from app.core.safety import log_classification_sync
 from app.core.usage_tracker import log_usage
 from app.core.case_persistence import persist_to_case_safely, get_user_from_authorization
+from app.core.anthropic_error import raise_http_for_anthropic
 from app.config import get_settings
 
 
@@ -135,7 +136,7 @@ def create_analysis(
             success="error",
             notes=str(e)[:200],
         )
-        raise HTTPException(status_code=500, detail=str(e))
+        raise_http_for_anthropic(e)
 
 
 @router.post("/video", response_model=AnalysisResponse)
@@ -213,7 +214,7 @@ async def create_analysis_with_video(
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise_http_for_anthropic(e)
     finally:
         if tmp_path and os.path.exists(tmp_path):
             os.unlink(tmp_path)
@@ -353,6 +354,6 @@ def analysis_chat(
             success="error",
             notes=str(e)[:200],
         )
-        raise HTTPException(status_code=500, detail=f"Error de IA: {e}")
+        raise_http_for_anthropic(e, fallback_msg=f"Error de IA: {e}")
 
     return ChatResponse(reply=reply, tokens_remaining=tokens_left)

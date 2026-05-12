@@ -6,6 +6,7 @@ from app.models.intervention import InterventionRequest, InterventionResponse
 from app.services.intervention_ai import run_intervention_plan
 from app.database import get_db
 from app.core.case_persistence import persist_to_case_safely, get_user_from_authorization
+from app.core.anthropic_error import raise_http_for_anthropic
 from app.config import get_settings
 
 router = APIRouter(prefix="/intervention", tags=["intervention-plan"])
@@ -43,4 +44,4 @@ def create_intervention(
             )
         return result
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise_http_for_anthropic(e)

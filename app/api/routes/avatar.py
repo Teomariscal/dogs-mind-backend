@@ -9,6 +9,7 @@ from app.database import get_db
 from app.core.token_utils import deduct_token
 from app.core.usage_tracker import log_usage
 from app.core.case_persistence import persist_to_case_safely, get_user_from_authorization
+from app.core.anthropic_error import raise_http_for_anthropic
 from app.config import get_settings
 
 router = APIRouter(prefix="/avatar", tags=["avatar"])
@@ -99,4 +100,4 @@ def avatar_chat(
             success="error",
             notes=f"avatar={request.avatar_id} | {str(e)[:150]}",
         )
-        raise HTTPException(status_code=500, detail=str(e))
+        raise_http_for_anthropic(e)

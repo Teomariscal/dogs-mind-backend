@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v109 (s-home: hero img-01.webp localizado a frontend/assets/ (eliminada dependencia jsdelivr que dio 404 transient), cards con tinte cyan + border 0.20->0.45 + inset glow para sentir vibrant emerald y no flat-white sobre fondo oscuro)
+// Dogs Mind Service Worker — v108 (limpieza post-auditor: vars --orange/--orange2 eliminadas (0 usos), 13 inline 'background:var(--cream)' zombies eliminados en pantallas vibrant - el CSS nuevo los sobrescribia con !important pero el inline confundia auditorias)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v109';
+const CACHE_NAME = 'dogs-mind-v108';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

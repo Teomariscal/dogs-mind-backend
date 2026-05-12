@@ -23,7 +23,7 @@
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" href="/icons/icon-96x96.png" type="image/png">
 <!-- Preload LCP image (splash background) -->
-<link rel="preload" as="image" href="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-00.webp" fetchpriority="high">
+<link rel="preload" as="image" href="assets/images/img-00.webp" fetchpriority="high">
 <!-- Fonts: async load to avoid render blocking -->
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"></noscript>
@@ -250,7 +250,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
      7593206 introdujo CSS roto que pudo cortar el parser y acumular
      overrides). Mantener URL CDN: jsdelivr cachea el WebP a edge, mismo
      comportamiento que el resto de imágenes hero del proyecto. */
-  background-image:url('https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-01.webp') !important;
+  background-image:url('assets/images/img-01.webp') !important;
   background-position:center 25% !important;
   background-size:cover !important;
   background-repeat:no-repeat !important;
@@ -5944,22 +5944,37 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   box-shadow:0 12px 38px rgba(0,0,0,0.42), 0 0 50px rgba(94,200,230,0.10);
 }
 
-/* Cards (action / avatar) — tienen fondo blanco; añadimos borde cyan
-   sutil + sombra mayor para destaque premium */
+/* Cards: Registros + Aigents + Insight row -> VERDE sage (uniformes).
+   Solo .teo-card (Analysis by Teo -> abre anamnesis) queda BLANCA para
+   destacar como CTA principal del home. */
 #s-home .action-card,
-#s-home .avatar-card{
-  border-color:rgba(94,200,230,0.20) !important;
+#s-home .avatar-card,
+#s-home .insight-row{
+  background:#c8d8bf !important;
+  border:1px solid rgba(74,103,65,0.45) !important;
   box-shadow:0 6px 22px rgba(0,0,0,0.26);
 }
 #s-home .teo-card{
-  border-color:rgba(94,200,230,0.20) !important;
-  box-shadow:0 6px 22px rgba(0,0,0,0.26);
+  background:#ffffff !important;
+  border:1px solid rgba(74,103,65,0.30) !important;
+  box-shadow:0 8px 26px rgba(0,0,0,0.30);
 }
-
-/* Insight row: mantenemos fondo blanco, ajustamos sombra */
-#s-home .insight-row{
-  border-color:rgba(94,200,230,0.20) !important;
-  box-shadow:0 6px 22px rgba(0,0,0,0.26);
+/* Contraste de textos dentro de cards verdes. */
+#s-home .action-card .card-title,
+#s-home .avatar-card .card-title{
+  color:#1f2e1c !important;
+}
+#s-home .action-card .card-sub,
+#s-home .avatar-card .card-sub{
+  color:rgba(31,46,28,0.72) !important;
+}
+#s-home .insight-row .insight-text{
+  color:#1f2e1c !important;
+}
+#s-home .insight-row .insight-icon{
+  background:rgba(255,255,255,0.55) !important;
+  border-color:rgba(74,103,65,0.35) !important;
+  color:#1f2e1c;
 }
 
 /* ── E extendido: rediseño vibrant de #s-tokens ────────────────────── */
@@ -6282,7 +6297,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   <!-- ══ S1: SPLASH ══ -->
   <div id="s-splash" class="screen active">
     <div class="splash-bg">
-      <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-00.webp"
+      <img src="assets/images/img-00.webp"
            style="width:100%;height:100%;object-fit:cover;object-position:42% 28%;display:block;position:absolute;top:0;left:0;" alt="">
     </div>
     <div class="splash-overlay"></div>
@@ -6503,7 +6518,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   <div id="s-home" class="screen">
     <div class="home-topbar">
       <div class="topbar-left">
-        <div class="teo-avatar"><img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-02.webp" style="width:100%;height:100%;object-fit:cover;object-position:center 15%"></div>
+        <div class="teo-avatar"><img src="assets/images/img-02.webp" style="width:100%;height:100%;object-fit:cover;object-position:center 15%"></div>
         <div class="topbar-brand">
           <div class="brand-name">Canine Behavior Consultancy</div>
           <div class="brand-by">by Teo Mariscal</div>
@@ -7007,7 +7022,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 
       <!-- ABC photo header — full bleed, sin marco cream -->
       <div style="margin:0 0 10px;border-radius:var(--r);overflow:hidden;position:relative;height:240px;flex-shrink:0;">
-        <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-14.jpg" style="width:100%;height:100%;object-fit:cover;object-position:center center;display:block;">
+        <img src="assets/images/img-14.jpg" style="width:100%;height:100%;object-fit:cover;object-position:center center;display:block;">
         <div style="position:absolute;bottom:0;left:0;right:0;
           background:linear-gradient(0deg,rgba(255,255,255,0.95) 0%,rgba(255,255,255,0.55) 60%,transparent 100%);
           padding:14px 0 8px;
@@ -7135,7 +7150,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 
     <!-- Hero image pancartafoto3 -->
     <div style="width:100%;height:200px;overflow:hidden;flex-shrink:0;">
-      <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-16.webp" style="width:100%;height:100%;object-fit:cover;object-position:center 30%;" alt="Dogs Mind" />
+      <img src="assets/images/img-16.webp" style="width:100%;height:100%;object-fit:cover;object-position:center 30%;" alt="Dogs Mind" />
     </div>
 
     <!-- Loading state -->
@@ -7434,7 +7449,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   <div id="s-chat" class="screen">
     <div class="chat-hdr">
       <div class="niaz-pic" id="chat-hdr-avi" style="background:none;padding:0;overflow:hidden">
-        <img id="chat-hdr-img" src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-17.webp" style="width:100%;height:100%;object-fit:cover;object-position:top">
+        <img id="chat-hdr-img" src="assets/images/img-17.webp" style="width:100%;height:100%;object-fit:cover;object-position:top">
       </div>
       <div class="chat-hdr-info">
         <div class="chat-hdr-name" id="chat-hdr-name">Niaz</div>
@@ -7446,7 +7461,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 
     <div class="msgs" id="msgs">
       <div class="msg niaz">
-        <div class="msg-av" style="background:none;padding:0;overflow:hidden"><img loading="lazy" id="intro-av-img" src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-17.webp" style="width:100%;height:100%;object-fit:cover;object-position:top;border-radius:50%"></div>
+        <div class="msg-av" style="background:none;padding:0;overflow:hidden"><img loading="lazy" id="intro-av-img" src="assets/images/img-17.webp" style="width:100%;height:100%;object-fit:cover;object-position:top;border-radius:50%"></div>
         <div>
           <div class="bbl" data-i18n="chat_intro_default">¡Hola! Soy Niaz. He leído el análisis de tu perro y ya tengo MIL ideas. Mi cerebro va a mil por hora — prepárate, porque no voy a darte respuestas aburridas. ¿Por dónde quieres empezar?</div>
           <div class="msg-t" data-i18n="chat_now">Ahora</div>
@@ -7537,7 +7552,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
       </div>
 
       <div class="av-card" id="avc-niaz" onclick="selectAv('niaz')">
-        <img class="av-photo" src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-17.webp" alt="Niaz">
+        <img class="av-photo" src="assets/images/img-17.webp" alt="Niaz">
         <div class="av-info">
           <div class="av-name">Niaz</div>
           <div class="av-role" style="color:#b8922a" data-i18n="av_role_niaz">Lujo &amp; Lifestyle canino</div>
@@ -7578,7 +7593,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 
 
       <div class="av-card" id="avc-ale" onclick="selectAv('ale')">
-        <img class="av-photo" src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-18.webp">
+        <img class="av-photo" src="assets/images/img-18.webp">
         <div class="av-info">
           <div class="av-name">Ale</div>
           <div class="av-role" style="color:#7a5a9a" data-i18n="av_role_ale">Vet · Adiestradora · Naturaleza</div>
@@ -7588,7 +7603,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
       </div>
 
       <div class="av-card" id="avc-borja" onclick="selectAv('borja')">
-        <img class="av-photo" src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-19.webp">
+        <img class="av-photo" src="assets/images/img-19.webp">
         <div class="av-info">
           <div class="av-name">Borja</div>
           <div class="av-role" style="color:#2a7a8a" data-i18n="av_role_borja">Cultura canina clásica</div>
@@ -7617,7 +7632,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   <div id="s-login" class="screen" style="position:relative;">
     <!-- fondo foto -->
     <div style="position:absolute;inset:0;z-index:0;pointer-events:none;">
-      <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-20.jpg" style="width:100%;height:100%;object-fit:cover;object-position:center;opacity:0.22;">
+      <img src="assets/images/img-20.jpg" style="width:100%;height:100%;object-fit:cover;object-position:center;opacity:0.22;">
     </div>
     <div style="position:relative;z-index:1;display:flex;flex-direction:column;flex:1;overflow-y:auto;">
 
@@ -8100,7 +8115,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   <div id="s-dog-profile" class="screen" style="background:linear-gradient(180deg, #4a6741 0%, #5a7a51 25%, var(--cream2) 60%, var(--cream) 100%);">
     <!-- Hero vibrant con foto + degradado oliva + back overlay (paleta de marca) -->
     <div style="position:relative;height:200px;flex-shrink:0;overflow:hidden;background:#3a4a30;">
-      <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/scenes/dog-profile-hero.webp"
+      <img src="assets/images/scenes/dog-profile-hero.webp"
            alt=""
            style="width:100%;height:100%;object-fit:cover;object-position:center 40%;display:block;">
       <!-- Degradado para legibilidad del título -->
@@ -8212,7 +8227,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   <div id="s-seguimiento" class="screen" style="background:linear-gradient(180deg, #4a6741 0%, #5a7a51 25%, var(--cream2) 60%, var(--cream) 100%);">
     <!-- Hero vibrant: golden retriever nadando + degradado oliva -->
     <div style="position:relative;height:200px;flex-shrink:0;overflow:hidden;background:#3a4a30;">
-      <img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/scenes/seguimiento-hero.webp"
+      <img src="assets/images/scenes/seguimiento-hero.webp"
            alt=""
            style="width:100%;height:100%;object-fit:cover;object-position:center 35%;display:block;">
       <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0.18) 0%,rgba(0,0,0,0) 35%,rgba(45,74,58,0.55) 70%,rgba(45,74,58,0.92) 100%);"></div>
@@ -8995,11 +9010,11 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   <!-- ══ GLOBAL BOTTOM NAV ══ -->
   <div id="global-nav">
     <div style="display:flex;width:100%;">
-      <button id="n-home"     class="n-btn" onclick="goTo('s-home')"    ><div class="n-ico" style="padding:0;overflow:hidden;border-radius:50%;background:#f0ece3;"><img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/icons/icon-home-with-dog.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div><span data-i18n="nav_home">Inicio</span></button>
+      <button id="n-home"     class="n-btn" onclick="goTo('s-home')"    ><div class="n-ico" style="padding:0;overflow:hidden;border-radius:50%;background:#f0ece3;"><img src="assets/images/icons/icon-home-with-dog.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div><span data-i18n="nav_home">Inicio</span></button>
       <button id="n-trainer"  class="n-btn" onclick="goTo('s-avatars')" ><div class="n-ico" style="padding:0;overflow:hidden;border-radius:50%;background:#1a1a1a;"><img src="aig-niaz-pixar.webp" alt="" style="width:140%;height:140%;object-fit:cover;object-position:center 18%;display:block;margin:-20% 0 0 -20%;"></div><span data-i18n="nav_trainer">Trainer</span></button>
       <button id="n-progress" class="n-btn" onclick="goTo('s-tracking')"><div class="n-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/></svg></div><span data-i18n="nav_progress">Progreso</span></button>
       <button id="n-teo"      class="n-btn" onclick="goTo('s-profile')" ><div class="n-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></div><span data-i18n="nav_teo">Teo</span></button>
-      <button id="n-register" class="n-btn" onclick="goTo('s-splash')"  ><div class="n-ico" style="padding:0;overflow:hidden;border-radius:50%;background:#1a1a1a;"><img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-00.webp" alt="" style="width:100%;height:100%;object-fit:cover;object-position:42% 28%;display:block;"></div><span data-i18n="nav_register">Registro</span></button>
+      <button id="n-register" class="n-btn" onclick="goTo('s-splash')"  ><div class="n-ico" style="padding:0;overflow:hidden;border-radius:50%;background:#1a1a1a;"><img src="assets/images/img-00.webp" alt="" style="width:100%;height:100%;object-fit:cover;object-position:42% 28%;display:block;"></div><span data-i18n="nav_register">Registro</span></button>
     </div>
   </div>
 
@@ -9266,7 +9281,7 @@ const AVATARS = {
   niaz: {
     name: 'Niaz',
     role: 'TDAH · Yoga · Energía infinita',
-    img: 'https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-17.webp',
+    img: 'assets/images/img-17.webp',
     color: '#c85070',
     intro: '¡Ah! Perdona, venía de una clase... o de dos, ya no sé. Soy Niaz. ¿En qué te puedo ayudar?'
   },
@@ -9287,14 +9302,14 @@ const AVATARS = {
   ale: {
     name: 'Ale',
     role: 'Veterinaria · Hippie auténtica',
-    img: 'https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-18.webp',
+    img: 'assets/images/img-18.webp',
     color: '#7a5a9a',
     intro: 'Hola, soy Ale. Cuéntame, ¿en qué te puedo ayudar?',
   },
   borja: {
     name: 'Borja',
     role: 'Pijo madrileño · El encantador',
-    img: 'https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-19.webp',
+    img: 'assets/images/img-19.webp',
     color: '#2a7a8a',
     intro: 'Hola, soy Borja. A ver, cuéntame. ¿En qué puedo ayudarte?',
   },
@@ -12027,7 +12042,7 @@ function getVal(id, fallback) {
 
     var fullHtml =
       '<div style="font-size:14px;line-height:1.75;color:var(--dark);margin-bottom:20px;padding:18px;border-radius:14px;border:1px solid rgba(0,0,0,0.07);position:relative;overflow:hidden;background:#fff;">' +
-        '<div style="position:absolute;inset:0;background-image:url(https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-21.webp);background-size:cover;background-position:center 30%;opacity:0.25;border-radius:14px;"></div>' +
+        '<div style="position:absolute;inset:0;background-image:url(assets/images/img-21.webp);background-size:cover;background-position:center 30%;opacity:0.25;border-radius:14px;"></div>' +
         '<div style="position:relative;z-index:1;">A continuación, y en función del análisis funcional realizado por la IA entrenada por Teo Mariscal y un equipo de los mejores etólogos mundiales que participa de este proyecto, nuestra recomendación es:</div>' +
       '</div>' +
       '<div style="background:#f7f9f5;border-left:4px solid #4a6741;border-radius:0 14px 14px 0;padding:20px 18px;margin-bottom:20px;">' +
@@ -12105,7 +12120,7 @@ function getVal(id, fallback) {
       // Build wrapper with intro + plan + footer
       var fullHtml =
         '<div style="font-size:14px;line-height:1.75;color:var(--dark);margin-bottom:20px;padding:18px;border-radius:14px;border:1px solid rgba(0,0,0,0.07);position:relative;overflow:hidden;background:#fff;">' +
-          '<div style="position:absolute;inset:0;background-image:url(https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-21.webp);background-size:cover;background-position:center 30%;opacity:0.25;border-radius:14px;"></div>' +
+          '<div style="position:absolute;inset:0;background-image:url(assets/images/img-21.webp);background-size:cover;background-position:center 30%;opacity:0.25;border-radius:14px;"></div>' +
           '<div style="position:relative;z-index:1;">A continuación, y en función del análisis funcional realizado por la IA entrenada por Teo Mariscal y un equipo de los mejores etólogos mundiales que participa de este proyecto, nuestra recomendación es:</div>' +
         '</div>' +
 
@@ -12653,10 +12668,10 @@ window._dogProfileState = { mode: 'create', dogId: null, pendingPhotoBase64: nul
 
 var _DEMO_DOGS = [
   { id: '_demo_buddy', name: 'Buddy',
-    photoUrl: 'https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-03.webp',
+    photoUrl: 'assets/images/img-03.webp',
     _demo: true, _imgPos: 'center 40%' },
   { id: '_demo_laika', name: 'Laika',
-    photoUrl: 'https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-04.webp',
+    photoUrl: 'assets/images/img-04.webp',
     _demo: true, _imgPos: 'center 20%' }
 ];
 

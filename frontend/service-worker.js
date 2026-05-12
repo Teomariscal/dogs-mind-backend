@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v108 (limpieza post-auditor: vars --orange/--orange2 eliminadas (0 usos), 13 inline 'background:var(--cream)' zombies eliminados en pantallas vibrant - el CSS nuevo los sobrescribia con !important pero el inline confundia auditorias)
+// Dogs Mind Service Worker — v109 (Fase 1 hardening: localización completa de assets. 15 archivos (img-00..04, 14, 16..21, 2 scenes, 1 icon) copiados desde cdn.jsdelivr.net/gh/Teomariscal/... a frontend/assets/images/ servidos por Netlify directo. Cero dependencias CDN externas para imagenes del producto. Verificado visualmente con preview MCP local en s-home, s-anamnesis, s-aigents-intro: hero photo cachorro labrador, aigents-FINAL cast Pixar, pomerania-paracaidista, todos OK. CSS sin cambios.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v108';
+const CACHE_NAME = 'dogs-mind-v109';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

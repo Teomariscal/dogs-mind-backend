@@ -250,7 +250,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
      7593206 introdujo CSS roto que pudo cortar el parser y acumular
      overrides). Mantener URL CDN: jsdelivr cachea el WebP a edge, mismo
      comportamiento que el resto de imágenes hero del proyecto. */
-  background-image:url('https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-01.webp') !important;
+  background-image:url('assets/images/img-01.webp') !important;
   background-position:center 25% !important;
   background-size:cover !important;
   background-repeat:no-repeat !important;
@@ -5944,22 +5944,18 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   box-shadow:0 12px 38px rgba(0,0,0,0.42), 0 0 50px rgba(94,200,230,0.10);
 }
 
-/* Cards (action / avatar) — tienen fondo blanco; añadimos borde cyan
-   sutil + sombra mayor para destaque premium */
+/* Cards (action / avatar / teo / insight) — fondo blanco con tinte cyan
+   sutil + borde cyan más visible + glow inset para sentir vibrant. */
 #s-home .action-card,
-#s-home .avatar-card{
-  border-color:rgba(94,200,230,0.20) !important;
-  box-shadow:0 6px 22px rgba(0,0,0,0.26);
-}
-#s-home .teo-card{
-  border-color:rgba(94,200,230,0.20) !important;
-  box-shadow:0 6px 22px rgba(0,0,0,0.26);
-}
-
-/* Insight row: mantenemos fondo blanco, ajustamos sombra */
+#s-home .avatar-card,
+#s-home .teo-card,
 #s-home .insight-row{
-  border-color:rgba(94,200,230,0.20) !important;
-  box-shadow:0 6px 22px rgba(0,0,0,0.26);
+  background:linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(232,247,252,0.96) 100%) !important;
+  border:1px solid rgba(94,200,230,0.45) !important;
+  box-shadow:
+    0 6px 22px rgba(0,0,0,0.28),
+    inset 0 1px 0 rgba(255,255,255,0.8),
+    0 0 18px rgba(94,200,230,0.10);
 }
 
 /* ── E extendido: rediseño vibrant de #s-tokens ────────────────────── */
@@ -6503,7 +6499,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   <div id="s-home" class="screen">
     <div class="home-topbar">
       <div class="topbar-left">
-        <div class="teo-avatar"><img src="https://cdn.jsdelivr.net/gh/Teomariscal/dogs-mind-backend@main/assets/images/img-02.webp" style="width:100%;height:100%;object-fit:cover;object-position:center 15%"></div>
+        <div class="teo-avatar"><img src="assets/images/img-02.webp" style="width:100%;height:100%;object-fit:cover;object-position:center 15%"></div>
         <div class="topbar-brand">
           <div class="brand-name">Canine Behavior Consultancy</div>
           <div class="brand-by">by Teo Mariscal</div>

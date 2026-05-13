@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v111 (fix s-home solape menu hamburguesa REFORZADO: topbar position:sticky top:0 z-index:100 con background gradient vibrant + backdrop-blur, menu-btn 44x44 Apple HIG z-index:101, home-menu dropdown z-index:200, hero margin-top:16px. Garantiza visibilidad del boton hamburguesa y clickabilidad del dropdown 'Cerrar sesion' en cualquier device / cache. Verificado visualmente con preview MCP local.)
+// Dogs Mind Service Worker — v112 (fix s-profile: boton 'Consultar a Teo' ya no flota tapando el texto 'Sobre Teo'. cv-cta-wrap pasa de position:sticky a relative (sin gradient, con margin-top:24px) - aparece al final del scroll natural. Ademas se oculta el .bottom-nav legacy duplicado dentro de s-profile (el #global-nav ya esta fuera). Scope-locked a #s-profile, cero impacto en otras pantallas. Verificado visualmente con preview MCP local incluyendo scroll bottom.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v111';
+const CACHE_NAME = 'dogs-mind-v112';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

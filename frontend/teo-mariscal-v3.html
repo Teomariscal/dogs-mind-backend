@@ -1996,6 +1996,19 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 #s-profile .nav-item.active { color: var(--amber); }
 /* CTA wrap deja espacio para la nav abajo */
 #s-profile .cv-cta-wrap { bottom: var(--nav-height, 78px); }
+/* Fix solape boton 'Consultar a Teo' con texto 'Sobre Teo':
+   el sticky con viewport corto flota encima del contenido. Forzar a flujo
+   normal en s-profile, sin gradient, con margen superior de respiracion. */
+#s-profile .cv-cta-wrap{
+  position:relative !important;
+  bottom:auto !important;
+  background:transparent !important;
+  margin-top:24px !important;
+}
+/* Ocultar .bottom-nav legacy duplicado dentro de s-profile (el #global-nav
+   ya esta fuera). Aparecia tapado por el sticky CTA - al pasar a relative
+   se hacia visible. */
+#s-profile .bottom-nav{ display:none !important; }
 
 .cv-halo {
   position: absolute;

@@ -6043,6 +6043,28 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   border-color:rgba(74,103,65,0.35) !important;
   color:#1f2e1c;
 }
+/* Token slot (donut + 'Recargar tokens' label debajo): button column flex */
+#s-home .token-slot{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:5px;
+  background:transparent;
+  border:none;
+  padding:0;
+  cursor:pointer;
+  font-family:inherit;
+  flex-shrink:0;
+}
+#s-home .token-recharge-label{
+  font-size:10px;
+  font-weight:600;
+  color:#1f2e1c;
+  letter-spacing:0.02em;
+  text-align:center;
+  white-space:nowrap;
+  line-height:1.1;
+}
 
 /* ── E extendido: rediseño vibrant de #s-tokens ────────────────────── */
 #s-tokens{
@@ -6659,12 +6681,15 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
       <div class="insight-row">
         <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.7.6 1 1.5 1 2.3v1h6v-1c0-.8.3-1.7 1-2.3A7 7 0 0 0 12 2z"/></svg></div>
         <div class="insight-text" data-i18n="tip_of_day">Consejo del día: El refuerzo positivo consistente es clave para el cambio conductual a largo plazo. Recompensa las acciones deseadas de inmediato.</div>
-        <div class="token-ring" onclick="goTo('s-tokens')" style="cursor:pointer;" title="Ver mis tokens">
-          <div class="token-inner">
-            <div class="token-num" id="tok-home">5</div>
-            <div class="token-lbl">Tokens</div>
+        <button class="token-slot" onclick="goTo('s-tokens')" type="button" aria-label="Recargar tokens" title="Recargar tokens">
+          <div class="token-ring">
+            <div class="token-inner">
+              <div class="token-num" id="tok-home">5</div>
+              <div class="token-lbl">Tokens</div>
+            </div>
           </div>
-        </div>
+          <span class="token-recharge-label" data-i18n="recharge_tokens">Recargar tokens</span>
+        </button>
       </div>
 
       <button class="btn-new-consult" onclick="goTo('s-anamnesis')" data-i18n="new_consultation">Nueva Consulta</button>
@@ -9199,7 +9224,7 @@ function goTo(id) {
   document.getElementById(id).classList.add('active');
   if (id === 's-records') renderRecords();
   if (id === 's-tokens') updateTokensScreen();
-  if (id === 's-home') fetchBalance();
+  if (id === 's-home') { fetchBalance(); loadDailyTip(); }
   if (id === 's-pro-company' && typeof _pcOnEnter === 'function') _pcOnEnter();
   if (id === 's-pro-area' && typeof renderProAreaAuthCTA === 'function') renderProAreaAuthCTA();
   if (id === 's-pro-signup' && typeof psHydrate === 'function') psHydrate();
@@ -11229,6 +11254,48 @@ function anam_choose_training(value) {
 var API_BASE = window.location.protocol === 'file:'
   ? 'http://localhost:8000'
   : 'https://dogs-mind-backend-production.up.railway.app';
+
+// ── DAILY TIP (Consejo del día generado por backend) ─────────────────────
+// Fetch /tip/today para el lang actual, cachea en localStorage por fecha.
+// Si falla la red o timeout > 3s, deja el texto estatico actual (data-i18n).
+function loadDailyTip() {
+  try {
+    var tipEl = document.querySelector('#s-home .insight-text');
+    if (!tipEl) return;
+    var lang = (window.currentLang || localStorage.getItem('dm_lang') || 'es').toLowerCase();
+    if (lang !== 'es' && lang !== 'en') lang = 'es';
+    var today = new Date().toISOString().slice(0, 10);  // YYYY-MM-DD UTC
+    var cacheKey = 'dm_daily_tip_' + today + '_' + lang;
+    var cached = null;
+    try { cached = localStorage.getItem(cacheKey); } catch(e) {}
+    if (cached) {
+      tipEl.textContent = cached;
+      return;
+    }
+    var prefix = (lang === 'en') ? 'Tip of the day: ' : 'Consejo del día: ';
+    // Fetch con timeout 3s para no bloquear si Railway esta lento
+    var controller = new AbortController();
+    var timeoutId = setTimeout(function(){ controller.abort(); }, 3000);
+    fetch(API_BASE + '/tip/today?lang=' + lang, { signal: controller.signal })
+      .then(function(r){ clearTimeout(timeoutId); return r.ok ? r.json() : null; })
+      .then(function(data){
+        if (!data || !data.tip) return;
+        var fullText = prefix + data.tip;
+        tipEl.textContent = fullText;
+        try { localStorage.setItem(cacheKey, fullText); } catch(e) {}
+        // Limpiar caches de dias anteriores para no llenar localStorage
+        try {
+          for (var i = localStorage.length - 1; i >= 0; i--) {
+            var k = localStorage.key(i);
+            if (k && k.indexOf('dm_daily_tip_') === 0 && k.indexOf(today) === -1) {
+              localStorage.removeItem(k);
+            }
+          }
+        } catch(e) {}
+      })
+      .catch(function(){ clearTimeout(timeoutId); /* fallback: texto estatico ya esta puesto */ });
+  } catch(e) { /* silent */ }
+}
 
 // ── READ TOGGLE STATE (verde = activo) ───────────────
 function isActive(id) {
@@ -13936,6 +14003,7 @@ function endTourIntro() {
       new_analysis:           'Nuevo Análisis',
       continue_case:          'Continuar caso',
       tip_of_day:             'Consejo del día: El refuerzo positivo consistente es clave para el cambio conductual a largo plazo. Recompensa las acciones deseadas de inmediato.',
+      recharge_tokens:        'Recargar tokens',
       new_consultation:       'Nueva Consulta',
       // Nav
       nav_home:    'Inicio',
@@ -14736,6 +14804,7 @@ function endTourIntro() {
       new_analysis:           'New Analysis',
       continue_case:          'Continue Case',
       tip_of_day:             'Tip of the day: Consistent positive reinforcement is key to long-term behavioral change. Reward desired actions immediately.',
+      recharge_tokens:        'Recharge tokens',
       new_consultation:       'New Consultation',
       // Nav
       nav_home:    'Home',

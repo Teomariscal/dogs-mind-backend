@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v114 (fix #4+#5: ocultar placeholders vacios en headers s-tracking y s-full-analysis. #interv-dog-photo y #full-dog-photo eran divs decorativos con border cyan que nunca se llenaban via JS, quedando como circulos blanco/azul vacios visibles. Cambio: display:none !important scope-locked a #s-tracking y #s-full-analysis. Cero JS tocado. Cero impacto en otras pantallas. Verificado visualmente con preview MCP.)
+// Dogs Mind Service Worker — v115 (feat Consejo del día dinámico + 'Recargar tokens' label. Backend nuevo endpoint GET /tip/today?lang=es|en con cache (date, lang) y Haiku 4.5 prompt psicologia del aprendizaje canino. Frontend: loadDailyTip() fetch async no bloqueante con cache localStorage por dia/lang + fallback estatico (texto i18n) si red falla. Donut tokens en s-home envuelto en button .token-slot con label 'Recargar tokens' debajo (i18n ES/EN). Cero cambios en otras pantallas. Sin repeticion de tip en ventana de 14 dias (Haiku ve lista evitar).)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v114';
+const CACHE_NAME = 'dogs-mind-v115';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

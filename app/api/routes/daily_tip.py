@@ -11,7 +11,7 @@ GET /tip/today?lang=es|en
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Literal
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
@@ -20,6 +20,11 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.case import DailyTip
 from app.services.daily_tip_ai import generate_daily_tip, get_fallback_tip
+
+# Numero de dias hacia atras de tips que NO se pueden repetir.
+# Con minimo 50 tips/año queremos variedad sin repeticion proxima. 14 dias
+# da margen amplio: con 14 dias bloqueados Haiku tiene que rotar suficiente.
+_NO_REPEAT_WINDOW_DAYS = 14
 
 logger = logging.getLogger(__name__)
 
@@ -59,9 +64,19 @@ def get_daily_tip(
             date=today, lang=lang, tip=existing.tip, cached=True,
         )
 
-    # 2) Generar via Haiku
+    # 2) Recuperar tips de los ultimos N dias para que Haiku no los repita.
+    #    Garantia: minimo 50 tips/año, sin repeticion en ventana de 14 dias.
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=_NO_REPEAT_WINDOW_DAYS)).strftime("%Y-%m-%d")
+    recent_rows = db.query(DailyTip).filter(
+        DailyTip.lang == lang,
+        DailyTip.date >= cutoff,
+        DailyTip.date < today,  # excluir hoy (no existe aun, pero por seguridad)
+    ).order_by(DailyTip.date.desc()).limit(_NO_REPEAT_WINDOW_DAYS).all()
+    recent_tips = [r.tip for r in recent_rows]
+
+    # 3) Generar via Haiku con la lista de tips recientes a evitar
     try:
-        tip = generate_daily_tip(lang=lang)
+        tip = generate_daily_tip(lang=lang, recent_tips=recent_tips)
     except Exception as e:
         # Anthropic caido / overload / timeout — devolver fallback estatico
         # sin persistir (para que mañana se reintente).
@@ -70,7 +85,7 @@ def get_daily_tip(
             date=today, lang=lang, tip=get_fallback_tip(lang), cached=False,
         )
 
-    # 3) Persistir y devolver
+    # 4) Persistir y devolver
     try:
         new_tip = DailyTip(date=today, lang=lang, tip=tip)
         db.add(new_tip)

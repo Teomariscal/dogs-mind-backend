@@ -57,13 +57,22 @@ HARD RULES:
 Return ONLY the sentence, without prefix or decoration."""
 
 
-_USER_PROMPT_ES = "Genera el consejo del día de hoy. Una frase concisa, basada en psicología del aprendizaje, aplicable al adiestramiento canino doméstico."
-_USER_PROMPT_EN = "Generate today's daily tip. One concise sentence, grounded in learning psychology, applicable to household dog training."
+_USER_PROMPT_ES_BASE = "Genera el consejo del día de hoy. Una frase concisa, basada en psicología del aprendizaje, aplicable al adiestramiento canino doméstico."
+_USER_PROMPT_EN_BASE = "Generate today's daily tip. One concise sentence, grounded in learning psychology, applicable to household dog training."
+
+_AVOID_PREAMBLE_ES = "\n\nIMPORTANTE — varía el tema. NO repitas ninguno de los consejos siguientes, mostrados en los últimos días (escoge un concepto, principio o acción distinta):\n"
+_AVOID_PREAMBLE_EN = "\n\nIMPORTANT — vary the topic. Do NOT repeat any of the following tips shown in recent days (pick a different concept, principle, or action):\n"
 
 
-def generate_daily_tip(lang: str = "es") -> str:
+def generate_daily_tip(lang: str = "es", recent_tips: list[str] | None = None) -> str:
     """
     Genera el consejo del día via Haiku 4.5. Devuelve la frase generada.
+
+    Si `recent_tips` se pasa (los ultimos N tips ya mostrados para esa lang),
+    se incluyen en el prompt para que Haiku NO los repita. Garantiza variedad
+    sin necesidad de mantener una lista fija de 50 tips: el modelo conoce el
+    histórico reciente y diversifica.
+
     Lanza Exception si Anthropic falla — el caller debe manejar fallback.
     """
     lang = (lang or "es").lower()
@@ -71,7 +80,14 @@ def generate_daily_tip(lang: str = "es") -> str:
         lang = "es"
 
     system = _SYSTEM_PROMPT_ES if lang == "es" else _SYSTEM_PROMPT_EN
-    user_msg = _USER_PROMPT_ES if lang == "es" else _USER_PROMPT_EN
+    user_msg = _USER_PROMPT_ES_BASE if lang == "es" else _USER_PROMPT_EN_BASE
+
+    # Inyectar histórico reciente en el user message (no en system, para no
+    # romper el prompt cache de Anthropic en system).
+    if recent_tips:
+        preamble = _AVOID_PREAMBLE_ES if lang == "es" else _AVOID_PREAMBLE_EN
+        avoid_block = preamble + "\n".join(f"- {t}" for t in recent_tips[:30])
+        user_msg = user_msg + avoid_block
 
     client = get_anthropic_client()
     settings = get_settings()
@@ -79,7 +95,7 @@ def generate_daily_tip(lang: str = "es") -> str:
     response = client.messages.create(
         model=settings.avatar_model,  # Haiku 4.5
         max_tokens=120,
-        temperature=0.9,  # variedad dia a dia
+        temperature=0.95,  # variedad alta dia a dia
         system=system,
         messages=[{"role": "user", "content": user_msg}],
     )

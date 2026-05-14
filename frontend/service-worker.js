@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v113 (RESPONSIVE TWO-MODE: mobile <768px app full viewport del dispositivo real sin marco mockup; desktop >=768px telefono ficticio centrado (390x844, bezel negro iPhone, notch, status-bar, sombra premium). Body sin padding/flex en mobile, body con flex-center + padding:20px en desktop. CSS scope-locked a .phone .notch .status-bar body via media query min-width:768px. Verificado visualmente con preview MCP en mobile 390x844 (full viewport, top:0, left:0) y iMac 1920x1080 (phone centrado simetrico left:765 right:765 top:118 bottom:118). Cero cambios en otras pantallas / componentes internos.)
+// Dogs Mind Service Worker — v114 (fix #4+#5: ocultar placeholders vacios en headers s-tracking y s-full-analysis. #interv-dog-photo y #full-dog-photo eran divs decorativos con border cyan que nunca se llenaban via JS, quedando como circulos blanco/azul vacios visibles. Cambio: display:none !important scope-locked a #s-tracking y #s-full-analysis. Cero JS tocado. Cero impacto en otras pantallas. Verificado visualmente con preview MCP.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v113';
+const CACHE_NAME = 'dogs-mind-v114';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

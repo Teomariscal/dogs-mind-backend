@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v112 (fix s-profile: boton 'Consultar a Teo' ya no flota tapando el texto 'Sobre Teo'. cv-cta-wrap pasa de position:sticky a relative (sin gradient, con margin-top:24px) - aparece al final del scroll natural. Ademas se oculta el .bottom-nav legacy duplicado dentro de s-profile (el #global-nav ya esta fuera). Scope-locked a #s-profile, cero impacto en otras pantallas. Verificado visualmente con preview MCP local incluyendo scroll bottom.)
+// Dogs Mind Service Worker — v113 (RESPONSIVE TWO-MODE: mobile <768px app full viewport del dispositivo real sin marco mockup; desktop >=768px telefono ficticio centrado (390x844, bezel negro iPhone, notch, status-bar, sombra premium). Body sin padding/flex en mobile, body con flex-center + padding:20px en desktop. CSS scope-locked a .phone .notch .status-bar body via media query min-width:768px. Verificado visualmente con preview MCP en mobile 390x844 (full viewport, top:0, left:0) y iMac 1920x1080 (phone centrado simetrico left:765 right:765 top:118 bottom:118). Cero cambios en otras pantallas / componentes internos.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v112';
+const CACHE_NAME = 'dogs-mind-v113';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

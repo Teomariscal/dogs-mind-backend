@@ -120,9 +120,10 @@
 html{height:100%;background:#d8d0c4;overscroll-behavior:none;}
 body{
   min-height:100vh;background:#d8d0c4;
-  display:flex;align-items:center;justify-content:center;
+  /* Mobile-first: app pegada al viewport, sin padding, sin centrado flex */
+  margin:0;
+  padding:0;
   font-family:var(--ff-sans);
-  padding:20px 0;
   overscroll-behavior:none;
 }
 /* iOS native feel: bloquear menú long-press en imágenes y elementos UI no-texto */
@@ -130,29 +131,61 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 /* Texto seleccionable: análisis, chat, contenido legal — NO bloquear */
 .analysis-content,.chat-message,.legal-text,p,h1,h2,h3,h4{-webkit-user-select:text;user-select:text;}
 
-/* ── PHONE FRAME ── */
+/* ── PHONE FRAME (responsive en dos modos) ──
+   - Mobile (<768px): full viewport del dispositivo real, sin bezel/notch
+     mockup (el OS real tiene los suyos).
+   - Desktop/tablet (>=768px): teléfono ficticio (como mockup visual)
+     centrado en la ventana, restaura el diseno original 390x844 con bezel
+     iPhone, notch, status-bar y sombra. */
 .phone{
-  width:390px;height:844px;
   background:var(--cream);
-  border-radius:50px;
   overflow:hidden;
   position:relative;
-  box-shadow:
-    0 0 0 10px #1a1a1a,
-    0 0 0 12px #2a2a2a,
-    0 30px 80px rgba(0,0,0,0.5),
-    0 10px 30px rgba(0,0,0,0.3);
   display:flex;flex-direction:column;
+  /* Default mobile-first: full viewport */
+  width:100%;
+  height:100vh;
+  height:100dvh;
+  max-width:none;
+  border-radius:0;
+  box-shadow:none;
 }
-.notch{
-  position:absolute;top:0;left:50%;transform:translateX(-50%);
-  width:120px;height:34px;background:#1a1a1a;border-radius:0 0 22px 22px;
-  z-index:100;
-}
-.status-bar{
-  height:32px;display:flex;align-items:flex-end;justify-content:space-between;
-  padding:0 24px 4px;font-size:12px;font-weight:600;color:var(--text2);
-  position:relative;z-index:10;flex-shrink:0;
+/* Notch y status-bar: ocultos en mobile (el OS real ya los provee). */
+.notch{ display:none; }
+.status-bar{ display:none; }
+
+/* Desktop / tablet: mockup teléfono ficticio (como originalmente). */
+@media (min-width: 768px){
+  body{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px 0;
+    background:#d8d0c4;       /* cream legacy para el "escritorio" */
+  }
+  .phone{
+    width:390px;
+    height:844px;
+    max-width:390px;
+    border-radius:50px;
+    box-shadow:
+      0 0 0 10px #1a1a1a,
+      0 0 0 12px #2a2a2a,
+      0 30px 80px rgba(0,0,0,0.5),
+      0 10px 30px rgba(0,0,0,0.3);
+  }
+  .notch{
+    display:block !important;
+    position:absolute;top:0;left:50%;transform:translateX(-50%);
+    width:120px;height:34px;background:#1a1a1a;border-radius:0 0 22px 22px;
+    z-index:100;
+  }
+  .status-bar{
+    display:flex !important;
+    height:32px;align-items:flex-end;justify-content:space-between;
+    padding:0 24px 4px;font-size:12px;font-weight:600;color:var(--text2);
+    position:relative;z-index:10;flex-shrink:0;
+  }
 }
 
 /* ── SCREENS ── */

@@ -10,6 +10,7 @@ from app.api.routes import dogs as dogs_router
 from app.api.routes import cases as cases_router
 from app.api.routes import account as account_router
 from app.api.routes import daily_followup as daily_followup_router
+from app.api.routes import daily_tip as daily_tip_router
 
 # Path to the frontend HTML — override via FRONTEND_HTML env var
 FRONTEND_HTML = os.environ.get(
@@ -219,6 +220,7 @@ app.include_router(dogs_router.router)
 app.include_router(cases_router.router)
 app.include_router(account_router.router)
 app.include_router(daily_followup_router.router)
+app.include_router(daily_tip_router.router)
 
 
 @app.get("/", include_in_schema=False)

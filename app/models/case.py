@@ -289,3 +289,38 @@ Index(
     "ix_theory_questions_lookup",
     TheoryQuestion.diagnosis_type, TheoryQuestion.question_type, TheoryQuestion.lang,
 )
+
+
+class DailyTip(Base):
+    """
+    Caché del "Consejo del día" mostrado en s-home. Indexado por (date, lang).
+
+    Generado por Claude Haiku 4.5 con prompt experto en psicologia del
+    aprendizaje canino. Una sola entrada por (fecha UTC, idioma): todos los
+    usuarios ven el MISMO consejo el mismo dia para esa lang. Coste minimo:
+    2 generaciones/dia (es + en) ≈ $0.0001/dia.
+
+    El usuario NO ve atribucion a "Cecilia"; el frontend solo muestra:
+    "Consejo del día: <tip>"
+    """
+    __tablename__ = "daily_tips"
+
+    id          = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    date        = Column(String(10), nullable=False, index=True)  # YYYY-MM-DD UTC
+    lang        = Column(String(2), nullable=False)               # 'es' | 'en'
+    tip         = Column(Text, nullable=False)
+    created_at  = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+    __table_args__ = (
+        CheckConstraint(
+            "lang IN ('es','en')",
+            name="ck_daily_tips_lang",
+        ),
+    )
+
+
+Index(
+    "ix_daily_tips_lookup",
+    DailyTip.date, DailyTip.lang,
+    unique=True,
+)

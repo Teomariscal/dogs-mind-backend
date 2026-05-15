@@ -87,6 +87,8 @@ Reglas duras:
 
 | Commit | Fecha | Locked |
 |---|---|---|
+| `598fbd7` | 2026-05-15 | **DAILY TIP + Recargar tokens**: nuevo endpoint backend GET /tip/today?lang con cache DB (date, lang) + Haiku 4.5 prompt psicologia del aprendizaje canino + variedad 14 dias (sin repetir tip en ventana). Frontend loadDailyTip() fetch async no-bloqueante con cache localStorage + fallback i18n. Donut tokens en s-home envuelto en button .token-slot con label "Recargar tokens" debajo (i18n ES/EN), click navega a s-tokens (3 packs Stripe). SW v115. **VERIFICADO POR TEO en prod: "esta ok"**. Anclado. |
+| `ad97a83` | 2026-05-13 | Fix #4+#5: ocultar placeholders vacios dog-photo en s-tracking y s-full-analysis. SW v114. **VERIFICADO POR TEO**. Anclado. |
 | `83b069f` | 2026-05-13 | **RESPONSIVE TWO-MODE**: mobile <768px app full viewport del dispositivo real (sin marco mockup); desktop >=768px telefono ficticio centrado (390x844, bezel iPhone, notch, status-bar, sombra premium). body sin padding/flex en mobile, body con flex-center + padding:20px en desktop. SW v113. **VERIFICADO POR TEO en prod: "correcto splash super correcto"**. Anclado. |
 | `65b4f6f` | 2026-05-13 | Fix #7 s-profile: cv-cta-wrap relative + ocultar bottom-nav legacy duplicado. SW v112. **VERIFICADO POR TEO en prod**. Anclado. |
 | `8c63307` | 2026-05-13 | Fix REFORZADO solape menu hamburguesa s-home: topbar position:sticky z-index:100 + menu-btn 44x44 z-index:101 + dropdown z-index:200 + hero margin-top:16px. SW v111. **VERIFICADO POR TEO en prod tras borrar caché**. Anclado. |

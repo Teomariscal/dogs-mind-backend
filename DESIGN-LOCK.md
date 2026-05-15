@@ -87,6 +87,9 @@ Reglas duras:
 
 | Commit | Fecha | Locked |
 |---|---|---|
+| `d38ba42` | 2026-05-16 | Copy s-tokens: 'consume 3 tokens' -> 'consume aproximadamente 3 tokens' (ES) / 'approximately 3 tokens' (EN). Coste real varia segun complejidad. SW v122. **VERIFICADO**. |
+| `84ac5e5` | 2026-05-16 | Footer s-tokens: quitado PayPal enganoso (backend Stripe). Reemplazado por icono SVG tarjeta + 'Pago seguro con tarjeta' / 'Secure card payment'. PayPal Business pendiente integracion (Smart Buttons SDK + dev.paypal.com app). SW v121. **VERIFICADO POR TEO: "mejor quitemos paypal"**. Anclado. |
+| `c66c22c` | 2026-05-16 | s-tokens packs: avatares Aigent en cuadrado redondeado 44x44 reemplazan cuadrados blancos vacios. Pack 5 -> Ale. Pack 20 (preferida) -> Mario. Pack 60 (pro) -> Cecilia. SW v120. **VERIFICADO POR TEO: "el resto OK"**. Anclado. |
 | `5a47f65` | 2026-05-16 | **FIX MOBILE CREAM REFORZADO**: en <768px .phone bg vibrant #0e1f1a + position:fixed inset:0 + width/height 100% con !important + body overflow:hidden. Garantiza que la app SIEMPRE cubre el viewport real del dispositivo, sin gap por URL bar dinamica de iOS Safari (dvh recalc) ni rubber-band scroll. Mi regla mobile-only va antes en cascade que la regla base de .phone, !important imprescindible. Desktop intacto. SW v119. **VERIFICADO POR TEO: "solucionado la banda crema"**. Anclado. |
 | `3c0e37b` | 2026-05-16 | Fix mobile overscroll (intento parcial v118) + eyebrow s-account-type: nueva key i18n 'account_type_eyebrow' = 'Perfil de Usuario' / 'User Profile' tras conflicto con 'at_eyebrow' duplicado que sombreaba a s-abc-translated. SW v118. |
 | `51901e1` | 2026-05-16 | Feat Macho/Hembra anamnesis + fix daily-followup lang con CRITICAL LANGUAGE INSTRUCTION en user_msg coach. SW v117. |

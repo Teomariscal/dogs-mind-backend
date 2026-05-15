@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v120 (s-tokens packs: cuadrados blancos vacios sustituidos por avatares Aigent. Pack 5 tokens -> Ale (starter, accesible). Pack 20 tokens 'ELECCION PREFERIDA' -> Mario (popular, mainstream). Pack 60 tokens profesional -> Cecilia (medica veterinaria etologa premium). Imagen aig-{name}-pixar.webp en cuadrado redondeado 44x44 con object-fit:cover. Sin cambios CSS globales, scope-locked al HTML de cada pack en s-tokens. Cero impacto en otras pantallas.)
+// Dogs Mind Service Worker — v121 (s-tokens footer: quitar PayPal enganoso (footer decia 'Pago seguro con PayPal' pero el backend usa Stripe checkout, mismatch UX). Cambiado a 'Pago seguro con tarjeta' / 'Secure card payment' con icono SVG tarjeta verde sutil. Sin promocionar Stripe brand, sin enganar al usuario. Pre-launch decision: integracion PayPal real (Smart Buttons o PayPal Checkout API) queda fuera de scope hasta verificar cuenta Business + crear app developer.paypal.com.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v120';
+const CACHE_NAME = 'dogs-mind-v121';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

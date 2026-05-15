@@ -87,6 +87,7 @@ Reglas duras:
 
 | Commit | Fecha | Locked |
 |---|---|---|
+| `427113a` | 2026-05-16 | Fix nav atrapado tras descargar PDF: botón verde grande mobile-friendly al final del footer en s-abc-translated ('Volver al análisis' → s-abc) y s-plan-simple ('Volver al plan' → s-tracking). i18n ES + EN. Header sticky con back ← se mantiene. SW v123. **VERIFICADO POR TEO: "ok"**. Anclado. |
 | `d38ba42` | 2026-05-16 | Copy s-tokens: 'consume 3 tokens' -> 'consume aproximadamente 3 tokens' (ES) / 'approximately 3 tokens' (EN). Coste real varia segun complejidad. SW v122. **VERIFICADO**. |
 | `84ac5e5` | 2026-05-16 | Footer s-tokens: quitado PayPal enganoso (backend Stripe). Reemplazado por icono SVG tarjeta + 'Pago seguro con tarjeta' / 'Secure card payment'. PayPal Business pendiente integracion (Smart Buttons SDK + dev.paypal.com app). SW v121. **VERIFICADO POR TEO: "mejor quitemos paypal"**. Anclado. |
 | `c66c22c` | 2026-05-16 | s-tokens packs: avatares Aigent en cuadrado redondeado 44x44 reemplazan cuadrados blancos vacios. Pack 5 -> Ale. Pack 20 (preferida) -> Mario. Pack 60 (pro) -> Cecilia. SW v120. **VERIFICADO POR TEO: "el resto OK"**. Anclado. |

@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v119 (fix REFORZADO mobile cream asomada: el v118 cambiaba bg de html/body pero .phone seguia con background:var(--cream) que asomaba cuando iOS Safari mostraba/ocultaba la URL bar dinamica (dvh cambia + gap). Fix: en <768px .phone bg #0e1f1a + position:fixed inset:0 + width/height 100% con !important (su regla original viene despues en cascade, sin !important perdia). body overflow:hidden bloquea scroll fuera de .phone. Asi .phone siempre cubre el viewport real al 100%, sin gaps ni rubber-band que asome cream.)
+// Dogs Mind Service Worker — v120 (s-tokens packs: cuadrados blancos vacios sustituidos por avatares Aigent. Pack 5 tokens -> Ale (starter, accesible). Pack 20 tokens 'ELECCION PREFERIDA' -> Mario (popular, mainstream). Pack 60 tokens profesional -> Cecilia (medica veterinaria etologa premium). Imagen aig-{name}-pixar.webp en cuadrado redondeado 44x44 con object-fit:cover. Sin cambios CSS globales, scope-locked al HTML de cada pack en s-tokens. Cero impacto en otras pantallas.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v119';
+const CACHE_NAME = 'dogs-mind-v120';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

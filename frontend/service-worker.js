@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v115 (feat Consejo del día dinámico + 'Recargar tokens' label. Backend nuevo endpoint GET /tip/today?lang=es|en con cache (date, lang) y Haiku 4.5 prompt psicologia del aprendizaje canino. Frontend: loadDailyTip() fetch async no bloqueante con cache localStorage por dia/lang + fallback estatico (texto i18n) si red falla. Donut tokens en s-home envuelto en button .token-slot con label 'Recargar tokens' debajo (i18n ES/EN). Cero cambios en otras pantallas. Sin repeticion de tip en ventana de 14 dias (Haiku ve lista evitar).)
+// Dogs Mind Service Worker — v116 (bug fixes 2026-05-15: #1 s-profile contenido cortado en mobile (CV + timeline + CTA invisibles) por overflow:hidden heredado de .screen base -> ahora #s-profile overflow-y:auto !important + -webkit-overflow-scrolling:touch para inertia iOS. #2 backend intervention_ai.py ahora respeta anamnesis.lang (user reporto plan en ES aunque app estaba en EN) -> añade CRITICAL LANGUAGE INSTRUCTION al user_message segun lang (mismo patron clinical_ai.py linea 114). Verificado visual #1 con scroll local. Smoke #2 tras deploy Railway.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v115';
+const CACHE_NAME = 'dogs-mind-v116';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

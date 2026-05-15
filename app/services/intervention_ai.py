@@ -52,8 +52,26 @@ def run_intervention_plan(request: InterventionRequest) -> InterventionResponse:
 
     anamnesis_summary = "\n".join(anamnesis_lines)
 
-    user_message = f"""Based on the following Functional Behavioral Analysis and case details, generate a complete behavioral intervention plan.
+    # Bug fix 2026-05-15: respetar el idioma del usuario. Antes el plan
+    # salia siempre en español aunque el user estuviera en EN. Mismo patron
+    # que clinical_ai.py (linea 114-126).
+    lang = (a.lang or "es").lower()
+    if lang == "en":
+        lang_instruction = (
+            "\nCRITICAL LANGUAGE INSTRUCTION: Write the ENTIRE intervention plan "
+            "in ENGLISH. All section headers, phases, exercises, instructions, "
+            "examples and clinical commentary must be in English. Even though "
+            "the system prompt is in English, the model has a tendency to reply "
+            "in Spanish — explicitly use English throughout.\n"
+        )
+    else:
+        lang_instruction = (
+            "\nCRITICAL LANGUAGE INSTRUCTION: Write the ENTIRE intervention plan "
+            "in SPANISH (español neutro/internacional). All section headers, "
+            "phases, exercises and clinical commentary in Spanish.\n"
+        )
 
+    user_message = f"""Based on the following Functional Behavioral Analysis and case details, generate a complete behavioral intervention plan.{lang_instruction}
 ═══════════════════════════════════════════════════════════════════════════════
 CASE SUMMARY
 ═══════════════════════════════════════════════════════════════════════════════

@@ -2019,6 +2019,11 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
     linear-gradient(180deg, #1a1f17 0%, #0f150d 55%, #0a0e08 100%);
   color: rgba(255,250,240,0.95);
   padding-bottom: 0;
+  /* Bug fix 2026-05-15: el .screen base tiene overflow:hidden lo que
+     recortaba el contenido del s-profile (timeline + especialidades +
+     CTA) en mobile. Habilitar scroll vertical interno. */
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
 }
 #s-profile .bottom-nav {
   background: rgba(10,14,8,0.92);

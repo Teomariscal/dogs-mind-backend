@@ -7956,6 +7956,14 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
         </div>
 
         <div style="margin-bottom:12px;">
+          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_sex">Sexo</div>
+          <div style="display:flex;gap:8px;">
+            <button id="sexo-macho" onclick="anam_toggle('sexo-macho','sexo-hembra')" data-i18n="anam_btn_male" type="button" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Macho</button>
+            <button id="sexo-hembra" onclick="anam_toggle('sexo-hembra','sexo-macho')" data-i18n="anam_btn_female" type="button" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Hembra</button>
+          </div>
+        </div>
+
+        <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_chronic">&iquest;Tiene alguna dolencia cr&oacute;nica?</div>
           <div style="display:flex;gap:8px;">
             <button id="dolencia-no" onclick="anam_toggle('dolencia-no','dolencia-si')" data-i18n="btn_no" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
@@ -12328,6 +12336,11 @@ async function analyzeWithAI() {
   var childrenPresent = isActive('ninios-si');
   var otherDogs       = isActive('convive-si');
 
+  // Sexo del perro (opcional): null si no se eligió
+  var dogSex = null;
+  if (isActive('sexo-macho'))  dogSex = 'male';
+  if (isActive('sexo-hembra')) dogSex = 'female';
+
   // Conditional details
   var chronicDetail  = chronicDisease ? getVal('inp-dolencia-detail', '') : null;
   var otherDogsDet   = otherDogs      ? getVal('inp-convive-detail',  '') : null;
@@ -12396,6 +12409,7 @@ async function analyzeWithAI() {
     var anamnesisPayload = {
         dog_name:          dogName,
         dog_age:           dogAge,
+        dog_sex:           dogSex,
         breed:             breed,
         weaning_age_weeks: weaningWeeks,
         chronic_disease:        chronicDisease,
@@ -13717,6 +13731,9 @@ function endTourIntro() {
       anam_lbl_name:           'Nombre',
       anam_lbl_age:            'Edad',
       anam_lbl_breed:          'Tipología racial',
+      anam_lbl_sex:            'Sexo',
+      anam_btn_male:           'Macho',
+      anam_btn_female:         'Hembra',
       anam_lbl_chronic:        '¿Tiene alguna dolencia crónica?',
       anam_lbl_living:         '¿Vive dentro o fuera de casa?',
       anam_lbl_environment:    '¿Entorno donde vive?',
@@ -14513,6 +14530,9 @@ function endTourIntro() {
       anam_lbl_name:           'Name',
       anam_lbl_age:            'Age',
       anam_lbl_breed:          'Breed',
+      anam_lbl_sex:            'Sex',
+      anam_btn_male:           'Male',
+      anam_btn_female:         'Female',
       anam_lbl_chronic:        'Any chronic condition?',
       anam_lbl_living:         'Lives indoors or outdoors?',
       anam_lbl_environment:    'Type of environment?',

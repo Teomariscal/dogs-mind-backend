@@ -29,8 +29,9 @@ def run_intervention_plan(request: InterventionRequest) -> InterventionResponse:
     a = request.anamnesis
 
     # Build a concise anamnesis summary for the user message
+    _sex = "Male" if a.dog_sex == "male" else ("Female" if a.dog_sex == "female" else "Not provided")
     anamnesis_lines = [
-        f"Dog: {a.dog_name}, {a.breed}, {a.dog_age}",
+        f"Dog: {a.dog_name}, {a.breed}, {a.dog_age}, Sex: {_sex}",
         f"Living: {a.living_environment.value}, {a.household_members} people in household",
     ]
     if a.children_present:

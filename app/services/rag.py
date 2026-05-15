@@ -150,10 +150,20 @@ def build_anamnesis_block(anamnesis: dict) -> str:
     else:
         training_str = _NOT_PROVIDED
 
+    # Sexo del perro: 'male' | 'female' | None
+    sex_raw = a.get("dog_sex")
+    if sex_raw == "male":
+        sex_str = "Male"
+    elif sex_raw == "female":
+        sex_str = "Female"
+    else:
+        sex_str = _NOT_PROVIDED
+
     lines = [
         "<anamnesis>",
         "## Dog profile",
         f"Dog: {a.get('dog_name') or _NOT_PROVIDED}, {a.get('breed') or _NOT_PROVIDED}, {a.get('dog_age') or _NOT_PROVIDED}",
+        f"Sex: {sex_str}",
         f"Weaning age: {weaning_str}",
         f"Chronic disease: {'Yes — ' + (a.get('chronic_disease_detail') or _NOT_PROVIDED) if a.get('chronic_disease') else _bool_label(a.get('chronic_disease'))}",
         "",

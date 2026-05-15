@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v116 (bug fixes 2026-05-15: #1 s-profile contenido cortado en mobile (CV + timeline + CTA invisibles) por overflow:hidden heredado de .screen base -> ahora #s-profile overflow-y:auto !important + -webkit-overflow-scrolling:touch para inertia iOS. #2 backend intervention_ai.py ahora respeta anamnesis.lang (user reporto plan en ES aunque app estaba en EN) -> añade CRITICAL LANGUAGE INSTRUCTION al user_message segun lang (mismo patron clinical_ai.py linea 114). Verificado visual #1 con scroll local. Smoke #2 tras deploy Railway.)
+// Dogs Mind Service Worker — v117 (feat sex + fix daily-followup lang: anamnesis form anade campo Sexo Macho/Hembra (opcional, null si no eligio) tras Tipologia racial - i18n ES/EN, payload backend dog_sex, build_anamnesis_block lo incluye en Dog profile, intervention_ai lo pasa al case summary. Backend daily_followup_ai genera ahora con CRITICAL LANGUAGE INSTRUCTION en user_msg para forzar idioma del usuario (user reporto plan diario en ES aunque app estaba en EN). Mismo patron que clinical_ai e intervention_ai.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v116';
+const CACHE_NAME = 'dogs-mind-v117';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

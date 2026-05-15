@@ -159,21 +159,29 @@ def generate_daily_checkin(
     history_block = _format_history(history, lang_norm)
     if lang_norm == "en":
         user_msg = (
+            f"CRITICAL LANGUAGE INSTRUCTION: All your output (exercise titles, "
+            f"descriptions, instructions, theory question, options and "
+            f"explanation) MUST be in ENGLISH. The intervention plan below may "
+            f"be in Spanish — translate the concepts but output everything in "
+            f"English.\n\n"
             f"Dog's name: {dog_name}\n"
             f"Diagnosis type: {diagnosis_type}\n"
             f"Today is day {day_index} of the follow-up.\n\n"
             f"INTERVENTION PLAN:\n\n{plan_text.strip()}\n\n"
             f"PREVIOUS DAYS HISTORY:\n\n{history_block}\n\n"
-            f"Generate today's check-in (day {day_index}) as JSON."
+            f"Generate today's check-in (day {day_index}) as JSON, ALL FIELDS IN ENGLISH."
         )
     else:
         user_msg = (
+            f"INSTRUCCIÓN DE IDIOMA CRÍTICA: Toda tu salida (títulos, "
+            f"descripciones, instrucciones, pregunta teórica, opciones y "
+            f"explicación) DEBE estar en ESPAÑOL.\n\n"
             f"Nombre del perro: {dog_name}\n"
             f"Tipo de diagnóstico: {diagnosis_type}\n"
             f"Hoy es el día {day_index} del seguimiento.\n\n"
             f"PLAN DE INTERVENCIÓN:\n\n{plan_text.strip()}\n\n"
             f"HISTÓRICO DE DÍAS ANTERIORES:\n\n{history_block}\n\n"
-            f"Genera el check-in de hoy (día {day_index}) en JSON."
+            f"Genera el check-in de hoy (día {day_index}) en JSON, TODO EN ESPAÑOL."
         )
 
     response = client.messages.create(

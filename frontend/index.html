@@ -126,6 +126,19 @@ body{
   font-family:var(--ff-sans);
   overscroll-behavior:none;
 }
+/* Mobile (<768px): body bg coherente con la app (vibrant emerald deep)
+   para que si el rubber-band scroll de iOS Safari escapa el contenedor
+   .phone, no se vea la franja cream del mockup desktop legacy.
+   Además contain-the-scroll en .phone evita bounce que asome el body. */
+@media (max-width: 767px){
+  html, body{
+    background:#0e1f1a !important;
+    overscroll-behavior:none;
+  }
+  .phone{
+    overscroll-behavior:contain;
+  }
+}
 /* iOS native feel: bloquear menú long-press en imágenes y elementos UI no-texto */
 img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
 /* Texto seleccionable: análisis, chat, contenido legal — NO bloquear */
@@ -9086,7 +9099,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
     <button class="at-back" onclick="goTo('s-splash')" aria-label="Volver">&#8592;</button>
 
     <section class="at-hero">
-      <p class="at-eyebrow" data-i18n="at_eyebrow">Regístrate como</p>
+      <p class="at-eyebrow" data-i18n="account_type_eyebrow">Perfil de Usuario</p>
       <h1 class="at-headline" data-i18n="at_headline">¿Cuál es tu perfil?</h1>
       <p class="at-tagline" data-i18n="at_tagline">Elige el tipo de cuenta que se ajusta a ti. Podrás cambiarla más adelante.</p>
     </section>
@@ -13972,7 +13985,7 @@ function endTourIntro() {
       take_tour:              'Ver el tour',
       splash_pro_area:        'Área profesional',
       // Account type select (s-account-type)
-      at_eyebrow:             'Regístrate como',
+      account_type_eyebrow:   'Perfil de Usuario',
       at_headline:            '¿Cuál es tu perfil?',
       at_tagline:             'Elige el tipo de cuenta que se ajusta a ti. Podrás cambiarla más adelante.',
       at_tag_particular:      'Pet Owner',
@@ -14776,7 +14789,7 @@ function endTourIntro() {
       take_tour:              'Take a Tour',
       splash_pro_area:        'Professional area',
       // Account type select (s-account-type)
-      at_eyebrow:             'Sign up as',
+      account_type_eyebrow:   'User Profile',
       at_headline:            "What's your profile?",
       at_tagline:             "Choose the account type that fits you. You can change it later.",
       at_tag_particular:      'Pet Owner',

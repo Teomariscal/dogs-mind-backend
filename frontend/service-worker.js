@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v117 (feat sex + fix daily-followup lang: anamnesis form anade campo Sexo Macho/Hembra (opcional, null si no eligio) tras Tipologia racial - i18n ES/EN, payload backend dog_sex, build_anamnesis_block lo incluye en Dog profile, intervention_ai lo pasa al case summary. Backend daily_followup_ai genera ahora con CRITICAL LANGUAGE INSTRUCTION en user_msg para forzar idioma del usuario (user reporto plan diario en ES aunque app estaba en EN). Mismo patron que clinical_ai e intervention_ai.)
+// Dogs Mind Service Worker — v118 (fix mobile overscroll + eyebrow account-type: en <768px html/body bg pasa de cream legacy #d8d0c4 a vibrant emerald #0e1f1a + .phone overscroll-behavior:contain, asi al rubber-band scroll de iOS Safari no asoma franja cream debajo del splash ni de s-account-type. Fix i18n conflict: 'at_eyebrow' tenia dos definiciones duplicadas (s-account-type 'Registrate como' + s-abc-translated 'Cecilia te explica' donde la 2a sombreaba la 1a) -> nueva key 'account_type_eyebrow' = 'Perfil de Usuario' / 'User Profile' exclusiva del s-account-type.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v117';
+const CACHE_NAME = 'dogs-mind-v118';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

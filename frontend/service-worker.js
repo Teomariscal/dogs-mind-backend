@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v121 (s-tokens footer: quitar PayPal enganoso (footer decia 'Pago seguro con PayPal' pero el backend usa Stripe checkout, mismatch UX). Cambiado a 'Pago seguro con tarjeta' / 'Secure card payment' con icono SVG tarjeta verde sutil. Sin promocionar Stripe brand, sin enganar al usuario. Pre-launch decision: integracion PayPal real (Smart Buttons o PayPal Checkout API) queda fuera de scope hasta verificar cuenta Business + crear app developer.paypal.com.)
+// Dogs Mind Service Worker — v122 (s-tokens copy: 'Cada análisis completo consume 3 tokens' -> 'consume aproximadamente 3 tokens' (ES) y 'uses approximately 3 tokens' (EN). Honesto: algunos analisis pueden consumir mas/menos segun complejidad real (video, longitud, RAG hits). Evita expectativa rigida del usuario.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v121';
+const CACHE_NAME = 'dogs-mind-v122';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

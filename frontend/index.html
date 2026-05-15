@@ -126,17 +126,31 @@ body{
   font-family:var(--ff-sans);
   overscroll-behavior:none;
 }
-/* Mobile (<768px): body bg coherente con la app (vibrant emerald deep)
-   para que si el rubber-band scroll de iOS Safari escapa el contenedor
-   .phone, no se vea la franja cream del mockup desktop legacy.
-   Además contain-the-scroll en .phone evita bounce que asome el body. */
+/* Mobile (<768px): TODO el chain (html, body, .phone) bg vibrant emerald
+   deep para que ningun rubber-band scroll ni cambio de URL bar de iOS
+   Safari (dvh dinamico) muestre la franja cream legacy del mockup
+   desktop. Cada .screen tiene su propio bg que cubre el .phone en uso
+   normal; el bg vibrant del .phone solo se ve cuando hay gap, y al ser
+   coherente no rompe la identidad de la app. */
 @media (max-width: 767px){
   html, body{
     background:#0e1f1a !important;
     overscroll-behavior:none;
+    /* Bloquear scroll del body — el scroll vive dentro de cada .screen */
+    overflow:hidden;
+    height:100%;
   }
   .phone{
+    background:#0e1f1a !important;
     overscroll-behavior:contain;
+    /* position:fixed garantiza que .phone SIEMPRE cubra todo el viewport
+       real del dispositivo, sin gaps por la URL bar dinamica de iOS Safari
+       que oculta/muestra con scroll y rompe los calculos de dvh. */
+    position:fixed !important;
+    inset:0 !important;
+    width:100% !important;
+    height:100% !important;
+    max-width:none !important;
   }
 }
 /* iOS native feel: bloquear menú long-press en imágenes y elementos UI no-texto */

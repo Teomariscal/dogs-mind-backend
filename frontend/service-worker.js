@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v118 (fix mobile overscroll + eyebrow account-type: en <768px html/body bg pasa de cream legacy #d8d0c4 a vibrant emerald #0e1f1a + .phone overscroll-behavior:contain, asi al rubber-band scroll de iOS Safari no asoma franja cream debajo del splash ni de s-account-type. Fix i18n conflict: 'at_eyebrow' tenia dos definiciones duplicadas (s-account-type 'Registrate como' + s-abc-translated 'Cecilia te explica' donde la 2a sombreaba la 1a) -> nueva key 'account_type_eyebrow' = 'Perfil de Usuario' / 'User Profile' exclusiva del s-account-type.)
+// Dogs Mind Service Worker — v119 (fix REFORZADO mobile cream asomada: el v118 cambiaba bg de html/body pero .phone seguia con background:var(--cream) que asomaba cuando iOS Safari mostraba/ocultaba la URL bar dinamica (dvh cambia + gap). Fix: en <768px .phone bg #0e1f1a + position:fixed inset:0 + width/height 100% con !important (su regla original viene despues en cascade, sin !important perdia). body overflow:hidden bloquea scroll fuera de .phone. Asi .phone siempre cubre el viewport real al 100%, sin gaps ni rubber-band que asome cream.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v118';
+const CACHE_NAME = 'dogs-mind-v119';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

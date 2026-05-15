@@ -7410,6 +7410,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
       <button class="cm-btn-secondary cm-btn-block" onclick="ppPrint()" data-i18n="pp_btn_print">Imprimir</button>
       <button class="cm-btn-secondary cm-btn-block" onclick="ppShare()" data-i18n="pp_btn_share">Compartir</button>
       <button class="cm-btn-secondary cm-btn-block" onclick="ppRegenerate()" data-i18n="pp_btn_regen">Regenerar (−0,1 tok.)</button>
+      <button class="cm-btn-primary cm-btn-block" style="margin-top:18px;background:var(--green);color:#fff;font-weight:700;padding:16px;font-size:15px;" onclick="goTo('s-tracking')" data-i18n="pp_btn_back_to_plan">&#8592; Volver al plan</button>
     </div>
   </div><!-- /s-plan-simple -->
 
@@ -7470,6 +7471,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
       <button class="cm-btn-secondary cm-btn-block" onclick="atPrint()" data-i18n="at_btn_print">Imprimir</button>
       <button class="cm-btn-secondary cm-btn-block" onclick="atShare()" data-i18n="at_btn_share">Compartir</button>
       <button class="cm-btn-secondary cm-btn-block" onclick="atRegenerate()" data-i18n="at_btn_regen">Regenerar (−0,1 tok.)</button>
+      <button class="cm-btn-primary cm-btn-block" style="margin-top:18px;background:var(--green);color:#fff;font-weight:700;padding:16px;font-size:15px;" onclick="goTo('s-abc')" data-i18n="at_btn_back_to_analysis">&#8592; Volver al análisis</button>
     </div>
   </div><!-- /s-abc-translated -->
 
@@ -14367,6 +14369,7 @@ function endTourIntro() {
       pp_btn_print:         'Imprimir',
       pp_btn_share:         'Compartir',
       pp_btn_regen:         'Regenerar (−0,1 tok.)',
+      pp_btn_back_to_plan:  '← Volver al plan',
       pp_err_no_plan:       'Genera primero un plan de intervención.',
       pp_err_no_balance:    'Saldo insuficiente. Recarga al menos 0,1 tokens.',
       pp_err_rate:          'Has alcanzado el máximo de generaciones por hora. Espera un momento.',
@@ -14388,6 +14391,7 @@ function endTourIntro() {
       at_btn_print:         'Imprimir',
       at_btn_share:         'Compartir',
       at_btn_regen:         'Regenerar (−0,1 tok.)',
+      at_btn_back_to_analysis: '← Volver al análisis',
       at_err_no_abc:        'Genera primero el análisis funcional ABC.',
       at_err_no_balance:    'Saldo insuficiente. Recarga al menos 0,1 tokens.',
       at_err_rate:          'Has alcanzado el máximo de generaciones por hora. Espera un momento.',
@@ -15171,6 +15175,7 @@ function endTourIntro() {
       pp_btn_print:         'Print',
       pp_btn_share:         'Share',
       pp_btn_regen:         'Regenerate (−0.1 tok.)',
+      pp_btn_back_to_plan:  '← Back to plan',
       pp_err_no_plan:       'Generate an intervention plan first.',
       pp_err_no_balance:    'Insufficient balance. Top up at least 0.1 tokens.',
       pp_err_rate:          'You’ve reached the maximum generations per hour. Wait a moment.',
@@ -15192,6 +15197,7 @@ function endTourIntro() {
       at_btn_print:         'Print',
       at_btn_share:         'Share',
       at_btn_regen:         'Regenerate (−0.1 tok.)',
+      at_btn_back_to_analysis: '← Back to analysis',
       at_err_no_abc:        'Generate the ABC functional analysis first.',
       at_err_no_balance:    'Insufficient balance. Top up at least 0.1 tokens.',
       at_err_rate:          'You’ve reached the maximum generations per hour. Wait a moment.',

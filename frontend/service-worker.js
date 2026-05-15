@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v122 (s-tokens copy: 'Cada análisis completo consume 3 tokens' -> 'consume aproximadamente 3 tokens' (ES) y 'uses approximately 3 tokens' (EN). Honesto: algunos analisis pueden consumir mas/menos segun complejidad real (video, longitud, RAG hits). Evita expectativa rigida del usuario.)
+// Dogs Mind Service Worker — v123 (fix nav atrapado tras descargar PDF: anadidos CTAs primary grandes mobile-friendly al final del bloque de acciones. s-abc-translated: 'Volver al análisis' (goTo s-abc). s-plan-simple: 'Volver al plan' (goTo s-tracking). i18n ES + EN. Antes tras pulsar Regenerar/Descargar PDF el usuario no veia forma de salir de la pantalla pet-owners y el atras del navegador rompia el caso.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v122';
+const CACHE_NAME = 'dogs-mind-v123';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

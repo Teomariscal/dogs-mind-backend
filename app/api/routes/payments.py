@@ -180,9 +180,51 @@ class ProCourtesyRequest(BaseModel):
     invite_code: str
 
 
+# ── Rate limit anti brute-force del invite_code ──────────────────────────────
+# Tracking in-memory de intentos fallidos (HTTP 403) por IP. Se limpia al
+# reiniciar Railway (aceptable: atacante no puede forzar restart). Para deploys
+# multi-instancia habría que usar Redis. Hoy 1 worker → suficiente.
+#
+# Política: 5 fallos por hora por IP. Tras superar, bloqueo con 429 hasta que
+# expire la entrada más antigua (sliding window).
+from collections import defaultdict as _defaultdict
+from datetime import datetime as _dt, timedelta as _td
+
+_COURTESY_FAILS: dict = _defaultdict(list)  # ip → list[datetime de fallos]
+COURTESY_MAX_FAILS_PER_HOUR = 5
+
+
+def _client_ip(request: Request) -> str:
+    """IP del cliente, respetando X-Forwarded-For del proxy Railway."""
+    xff = request.headers.get("x-forwarded-for", "")
+    if xff:
+        return xff.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
+def _courtesy_is_blocked(ip: str) -> tuple[bool, int]:
+    """Devuelve (bloqueado, retry_after_segundos). Limpia entradas expiradas."""
+    now = _dt.utcnow()
+    cutoff = now - _td(hours=1)
+    fails = [t for t in _COURTESY_FAILS.get(ip, []) if t > cutoff]
+    _COURTESY_FAILS[ip] = fails
+    if len(fails) >= COURTESY_MAX_FAILS_PER_HOUR:
+        # Bloqueado hasta que expire la entrada más antigua
+        oldest = fails[0]
+        retry = int((oldest + _td(hours=1) - now).total_seconds())
+        return True, max(retry, 60)
+    return False, 0
+
+
+def _courtesy_record_fail(ip: str) -> None:
+    """Registra un intento fallido para el sliding window."""
+    _COURTESY_FAILS[ip].append(_dt.utcnow())
+
+
 @router.post("/payments/pro-activate-courtesy")
 def pro_activate_courtesy(
     req: ProCourtesyRequest,
+    request: Request,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -191,27 +233,55 @@ def pro_activate_courtesy(
     invite_code coincida con la env var PRO_INVITE_CODE.
 
     Flujo:
-      1. Validar que PRO_INVITE_CODE está configurado en el backend.
-      2. Validar que el código enviado coincide (case-sensitive, trim espacios).
-      3. Rechazar si la cuenta ya es Profesional (idempotente).
-      4. Activar account_type='professional' y sumar PRO_MEMBERSHIP_TOKENS
+      1. Rate limit check (max 5 fallos/h por IP, anti brute-force).
+      2. Validar que PRO_INVITE_CODE está configurado en el backend.
+      3. Validar que el código enviado coincide (case-sensitive, trim espacios).
+         Si NO coincide → registra fallo + 403.
+      4. Rechazar si la cuenta ya es Profesional (idempotente, NO cuenta como fallo).
+      5. Activar account_type='professional' y sumar PRO_MEMBERSHIP_TOKENS
          (10) tokens cortesía.
-      5. Membresía permanente: NO se programa caducidad. Si gastan los tokens,
+      6. Membresía permanente: NO se programa caducidad. Si gastan los tokens,
          pueden comprar packs como cualquier Pro pagador.
 
     Diseñado para 3B del producto: solo email+password al activarse, los datos
     de empresa (CIF, logo, ciudad…) se completan después desde el área Pro.
+
+    Rate-limit (2026-05-16, anti brute-force):
+      - 5 intentos fallidos (HTTP 403) por IP por hora → bloqueo 429
+      - Solo cuentan fallos de credencial (403), no errores de servidor (503)
+      - Intentos exitosos (200) no cuentan ni resetean el contador
+      - Tracking en memoria del proceso (no Redis), se resetea al restart
     """
+    ip = _client_ip(request)
+
+    # 1. Rate limit (antes de cualquier procesamiento)
+    blocked, retry_after = _courtesy_is_blocked(ip)
+    if blocked:
+        print(f"[Pro-Courtesy] RATE-LIMITED IP={ip} retry_after={retry_after}s")
+        raise HTTPException(
+            status_code=429,
+            detail=f"Demasiados intentos fallidos. Espera {(retry_after // 60) + 1} minutos antes de volver a intentar.",
+            headers={"Retry-After": str(retry_after)},
+        )
+
+    # 2. Servicio configurado
     if not PRO_INVITE_CODE:
         raise HTTPException(
             status_code=503,
             detail="Activación cortesía no disponible: PRO_INVITE_CODE no configurado en el servidor.",
         )
+
+    # 3. Validar código
     if req.invite_code.strip() != PRO_INVITE_CODE:
+        _courtesy_record_fail(ip)
+        fail_count = len(_COURTESY_FAILS[ip])
+        print(f"[Pro-Courtesy] INVALID CODE IP={ip} fails_in_window={fail_count}")
         raise HTTPException(
             status_code=403,
             detail="Código de invitación profesional inválido.",
         )
+
+    # 4. Idempotencia (no cuenta como fallo: el usuario ya está bien, no es ataque)
     if current_user.account_type == "professional":
         raise HTTPException(
             status_code=400,

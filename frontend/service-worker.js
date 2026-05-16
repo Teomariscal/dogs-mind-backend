@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v135 (Programa de delegaciones por país, decisión Teo 2026-05-16 con respuestas A1/B1/C1/D2: cada delegación (Bocalán México, Bocalán Argentina, etc.) tiene un código único legible tipo BOCALAN-MX que sus equipos comparten con clientes finales; al registrarse vía ?invite=BOCALAN-MX el usuario queda atribuido permanentemente a la delegación vía users.delegation_id FK inmutable + recibe 5+3=8 tokens de bienvenida + role 'user' normal. Backend: nueva tabla delegations (code, name, country, welcome_bonus_tokens DEFAULT 3, commission_pct_web DEFAULT 10, commission_pct_ios DEFAULT 5, active), nueva columna nullable users.delegation_id, nuevos endpoints admin GET/POST/PATCH /admin/delegations + GET /admin/delegations/report con agregados por delegación (users_count, paying_users_count, total_revenue_eur, commission_due_eur) para calcular comisiones a delegaciones sin exponer datos individuales. Resolución de invite_code en /auth/register: 1) check tabla delegations 2) check AMBASSADOR_CODE env 3) sin match → role user normal. Frontend: AuthResponse incluye delegation_name opcional, toast post-registro dinámico que usa tokens reales y nombre de delegación cuando aplica ('Bienvenido por cortesía de Bocalán México! Tienes 8 tokens'). Backwards-compat 100% — usuarios pre-feature mantienen delegation_id=NULL. DESPLEGADO STAGING beta.thedogsmind.net, PROD aún no.)
+// Dogs Mind Service Worker — v136 (mejora visual campo invite prerrellenado: el estilo sutil anterior (bg 6% verde + borde 35% verde) se confundía con un input vacío. Ahora: cuando el IIFE INVITE LINK AUTO-FILL prellena #reg-invite o #ps-invite, aplica estilo inequívoco solid sage green (bg #dbe7d2 + border 2px #4a6741 + color #1a3320 + font-weight 700 + letter-spacing 0.3px + readonly attribute para bloquear edición). Adicionalmente inserta un badge encima del input con SVG checkmark + texto "CÓDIGO APLICADO: BOCALAN-XX" (verde sólido bg #4a6741 + texto blanco-cream). Mismo patrón ES y EN. Verificado preview iPhone 14 con BOCALAN-CL: visualmente claro y profesional. Solo afecta a inputs prerrellenados, no a campos manuales.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v135';
+const CACHE_NAME = 'dogs-mind-v136';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

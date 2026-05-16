@@ -9254,9 +9254,30 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
         var el = document.getElementById(id);
         if (el && !el.value) {
           el.value = stored;
+          // Estilo "aplicado" inequívoco: verde sage sólido con borde fuerte
+          // + texto bold verde oscuro. Reemplaza el estilo sutil anterior
+          // que se confundía con un input vacío.
           try {
-            el.style.background = 'rgba(74,103,65,0.06)';
-            el.style.borderColor = 'rgba(74,103,65,0.35)';
+            el.style.setProperty('background', '#dbe7d2', 'important');
+            el.style.setProperty('border', '2px solid #4a6741', 'important');
+            el.style.setProperty('color', '#1a3320', 'important');
+            el.style.setProperty('font-weight', '700', 'important');
+            el.style.setProperty('letter-spacing', '0.3px', 'important');
+            el.setAttribute('readonly', 'readonly');  // bloqueo edición — vino del link
+          } catch(e) {}
+          // Insertar badge "Código aplicado" encima si aún no existe.
+          try {
+            var badgeId = '_applied_badge_' + id;
+            if (!document.getElementById(badgeId)) {
+              var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+              var label = (lang === 'en') ? 'Code applied' : 'Código aplicado';
+              var badge = document.createElement('div');
+              badge.id = badgeId;
+              badge.style.cssText = 'display:flex;align-items:center;gap:6px;background:#4a6741;color:#fffaf0;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;width:fit-content;margin-bottom:6px;';
+              badge.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg><span>' + label + ': ' + stored + '</span>';
+              // Insertar inmediatamente ANTES del input
+              el.parentNode.insertBefore(badge, el);
+            }
           } catch(e) {}
         }
       });

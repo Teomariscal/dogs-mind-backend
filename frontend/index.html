@@ -151,6 +151,11 @@ body{
     width:100% !important;
     height:100% !important;
     max-width:none !important;
+    /* Padding-bottom dinámico para que cuando aparezca el teclado iOS
+       (visualViewport API) la chat-bar / inputs no queden debajo del
+       teclado. JS al final del file actualiza --kbd-h en :root. */
+    padding-bottom: var(--kbd-h, 0px);
+    transition: padding-bottom 180ms ease-out;
   }
 }
 /* iOS native feel: bloquear menú long-press en imágenes y elementos UI no-texto */
@@ -9172,6 +9177,30 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   if (splash) splash.classList.add('active');
   var nav = document.getElementById('global-nav');
   if (nav) nav.style.display = 'none';
+})();
+
+// ── KEYBOARD-AWARE LAYOUT (mobile iOS Safari) ─────────────────────────────
+// Cuando aparece el teclado del sistema, el visual viewport se reduce pero el
+// layout viewport (window.innerHeight) no cambia. Sin esto, la chat-bar y los
+// inputs del fondo de cada pantalla quedan ocultos detrás del teclado.
+// Solución: detectar visualViewport y ajustar --kbd-h en :root, que el CSS
+// usa como padding-bottom dinámico del .phone (solo en mobile <768px).
+// Autocontenido, fallback silencioso si visualViewport no existe.
+(function() {
+  if (typeof window === 'undefined' || !window.visualViewport) return;
+  var vv = window.visualViewport;
+  function updateKbdHeight() {
+    try {
+      // Diferencia entre layout viewport y visual viewport = altura teclado.
+      // En iOS Safari aparece > 0 cuando teclado activo.
+      var diff = window.innerHeight - vv.height;
+      var kbd = Math.max(0, Math.round(diff));
+      document.documentElement.style.setProperty('--kbd-h', kbd + 'px');
+    } catch(e) {}
+  }
+  vv.addEventListener('resize', updateKbdHeight);
+  vv.addEventListener('scroll', updateKbdHeight);
+  updateKbdHeight();
 })();
 
 // ── STATE ──────────────────────────────────────

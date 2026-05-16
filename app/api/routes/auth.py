@@ -12,6 +12,7 @@ from pydantic import BaseModel, EmailStr
 
 from app.database import get_db
 from app.models.user import User
+from app.models.delegation import Delegation
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -45,6 +46,10 @@ class AuthResponse(BaseModel):
     tokens: float
     role: str = "user"
     account_type: str = "particular"
+    # Si el registro vino con código de delegación, devolvemos el nombre para
+    # que el frontend pueda pintar un toast personalizado ("Bienvenido por
+    # cortesía de Bocalán México"). NULL si no hay atribución.
+    delegation_name: Optional[str] = None
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -99,16 +104,44 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
     if len(req.password) < 6:
         raise HTTPException(status_code=400, detail="La contraseña debe tener al menos 6 caracteres")
 
-    # Check ambassador code
-    is_ambassador = AMBASSADOR_CODE and req.invite_code.strip() == AMBASSADOR_CODE
-    role   = "ambassador" if is_ambassador else "user"
-    tokens = AMBASSADOR_TOKENS if is_ambassador else DEFAULT_TOKENS
+    # ── Resolución de invite_code ────────────────────────────────────────────
+    # Orden de prioridad (más específico primero):
+    #   1. ¿Coincide con una Delegation activa? → role=user, tokens=5+bonus, atribuido
+    #   2. ¿Coincide con AMBASSADOR_CODE env? → role=ambassador, tokens=AMBASSADOR_TOKENS
+    #   3. Sin match → role=user, tokens=DEFAULT_TOKENS
+    #
+    # case-sensitive a propósito para evitar colisiones accidentales.
+    # Trim de espacios por defensa contra paste con whitespace.
+    invite_clean = (req.invite_code or "").strip()
+    delegation_obj: Optional[Delegation] = None
+    role = "user"
+    tokens = DEFAULT_TOKENS
+
+    if invite_clean:
+        # Resolución 1: delegation
+        delegation_obj = db.query(Delegation).filter(
+            Delegation.code == invite_clean,
+            Delegation.active == True,
+        ).first()
+        if delegation_obj:
+            tokens = DEFAULT_TOKENS + int(delegation_obj.welcome_bonus_tokens or 0)
+            # role queda 'user' — la delegación NO confiere role especial
+        # Resolución 2: ambassador (solo si no fue delegation)
+        elif AMBASSADOR_CODE and invite_clean == AMBASSADOR_CODE:
+            role = "ambassador"
+            tokens = AMBASSADOR_TOKENS
 
     # Sanitize phone: trim + None si vacío
     phone_clean = (req.phone or "").strip() or None
 
-    user = User(email=email_norm, password_hash=hash_password(req.password),
-                phone=phone_clean, tokens=tokens, role=role)
+    user = User(
+        email=email_norm,
+        password_hash=hash_password(req.password),
+        phone=phone_clean,
+        tokens=tokens,
+        role=role,
+        delegation_id=(delegation_obj.id if delegation_obj else None),
+    )
     db.add(user)
     db.commit()
     db.refresh(user)
@@ -120,6 +153,7 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
         tokens=float(user.tokens),
         role=user.role,
         account_type=user.account_type,
+        delegation_name=(delegation_obj.name if delegation_obj else None),
     )
 
 

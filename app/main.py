@@ -11,6 +11,7 @@ from app.api.routes import cases as cases_router
 from app.api.routes import account as account_router
 from app.api.routes import daily_followup as daily_followup_router
 from app.api.routes import daily_tip as daily_tip_router
+from app.api.routes import delegations as delegations_router
 
 # Path to the frontend HTML — override via FRONTEND_HTML env var
 FRONTEND_HTML = os.environ.get(
@@ -124,6 +125,15 @@ async def lifespan(app: FastAPI):
             # fallback de query-param `?lang=` (cero regresión). Casos creados
             # tras esta migración llevan el lang de UI al crear el caso.
             "ALTER TABLE cases ADD COLUMN IF NOT EXISTS lang VARCHAR(2)",
+            # ── Programa de delegaciones (afiliación por país, 2026-05-16) ──
+            # init_db() crea la tabla `delegations` via Base.metadata.create_all().
+            # Aquí garantizamos índices y FK desde users si la tabla ya existía.
+            # User.delegation_id es FK nullable: usuarios pre-feature quedan NULL,
+            # solo los nuevos que se registren con código válido reciben FK.
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS delegation_id UUID",
+            "CREATE INDEX IF NOT EXISTS ix_users_delegation_id ON users(delegation_id)",
+            "CREATE INDEX IF NOT EXISTS ix_delegations_code ON delegations(code)",
+            "CREATE INDEX IF NOT EXISTS ix_delegations_active ON delegations(active)",
             # Tabla theory_questions — caché por diagnosis_type + question_type + lang.
             # init_db() crea la tabla via Base.metadata.create_all(); aquí garantizamos
             # los índices y constraints adicionales.
@@ -226,6 +236,7 @@ app.include_router(cases_router.router)
 app.include_router(account_router.router)
 app.include_router(daily_followup_router.router)
 app.include_router(daily_tip_router.router)
+app.include_router(delegations_router.router)
 
 
 @app.get("/", include_in_schema=False)

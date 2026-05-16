@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime, Numeric, Integer, Boolean, Text
+from sqlalchemy import Column, String, DateTime, Numeric, Integer, Boolean, Text, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from app.database import Base
 
@@ -39,3 +39,10 @@ class User(Base):
     company_collaborate_interest = Column(Boolean, nullable=True)      # ¿quiere colaborar con TDM?
     # Logo de empresa inline base64 (mismo enfoque que Dog.photo_base64). Nullable.
     company_logo_base64          = Column(Text, nullable=True)
+
+    # ── Programa de delegaciones (afiliación por país, 2026-05-16) ──────────
+    # FK opcional a Delegation. Se fija al registrarse cuando el invite_code
+    # coincide con el code de una delegación activa. Una vez fijada NO debe
+    # cambiar (atribución inmutable para coherencia de reporting de comisiones).
+    # NULL = usuario no atribuido a ninguna delegación.
+    delegation_id                = Column(UUID(as_uuid=True), ForeignKey("delegations.id"), nullable=True, index=True)

@@ -9523,12 +9523,22 @@ function registerUser() {
     }
 
     var role = res.data.role || 'user';
+    var tokensGranted = res.data.tokens || 5;
+    var delegationName = res.data.delegation_name || null;
+    var langTk = (window.getCurrentLang ? window.getCurrentLang() : 'es');
     if (role === 'ambassador') {
-      var langTk = (window.getCurrentLang ? window.getCurrentLang() : 'es');
-      showToast(langTk === 'en' ? 'Welcome ambassador! You have 8 tokens' : '¡Bienvenido embajador! Tienes 8 tokens');
+      showToast(langTk === 'en' ? 'Welcome ambassador! You have ' + tokensGranted + ' tokens' : '¡Bienvenido embajador! Tienes ' + tokensGranted + ' tokens');
     }
-    else if (role === 'tech') showToast('¡Bienvenido Dogs Mind Tech! Tienes 50 tokens');
-    else showToast('¡Bienvenido! Tienes 5 tokens listos');
+    else if (role === 'tech') showToast(langTk === 'en' ? 'Welcome Dogs Mind Tech! You have ' + tokensGranted + ' tokens' : '¡Bienvenido Dogs Mind Tech! Tienes ' + tokensGranted + ' tokens');
+    else if (delegationName) {
+      // Usuario atribuido a una delegación: mensaje personalizado.
+      showToast(langTk === 'en'
+        ? 'Welcome courtesy of ' + delegationName + '! You have ' + tokensGranted + ' tokens'
+        : '¡Bienvenido por cortesía de ' + delegationName + '! Tienes ' + tokensGranted + ' tokens');
+    }
+    else {
+      showToast(langTk === 'en' ? 'Welcome! You have ' + tokensGranted + ' tokens' : '¡Bienvenido! Tienes ' + tokensGranted + ' tokens listos');
+    }
     // Si veníamos del flujo "Activar Profesional" sin sesión, reanudamos
     // automáticamente (registro → datos empresa → checkout). Si no, home.
     if (window._pendingActivatePro && typeof _consumePendingActivatePro === 'function') {

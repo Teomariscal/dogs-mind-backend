@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v128 (fix chat Aigents mobile: el teclado iOS Safari tapaba el boton enviar de la chat-bar (y los inputs del fondo de otras pantallas). Causa: .phone position:fixed inset:0 cubre el viewport fisico, pero el teclado reduce solo el visual viewport - sin ajustar nada la chat-bar quedaba debajo. Fix: visualViewport API listener en IIFE autocontenida calcula la altura del teclado (innerHeight - vv.height) y la pone en CSS var --kbd-h. .phone en mobile <768px usa padding-bottom: var(--kbd-h, 0). Transition 180ms suave. Fallback silencioso si visualViewport no existe.)
+// Dogs Mind Service Worker — v129 (fix chat Aigents send button tapado: el #global-nav (Home/Aigents/Progress/Teo/Sign up) se renderizaba en s-chat tapando la chat-bar y ocultando el boton ↑ enviar. s-chat anadido a noNav array en goTo() para que #global-nav se oculte durante el chat 1-on-1 con un Aigent. El chat ya tiene su back button propio (chatBack) en el header. Cero impacto en otras pantallas.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v128';
+const CACHE_NAME = 'dogs-mind-v129';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

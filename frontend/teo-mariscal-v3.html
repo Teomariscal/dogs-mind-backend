@@ -9306,7 +9306,7 @@ function goTo(id) {
   // Global nav show/hide.
   // - Pantallas que NUNCA muestran nav (incluso logueado): splash, login, refine, tour, account-type select, área pro hero (es full-screen).
   // - Si el usuario NO tiene sesión, NO mostramos nav en ningún sitio (confunde ver "Progreso/Teo/Registro" sin ser nadie).
-  var noNav = ['s-splash','s-login','s-refine','s-tour-intro','s-account-type','s-pro-area','s-pro-activate','s-pro-company'];
+  var noNav = ['s-splash','s-login','s-refine','s-tour-intro','s-account-type','s-pro-area','s-pro-activate','s-pro-company','s-chat'];
   var nav = document.getElementById('global-nav');
   // Leer JWT directo de localStorage para evitar problema de scope con la IIFE.
   var hasJWT = false;

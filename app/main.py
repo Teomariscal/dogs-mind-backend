@@ -150,6 +150,46 @@ async def lifespan(app: FastAPI):
             except Exception:
                 pass  # already applied
 
+        # ── Bootstrap delegaciones iniciales (idempotente) ────────────────────
+        # Lista de delegaciones aprobadas por Teo 2026-05-16. Se crean en el
+        # primer arranque tras desplegar la feature; si ya existen no se tocan
+        # (INSERT ... WHERE NOT EXISTS). Para añadir nuevas: editar esta lista
+        # y push (próximo arranque crea las nuevas). Para modificar tokens/%
+        # de una existente: PATCH /admin/delegations/{id} (NO editar aquí).
+        BOOTSTRAP_DELEGATIONS = [
+            ("BOCALAN-CO", "Bocalán Colombia",   "Colombia"),
+            ("BOCALAN-PE", "Bocalán Perú",       "Perú"),
+            ("BOCALAN-EC", "Bocalán Ecuador",    "Ecuador"),
+            ("BOCALAN-CL", "Bocalán Chile",      "Chile"),
+            ("BOCALAN-UY", "Bocalán Uruguay",    "Uruguay"),
+            ("BOCALAN-CR", "Bocalán Costa Rica", "Costa Rica"),
+            ("BOCALAN-IT", "Bocalán Italia",     "Italia"),
+            ("BOCALAN-IL", "Bocalán Israel",     "Israel"),
+            ("BOCALAN-ES", "Bocalán España",     "España"),
+        ]
+        try:
+            import uuid as _uuid_mod
+            with engine.connect() as conn:
+                for code, name, country in BOOTSTRAP_DELEGATIONS:
+                    # Defaults coinciden con DelegationCreate Pydantic:
+                    # welcome_bonus_tokens=3, commission_pct_web=10, commission_pct_ios=5, active=true
+                    # UUID generado en Python para evitar dependencia de pgcrypto.
+                    conn.execute(
+                        text("""
+                            INSERT INTO delegations (id, code, name, country, welcome_bonus_tokens,
+                                                     commission_pct_web, commission_pct_ios, active,
+                                                     created_at, updated_at)
+                            SELECT :id, :code, :name, :country, 3, 10.00, 5.00, true,
+                                   NOW(), NOW()
+                            WHERE NOT EXISTS (SELECT 1 FROM delegations WHERE code = :code)
+                        """),
+                        {"id": str(_uuid_mod.uuid4()), "code": code, "name": name, "country": country},
+                    )
+                conn.commit()
+                print(f"[startup] Bootstrap delegations checked ({len(BOOTSTRAP_DELEGATIONS)} entries, idempotent)")
+        except Exception as e:
+            print(f"[startup] Bootstrap delegations failed (non-fatal): {e}")
+
         # ── Promote first admin (set via ADMIN_EMAIL env var) ─────────────────
         admin_email = os.environ.get("ADMIN_EMAIL", "").strip()
         if admin_email:

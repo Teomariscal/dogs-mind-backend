@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v132 (fix chat-bar iPhone 14 send button tapado: textarea sin min-width:0 empujaba al send button (38px circular) fuera del viewport visible en iOS Safari porque el default min-content de flex items es > 0 y el contenido del textarea se expande sin permitir shrink. Fix scope-locked a #s-chat: a) .chat-ta min-width:0!important + flex:1 1 0%!important (canon flexbox overflow fix), b) .send flex-shrink:0!important + flex-grow:0!important reforzado, c) .chat-bar padding ampliado a 12px 20px ... 16px (extra padding-right para garantizar separación del send button del borde derecho del viewport). Verificado en preview a 390x844 iPhone 14: send button x=332+38=370 con 20px margin del viewport 390. Cero impacto en s-refine (chat refine) que usa selectores distintos.)
+// Dogs Mind Service Worker — v133 (ROOT CAUSE real chat-bar iPhone 14: iOS auto-zoom al hacer focus en textarea con font-size:14px. iOS Safari hace zoom automatico cuando enfocas cualquier input/textarea con font-size <16px para mejorar legibilidad, lo cual amplia toda la pagina y empuja al send button fuera del viewport visible. El pinch-out manual del usuario restauraba la escala. Fix definitivo: #s-chat .chat-ta font-size de 14px a 16px (minimo iOS para mantener escala 1.0 al enfocar). Mantenemos tambien los fixes flexbox de v132 (min-width:0, flex-shrink:0 send) por defensa en profundidad. Otros inputs en la app (dog-profile, seguimiento) tienen tambien font-size 14px y mismo riesgo iOS zoom, pendiente decidir si fix global o solo cuando reporten problema.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v132';
+const CACHE_NAME = 'dogs-mind-v133';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

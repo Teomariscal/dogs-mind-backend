@@ -3493,7 +3493,11 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   border-radius: 22px !important;
   min-height: 48px;
   padding: 12px 18px !important;
-  font-size: 14px !important;
+  /* IMPORTANTE: font-size:16px obligatorio para evitar el auto-zoom de iOS
+     Safari al hacer focus en el textarea. Cualquier valor <16px dispara el
+     zoom y empuja el send button fuera del viewport. 16px es el mínimo
+     legal de iOS para mantener escala 1.0 al enfocar. */
+  font-size: 16px !important;
   line-height: 1.45;
   /* min-width:0 es el fix canónico flex: sin esto, el textarea con texto
      largo empuja al send button fuera del contenedor visible en iOS Safari. */

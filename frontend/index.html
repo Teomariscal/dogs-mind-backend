@@ -9758,7 +9758,11 @@ async function _planSimpleFlow(rec, opts) {
         problem: rec.problem || null,
         analysis: rec.analysis || null,
         plan: rec.plan || null,
-        status: rec.status || 'active'
+        status: rec.status || 'active',
+        // Opción C: lang del record. Si rec.lang existe (case creado tras la
+        // feature), lo enviamos. Si no, enviamos el idioma de UI actual como
+        // mejor estimación para casos legacy migrados desde localStorage.
+        lang: rec.lang || (window.getCurrentLang ? window.getCurrentLang() : null)
       }]
     };
     try {
@@ -9991,7 +9995,11 @@ async function _abcExplainedFlow(rec, opts) {
         problem: rec.problem || null,
         analysis: rec.analysis || null,
         plan: rec.plan || null,
-        status: rec.status || 'active'
+        status: rec.status || 'active',
+        // Opción C: lang del record. Si rec.lang existe (case creado tras la
+        // feature), lo enviamos. Si no, enviamos el idioma de UI actual como
+        // mejor estimación para casos legacy migrados desde localStorage.
+        lang: rec.lang || (window.getCurrentLang ? window.getCurrentLang() : null)
       }]
     };
     try {
@@ -11752,10 +11760,20 @@ function getVal(id, fallback) {
     }
 
     var html = '';
+    // Opción C — idioma de UI actual, usado para decidir si pintar el badge
+    // de lang en cada card. Solo se pinta cuando r.lang existe y difiere
+    // del UI actual. Casos legacy sin r.lang NO muestran badge (silent).
+    var _uiLang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
     filtered.forEach(function(r, i) {
       var sl = statusLabel(r.status);
       var shortProblem = (r.problem || '').substring(0, 120);
       if ((r.problem || '').length > 120) shortProblem += '…';
+      // Badge lang: solo si r.lang está definido y difiere del UI actual.
+      // Neutral, no intrusivo: gris claro con el código del idioma del caso.
+      var _langBadge = '';
+      if (r.lang && r.lang !== _uiLang) {
+        _langBadge = '<span title="' + _i18nText('rec_lang_badge_title', 'Este caso está en otro idioma. El contenido se mantiene en su idioma original.') + '" style="font-size:10px;font-weight:700;background:rgba(0,0,0,0.06);color:var(--grey);padding:3px 8px;border-radius:100px;white-space:nowrap;letter-spacing:0.5px;">' + r.lang.toUpperCase() + '</span>';
+      }
       html += '<div onclick="openRecord(' + i + ')" style="background:#fff;border-radius:14px;padding:14px 16px;border:1px solid rgba(0,0,0,0.07);margin-bottom:' + (r.backend_case_id ? '0' : '10px') + ';cursor:pointer;" onmouseover="this.style.borderColor=\'rgba(74,103,65,0.4)\'" onmouseout="this.style.borderColor=\'rgba(0,0,0,0.07)\'">' +
         '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;">' +
           '<div style="display:flex;align-items:center;gap:10px;">' +
@@ -11765,7 +11783,10 @@ function getVal(id, fallback) {
               '<div style="font-size:11px;color:var(--grey);">' + (r.breed || '') + (r.dog_age ? ' · ' + r.dog_age : '') + '</div>' +
             '</div>' +
           '</div>' +
-          '<span style="font-size:10px;font-weight:700;background:' + sl.bg + ';color:' + sl.color + ';padding:3px 10px;border-radius:100px;white-space:nowrap;">' + sl.text + '</span>' +
+          '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;">' +
+            _langBadge +
+            '<span style="font-size:10px;font-weight:700;background:' + sl.bg + ';color:' + sl.color + ';padding:3px 10px;border-radius:100px;white-space:nowrap;">' + sl.text + '</span>' +
+          '</div>' +
         '</div>' +
         '<div style="font-size:12px;font-weight:600;color:var(--dark);margin-bottom:3px;">' + (r.problem || 'Sin descripción').substring(0,60) + '</div>' +
         '<div style="font-size:11px;color:var(--grey);line-height:1.5;margin-bottom:10px;">' + shortProblem + '</div>' +
@@ -12389,7 +12410,12 @@ function getVal(id, fallback) {
       problem:  (window._lastAnamnesisData && window._lastAnamnesisData.problem_description) || '',
       analysis: window._lastAnalysisText  || '',
       plan:     window._lastInterventionPlan || '',
-      status:   'active'
+      status:   'active',
+      // Opción C: estampar el idioma con el que se generó el caso. Se persiste
+      // junto al record en localStorage; cuando el caso se migre al backend,
+      // este valor llega a Case.lang y queda fijado para siempre.
+      lang:     (window._lastAnamnesisData && window._lastAnamnesisData.lang)
+                || (window.getCurrentLang ? window.getCurrentLang() : 'es')
     };
     // Si plan-simple/abc-explained ya migraron el caso al backend antes del
     // accept, reusar ese case_id para no duplicar el caso en backend.
@@ -13658,7 +13684,11 @@ async function openSeguimientoFromRecord(idx) {
         problem: rec.problem || null,
         analysis: rec.analysis || null,
         plan: rec.plan || null,
-        status: rec.status || 'active'
+        status: rec.status || 'active',
+        // Opción C: lang del record. Si rec.lang existe (case creado tras la
+        // feature), lo enviamos. Si no, enviamos el idioma de UI actual como
+        // mejor estimación para casos legacy migrados desde localStorage.
+        lang: rec.lang || (window.getCurrentLang ? window.getCurrentLang() : null)
       }]
     };
     var res = await fetch(API_BASE + '/cases/migrate', {

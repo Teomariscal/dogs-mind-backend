@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v133 (ROOT CAUSE real chat-bar iPhone 14: iOS auto-zoom al hacer focus en textarea con font-size:14px. iOS Safari hace zoom automatico cuando enfocas cualquier input/textarea con font-size <16px para mejorar legibilidad, lo cual amplia toda la pagina y empuja al send button fuera del viewport visible. El pinch-out manual del usuario restauraba la escala. Fix definitivo: #s-chat .chat-ta font-size de 14px a 16px (minimo iOS para mantener escala 1.0 al enfocar). Mantenemos tambien los fixes flexbox de v132 (min-width:0, flex-shrink:0 send) por defensa en profundidad. Otros inputs en la app (dog-profile, seguimiento) tienen tambien font-size 14px y mismo riesgo iOS zoom, pendiente decidir si fix global o solo cuando reporten problema.)
+// Dogs Mind Service Worker — v134 (Opcion C lang por caso, decisión 2026-05-16: cada Case lleva campo `lang` (es|en) fijado al crear, todos los contenidos clínicos derivados se generan en ese idioma y permanecen en él independientemente del idioma de UI actual. Resuelve bug Teo: usuario en ES UI veía daily-followup ejercicios en EN porque el caso fue creado en EN. Backend: nueva columna nullable cases.lang (ALTER TABLE IF NOT EXISTS en main.py), Pydantic CaseCreate/CaseUpdate/CaseResponse/LegacyRecord con lang opcional, endpoints create_case y migrate persisten lang, endpoints plan-simple/abc-explained/daily-followup-today usan effective_lang = case.lang || query_lang || 'es' (cero regresión para casos legacy con case.lang=NULL), daily-followup/init hace backfill oportunista. Frontend: record localStorage estampa lang al crear el caso, migrate payload envía lang, renderRecords pinta badge sutil EN/ES en cards cuando difiere del UI lang (solo si r.lang está definido — silencio en casos legacy). Estrategia backwards-compat 100%: ningún caso existente cambia comportamiento. DESPLEGADO STAGING beta.thedogsmind.net, PROD aún no.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v133';
+const CACHE_NAME = 'dogs-mind-v134';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

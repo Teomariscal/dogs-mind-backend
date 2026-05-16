@@ -298,11 +298,18 @@ def init_daily_followup(
             case.diagnosis_type = "other"
 
     case.daily_followup_enabled = True
+
+    # Opción C — backfill oportunista de case.lang si está NULL y el cliente
+    # envía un lang en el payload. Esto resuelve casos pre-feature sin tener
+    # que correr una migración batch. Idempotente: solo si está NULL.
+    if not case.lang and payload.lang in ("es", "en"):
+        case.lang = payload.lang
+
     db.commit()
     db.refresh(case)
 
     logger.info(
-        f"[daily-followup-init] case={case.id} diagnosis={case.diagnosis_type} enabled=True"
+        f"[daily-followup-init] case={case.id} diagnosis={case.diagnosis_type} enabled=True lang={case.lang}"
     )
 
     return DailyFollowupInitResponse(
@@ -375,6 +382,11 @@ def get_daily_followup_today(
     day_index = _compute_day_index(case.id, db, today)
     history = _build_history(case.id, db, exclude_today=today)
 
+    # Opción C — lang fijo del caso prevalece sobre query-param.
+    # Casos creados antes de la feature tienen case.lang=NULL → usa el query
+    # (comportamiento previo, cero regresión).
+    effective_lang = case.lang or lang or "es"
+
     try:
         checkin = generate_daily_checkin(
             db=db,
@@ -384,7 +396,7 @@ def get_daily_followup_today(
             diagnosis_type=case.diagnosis_type,
             day_index=day_index,
             history=history,
-            lang=lang,
+            lang=effective_lang,
         )
     except ValueError as e:
         logger.error(f"[daily-followup-today] coach validation error case={case.id}: {e}")

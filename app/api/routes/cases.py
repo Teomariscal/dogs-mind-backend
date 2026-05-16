@@ -75,6 +75,10 @@ class CaseCreate(BaseModel):
     client_dog_name: Optional[str] = Field(None, max_length=80)
     client_dog_breed: Optional[str] = Field(None, max_length=120)
     client_dog_age: Optional[str] = Field(None, max_length=80)
+    # Idioma fijo del caso (Opción C). Si no se envía, queda NULL y los endpoints
+    # caen al fallback de query-param `?lang=` (compat). Frontend debería enviar
+    # window.getCurrentLang() al crear el caso.
+    lang: Optional[Literal["es", "en"]] = Field(None, description="'es' | 'en'. Si NULL, fallback al ?lang= en endpoints.")
 
     @field_validator("title", "motivo_consulta", "client_dog_name", "client_dog_breed", "client_dog_age")
     @classmethod
@@ -93,6 +97,9 @@ class CaseUpdate(BaseModel):
     client_dog_name: Optional[str] = Field(None, max_length=80)
     client_dog_breed: Optional[str] = Field(None, max_length=120)
     client_dog_age: Optional[str] = Field(None, max_length=80)
+    # Permite cambio explícito de lang (uso raro: corregir un caso mal etiquetado).
+    # Si NULL en patch, NO modifica el valor actual (model_dump exclude_unset).
+    lang: Optional[Literal["es", "en"]] = None
 
     @field_validator("title", "motivo_consulta", "client_dog_name", "client_dog_breed", "client_dog_age")
     @classmethod
@@ -116,6 +123,10 @@ class CaseResponse(BaseModel):
     client_dog_name: Optional[str] = None
     client_dog_breed: Optional[str] = None
     client_dog_age: Optional[str] = None
+    # Idioma del caso. NULL para casos creados antes de la feature (legacy).
+    # Frontend usa esto para decidir si pintar el badge "Este caso está en EN/ES"
+    # cuando difiere del idioma de UI actual.
+    lang: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
@@ -195,6 +206,10 @@ class LegacyRecord(BaseModel):
     analysis: Optional[str] = Field(None, max_length=200000)
     plan: Optional[str] = Field(None, max_length=200000)
     status: Optional[str] = Field("active", max_length=40)
+    # Opción C — idioma con el que se creó el record en el cliente.
+    # NULL si el record fue creado antes de esta feature → case.lang queda NULL,
+    # endpoints caen al fallback ?lang= (cero regresión).
+    lang: Optional[Literal["es", "en"]] = Field(None, description="'es' | 'en' si se conoce; NULL para records legacy.")
 
 
 class MigrateRequest(BaseModel):
@@ -341,6 +356,7 @@ def _to_case_response(case: Case) -> CaseResponse:
         client_dog_name=case.client_dog_name,
         client_dog_breed=case.client_dog_breed,
         client_dog_age=case.client_dog_age,
+        lang=case.lang,
         created_at=case.created_at,
         updated_at=case.updated_at,
     )
@@ -556,6 +572,9 @@ def create_case(
         client_dog_name=client_name,
         client_dog_breed=client_breed,
         client_dog_age=client_age,
+        # Opción C: idioma fijo del caso. Si el frontend no envía lang
+        # (cliente antiguo), queda NULL → endpoints caen al fallback ?lang=
+        lang=payload.lang,
     )
     db.add(case)
     db.commit()
@@ -980,12 +999,16 @@ def generate_plan_simple(
     # 4. Cobrar 0,1 tokens ANTES de invocar IA (invariante financiera)
     new_balance = _charge_user_tokens(user, PLAN_SIMPLE_TOKEN_COST, db)
 
+    # Opción C: lang efectivo = case.lang (si está fijado) > query-param > 'es'.
+    # Casos creados antes de la feature tienen case.lang=NULL → mantiene comportamiento legacy.
+    effective_lang = case.lang or lang or "es"
+
     # 5. Llamar Haiku 4.5
     try:
         from app.services.plan_simple_ai import run_plan_simple
         ai_result = run_plan_simple(
             original_plan_text=intervention_entry.content,
-            lang=lang,
+            lang=effective_lang,
         )
     except Exception as e:
         # Refund si falla la IA
@@ -1123,12 +1146,15 @@ def generate_abc_explained(
     # 4. Cobrar 0,1 tokens ANTES de invocar IA
     new_balance = _charge_user_tokens(user, ABC_EXPLAINED_TOKEN_COST, db)
 
+    # Opción C: lang efectivo = case.lang > query-param > 'es'
+    effective_lang = case.lang or lang or "es"
+
     # 5. Llamar Haiku 4.5
     try:
         from app.services.abc_explained_ai import run_abc_explained
         ai_result = run_abc_explained(
             original_abc_text=abc_entry.content,
-            lang=lang,
+            lang=effective_lang,
         )
     except Exception as e:
         # Refund si falla la IA
@@ -1338,6 +1364,9 @@ def migrate_legacy_records(
             status=case_status,
             summary_abc=_summarize_text(rec.analysis),
             summary_plan=_summarize_text(rec.plan),
+            # Opción C: persistimos el lang del record si el cliente lo envió.
+            # Records legacy sin lang quedan NULL → endpoints caen al fallback ?lang=
+            lang=rec.lang,
         )
         case.summary_full = _build_summary_full(case, dog=None)
         db.add(case)

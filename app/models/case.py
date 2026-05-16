@@ -109,6 +109,16 @@ class Case(Base):
     # esta feature no la tienen rellenada.
     diagnosis_type          = Column(String(40), nullable=True, index=True)
 
+    # ── Idioma fijo del caso (Opción C, decidida 2026-05-16) ──────────────────
+    # 'es' | 'en'. Se fija al crear el caso con el idioma de UI del usuario en
+    # ese momento. Todos los contenidos clínicos generados (plan, plan-simple,
+    # ABC, daily-followup ejercicios) se generan y permanecen en este idioma,
+    # independientemente del idioma de UI actual. Coherencia documental clínica.
+    # NULLABLE: casos creados antes de esta feature tienen NULL → los endpoints
+    # caen al fallback de query-param `?lang=` (comportamiento previo intacto,
+    # cero regresión). Backfill manual posterior si se desea.
+    lang                    = Column(String(2), nullable=True)
+
     # Audit / GDPR
     created_at      = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at      = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)

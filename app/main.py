@@ -119,6 +119,11 @@ async def lifespan(app: FastAPI):
             # Diagnóstico clínico del caso (clave de caché de preguntas).
             "ALTER TABLE cases ADD COLUMN IF NOT EXISTS diagnosis_type VARCHAR(40)",
             "CREATE INDEX IF NOT EXISTS ix_cases_diagnosis_type ON cases(diagnosis_type)",
+            # ── Idioma fijo por caso (Opción C, 2026-05-16) ──
+            # NULLABLE: casos existentes quedan en NULL → endpoints caen al
+            # fallback de query-param `?lang=` (cero regresión). Casos creados
+            # tras esta migración llevan el lang de UI al crear el caso.
+            "ALTER TABLE cases ADD COLUMN IF NOT EXISTS lang VARCHAR(2)",
             # Tabla theory_questions — caché por diagnosis_type + question_type + lang.
             # init_db() crea la tabla via Base.metadata.create_all(); aquí garantizamos
             # los índices y constraints adicionales.

@@ -9203,6 +9203,41 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   updateKbdHeight();
 })();
 
+// ── INVITE LINK AUTO-FILL ─────────────────────────────────────────────────
+// Si el usuario llega vía https://thedogsmind.net/?invite=CODIGO (link de
+// embajador compartido), capturamos el código en localStorage y lo prellenamos
+// en #reg-invite. Backend (auth.py) lo valida contra AMBASSADOR_CODE en env
+// Railway: si coincide, el nuevo usuario recibe role 'ambassador' + 8 tokens.
+// Idempotente: si el campo se rellena a mano, no lo sobreescribe.
+(function() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var invite = (params.get('invite') || params.get('code') || '').trim();
+    if (invite) {
+      // Persistir entre navegaciones internas (splash → s-account-type → s-splash)
+      localStorage.setItem('dm_pending_invite', invite);
+    }
+    var stored = (localStorage.getItem('dm_pending_invite') || '').trim();
+    if (!stored) return;
+    var fill = function() {
+      var el = document.getElementById('reg-invite');
+      if (el && !el.value) {
+        el.value = stored;
+        // Marcar visualmente que viene del link (sutil, no intrusivo)
+        try {
+          el.style.background = 'rgba(74,103,65,0.06)';
+          el.style.borderColor = 'rgba(74,103,65,0.35)';
+        } catch(e) {}
+      }
+    };
+    fill();
+    // Reintentos por si el DOM aún no ha pintado el form de registro
+    setTimeout(fill, 300);
+    setTimeout(fill, 1500);
+    setTimeout(fill, 3500);
+  } catch(e) {}
+})();
+
 // ── STATE ──────────────────────────────────────
 let tokens = 5;
 let apiKey = '';
@@ -9408,6 +9443,8 @@ function registerUser() {
     setJWT(res.data.token);
     setTokens(res.data.tokens);
     if (res.data.role) localStorage.setItem('dm_role', res.data.role);
+    // Limpiar invite pendiente: ya se usó (válido o no, no se reutiliza)
+    try { localStorage.removeItem('dm_pending_invite'); } catch(e) {}
     // Precargar lista de perros tras registro exitoso
     if (typeof loadMyDogs === 'function') loadMyDogs();
     if (typeof loadAccountInfo === 'function') loadAccountInfo();
@@ -9421,7 +9458,10 @@ function registerUser() {
     }
 
     var role = res.data.role || 'user';
-    if (role === 'ambassador') showToast('¡Bienvenido embajador! Tienes 15 tokens');
+    if (role === 'ambassador') {
+      var langTk = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+      showToast(langTk === 'en' ? 'Welcome ambassador! You have 8 tokens' : '¡Bienvenido embajador! Tienes 8 tokens');
+    }
     else if (role === 'tech') showToast('¡Bienvenido Dogs Mind Tech! Tienes 50 tokens');
     else showToast('¡Bienvenido! Tienes 5 tokens listos');
     // Si veníamos del flujo "Activar Profesional" sin sesión, reanudamos

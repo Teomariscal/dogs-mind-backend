@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v129 (fix chat Aigents send button tapado: el #global-nav (Home/Aigents/Progress/Teo/Sign up) se renderizaba en s-chat tapando la chat-bar y ocultando el boton ↑ enviar. s-chat anadido a noNav array en goTo() para que #global-nav se oculte durante el chat 1-on-1 con un Aigent. El chat ya tiene su back button propio (chatBack) en el header. Cero impacto en otras pantallas.)
+// Dogs Mind Service Worker — v130 (link embajador con auto-fill: nuevo IIFE startup lee ?invite=CODIGO (o ?code=) de la URL, lo guarda en localStorage.dm_pending_invite y lo prellena en #reg-invite con marcado visual sutil (verde sage 6% bg + borde verde 35%). Tras registro exitoso se limpia. Tokens embajador bajados 15 → 8 (auth.py AMBASSADOR_TOKENS=8 + payments.py ROLE_TOKENS.ambassador=8 + toast frontend). Link plantilla: https://thedogsmind.net/?invite=AMBASSADOR_CODE_VALUE)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v129';
+const CACHE_NAME = 'dogs-mind-v130';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

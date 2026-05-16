@@ -25,7 +25,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # ── Schemas ───────────────────────────────────────────────────────────────────
 AMBASSADOR_CODE    = os.environ.get("AMBASSADOR_CODE", "").strip()
-AMBASSADOR_TOKENS  = 15
+AMBASSADOR_TOKENS  = 8
 DEFAULT_TOKENS     = 5
 
 class RegisterRequest(BaseModel):

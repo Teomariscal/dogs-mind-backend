@@ -255,7 +255,7 @@ class SetRoleRequest(BaseModel):
     role: str  # "user" | "collaborator" | "admin"
 
 VALID_ROLES = ("user", "ambassador", "tech", "developer", "admin")
-ROLE_TOKENS = {"ambassador": 15, "tech": 50}  # tokens gifted on role assignment
+ROLE_TOKENS = {"ambassador": 8, "tech": 50}  # tokens gifted on role assignment
 
 @router.post("/admin/set-role")
 def set_role(

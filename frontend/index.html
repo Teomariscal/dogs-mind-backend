@@ -11535,9 +11535,9 @@ function getVal(id, fallback) {
   }
 
   function statusLabel(status) {
-    if (status === 'resolved') return {text:'Resuelto', bg:'#dcf0dc', color:'#2a6a2a'};
-    if (status === 'closed')   return {text:'Cerrado',  bg:'#f0dcdc', color:'#8a2020'};
-    return {text:'En seguimiento', bg:'#fff4dc', color:'#a06010'};
+    if (status === 'resolved') return {text:_i18nText('rec_status_resolved','Resuelto'), bg:'#dcf0dc', color:'#2a6a2a'};
+    if (status === 'closed')   return {text:_i18nText('rec_status_closed','Cerrado'),  bg:'#f0dcdc', color:'#8a2020'};
+    return {text:_i18nText('rec_status_active','En seguimiento'), bg:'#fff4dc', color:'#a06010'};
   }
 
   function renderRecords() {
@@ -11556,7 +11556,7 @@ function getVal(id, fallback) {
         '<div style="font-size:15px;font-weight:600;margin-bottom:6px;">Sin casos guardados</div>' +
         '<div style="font-size:13px;line-height:1.5;">Acepta una intervención para guardar el primer caso.</div>' +
         '</div>' +
-        '<button onclick="goTo(\'s-anamnesis\')" style="background:var(--green2);color:#fff;border:none;border-radius:100px;padding:14px 24px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;margin-top:6px;">+ Nueva Consulta</button>';
+        '<button onclick="goTo(\'s-anamnesis\')" style="background:var(--green2);color:#fff;border:none;border-radius:100px;padding:14px 24px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;margin-top:6px;">' + _i18nText('rec_btn_new_consult','+ Nueva Consulta') + '</button>';
       return;
     }
 
@@ -11580,14 +11580,14 @@ function getVal(id, fallback) {
         '<div style="font-size:11px;color:var(--grey);line-height:1.5;margin-bottom:10px;">' + shortProblem + '</div>' +
         '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">' +
           '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
-            '<span style="font-size:10px;background:rgba(42,90,42,0.07);color:var(--green2);padding:3px 8px;border-radius:6px;">ABC Análisis</span>' +
-            (r.plan ? '<span style="font-size:10px;background:rgba(42,90,42,0.07);color:var(--green2);padding:3px 8px;border-radius:6px;">Plan LIMA</span>' : '') +
+            '<span style="font-size:10px;background:rgba(42,90,42,0.07);color:var(--green2);padding:3px 8px;border-radius:6px;">' + _i18nText('rec_tag_abc','ABC Análisis') + '</span>' +
+            (r.plan ? '<span style="font-size:10px;background:rgba(42,90,42,0.07);color:var(--green2);padding:3px 8px;border-radius:6px;">' + _i18nText('rec_tag_plan_lima','Plan LIMA') + '</span>' : '') +
           '</div>' +
           '<div style="display:flex;align-items:center;gap:8px;">' +
             '<div style="font-size:10px;color:var(--grey);">' + (r.date || '') + '</div>' +
             '<div style="display:flex;gap:4px;flex-wrap:wrap;">' +
-              '<button onclick="event.stopPropagation();openSeguimientoFromRecord(' + i + ')" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid rgba(74,103,65,0.3);background:rgba(74,103,65,0.08);cursor:pointer;color:var(--green2);font-weight:600;">+ Seguimiento</button>' +
-              '<button onclick="event.stopPropagation();changeRecordStatus(' + i + ')" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid rgba(0,0,0,0.12);background:#fafafa;cursor:pointer;color:var(--grey);">Estado</button>' +
+              '<button onclick="event.stopPropagation();openSeguimientoFromRecord(' + i + ')" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid rgba(74,103,65,0.3);background:rgba(74,103,65,0.08);cursor:pointer;color:var(--green2);font-weight:600;">' + _i18nText('rec_btn_seguimiento','+ Seguimiento') + '</button>' +
+              '<button onclick="event.stopPropagation();changeRecordStatus(' + i + ')" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid rgba(0,0,0,0.12);background:#fafafa;cursor:pointer;color:var(--grey);">' + _i18nText('rec_btn_estado','Estado') + '</button>' +
               '<button onclick="event.stopPropagation();deleteRecord(' + i + ')" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid rgba(220,80,80,0.2);background:#fff5f5;cursor:pointer;color:#c03030;" title="Eliminar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>' +
             '</div>' +
           '</div>' +
@@ -11613,15 +11613,15 @@ function getVal(id, fallback) {
             '</svg>' +
           '</div>' +
           '<div class="rec-df-cta-text">' +
-            '<div class="rec-df-cta-title" data-i18n="df_records_btn_title">Seguimiento diario</div>' +
-            '<div class="rec-df-cta-sub" data-i18n="df_records_btn_sub">Cumple todos los días con las tareas recomendadas para sacar el máximo provecho.</div>' +
+            '<div class="rec-df-cta-title">' + _i18nText('df_records_btn_title','Seguimiento diario') + '</div>' +
+            '<div class="rec-df-cta-sub">' + _i18nText('df_records_btn_sub','Cumple todos los días con las tareas recomendadas para sacar el máximo provecho.') + '</div>' +
           '</div>' +
           '<div class="rec-df-cta-arrow">→</div>' +
         '</button>';
       }
     });
 
-    html += '<button onclick="goTo(\'s-anamnesis\')" style="background:var(--green2);color:#fff;border:none;border-radius:100px;padding:14px 24px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;margin-top:6px;">+ Nueva Consulta</button>';
+    html += '<button onclick="goTo(\'s-anamnesis\')" style="background:var(--green2);color:#fff;border:none;border-radius:100px;padding:14px 24px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;margin-top:6px;">' + _i18nText('rec_btn_new_consult','+ Nueva Consulta') + '</button>';
     list.innerHTML = html;
   }
 
@@ -11632,7 +11632,11 @@ function getVal(id, fallback) {
     var r = filtered[idx];
     if (!r) return;
     var opts = ['active','resolved','closed'];
-    var labels = {'active':'En seguimiento','resolved':'Resuelto','closed':'Cerrado'};
+    var labels = {
+      'active':   _i18nText('rec_status_active','En seguimiento'),
+      'resolved': _i18nText('rec_status_resolved','Resuelto'),
+      'closed':   _i18nText('rec_status_closed','Cerrado'),
+    };
     var cur = opts.indexOf(r.status);
     var next = opts[(cur + 1) % opts.length];
     // find in full records and update
@@ -14112,6 +14116,15 @@ function endTourIntro() {
       filter_active:    'En seguimiento',
       filter_resolved:  'Resueltos',
       filter_closed:    'Cerrados',
+      // Records cards (renderizado JS dinámico)
+      rec_status_active:    'En seguimiento',
+      rec_status_resolved:  'Resuelto',
+      rec_status_closed:    'Cerrado',
+      rec_tag_abc:          'ABC Análisis',
+      rec_tag_plan_lima:    'Plan LIMA',
+      rec_btn_seguimiento:  '+ Seguimiento',
+      rec_btn_estado:       'Estado',
+      rec_btn_new_consult:  '+ Nueva Consulta',
       // Avatars
       avatars_title: 'Tus Aigents',
       avatars_sub:   'Para consultas importantes usa el análisis del home. Aquí resuelve dudas rápidas sobre tu perro, lugares, lifestyle y alimentación. Apenas consumen tokens.',
@@ -14918,6 +14931,15 @@ function endTourIntro() {
       filter_active:    'In Progress',
       filter_resolved:  'Resolved',
       filter_closed:    'Closed',
+      // Records cards (rendered in JS)
+      rec_status_active:    'In Progress',
+      rec_status_resolved:  'Resolved',
+      rec_status_closed:    'Closed',
+      rec_tag_abc:          'ABC Analysis',
+      rec_tag_plan_lima:    'LIMA Plan',
+      rec_btn_seguimiento:  '+ Follow-up',
+      rec_btn_estado:       'Status',
+      rec_btn_new_consult:  '+ New Consultation',
       // Avatars
       avatars_title: 'Your Aigents',
       avatars_sub:   'For important queries use the home screen analysis. Here quickly resolve questions about your dog, places, lifestyle and nutrition. They barely use tokens.',

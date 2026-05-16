@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v126 (Mario peek recuperado pero flotando arriba en s-aigents-intro: .aig-peek pasa de 'asomar entre letras' (que rompia en mobile iOS) a 'flotar en zona superior'. Posicion right:-32px top:-110px relativo al span del titulo (ubica Mario en zona arriba del eyebrow), animacion aigPeekFloat 4.2s con translateY 0/-10px + rotacion -3/+4deg + scale sutil. Reemplaza la teatral aig-peek-show que ya no aplica para esta posicion. Visualmente: circulo Mario con su french bulldog visible, sombra premium, flotando sutil.)
+// Dogs Mind Service Worker — v127 (fix i18n s-records: textos hardcoded en JS dinamico de renderRecords ahora usan _i18nText() y respetan el lang actual. Antes en modo EN aparecian en ES: 'En seguimiento', 'ABC Analisis', 'Plan LIMA', '+ Seguimiento', 'Estado', '+ Nueva Consulta', banner 'Seguimiento diario / Cumple todos los dias...'. Nuevas claves i18n: rec_status_active/resolved/closed, rec_tag_abc, rec_tag_plan_lima, rec_btn_seguimiento, rec_btn_estado, rec_btn_new_consult. EN: In Progress / Resolved / Closed, ABC Analysis, LIMA Plan, + Follow-up, Status, + New Consultation, Daily follow-up.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v126';
+const CACHE_NAME = 'dogs-mind-v127';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

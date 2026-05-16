@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v137 (banner welcome tokens dinámico: cuando el IIFE INVITE LINK AUTO-FILL prellena un código de invitación, además de aplicar el estilo verde sólido al input y mostrar el badge "CÓDIGO APLICADO" encima, también actualiza el banner inferior del form de registro de "5 tokens de bienvenida" a "8 tokens de bienvenida" (ES) / "8 welcome tokens" (EN) para reflejar el bonus real que recibirá el usuario al registrarse con código válido. Banner upgrade visual también: fondo verde más sólido + borde verde más fuerte. Idempotente via data-attribute inviteUpgraded.)
+// Dogs Mind Service Worker — v138 (fix botón Pro cortesía: invitados a perfil Profesional veían "Pagar 20€" en el botón azul aunque el código se autorrellenara. Causa raíz: ps-pay-btn tiene data-i18n="ps_pay" → setLang() re-renderizaba y pisaba el texto que syncProBtn había puesto. Fix: applyLang() ahora llama window._syncProBtn() al final, re-aplicando la lógica de cortesía tras cualquier re-render i18n. Texto del botón cortesía simplificado de "Activar gratis (cortesía)" a "OK" para evitar confusiones largas. Verificado preview iPhone 14: tras setLang('es') el botón queda "OK" y el total "Gratis", no se resetean.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v137';
+const CACHE_NAME = 'dogs-mind-v138';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

@@ -8963,6 +8963,15 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
           <input type="checkbox" id="ps-tos" required>
           <span class="ps-check-text" data-i18n="ps_tos_text">Acepto los <a href="#" onclick="event.preventDefault(); goTo('s-terms');" data-i18n="ps_tos_link_terms">Términos</a> y la <a href="#" onclick="event.preventDefault(); goTo('s-privacy');" data-i18n="ps_tos_link_privacy">Política de Privacidad</a>.</span>
         </label>
+
+        <!-- Código invitación Pro (opcional). Si coincide con PRO_INVITE_CODE
+             backend → cuenta Profesional cortesía gratis + 10 tokens, salta
+             Stripe y datos de empresa (se completan luego desde área Pro). -->
+        <div class="ps-field">
+          <label for="ps-invite" data-i18n="ps_invite_label">Código de invitación Profesional <span style="color:var(--ps-text3,#777);font-size:11px;font-weight:400;">(opcional)</span></label>
+          <input type="text" id="ps-invite" autocomplete="off" placeholder="Si tienes un código, introdúcelo aquí" data-i18n-placeholder="ps_invite_ph">
+          <p class="ps-field-hint" data-i18n="ps_invite_hint">Con código válido la activación es gratuita y sin datos de empresa.</p>
+        </div>
       </section>
 
       <!-- ── Sección 2: Datos de tu empresa ── -->
@@ -9220,15 +9229,19 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
     var stored = (localStorage.getItem('dm_pending_invite') || '').trim();
     if (!stored) return;
     var fill = function() {
-      var el = document.getElementById('reg-invite');
-      if (el && !el.value) {
-        el.value = stored;
-        // Marcar visualmente que viene del link (sutil, no intrusivo)
-        try {
-          el.style.background = 'rgba(74,103,65,0.06)';
-          el.style.borderColor = 'rgba(74,103,65,0.35)';
-        } catch(e) {}
-      }
+      // Prellena AMBOS forms si existen: registro particular (#reg-invite) y
+      // activación Profesional (#ps-invite). El backend decide qué tipo de
+      // invite es según endpoint llamado.
+      ['reg-invite', 'ps-invite'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el && !el.value) {
+          el.value = stored;
+          try {
+            el.style.background = 'rgba(74,103,65,0.06)';
+            el.style.borderColor = 'rgba(74,103,65,0.35)';
+          } catch(e) {}
+        }
+      });
     };
     fill();
     // Reintentos por si el DOM aún no ha pintado el form de registro
@@ -9236,6 +9249,40 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
     setTimeout(fill, 1500);
     setTimeout(fill, 3500);
   } catch(e) {}
+})();
+
+// ── PRO COURTESY UI REACT ─────────────────────────────────────────────────
+// Cuando #ps-invite tiene contenido, el pago Stripe NO ocurre — el botón
+// "Pagar 20,00 €" pasa a "Activar gratis (cortesía)" y el subtítulo "Pago
+// seguro vía Stripe" a "Activación cortesía sin pago". Se reactiva al borrar.
+(function() {
+  function syncProBtn() {
+    var inv = document.getElementById('ps-invite');
+    var btn = document.getElementById('ps-pay-btn');
+    var secure = document.querySelector('#s-pro-signup .ps-secure');
+    var total = document.getElementById('ps-total-amount');
+    if (!inv || !btn) return;
+    var hasCode = !!inv.value.trim();
+    var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+    if (hasCode) {
+      btn.textContent = (lang === 'en') ? 'Activate free (courtesy)' : 'Activar gratis (cortesía)';
+      if (secure) secure.textContent = (lang === 'en') ? 'Courtesy activation — no payment required.' : 'Activación cortesía — sin pago.';
+      if (total) total.textContent = (lang === 'en') ? 'Free' : 'Gratis';
+    } else {
+      btn.textContent = (lang === 'en') ? 'Pay €20.00' : 'Pagar 20,00 €';
+      if (secure) secure.textContent = (lang === 'en') ? 'Secure payment via Stripe.' : 'Pago seguro vía Stripe.';
+      if (total) total.textContent = '20,00 €';
+    }
+  }
+  // Listener en input + chequeo periódico (cubre el autofill diferido del IIFE invite)
+  document.addEventListener('input', function(e) {
+    if (e.target && e.target.id === 'ps-invite') syncProBtn();
+  });
+  setTimeout(syncProBtn, 400);
+  setTimeout(syncProBtn, 1800);
+  setTimeout(syncProBtn, 3800);
+  // Exponer para que setLang() pueda re-disparar si cambian idioma
+  window._syncProBtn = syncProBtn;
 })();
 
 // ── STATE ──────────────────────────────────────
@@ -10828,12 +10875,18 @@ function _psValidate(hasSession) {
     if (!tos || !tos.checked) errors.push(_i18nText('ps_err_tos', 'Debes aceptar los Términos y la Política de Privacidad.'));
   }
 
-  if (!_v('ps-company-name')) errors.push(_i18nText('ps_err_company_name', 'Indica el nombre de la empresa.'));
-  if (!_v('ps-legal-rep')) errors.push(_i18nText('ps_err_legal_rep', 'Indica el nombre del representante legal.'));
-  var billing = _v('ps-billing-email');
-  if (!billing || !/.+@.+\..+/.test(billing)) errors.push(_i18nText('ps_err_billing_email', 'Introduce un email de facturación válido.'));
-  if (!_v('ps-city')) errors.push(_i18nText('ps_err_city', 'Indica la ciudad.'));
-  if (!_v('ps-country')) errors.push(_i18nText('ps_err_country', 'Indica el país.'));
+  // Flujo cortesía: si hay invite_code, los datos de empresa son OPCIONALES
+  // (se completan luego desde el área Pro). Si NO hay invite, son obligatorios
+  // como en el flujo Stripe estándar.
+  var hasInvite = !!_v('ps-invite');
+  if (!hasInvite) {
+    if (!_v('ps-company-name')) errors.push(_i18nText('ps_err_company_name', 'Indica el nombre de la empresa.'));
+    if (!_v('ps-legal-rep')) errors.push(_i18nText('ps_err_legal_rep', 'Indica el nombre del representante legal.'));
+    var billing = _v('ps-billing-email');
+    if (!billing || !/.+@.+\..+/.test(billing)) errors.push(_i18nText('ps_err_billing_email', 'Introduce un email de facturación válido.'));
+    if (!_v('ps-city')) errors.push(_i18nText('ps_err_city', 'Indica la ciudad.'));
+    if (!_v('ps-country')) errors.push(_i18nText('ps_err_country', 'Indica el país.'));
+  }
 
   return errors;
 }
@@ -10870,6 +10923,12 @@ async function psSubmit() {
     return;
   }
 
+  // Detectar flujo cortesía: si hay invite_code rellenado, NO se cobra,
+  // se llama a /payments/pro-activate-courtesy en lugar de Stripe.
+  var inviteEl = document.getElementById('ps-invite');
+  var inviteCode = (inviteEl && inviteEl.value || '').trim();
+  var isCourtesyFlow = !!inviteCode;
+
   _psSetBusy(true);
   try {
     // Paso 1 — Si no hay sesión, registrar cuenta tipo profesional.
@@ -10879,7 +10938,11 @@ async function psSubmit() {
       // Reusar el endpoint de registro existente (POST /auth/register).
       // POST /auth/register acepta email/password/phone?/invite_code? (Pydantic
       // RegisterRequest). NO acepta name/account_type — el account_type pasa a
-      // 'professional' en el webhook Stripe tras el pago confirmado.
+      // 'professional' en el webhook Stripe tras el pago confirmado, O en el
+      // endpoint /payments/pro-activate-courtesy (flujo cortesía).
+      // Importante: NO pasamos invite_code aquí aunque venga del link, porque
+      // este código es para el sistema Pro (PRO_INVITE_CODE), no para el de
+      // embajador particular (AMBASSADOR_CODE) que vive en /auth/register.
       var regRes = await fetch(API_BASE + '/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -10911,9 +10974,50 @@ async function psSubmit() {
       try { if (typeof loadAccountInfo === 'function') await loadAccountInfo(); } catch(e) {}
     }
 
+    var jwt = localStorage.getItem('dm_jwt');
+
+    // ─── FLUJO CORTESÍA (invite-only, sin Stripe, sin datos empresa) ───
+    if (isCourtesyFlow) {
+      var courtesyRes = await fetch(API_BASE + '/payments/pro-activate-courtesy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + jwt
+        },
+        body: JSON.stringify({ invite_code: inviteCode })
+      });
+      if (!courtesyRes.ok) {
+        var courtesyMsg = '';
+        try { courtesyMsg = await courtesyRes.text(); } catch(e) {}
+        if (courtesyRes.status === 403) {
+          _psShowError(_i18nText('ps_err_invite_invalid', 'Código de invitación Profesional inválido. Verifícalo o continúa con el pago estándar.'));
+        } else if (courtesyRes.status === 400) {
+          _psShowError(_i18nText('ps_err_invite_already_pro', 'Tu cuenta ya es Profesional.'));
+        } else {
+          _psShowError(_i18nText('ps_err_invite_unexpected', 'No se pudo activar la cuenta cortesía.') + ' ' + (courtesyMsg || ''));
+        }
+        _psSetBusy(false);
+        return;
+      }
+      // Limpiar invite pendiente (single-use)
+      try { localStorage.removeItem('dm_pending_invite'); } catch(e) {}
+      // Recargar datos de cuenta
+      try { if (typeof loadAccountInfo === 'function') await loadAccountInfo(); } catch(e) {}
+      // Toast + navegación a home
+      var langCt = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+      if (typeof showToast === 'function') {
+        showToast(langCt === 'en'
+          ? 'Welcome Professional! 10 courtesy tokens credited.'
+          : '¡Bienvenido Profesional! 10 tokens cortesía acreditados.');
+      }
+      _psSetBusy(false);
+      if (typeof goTo === 'function') goTo('s-home');
+      return;
+    }
+
+    // ─── FLUJO STRIPE ESTÁNDAR (con pago de membresía) ───
     // Paso 2 — Guardar datos de empresa (PUT /me/company).
     var companyPayload = _psBuildCompanyPayload();
-    var jwt = localStorage.getItem('dm_jwt');
     var compRes = await fetch(API_BASE + '/me/company', {
       method: 'PUT',
       headers: {

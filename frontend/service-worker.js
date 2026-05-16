@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v130 (link embajador con auto-fill: nuevo IIFE startup lee ?invite=CODIGO (o ?code=) de la URL, lo guarda en localStorage.dm_pending_invite y lo prellena en #reg-invite con marcado visual sutil (verde sage 6% bg + borde verde 35%). Tras registro exitoso se limpia. Tokens embajador bajados 15 → 8 (auth.py AMBASSADOR_TOKENS=8 + payments.py ROLE_TOKENS.ambassador=8 + toast frontend). Link plantilla: https://thedogsmind.net/?invite=AMBASSADOR_CODE_VALUE)
+// Dogs Mind Service Worker — v131 (Pro cortesía via invite: nuevo endpoint backend /payments/pro-activate-courtesy valida PRO_INVITE_CODE env var, activa account_type='professional' + 10 tokens cortesía SIN Stripe, membresía permanente. Frontend: nuevo campo #ps-invite en s-pro-signup autofilleado desde dm_pending_invite (mismo IIFE que #reg-invite). psSubmit() detecta invite_code → llama /pro-activate-courtesy en lugar de Stripe → skip datos empresa (3B: se completan luego desde área Pro) → toast "Bienvenido Profesional! 10 tokens cortesía" → goTo s-home. Listener reactivo: botón "Pagar 20€" → "Activar gratis (cortesía)" + total "Gratis" cuando hay código. Mismo link ?invite=CODIGO funciona para particular (8 tokens) y Pro (membresía gratis) segun por dónde entren.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v130';
+const CACHE_NAME = 'dogs-mind-v131';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

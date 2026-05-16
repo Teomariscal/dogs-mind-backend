@@ -42,6 +42,14 @@ PRICE_PRO_TOKEN_BUNDLE = os.environ.get("STRIPE_PRICE_PRO_TOKEN_BUNDLE", "").str
 PRO_MEMBERSHIP_TOKENS = 10  # tokens cortesía al activar Profesional
 PRO_BUNDLE_TOKENS     = 60  # tokens del pack promo si compra bundle
 
+# ── Invitación cortesía Profesional ──────────────────────────────────────────
+# Sistema paralelo al de embajador (auth.py AMBASSADOR_CODE). Permite a Teo
+# invitar selectos a registrarse como Profesional SIN PAGAR los 20€ de membresía.
+# El usuario invitado recibe account_type='professional' + PRO_MEMBERSHIP_TOKENS
+# (10) tokens cortesía. Puede comprar packs de tokens después como cualquier
+# Pro pagador. Membresía permanente (no caduca).
+PRO_INVITE_CODE = os.environ.get("PRO_INVITE_CODE", "").strip()
+
 
 class CheckoutRequest(BaseModel):
     pack: int  # 5, 20 o 60
@@ -165,6 +173,63 @@ def create_pro_checkout(
     db.commit()
 
     return {"checkout_url": session.url}
+
+
+# ── Activación cortesía Profesional (sin pago, invite-only) ──────────────────
+class ProCourtesyRequest(BaseModel):
+    invite_code: str
+
+
+@router.post("/payments/pro-activate-courtesy")
+def pro_activate_courtesy(
+    req: ProCourtesyRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Activa cuenta Profesional cortesía (sin pago Stripe). Requiere que el
+    invite_code coincida con la env var PRO_INVITE_CODE.
+
+    Flujo:
+      1. Validar que PRO_INVITE_CODE está configurado en el backend.
+      2. Validar que el código enviado coincide (case-sensitive, trim espacios).
+      3. Rechazar si la cuenta ya es Profesional (idempotente).
+      4. Activar account_type='professional' y sumar PRO_MEMBERSHIP_TOKENS
+         (10) tokens cortesía.
+      5. Membresía permanente: NO se programa caducidad. Si gastan los tokens,
+         pueden comprar packs como cualquier Pro pagador.
+
+    Diseñado para 3B del producto: solo email+password al activarse, los datos
+    de empresa (CIF, logo, ciudad…) se completan después desde el área Pro.
+    """
+    if not PRO_INVITE_CODE:
+        raise HTTPException(
+            status_code=503,
+            detail="Activación cortesía no disponible: PRO_INVITE_CODE no configurado en el servidor.",
+        )
+    if req.invite_code.strip() != PRO_INVITE_CODE:
+        raise HTTPException(
+            status_code=403,
+            detail="Código de invitación profesional inválido.",
+        )
+    if current_user.account_type == "professional":
+        raise HTTPException(
+            status_code=400,
+            detail="Tu cuenta ya es Profesional.",
+        )
+    current_user.account_type = "professional"
+    current_user.tokens = float(current_user.tokens) + PRO_MEMBERSHIP_TOKENS
+    db.commit()
+    print(
+        f"[Pro-Courtesy] {current_user.email} activado Profesional cortesía · "
+        f"+{PRO_MEMBERSHIP_TOKENS} tokens · saldo={current_user.tokens}"
+    )
+    return {
+        "ok": True,
+        "account_type": "professional",
+        "tokens": float(current_user.tokens),
+        "credited": PRO_MEMBERSHIP_TOKENS,
+    }
 
 
 # ── Webhook de Stripe (automático, <30 segundos) ───────────────────────────────

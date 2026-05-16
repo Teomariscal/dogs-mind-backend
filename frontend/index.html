@@ -3479,8 +3479,12 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   border-top: none !important;
 }
 #s-chat .chat-bar {
-  padding: 12px 16px max(20px, env(safe-area-inset-bottom, 20px)) !important;
+  /* padding-right ampliado (20px) para garantizar que el send button no quede
+     pegado al borde derecho del viewport en iPhone 14 / Safari. Reservamos
+     visualmente el espacio del botón circular + margen de respiro. */
+  padding: 12px 20px max(20px, env(safe-area-inset-bottom, 20px)) 16px !important;
   gap: 10px;
+  align-items: flex-end !important;
 }
 #s-chat .chat-ta {
   background: rgba(255,250,240,0.06) !important;
@@ -3491,6 +3495,16 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   padding: 12px 18px !important;
   font-size: 14px !important;
   line-height: 1.45;
+  /* min-width:0 es el fix canónico flex: sin esto, el textarea con texto
+     largo empuja al send button fuera del contenedor visible en iOS Safari. */
+  min-width: 0 !important;
+  flex: 1 1 0% !important;
+}
+#s-chat .send {
+  /* flex-shrink:0 reforzado scope-locked al s-chat para asegurar que el
+     send button NUNCA se reduce ni desplaza por culpa del textarea. */
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
 }
 #s-chat .chat-ta::placeholder { color: rgba(255,250,240,0.40) !important; }
 #s-chat .chat-ta:focus {

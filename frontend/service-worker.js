@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v131 (Pro cortesía via invite: nuevo endpoint backend /payments/pro-activate-courtesy valida PRO_INVITE_CODE env var, activa account_type='professional' + 10 tokens cortesía SIN Stripe, membresía permanente. Frontend: nuevo campo #ps-invite en s-pro-signup autofilleado desde dm_pending_invite (mismo IIFE que #reg-invite). psSubmit() detecta invite_code → llama /pro-activate-courtesy en lugar de Stripe → skip datos empresa (3B: se completan luego desde área Pro) → toast "Bienvenido Profesional! 10 tokens cortesía" → goTo s-home. Listener reactivo: botón "Pagar 20€" → "Activar gratis (cortesía)" + total "Gratis" cuando hay código. Mismo link ?invite=CODIGO funciona para particular (8 tokens) y Pro (membresía gratis) segun por dónde entren.)
+// Dogs Mind Service Worker — v132 (fix chat-bar iPhone 14 send button tapado: textarea sin min-width:0 empujaba al send button (38px circular) fuera del viewport visible en iOS Safari porque el default min-content de flex items es > 0 y el contenido del textarea se expande sin permitir shrink. Fix scope-locked a #s-chat: a) .chat-ta min-width:0!important + flex:1 1 0%!important (canon flexbox overflow fix), b) .send flex-shrink:0!important + flex-grow:0!important reforzado, c) .chat-bar padding ampliado a 12px 20px ... 16px (extra padding-right para garantizar separación del send button del borde derecho del viewport). Verificado en preview a 390x844 iPhone 14: send button x=332+38=370 con 20px margin del viewport 390. Cero impacto en s-refine (chat refine) que usa selectores distintos.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v131';
+const CACHE_NAME = 'dogs-mind-v132';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

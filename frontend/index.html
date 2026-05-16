@@ -2518,48 +2518,36 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   display: inline-block;
 }
 .aig-peek {
-  /* Decoracion 'peek' Mario asomando detras de las letras "Aigents":
-     el z-index:-1 no se comporta consistente en mobile (Safari iOS rompe
-     el stacking context del padre inline-block en algunos casos) y la
-     cara aparece visible POR ENCIMA de las letras, no detras. Ocultamos
-     para limpieza visual hasta refinar el efecto post-launch. */
-  display: none;
+  /* Mario flotando en la esquina superior derecha de s-aigents-intro.
+     Posicion fija respecto al padre .aig-peek-anchor (inline-block del
+     titulo), reposicionada a top negativo para subir sobre la zona del
+     eyebrow + back button. Animacion float vertical sutil 3.6s loop.
+     z-index:5 sobre fondo, no tapa back ni eyebrow. */
   position: absolute;
-  /* nudge so face emerges between t and s of "Aigents" */
-  right: 11%;
-  top: -32px;
-  width: 70px;
-  height: 70px;
+  right: -32px;
+  top: -110px;
+  width: 64px;
+  height: 64px;
   background-image: url('peek-mario.webp');
   background-size: cover;
   background-position: 50% 24%;
   border-radius: 50%;
-  z-index: -1;
+  z-index: 5;
   pointer-events: none;
-  filter:
-    drop-shadow(0 6px 10px rgba(0,0,0,0.6))
-    drop-shadow(-1px -1px 0 rgba(255,210,150,0.22))
-    drop-shadow(2px 2px 0 rgba(0,0,0,0.35));
+  box-shadow:
+    0 8px 20px rgba(0,0,0,0.45),
+    0 0 0 2px rgba(255,210,150,0.22) inset;
+  animation: aigPeekFloat 4.2s ease-in-out infinite;
+  will-change: transform;
   transform-origin: 50% 100%;
-  /* Loop teatral: se asoma → mira a un lado → se esconde → vuelve */
-  animation: aig-peek-show 7.5s ease-in-out infinite;
 }
-@keyframes aig-peek-show {
-  /* hidden behind letters */
-  0%   { transform: translateY(22px) rotate(-2deg) scale(0.92); }
-  /* sube a asomarse */
-  12%  { transform: translateY(0)    rotate(-4deg) scale(1);    }
-  /* mira a la izquierda con la cabeza ladeada */
-  28%  { transform: translateY(-2px) rotate(-7deg) scale(1.02); }
-  /* recentra */
-  44%  { transform: translateY(-1px) rotate( 0deg) scale(1);    }
-  /* mira a la derecha */
-  58%  { transform: translateY(-3px) rotate( 7deg) scale(1.02); }
-  /* asiente */
-  72%  { transform: translateY( 1px) rotate( 2deg) scale(1);    }
-  /* se esconde otra vez */
-  88%  { transform: translateY(18px) rotate(-1deg) scale(0.94); }
-  100% { transform: translateY(22px) rotate(-2deg) scale(0.92); }
+@keyframes aigPeekFloat {
+  /* Mario flotando sutilmente con leve balanceo */
+  0%   { transform: translateY(0)    rotate(-3deg) scale(1);    }
+  25%  { transform: translateY(-6px) rotate( 2deg) scale(1.02); }
+  50%  { transform: translateY(-10px) rotate( 4deg) scale(1.03); }
+  75%  { transform: translateY(-6px) rotate( 1deg) scale(1.02); }
+  100% { transform: translateY(0)    rotate(-3deg) scale(1);    }
 }
 
 .aig-lede {

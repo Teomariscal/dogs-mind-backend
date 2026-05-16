@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v125 (fix s-aigents-intro: ocultar decoracion .aig-peek (Mario asomando detras del titulo 'Aigents'). El z-index:-1 no funcionaba en mobile iOS Safari debido a stacking context inline-block del padre - la cara aparecia ENCIMA de las letras, no detras. display:none scope-locked, posible recuperar post-launch si Teo decide refinar el efecto. Titulo 'The Aigents' / 'Los Aigents' queda limpio.)
+// Dogs Mind Service Worker — v126 (Mario peek recuperado pero flotando arriba en s-aigents-intro: .aig-peek pasa de 'asomar entre letras' (que rompia en mobile iOS) a 'flotar en zona superior'. Posicion right:-32px top:-110px relativo al span del titulo (ubica Mario en zona arriba del eyebrow), animacion aigPeekFloat 4.2s con translateY 0/-10px + rotacion -3/+4deg + scale sutil. Reemplaza la teatral aig-peek-show que ya no aplica para esta posicion. Visualmente: circulo Mario con su french bulldog visible, sombra premium, flotando sutil.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v125';
+const CACHE_NAME = 'dogs-mind-v126';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

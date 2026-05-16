@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v123 (fix nav atrapado tras descargar PDF: anadidos CTAs primary grandes mobile-friendly al final del bloque de acciones. s-abc-translated: 'Volver al análisis' (goTo s-abc). s-plan-simple: 'Volver al plan' (goTo s-tracking). i18n ES + EN. Antes tras pulsar Regenerar/Descargar PDF el usuario no veia forma de salir de la pantalla pet-owners y el atras del navegador rompia el caso.)
+// Dogs Mind Service Worker — v124 (fix download PDF mobile: _downloadAccessiblePdf ya no usa <a download> ciego (en iOS Safari NAVEGA al blob y saca al user de la app). Nueva estrategia 3-tier: (1) navigator.share con files -> menu nativo iOS/Android (Acrobat, Archivos, AirDrop, etc), user elige donde guardar SIN salir de la app. (2) window.open(blobUrl, '_blank') -> nueva pestaña con el PDF, app queda intacta. (3) <a download> tradicional para desktop antiguo. AbortError del share API se trata como cancel silencioso.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v123';
+const CACHE_NAME = 'dogs-mind-v124';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

@@ -87,6 +87,12 @@ Reglas duras:
 
 | Commit | Fecha | Locked |
 |---|---|---|
+| `9007f15` | 2026-05-16 | Fix chat Aigents send button tapado: s-chat añadido a noNav array → #global-nav se oculta durante el chat (el chat tiene su propio back button en header). El botón ↑ enviar queda libre. SW v129. |
+| `ac836cb` | 2026-05-16 | Keyboard-aware layout mobile: visualViewport API listener actualiza --kbd-h dinámico. .phone mobile <768px usa padding-bottom: var(--kbd-h) → cuando aparece teclado iOS, la chat-bar y inputs no quedan tapados. SW v128. |
+| `6de2a96` | 2026-05-16 | i18n s-records: textos hardcoded en JS (renderRecords, statusLabel, changeRecordStatus) ahora usan _i18nText(). Nuevas claves rec_status_*/rec_tag_*/rec_btn_*. EN: In Progress / Resolved / Closed, ABC Analysis, LIMA Plan, + Follow-up, Status, + New Consultation, Daily follow-up. SW v127. **VERIFICADO POR TEO: "idioma solucionado"**. |
+| `a419c5e` | 2026-05-16 | Mario peek recuperado flotando arriba derecha en s-aigents-intro. Animación aigPeekFloat 4.2s ease-in-out infinite (translateY/rotate/scale sutil). Posición right:-32px top:-110px relativo al span del título. SW v126. |
+| `a5d5051` | 2026-05-16 | Fix s-aigents-intro: .aig-peek display:none (Mario asomando entre letras 'Aigents' aparecía visible POR ENCIMA en mobile iOS, no detrás como pretendía z-index:-1). SW v125. |
+| `b4c8234` | 2026-05-16 | Fix download PDF mobile 3-tier: (1) navigator.share({files}) menú nativo iOS Acrobat/Archivos/AirDrop, no saca de la app. (2) window.open(blobUrl, '_blank') fallback nueva pestaña. (3) <a download> último fallback desktop. SW v124. |
 | `427113a` | 2026-05-16 | Fix nav atrapado tras descargar PDF: botón verde grande mobile-friendly al final del footer en s-abc-translated ('Volver al análisis' → s-abc) y s-plan-simple ('Volver al plan' → s-tracking). i18n ES + EN. Header sticky con back ← se mantiene. SW v123. **VERIFICADO POR TEO: "ok"**. Anclado. |
 | `d38ba42` | 2026-05-16 | Copy s-tokens: 'consume 3 tokens' -> 'consume aproximadamente 3 tokens' (ES) / 'approximately 3 tokens' (EN). Coste real varia segun complejidad. SW v122. **VERIFICADO**. |
 | `84ac5e5` | 2026-05-16 | Footer s-tokens: quitado PayPal enganoso (backend Stripe). Reemplazado por icono SVG tarjeta + 'Pago seguro con tarjeta' / 'Secure card payment'. PayPal Business pendiente integracion (Smart Buttons SDK + dev.paypal.com app). SW v121. **VERIFICADO POR TEO: "mejor quitemos paypal"**. Anclado. |

@@ -2518,6 +2518,12 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   display: inline-block;
 }
 .aig-peek {
+  /* Decoracion 'peek' Mario asomando detras de las letras "Aigents":
+     el z-index:-1 no se comporta consistente en mobile (Safari iOS rompe
+     el stacking context del padre inline-block en algunos casos) y la
+     cara aparece visible POR ENCIMA de las letras, no detras. Ocultamos
+     para limpieza visual hasta refinar el efecto post-launch. */
+  display: none;
   position: absolute;
   /* nudge so face emerges between t and s of "Aigents" */
   right: 11%;

@@ -9281,6 +9281,24 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
           } catch(e) {}
         }
       });
+      // Cuando hay invite aplicado, actualizar el banner "5 tokens de bienvenida"
+      // del form de registro particular a "8 tokens de bienvenida" para reflejar
+      // el bonus real que recibirá el usuario al registrarse con código válido.
+      // Idempotente: solo escribe si encuentra el texto base original.
+      try {
+        var welcomeBanner = document.querySelector('[data-i18n="login_welcome_tokens"]');
+        if (welcomeBanner) {
+          var langWB = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+          welcomeBanner.textContent = (langWB === 'en') ? '8 welcome tokens' : '8 tokens de bienvenida';
+          // Marcamos el banner visualmente más vibrante (fondo verde más sólido)
+          var bannerWrap = welcomeBanner.closest('div[style*="green-bg"]') || welcomeBanner.parentElement.parentElement;
+          if (bannerWrap && !bannerWrap.dataset.inviteUpgraded) {
+            bannerWrap.style.setProperty('background', 'linear-gradient(135deg, #d4e2cb, rgba(74,103,65,0.18))', 'important');
+            bannerWrap.style.setProperty('border', '1.5px solid rgba(74,103,65,0.45)', 'important');
+            bannerWrap.dataset.inviteUpgraded = '1';
+          }
+        }
+      } catch(e) {}
     };
     fill();
     // Reintentos por si el DOM aún no ha pintado el form de registro

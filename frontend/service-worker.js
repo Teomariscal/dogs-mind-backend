@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v136 (mejora visual campo invite prerrellenado: el estilo sutil anterior (bg 6% verde + borde 35% verde) se confundía con un input vacío. Ahora: cuando el IIFE INVITE LINK AUTO-FILL prellena #reg-invite o #ps-invite, aplica estilo inequívoco solid sage green (bg #dbe7d2 + border 2px #4a6741 + color #1a3320 + font-weight 700 + letter-spacing 0.3px + readonly attribute para bloquear edición). Adicionalmente inserta un badge encima del input con SVG checkmark + texto "CÓDIGO APLICADO: BOCALAN-XX" (verde sólido bg #4a6741 + texto blanco-cream). Mismo patrón ES y EN. Verificado preview iPhone 14 con BOCALAN-CL: visualmente claro y profesional. Solo afecta a inputs prerrellenados, no a campos manuales.)
+// Dogs Mind Service Worker — v137 (banner welcome tokens dinámico: cuando el IIFE INVITE LINK AUTO-FILL prellena un código de invitación, además de aplicar el estilo verde sólido al input y mostrar el badge "CÓDIGO APLICADO" encima, también actualiza el banner inferior del form de registro de "5 tokens de bienvenida" a "8 tokens de bienvenida" (ES) / "8 welcome tokens" (EN) para reflejar el bonus real que recibirá el usuario al registrarse con código válido. Banner upgrade visual también: fondo verde más sólido + borde verde más fuerte. Idempotente via data-attribute inviteUpgraded.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v136';
+const CACHE_NAME = 'dogs-mind-v137';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

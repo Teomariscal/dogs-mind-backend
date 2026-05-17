@@ -31,7 +31,7 @@ JPEG_QUALITY = 82
 
 # ── OpenCV implementation ────────────────────────────────────────────────────
 
-def _extract_with_cv2(video_path: str, max_frames: int) -> list[str]:
+def _extract_with_cv2(video_path: str, max_frames: int, max_duration_sec: float | None = None) -> list[str]:
     import cv2  # type: ignore
 
     cap = cv2.VideoCapture(video_path)
@@ -42,8 +42,20 @@ def _extract_with_cv2(video_path: str, max_frames: int) -> list[str]:
     if total <= 0:
         raise RuntimeError("Could not determine frame count")
 
-    # Evenly spaced frame indices
-    indices = [int(total * i / max_frames) for i in range(max_frames)]
+    # Si se pasa max_duration_sec, limitamos el rango de frames a los primeros
+    # N segundos del vídeo (FPS × max_duration_sec). Esto permite que el usuario
+    # suba un vídeo más largo (hasta el tope del endpoint) y nosotros analicemos
+    # solo el principio — UX más amigable que rechazar el vídeo entero.
+    effective_total = total
+    if max_duration_sec is not None and max_duration_sec > 0:
+        fps = float(cap.get(cv2.CAP_PROP_FPS) or 0)
+        if fps > 0:
+            frames_in_range = int(fps * max_duration_sec)
+            if 0 < frames_in_range < total:
+                effective_total = frames_in_range
+
+    # Evenly spaced frame indices DENTRO del rango efectivo
+    indices = [int(effective_total * i / max_frames) for i in range(max_frames)]
 
     frames_b64: list[str] = []
     for idx in indices:
@@ -70,16 +82,25 @@ def _extract_with_cv2(video_path: str, max_frames: int) -> list[str]:
 
 # ── ffmpeg fallback ──────────────────────────────────────────────────────────
 
-def _extract_with_ffmpeg(video_path: str, max_frames: int) -> list[str]:
+def _extract_with_ffmpeg(video_path: str, max_frames: int, max_duration_sec: float | None = None) -> list[str]:
     """
     Uses ffmpeg to extract evenly spaced frames to a temp directory.
     Requires ffmpeg to be installed and in PATH.
+
+    Si max_duration_sec se pasa, usa -t para limitar el rango procesado a
+    los primeros N segundos (UX: usuario sube vídeo largo, analizamos solo
+    el principio).
     """
     with tempfile.TemporaryDirectory() as tmpdir:
         # Extract frames using select filter (evenly spaced)
         out_pattern = os.path.join(tmpdir, "frame_%03d.jpg")
         cmd = [
             "ffmpeg", "-y", "-i", video_path,
+        ]
+        # Si hay límite de duración, restringe el rango ANTES del filtro
+        if max_duration_sec is not None and max_duration_sec > 0:
+            cmd += ["-t", f"{max_duration_sec:.2f}"]
+        cmd += [
             "-vf", f"select=not(mod(n\\,1)),scale={MAX_WIDTH}:-2",
             "-vframes", str(max_frames * 10),   # grab more, then subsample
             "-q:v", "4",                         # JPEG quality (1=best, 31=worst)
@@ -153,17 +174,29 @@ def get_duration_seconds(video_path: str) -> float:
     return -1.0
 
 
-def extract_frames(video_path: str, max_frames: int = MAX_FRAMES) -> list[str]:
+def extract_frames(
+    video_path: str,
+    max_frames: int = MAX_FRAMES,
+    max_duration_sec: float | None = None,
+) -> list[str]:
     """
     Extract up to *max_frames* representative frames from *video_path*.
+
+    Si max_duration_sec se pasa, los frames se extraen únicamente del rango
+    [0, max_duration_sec] del vídeo (el resto se ignora). Esto permite UX
+    "soft truncate": usuario sube un vídeo de 18s, el endpoint pasa 10.0
+    como max_duration_sec → solo analizamos los primeros 10s.
 
     Returns a list of base64-encoded JPEG strings.
     Tries OpenCV first; falls back to ffmpeg if cv2 is not installed.
     Raises RuntimeError if neither method succeeds.
     """
     try:
-        frames = _extract_with_cv2(video_path, max_frames)
-        logger.info("Extracted %d frames with OpenCV from %s", len(frames), video_path)
+        frames = _extract_with_cv2(video_path, max_frames, max_duration_sec=max_duration_sec)
+        logger.info(
+            "Extracted %d frames with OpenCV from %s (max_duration_sec=%s)",
+            len(frames), video_path, max_duration_sec,
+        )
         return frames
     except ImportError:
         logger.warning("cv2 not available — falling back to ffmpeg")
@@ -171,8 +204,11 @@ def extract_frames(video_path: str, max_frames: int = MAX_FRAMES) -> list[str]:
         logger.warning("OpenCV extraction failed (%s) — trying ffmpeg", e)
 
     try:
-        frames = _extract_with_ffmpeg(video_path, max_frames)
-        logger.info("Extracted %d frames with ffmpeg from %s", len(frames), video_path)
+        frames = _extract_with_ffmpeg(video_path, max_frames, max_duration_sec=max_duration_sec)
+        logger.info(
+            "Extracted %d frames with ffmpeg from %s (max_duration_sec=%s)",
+            len(frames), video_path, max_duration_sec,
+        )
         return frames
     except Exception as e:
         raise RuntimeError(

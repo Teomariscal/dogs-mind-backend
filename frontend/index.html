@@ -11676,10 +11676,14 @@ function getVal(id, fallback) {
     if (files && files[0]) attachVideo(files[0]);
   }
 
-  // MAX duration enforced (Teo 2026-05-17): 10s. Backend valida también con
-  // ffprobe/OpenCV y rechaza si > 10s ANTES de cobrar. Margen 10.5s aquí para
-  // tolerar pequeñas imprecisiones del HTMLVideoElement vs backend.
-  var MAX_VIDEO_DURATION_SEC = 10;
+  // Soft-truncate UX (Teo 2026-05-17):
+  // - Si vídeo ≤ 10s → procesamos completo.
+  // - Si vídeo > 10s y ≤ 20s → aceptamos pero solo analizamos los primeros 10s
+  //   (backend hace el truncate al extraer frames). Mostramos texto info al
+  //   usuario: "Tu vídeo dura Xs — analizaremos los primeros 10s".
+  // - Si vídeo > 20s → rechazamos con alert. Probablemente vídeo equivocado.
+  var ANALYSIS_VIDEO_DURATION_SEC = 10;
+  var MAX_VIDEO_DURATION_SEC      = 20;
 
   function attachVideo(file) {
     var maxBytes = 200 * 1024 * 1024;
@@ -11699,26 +11703,28 @@ function getVal(id, fallback) {
     probe.onloadedmetadata = function() {
       var d = probe.duration;
       URL.revokeObjectURL(probeUrl);
+      // Tope superior con margen 0.5s tolerancia vs backend (20.0s)
       if (isFinite(d) && d > (MAX_VIDEO_DURATION_SEC + 0.5)) {
         var lang2 = (window.getCurrentLang ? window.getCurrentLang() : 'es');
         alert(lang2 === 'en'
           ? 'Video is ' + d.toFixed(1) + 's. Maximum allowed: ' + MAX_VIDEO_DURATION_SEC + ' seconds. Please trim it and try again.'
           : 'El vídeo dura ' + d.toFixed(1) + 's. Máximo permitido: ' + MAX_VIDEO_DURATION_SEC + ' segundos. Recórtalo y vuelve a subirlo.');
-        // Limpiar input file para que puedan re-seleccionar el mismo nombre tras editar
         try { document.getElementById('inp-video').value = ''; } catch(e) {}
         return;
       }
-      _doAttachVideo(file);
+      // Aceptable. Pasamos la duración detectada para que _doAttachVideo
+      // muestre el texto info correcto si supera el rango analizado.
+      _doAttachVideo(file, isFinite(d) ? d : null);
     };
     probe.onerror = function() {
       // Si no podemos leer metadata (formato raro), aceptamos — backend validará y rechazará si procede.
       URL.revokeObjectURL(probeUrl);
-      _doAttachVideo(file);
+      _doAttachVideo(file, null);
     };
     probe.src = probeUrl;
   }
 
-  function _doAttachVideo(file) {
+  function _doAttachVideo(file, durationSec) {
     window._attachedVideo = file;
 
     // Show preview
@@ -11726,8 +11732,36 @@ function getVal(id, fallback) {
     var videoEl = document.getElementById('video-preview-el');
     videoEl.src = url;
 
+    // File info: nombre · tamaño · duración (+ aviso si supera analysis window).
     var mb = (file.size / 1024 / 1024).toFixed(1);
-    document.getElementById('video-file-info').textContent = file.name + ' · ' + mb + ' MB';
+    var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+    var info = file.name + ' · ' + mb + ' MB';
+    if (durationSec != null && isFinite(durationSec)) {
+      info += ' · ' + durationSec.toFixed(1) + 's';
+    }
+    document.getElementById('video-file-info').textContent = info;
+
+    // Aviso inline cuando duración > 10s pero aceptada (≤ 20s): le decimos al
+    // usuario que solo analizaremos los primeros N segundos. Reusa el slot
+    // video-trim-notice si existe; si no, lo creamos sobre la marcha.
+    var notice = document.getElementById('video-trim-notice');
+    if (!notice) {
+      notice = document.createElement('div');
+      notice.id = 'video-trim-notice';
+      notice.style.cssText = 'font-size:11px;color:var(--green3);background:rgba(74,103,65,0.08);border:1px solid rgba(74,103,65,0.25);border-radius:8px;padding:8px 10px;margin-top:8px;text-align:left;line-height:1.4;display:none;';
+      var wrap = document.getElementById('video-preview-wrap');
+      if (wrap) wrap.appendChild(notice);
+    }
+    if (durationSec != null && isFinite(durationSec) && durationSec > ANALYSIS_VIDEO_DURATION_SEC) {
+      var ds = durationSec.toFixed(1);
+      notice.textContent = (lang === 'en')
+        ? 'Your video is ' + ds + 's — we will analyze the first ' + ANALYSIS_VIDEO_DURATION_SEC + ' seconds.'
+        : 'Tu vídeo dura ' + ds + 's — analizaremos los primeros ' + ANALYSIS_VIDEO_DURATION_SEC + ' segundos.';
+      notice.style.display = 'block';
+    } else {
+      notice.style.display = 'none';
+    }
+
     document.getElementById('video-drop-label').style.display  = 'none';
     document.getElementById('video-preview-wrap').style.display = 'block';
 
@@ -14189,7 +14223,7 @@ function endTourIntro() {
       anam_freq_occasion:      'Ocasionalmente',
       anam_freq_rare:          'Raramente',
       anam_drop_text:          'Pulsa o arrastra un vídeo aquí',
-      anam_drop_formats:       'MP4, MOV, AVI · Máx 10 segundos · +1 token',
+      anam_drop_formats:       'MP4, MOV, AVI · Máx 20s (analizamos los primeros 10) · +1 token',
       anam_video_remove:       'Quitar vídeo',
       anam_modal_title:        'Tokens insuficientes',
       anam_modal_text:         'Necesitas al menos <strong>10 tokens</strong> para adjuntar un video. Actualmente tienes <strong id="modal-token-count">0</strong> tokens.',
@@ -15000,7 +15034,7 @@ function endTourIntro() {
       anam_freq_occasion:      'Occasionally',
       anam_freq_rare:          'Rarely',
       anam_drop_text:          'Tap or drag a video here',
-      anam_drop_formats:       'MP4, MOV, AVI · Max 10 seconds · +1 token',
+      anam_drop_formats:       'MP4, MOV, AVI · Max 20s (we analyze the first 10) · +1 token',
       anam_video_remove:       'Remove video',
       anam_modal_title:        'Not enough tokens',
       anam_modal_text:         'You need at least <strong>10 tokens</strong> to attach a video. You currently have <strong id="modal-token-count">0</strong> tokens.',

@@ -61,10 +61,13 @@ from app.core.token_utils import deduct_token
 # Max video size accepted: 200 MB
 MAX_VIDEO_BYTES = 200 * 1024 * 1024
 
-# Max video duration (Teo 2026-05-17): 10s. Vídeos más largos se rechazan
-# antes de extraer frames + invocar IA (ahorra tokens + UX clara).
-# Frontend valida también con metadata HTMLVideoElement antes de subir.
-MAX_VIDEO_DURATION_SEC = 10.0
+# Vídeo: soft-truncate UX (Teo 2026-05-17):
+# - ANALYSIS_VIDEO_DURATION_SEC: lo que realmente analizamos (8 frames de aquí).
+# - MAX_VIDEO_DURATION_SEC: tope superior aceptado. Vídeos entre 10-20s se
+#   aceptan pero solo se analizan los primeros 10s (UX amigable vs error puro).
+# - Vídeos > 20s se rechazan (probable error del usuario, vídeo equivocado).
+ANALYSIS_VIDEO_DURATION_SEC = 10.0
+MAX_VIDEO_DURATION_SEC      = 20.0
 
 # Pricing (Teo 2026-05-17): vídeo cobra +1 token sobre texto-only.
 # Coste extra real Anthropic ~$0.011 → cobro extra 1 tok ≈ 0.80€ (margen 92%).
@@ -204,6 +207,9 @@ async def create_analysis_with_video(
 
         from app.services.video_processor import extract_frames, get_duration_seconds
         duration = get_duration_seconds(tmp_path)
+        # Tope superior: rechazar > MAX_VIDEO_DURATION_SEC (20s). Vídeos
+        # entre ANALYSIS_VIDEO_DURATION_SEC (10s) y MAX se aceptan pero solo
+        # se analizan los primeros 10s (soft truncate UX-friendly).
         if duration > 0 and duration > MAX_VIDEO_DURATION_SEC:
             raise HTTPException(
                 status_code=413,
@@ -228,7 +234,13 @@ async def create_analysis_with_video(
             )
 
         try:
-            frames = extract_frames(tmp_path)
+            # Pasar ANALYSIS_VIDEO_DURATION_SEC para soft-truncate al rango
+            # [0, 10s]. Si el vídeo dura más, los frames se extraen solo del
+            # principio (UX amigable: no rechazamos vídeos de 12-20s).
+            frames = extract_frames(
+                tmp_path,
+                max_duration_sec=ANALYSIS_VIDEO_DURATION_SEC,
+            )
         except RuntimeError as e:
             # Frame extraction failed — fall back to text-only analysis
             frames = []

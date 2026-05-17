@@ -308,3 +308,125 @@ def report_delegations(
             "scope": "lifetime" if (not from_ and not to) else "filtered",
         },
     )
+
+
+# ── CFO REPORT — agregados de usage_log para análisis de coste/margen ───────
+# Endpoint admin para que la skill CFO obtenga datos reales sin pasar por
+# dashboards externos. Cero exposición de datos individuales, solo agregados.
+
+from app.models.usage_log import UsageLog
+
+
+@router.get("/admin/cfo-report")
+def cfo_report(
+    from_: Optional[date] = Query(None, alias="from", description="YYYY-MM-DD"),
+    to: Optional[date] = Query(None, description="YYYY-MM-DD inclusivo"),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Devuelve agregados de usage_log para análisis financiero CFO:
+      - Coste real Anthropic por endpoint (SUM cost_eur)
+      - Tokens vendidos al usuario por endpoint (SUM tokens_charged)
+      - Margen real (tokens_charged_eur - cost_eur) por endpoint
+      - Coste por modelo IA
+      - Total casos / éxitos / errores
+
+    Sin filtros temporales → lifetime. Con `from`/`to` → ventana.
+    Solo el agregado, NUNCA filas individuales.
+    """
+    _require_admin(current_user)
+
+    q_base = db.query(UsageLog)
+    if from_:
+        q_base = q_base.filter(UsageLog.created_at >= datetime.combine(from_, datetime.min.time()))
+    if to:
+        q_base = q_base.filter(UsageLog.created_at <= datetime.combine(to, datetime.max.time()))
+
+    # ── Por endpoint ────────────────────────────────────────────────────────
+    by_endpoint = (
+        q_base.with_entities(
+            UsageLog.endpoint,
+            func.count(UsageLog.id).label("calls"),
+            func.sum(func.case((UsageLog.success == "ok", 1), else_=0)).label("ok"),
+            func.sum(func.case((UsageLog.success == "error", 1), else_=0)).label("errors"),
+            func.coalesce(func.sum(UsageLog.input_tokens), 0).label("input_toks"),
+            func.coalesce(func.sum(UsageLog.output_tokens), 0).label("output_toks"),
+            func.coalesce(func.sum(UsageLog.cost_eur), 0.0).label("cost_eur_total"),
+            func.coalesce(func.avg(UsageLog.cost_eur), 0.0).label("cost_eur_avg"),
+            func.coalesce(func.sum(UsageLog.tokens_charged), 0.0).label("tokens_charged_total"),
+        )
+        .group_by(UsageLog.endpoint)
+        .order_by(func.sum(UsageLog.cost_eur).desc().nullslast())
+        .all()
+    )
+
+    endpoint_rows = []
+    grand_cost = 0.0
+    grand_charged_tokens = 0.0
+    grand_calls = 0
+    for r in by_endpoint:
+        cost = float(r.cost_eur_total or 0)
+        charged_tok = float(r.tokens_charged_total or 0)
+        # Estimación valor EUR de tokens cobrados (€/tok blended ~0.80 pack 20)
+        charged_eur = charged_tok * 0.80
+        endpoint_rows.append({
+            "endpoint": r.endpoint,
+            "calls": int(r.calls or 0),
+            "ok": int(r.ok or 0),
+            "errors": int(r.errors or 0),
+            "input_tokens_total": int(r.input_toks or 0),
+            "output_tokens_total": int(r.output_toks or 0),
+            "cost_eur_total": round(cost, 4),
+            "cost_eur_avg_per_call": round(float(r.cost_eur_avg or 0), 4),
+            "tokens_charged_total": round(charged_tok, 2),
+            "tokens_charged_eur_estimated": round(charged_eur, 2),
+            "margin_eur_estimated": round(charged_eur - cost, 2),
+            "margin_pct_estimated": round((charged_eur - cost) / charged_eur * 100, 1) if charged_eur > 0 else None,
+        })
+        grand_cost += cost
+        grand_charged_tokens += charged_tok
+        grand_calls += int(r.calls or 0)
+
+    # ── Por modelo IA ───────────────────────────────────────────────────────
+    by_model = (
+        q_base.with_entities(
+            UsageLog.model,
+            func.count(UsageLog.id).label("calls"),
+            func.coalesce(func.sum(UsageLog.cost_eur), 0.0).label("cost_eur_total"),
+        )
+        .group_by(UsageLog.model)
+        .order_by(func.sum(UsageLog.cost_eur).desc().nullslast())
+        .all()
+    )
+    model_rows = [{
+        "model": r.model,
+        "calls": int(r.calls or 0),
+        "cost_eur_total": round(float(r.cost_eur_total or 0), 4),
+    } for r in by_model]
+
+    # ── Total general ───────────────────────────────────────────────────────
+    grand_charged_eur = grand_charged_tokens * 0.80
+    return {
+        "period": {
+            "from": from_.isoformat() if from_ else None,
+            "to": to.isoformat() if to else None,
+            "scope": "lifetime" if (not from_ and not to) else "filtered",
+        },
+        "totals": {
+            "calls": grand_calls,
+            "cost_eur_total": round(grand_cost, 4),
+            "tokens_charged_total": round(grand_charged_tokens, 2),
+            "tokens_charged_eur_estimated_at_0_80_per_tok": round(grand_charged_eur, 2),
+            "margin_eur_estimated": round(grand_charged_eur - grand_cost, 2),
+            "margin_pct_estimated": round((grand_charged_eur - grand_cost) / grand_charged_eur * 100, 1) if grand_charged_eur > 0 else None,
+        },
+        "by_endpoint": endpoint_rows,
+        "by_model": model_rows,
+        "notes": [
+            "tokens_charged_eur_estimated usa blended €/tok = 0.80 (pack 20 preferido)",
+            "cost_eur viene del log al ejecutar la llamada (precio Anthropic en ese momento)",
+            "tokens_charged = lo cobrado al usuario, NO €",
+            "Endpoints sin cobro (/intervention, /daily-followup) aparecen con tokens_charged=0 → margin negativo = coste regalado",
+        ],
+    }

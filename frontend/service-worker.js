@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v139 (vídeo en anamnesis: límite duración 10s + pricing +1 token. Decisión Teo 2026-05-17 tras análisis CFO. Backend: ANALYSIS_VIDEO_TOKEN_COST=4.0 (vs 3.0 texto-only), MAX_VIDEO_DURATION_SEC=10.0, nuevo helper get_duration_seconds() en video_processor.py (OpenCV primario, ffprobe fallback). Endpoint /analysis/video: 1) validar formato 2) validar tamaño 3) escribir tmp 4) measure duration → rechaza HTTP 413 ANTES de cobrar si > 10s 5) deduct 4 tokens 6) extract frames + run analysis. Frontend attachVideo: HTMLVideoElement metadata probe lee duración asíncrono, alert + reset input si > 10.5s (margen vs backend 10s). i18n anam_drop_formats actualizado ES+EN: "Máx 10 segundos · +1 token". Margen 92% sobre vídeo (capture justa del valor multimodal sin abusar). 🚩 pendiente revisar: /intervention NO cobra tokens hoy.)
+// Dogs Mind Service Worker — v140 (mejora copy mensajes 402 'Sin tokens'): nuevo helper top-level _fmtInsufTokens(needed) que lee balance de localStorage por canal estable (evita scope IIFE bug) y devuelve "Necesitas N tokens, tienes M. Recarga para continuar." (ES) / "You need N tokens, you have M. Recharge to continue." (EN). Reemplaza el genérico "Sin tokens" en 3 handlers status===402: /avatar (0.10 tok), /analysis/chat (0.25 tok), /analysis (3 o 4 tok según _attachedVideo). El usuario ahora ve cuántos tokens le faltan exactamente.
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v139';
+const CACHE_NAME = 'dogs-mind-v140';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

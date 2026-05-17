@@ -11408,7 +11408,8 @@ async function sendMsg() {
     if (r.status === 401) { goToLogin(); return; }
     if (r.status === 402) {
       _avatarHistory.pop();
-      showToast('Sin tokens. Recarga para continuar.');
+      // /avatar chat cobra 0.10 tokens
+      showToast(_fmtInsufTokens(0.10));
       goTo('s-tokens');
       return;
     }
@@ -11971,6 +11972,22 @@ function getVal(id, fallback) {
   function fmtTokens(n)     { return Number.isInteger(n) ? n : parseFloat(n.toFixed(2)); }
   function setTokens(n)     { localStorage.setItem('dm_tokens', n); updateTokensScreen(); }
 
+  // Mensaje uniforme para HTTP 402: "Necesitas N tokens, tienes M. Recarga para
+  // continuar." Lee balance de localStorage por canal estable (evita bug scope IIFE).
+  // Usado en todos los handlers de status===402 para que el usuario sepa cuánto le
+  // falta exactamente, en lugar del genérico "Sin tokens" que confundía a usuarios
+  // con saldo > 0 pero insuficiente.
+  function _fmtInsufTokens(needed) {
+    var have = 0;
+    try { have = parseFloat(localStorage.getItem('dm_tokens') || '0'); } catch(e) {}
+    var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+    var n = (needed % 1 === 0) ? String(needed) : needed.toFixed(2).replace(/\.?0+$/, '');
+    var h = (have % 1 === 0) ? String(have) : have.toFixed(2).replace(/\.?0+$/, '');
+    if (lang === 'en') return 'You need ' + n + ' tokens, you have ' + h + '. Recharge to continue.';
+    return 'Necesitas ' + n + ' tokens, tienes ' + h + '. Recarga para continuar.';
+  }
+  window._fmtInsufTokens = _fmtInsufTokens;
+
   function authHeaders() {
     return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getJWT() };
   }
@@ -12435,7 +12452,8 @@ function getVal(id, fallback) {
       typing.remove();
 
       if (res.status === 402) {
-        showToast('Sin tokens. Recarga para continuar.');
+        // /analysis/chat (modificación pequeña del plan) cobra 0.25 tokens
+        showToast(_fmtInsufTokens(0.25));
         goTo('s-tokens');
         return;
       }
@@ -12851,7 +12869,9 @@ async function analyzeWithAI() {
     }
 
     if (res.status === 402) {
-      showToast('Sin tokens. Recarga para continuar.');
+      // /analysis: 3 tokens texto-only, 4 con vídeo adjuntado
+      var _cost = window._attachedVideo ? 4 : 3;
+      showToast(_fmtInsufTokens(_cost));
       goTo('s-tokens');
       btn.textContent = 'Analizar con IA →';
       btn.disabled = false;

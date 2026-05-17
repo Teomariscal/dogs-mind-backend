@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v142 (vídeo soft-truncate UX): cambio de política para vídeos largos. Antes: rechazo HTTP 413 si > 10s. Ahora: aceptar hasta 20s, analizar solo los primeros 10s (8 frames extraídos del rango [0, 10s]). Si > 20s → rechazo (probable vídeo equivocado). Decisión Teo 2026-05-17 para UX más amigable. Backend: video_processor.extract_frames() acepta max_duration_sec opcional (OpenCV usa fps×duration para limitar índices, ffmpeg usa flag -t). Endpoint /analysis/video pasa ANALYSIS_VIDEO_DURATION_SEC=10 y MAX_VIDEO_DURATION_SEC=20. Frontend: probe acepta hasta 20.5s tolerancia, _doAttachVideo recibe durationSec y muestra inline notice verde "Tu vídeo dura Xs — analizaremos los primeros 10 segundos" cuando aplica. i18n anam_drop_formats actualizado ES+EN al nuevo rango (20s tope, 10s analysis window). Cobro sigue 4 tokens.
+// Dogs Mind Service Worker — v143 (fix iOS picker vídeo: eliminar atributo capture="environment" del <input type="file" id="inp-video"> porque forzaba a iOS Safari a abrir directamente la cámara sin opción de elegir del carrete. Sin ese atributo, iOS muestra el action sheet completo: Photo Library / Take Video / Choose Files — UX correcta para vídeos ya grabados. Reportado por Teo en testing 2026-05-17.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v142';
+const CACHE_NAME = 'dogs-mind-v143';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

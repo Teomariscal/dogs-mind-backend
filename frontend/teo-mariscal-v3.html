@@ -8188,9 +8188,12 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
       <div style="margin-top:16px;margin-bottom:4px;">
         <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_attach_video">Adjuntar vídeo del comportamiento (opcional)</div>
 
+        <!-- capture="environment" eliminado (Teo 2026-05-17): en iOS Safari
+             ese atributo fuerza la cámara directa y suprime la opción de
+             elegir desde la galería. Sin él, iOS muestra el action sheet
+             completo (Photo Library / Take Video / Choose Files). -->
         <input type="file" id="inp-video"
                accept="video/mp4,video/quicktime,video/x-msvideo,video/x-matroska,video/webm,video/mpeg"
-               capture="environment"
                style="display:none;"
                onchange="handleVideoSelect(this)">
 

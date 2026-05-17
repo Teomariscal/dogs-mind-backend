@@ -318,10 +318,13 @@ def analysis_chat(
     """
     tokens_left = deduct_token(authorization, db, amount=0.25)
 
-    # Shadow safety classifier sobre el último mensaje del usuario
+    # Shadow safety classifier sobre el último mensaje del usuario.
+    # Fix audit 2026-05-17: antes leía req.history (atributo inexistente en
+    # ChatRequest → siempre []), dejando la telemetry de safety en /chat ciega.
+    # ChatRequest define `messages: List[ChatMessage]`. Apple Guideline 1.1.6.
     last_user_msg = ""
     try:
-        for m in reversed(req.history or []):
+        for m in reversed(req.messages or []):
             if getattr(m, "role", "") == "user":
                 last_user_msg = (getattr(m, "content", "") or "").strip()
                 break

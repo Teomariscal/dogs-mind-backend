@@ -17,7 +17,18 @@ from app.models.delegation import Delegation
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 # ── Config ────────────────────────────────────────────────────────────────────
-JWT_SECRET    = os.environ.get("JWT_SECRET", "dev-secret-change-in-production")
+# JWT_SECRET es OBLIGATORIO en producción. Antes había fallback hardcoded
+# "dev-secret-change-in-production" que permitía forjar JWTs si la env var se
+# perdía en Railway. Audit 2026-05-17: ahora si la var no está o es el default
+# conocido, abortamos el arranque (App Store + security).
+_JWT_INSECURE_DEFAULT = "dev-secret-change-in-production"
+JWT_SECRET    = os.environ.get("JWT_SECRET", "").strip()
+if not JWT_SECRET or JWT_SECRET == _JWT_INSECURE_DEFAULT:
+    raise RuntimeError(
+        "[FATAL] JWT_SECRET no configurada (o es el default inseguro). "
+        "Define una env var JWT_SECRET con un valor aleatorio fuerte antes de arrancar. "
+        "Genera uno con: python -c 'import secrets; print(secrets.token_urlsafe(48))'"
+    )
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRE_DAYS = 30
 
@@ -402,8 +413,13 @@ def forgot_password(req: ForgotPasswordRequest, db: Session = Depends(get_db)):
     Returns 200 even if email doesn't exist (no enumeration leakage).
     Email is normalized to lowercase to avoid case-mismatch bugs.
     """
+    # Fix audit 2026-05-17: usar case-insensitive match (func.lower) igual que
+    # register/login. Antes el filter exacto fallaba en silencio para usuarios
+    # cuyo email se persistió con mayúsculas pre-normalización → nunca recibían
+    # email de recuperación pero la respuesta era "ok" (zero feedback).
+    from sqlalchemy import func
     email_norm = (req.email or "").strip().lower()
-    user = db.query(User).filter(User.email == email_norm).first()
+    user = db.query(User).filter(func.lower(User.email) == email_norm).first()
     if user and user.deleted_at is None:
         new_password = _generate_temp_password()
         user.password_hash = hash_password(new_password)

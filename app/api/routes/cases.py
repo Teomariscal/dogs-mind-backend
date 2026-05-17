@@ -247,6 +247,14 @@ class CaseEntryResponse(BaseModel):
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 def _get_owned_case(case_id: str, user: User, db: Session) -> Case:
+    # Fix audit 2026-05-17: validar UUID ANTES de query. Antes un case_id mal
+    # formado (string random vía URL manipulation) llegaba al filter y Postgres
+    # lanzaba DataError → respuesta 500 en lugar de 404. Apple Review malo.
+    import uuid as _uuid_mod
+    try:
+        _uuid_mod.UUID(str(case_id))
+    except (ValueError, TypeError, AttributeError):
+        raise HTTPException(status_code=404, detail="Caso no encontrado")
     case = db.query(Case).filter(
         Case.id == case_id,
         Case.user_id == user.id,

@@ -8238,14 +8238,19 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   </div>
 
     <!-- token warning modal -->
+    <!-- Fix audit 2026-05-17:
+         · padding-bottom: max(32px, safe-area-inset-bottom) → botón ya no tapado
+           por home indicator iPhone (X+)
+         · texto modal: "10 tokens" stale → "4 tokens" (coste actual del análisis
+           con vídeo según ANALYSIS_VIDEO_TOKEN_COST en backend) -->
     <div id="video-token-modal" style="display:none;position:absolute;inset:0;z-index:9998;background:rgba(0,0,0,0.55);backdrop-filter:blur(2px);align-items:flex-end;justify-content:center;">
-      <div style="background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 32px;width:100%;box-sizing:border-box;">
+      <div style="background:#fff;border-radius:20px 20px 0 0;padding:24px 20px max(32px, env(safe-area-inset-bottom, 32px));width:100%;box-sizing:border-box;">
         <div style="width:36px;height:4px;background:rgba(0,0,0,0.12);border-radius:2px;margin:0 auto 20px;"></div>
         <div style="margin-bottom:12px;text-align:center;">
           <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="var(--green2)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
         </div>
         <div style="font-size:16px;font-weight:700;color:var(--dark);text-align:center;margin-bottom:6px;" data-i18n="anam_modal_title">Tokens insuficientes</div>
-        <div style="font-size:13px;color:var(--grey);text-align:center;margin-bottom:20px;line-height:1.5;" data-i18n="anam_modal_text">Necesitas al menos <strong>10 tokens</strong> para adjuntar un video. Actualmente tienes <strong id="modal-token-count">0</strong> tokens.</div>
+        <div style="font-size:13px;color:var(--grey);text-align:center;margin-bottom:20px;line-height:1.5;" data-i18n="anam_modal_text">Necesitas al menos <strong>4 tokens</strong> para analizar con vídeo (3 análisis + 1 vídeo). Actualmente tienes <strong id="modal-token-count">0</strong> tokens.</div>
         <button onclick="goTo('s-splash')" style="width:100%;padding:13px;background:var(--green2);color:#fff;border:none;border-radius:100px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px;" data-i18n="anam_modal_btn_recharge">Recargar tokens</button>
         <button onclick="closeVideoModal()" style="width:100%;padding:13px;background:transparent;color:var(--dark);border:1.5px solid rgba(0,0,0,0.15);border-radius:100px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;" data-i18n="anam_modal_btn_skip">Continuar sin video</button>
       </div>
@@ -8878,7 +8883,13 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
         <button class="pro-card-cta" onclick="onActivateProClick()" data-i18n="pro_cta_activate">Activar Profesional</button>
       </article>
 
-      <article class="pro-card pro-card--certified">
+      <!-- Card Certified Professional ocultado 2026-05-17 (audit) por riesgo
+           App Store Review Guideline 2.1 ("apps with placeholder content")
+           debido a botón "Próximamente". Reactivar en v1.1 cuando el curso +
+           examen oficial esté operativo, sustituyendo el botón disabled por
+           CTA accionable (ej. onCertifiedContact() o link a página de
+           información externa con form de solicitud). Código preservado. -->
+      <article class="pro-card pro-card--certified" style="display:none;">
         <span class="pro-card-tag" data-i18n="pro_tag_certified">Certified · International Hub</span>
         <h3 class="pro-card-title" data-i18n="pro_cert_title">Certified Professional<br>by The Dogs Mind International</h3>
         <p class="pro-card-pitch" data-i18n="pro_cert_pitch">El siguiente paso: acreditación internacional, presencia en el hub mundial y derivación de clientes desde nuestra red. Para quienes definen el estándar del sector.</p>
@@ -14241,7 +14252,7 @@ function endTourIntro() {
       anam_drop_formats:       'MP4, MOV, AVI · Máx 20s (analizamos los primeros 10) · +1 token',
       anam_video_remove:       'Quitar vídeo',
       anam_modal_title:        'Tokens insuficientes',
-      anam_modal_text:         'Necesitas al menos <strong>10 tokens</strong> para adjuntar un video. Actualmente tienes <strong id="modal-token-count">0</strong> tokens.',
+      anam_modal_text:         'Necesitas al menos <strong>4 tokens</strong> para analizar con vídeo (3 análisis + 1 vídeo). Actualmente tienes <strong id="modal-token-count">0</strong> tokens.',
       anam_modal_btn_recharge: 'Recargar tokens',
       anam_modal_btn_skip:     'Continuar sin video',
       // Privacy Policy
@@ -15052,7 +15063,7 @@ function endTourIntro() {
       anam_drop_formats:       'MP4, MOV, AVI · Max 20s (we analyze the first 10) · +1 token',
       anam_video_remove:       'Remove video',
       anam_modal_title:        'Not enough tokens',
-      anam_modal_text:         'You need at least <strong>10 tokens</strong> to attach a video. You currently have <strong id="modal-token-count">0</strong> tokens.',
+      anam_modal_text:         'You need at least <strong>4 tokens</strong> to analyze with video (3 analysis + 1 video). You currently have <strong id="modal-token-count">0</strong> tokens.',
       anam_modal_btn_recharge: 'Top up tokens',
       anam_modal_btn_skip:     'Continue without video',
       // Privacy Policy

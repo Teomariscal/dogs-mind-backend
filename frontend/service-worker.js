@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v144 (markdownToHtml: handler nuevo para # (h1) + divider regex baja de {4,} a {1,} para chars decorativos en-dash/em-dash/box-drawing). Bug Teo: el plan de intervención empezaba con "# PLAN DE INTERVENCIÓN" y un "–" suelto que quedaban literales (el regex de markdown solo manejaba ## y ###, y el de divider exigía 4+ chars). Cambios estrictamente aditivos: ## y ### siguen comportándose idéntico, bullets ASCII '-' siguen funcionando (regex distinta a en-dash decorativo). Render del plan ahora 100% limpio sin artefactos markdown visibles.)
+// Dogs Mind Service Worker — v145 (audit Tier 1+2 aprobado por Teo 2026-05-17): paquete de 7 fixes pre-submit App Store. BACKEND: #1 JWT_SECRET ahora ABORTA arranque si default/missing (auth.py), #4 safety classifier en /analysis/chat ya no es ciego (req.history → req.messages en analysis.py:324), #6 /auth/forgot-password usa func.lower para encontrar usuarios con email en mayúsculas, #7 _get_owned_case valida UUID antes de query para devolver 404 en lugar de 500. FRONTEND: #2 card Certified Professional ocultado por display:none (botón "Próximamente" violaba Apple Guideline 2.1, código preservado para v1.1), #9 video-token-modal padding-bottom usa env(safe-area-inset-bottom) para no tapar botón con home indicator iPhone, #12 modal texto stale "10 tokens" actualizado a "4 tokens (3 análisis + 1 vídeo)" alineado con ANALYSIS_VIDEO_TOKEN_COST real (ES + EN i18n).)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v144';
+const CACHE_NAME = 'dogs-mind-v145';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

@@ -87,6 +87,9 @@ Reglas duras:
 
 | Commit | Fecha | Locked |
 |---|---|---|
+| `42f905d` | 2026-05-17 | **Vídeo en anamnesis: max 10s + cobro 4 tokens** (+1 sobre texto). Decisión Teo tras análisis CFO. Backend: ANALYSIS_VIDEO_TOKEN_COST=4.0, MAX_VIDEO_DURATION_SEC=10.0, get_duration_seconds() en video_processor (OpenCV→ffprobe). Duration check ANTES de cobrar → rechaza HTTP 413 si > 10s sin gastar tokens. Frontend: HTMLVideoElement metadata probe en attachVideo + i18n actualizado. Margen 92% sobre vídeo. SW v139. **PROD**. |
+| `d9083ef` | 2026-05-17 | **Rate-limit anti brute-force** /payments/pro-activate-courtesy: 5 fallos/h/IP → HTTP 429. Tracking in-memory, respeta X-Forwarded-For del proxy Railway. Smoke 6 intentos consecutivos PASS. |
+| `8404981` | 2026-05-16 | **Fix botón Pro cortesía** "OK" + hook _syncProBtn en applyLang (data-i18n="ps_pay" se re-renderizaba pisando texto cortesía). SW v138. **PROD**. |
 | `b8f3324` | 2026-05-16 | **Banner welcome tokens dinámico** 5→8 cuando hay invite aplicado. SW v137. **PROD VERIFICADO POR TEO: "Perfecto"**. Anclado. |
 | `961a4d0` | 2026-05-16 | **Estilo invite prerrellenado** inequívoco: bg #dbe7d2 + border 2px #4a6741 + bold + readonly + badge "CÓDIGO APLICADO: BOCALAN-XX". SW v136. **PROD**. Anclado. |
 | `7baf302` | 2026-05-16 | **Bootstrap automático 9 delegaciones** iniciales en startup main.py (idempotente INSERT WHERE NOT EXISTS). BOCALAN-CO/PE/EC/CL/UY/CR/IT/IL/ES. Smoke E2E prod BOCALAN-CO devolvió tokens=8 + delegation_name="Bocalán Colombia". **PROD VIVO**. |

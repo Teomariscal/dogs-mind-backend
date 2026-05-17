@@ -358,13 +358,11 @@ def cfo_report(
     if to:
         q_base = q_base.filter(UsageLog.created_at <= datetime.combine(to, datetime.max.time()))
 
-    # ── Por endpoint ────────────────────────────────────────────────────────
-    by_endpoint = (
+    # ── Por endpoint (queries simples — máxima compatibilidad SQLAlchemy) ──
+    by_endpoint_main = (
         q_base.with_entities(
             UsageLog.endpoint,
             func.count(UsageLog.id).label("calls"),
-            func.sum(func.case((UsageLog.success == "ok", 1), else_=0)).label("ok"),
-            func.sum(func.case((UsageLog.success == "error", 1), else_=0)).label("errors"),
             func.coalesce(func.sum(UsageLog.input_tokens), 0).label("input_toks"),
             func.coalesce(func.sum(UsageLog.output_tokens), 0).label("output_toks"),
             func.coalesce(func.sum(UsageLog.cost_eur), 0.0).label("cost_eur_total"),
@@ -372,15 +370,30 @@ def cfo_report(
             func.coalesce(func.sum(UsageLog.tokens_charged), 0.0).label("tokens_charged_total"),
         )
         .group_by(UsageLog.endpoint)
-        .order_by(func.sum(UsageLog.cost_eur).desc().nullslast())
         .all()
     )
+
+    # Counts por success separados (evita case syntax)
+    ok_counts_q = db.query(
+        UsageLog.endpoint, func.count(UsageLog.id)
+    ).filter(UsageLog.success == "ok")
+    err_counts_q = db.query(
+        UsageLog.endpoint, func.count(UsageLog.id)
+    ).filter(UsageLog.success == "error")
+    if from_:
+        ok_counts_q = ok_counts_q.filter(UsageLog.created_at >= datetime.combine(from_, datetime.min.time()))
+        err_counts_q = err_counts_q.filter(UsageLog.created_at >= datetime.combine(from_, datetime.min.time()))
+    if to:
+        ok_counts_q = ok_counts_q.filter(UsageLog.created_at <= datetime.combine(to, datetime.max.time()))
+        err_counts_q = err_counts_q.filter(UsageLog.created_at <= datetime.combine(to, datetime.max.time()))
+    ok_map = dict(ok_counts_q.group_by(UsageLog.endpoint).all())
+    err_map = dict(err_counts_q.group_by(UsageLog.endpoint).all())
 
     endpoint_rows = []
     grand_cost = 0.0
     grand_charged_tokens = 0.0
     grand_calls = 0
-    for r in by_endpoint:
+    for r in sorted(by_endpoint_main, key=lambda x: float(x.cost_eur_total or 0), reverse=True):
         cost = float(r.cost_eur_total or 0)
         charged_tok = float(r.tokens_charged_total or 0)
         # Estimación valor EUR de tokens cobrados (€/tok blended ~0.80 pack 20)
@@ -388,8 +401,8 @@ def cfo_report(
         endpoint_rows.append({
             "endpoint": r.endpoint,
             "calls": int(r.calls or 0),
-            "ok": int(r.ok or 0),
-            "errors": int(r.errors or 0),
+            "ok": int(ok_map.get(r.endpoint, 0)),
+            "errors": int(err_map.get(r.endpoint, 0)),
             "input_tokens_total": int(r.input_toks or 0),
             "output_tokens_total": int(r.output_toks or 0),
             "cost_eur_total": round(cost, 4),

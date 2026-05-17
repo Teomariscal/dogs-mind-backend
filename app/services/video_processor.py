@@ -106,6 +106,53 @@ def _extract_with_ffmpeg(video_path: str, max_frames: int) -> list[str]:
 
 # ── Public API ───────────────────────────────────────────────────────────────
 
+def get_duration_seconds(video_path: str) -> float:
+    """
+    Devuelve la duración del vídeo en segundos. Intenta OpenCV primero (rápido,
+    in-process), fallback a ffprobe (binario externo). Si ambos fallan devuelve
+    -1.0 (caller decide qué hacer — política conservadora: aceptar el vídeo).
+
+    Usado por /analysis/video para enforcement de MAX_VIDEO_DURATION_SEC=10
+    antes de hacer extracción de frames + análisis IA (evita procesar vídeos
+    que luego rechazaríamos).
+    """
+    # ── 1. OpenCV ────────────────────────────────────────────────────────────
+    try:
+        import cv2  # type: ignore
+        cap = cv2.VideoCapture(video_path)
+        if cap.isOpened():
+            try:
+                fps = float(cap.get(cv2.CAP_PROP_FPS) or 0)
+                frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
+                if fps > 0 and frames > 0:
+                    return frames / fps
+            finally:
+                cap.release()
+    except Exception as e:
+        logger.warning("cv2 duration check failed (%s) — trying ffprobe", e)
+
+    # ── 2. ffprobe fallback ──────────────────────────────────────────────────
+    try:
+        result = subprocess.run(
+            [
+                "ffprobe", "-v", "error",
+                "-show_entries", "format=duration",
+                "-of", "default=noprint_wrappers=1:nokey=1",
+                video_path,
+            ],
+            capture_output=True, text=True, timeout=10,
+        )
+        if result.returncode == 0:
+            out = (result.stdout or "").strip()
+            if out:
+                return float(out)
+    except Exception as e:
+        logger.warning("ffprobe duration check failed (%s)", e)
+
+    # No se pudo determinar — devolver -1 para que el caller decida (no rechazar).
+    return -1.0
+
+
 def extract_frames(video_path: str, max_frames: int = MAX_FRAMES) -> list[str]:
     """
     Extract up to *max_frames* representative frames from *video_path*.

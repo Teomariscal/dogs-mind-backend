@@ -61,6 +61,16 @@ from app.core.token_utils import deduct_token
 # Max video size accepted: 200 MB
 MAX_VIDEO_BYTES = 200 * 1024 * 1024
 
+# Max video duration (Teo 2026-05-17): 10s. Vídeos más largos se rechazan
+# antes de extraer frames + invocar IA (ahorra tokens + UX clara).
+# Frontend valida también con metadata HTMLVideoElement antes de subir.
+MAX_VIDEO_DURATION_SEC = 10.0
+
+# Pricing (Teo 2026-05-17): vídeo cobra +1 token sobre texto-only.
+# Coste extra real Anthropic ~$0.011 → cobro extra 1 tok ≈ 0.80€ (margen 92%).
+ANALYSIS_TEXT_TOKEN_COST  = 3.0
+ANALYSIS_VIDEO_TOKEN_COST = 4.0
+
 ALLOWED_VIDEO_TYPES = {
     "video/mp4", "video/quicktime", "video/x-msvideo",
     "video/x-matroska", "video/webm", "video/mpeg",
@@ -87,7 +97,7 @@ def create_analysis(
     SHADOW SAFETY: lanza un classifier en background tras la respuesta
     (no añade latencia) que loguea categorías de riesgo en safety_log.
     """
-    deduct_token(authorization, db, amount=3.0, require_auth=True)
+    deduct_token(authorization, db, amount=ANALYSIS_TEXT_TOKEN_COST, require_auth=True)
     user_id_for_logs = _extract_user_id(authorization)
     # Shadow-mode safety classifier — no bloquea, solo loguea para análisis posterior
     safety_text = _anamnesis_text_for_safety(anamnesis)
@@ -108,7 +118,7 @@ def create_analysis(
             model=get_settings().clinical_model,
             input_tokens=getattr(result, "input_tokens", None),
             output_tokens=getattr(result, "output_tokens", None),
-            tokens_charged=3.0,
+            tokens_charged=ANALYSIS_TEXT_TOKEN_COST,
             success="ok",
         )
         # Persistencia opcional al caso (no rompe respuesta si falla)
@@ -122,7 +132,7 @@ def create_analysis(
                 ai_model=get_settings().clinical_model,
                 input_tokens=getattr(result, "input_tokens", None),
                 output_tokens=getattr(result, "output_tokens", None),
-                tokens_charged=3.0,
+                tokens_charged=ANALYSIS_TEXT_TOKEN_COST,
                 update_summary_abc=True,
             )
         return result
@@ -132,7 +142,7 @@ def create_analysis(
             user_id=user_id_for_logs,
             endpoint="/analysis",
             model=get_settings().clinical_model,
-            tokens_charged=3.0,
+            tokens_charged=ANALYSIS_TEXT_TOKEN_COST,
             success="error",
             notes=str(e)[:200],
         )
@@ -153,10 +163,12 @@ async def create_analysis_with_video(
     The video is stored to a temporary file, key frames are extracted
     with OpenCV (or ffmpeg as fallback), and the frames are passed to
     Claude alongside the written anamnesis for multi-modal analysis.
-    """
-    # ── Deduct token (3 tokens, requires auth) ───────────────────────────────
-    deduct_token(authorization, db, amount=3.0, require_auth=True)
 
+    Pricing (Teo 2026-05-17): cobra ANALYSIS_VIDEO_TOKEN_COST (4 tokens, +1
+    sobre texto-only para captura justa del valor multimodal). Validación
+    de duración ≤ MAX_VIDEO_DURATION_SEC (10s) — vídeos más largos se
+    rechazan ANTES de cobrar (sin descuento al usuario).
+    """
     # ── Validate content type ────────────────────────────────────────────────
     ct = (video.content_type or "").lower()
     if ct and ct not in ALLOWED_VIDEO_TYPES:
@@ -180,17 +192,9 @@ async def create_analysis_with_video(
     except Exception as e:
         raise HTTPException(status_code=422, detail=f"Invalid anamnesis JSON: {e}")
 
-    # ── Shadow safety classifier (no bloquea, fire-and-forget) ───────────────
-    safety_text = _anamnesis_text_for_safety(anamnesis)
-    if safety_text:
-        background_tasks.add_task(
-            log_classification_sync,
-            user_id=_extract_user_id(authorization),
-            endpoint="/analysis/video",
-            input_text=safety_text,
-        )
-
-    # ── Write video to temp file & extract frames ────────────────────────────
+    # ── Write video to temp + duration check ANTES de cobrar ─────────────────
+    # Política: si el vídeo dura más de MAX_VIDEO_DURATION_SEC, rechazar SIN
+    # descontar tokens. Frontend valida también con metadata HTMLVideoElement.
     suffix = os.path.splitext(video.filename or "video.mp4")[1] or ".mp4"
     tmp_path = None
     try:
@@ -198,7 +202,31 @@ async def create_analysis_with_video(
             tmp.write(video_bytes)
             tmp_path = tmp.name
 
-        from app.services.video_processor import extract_frames
+        from app.services.video_processor import extract_frames, get_duration_seconds
+        duration = get_duration_seconds(tmp_path)
+        if duration > 0 and duration > MAX_VIDEO_DURATION_SEC:
+            raise HTTPException(
+                status_code=413,
+                detail=(
+                    f"El vídeo dura {duration:.1f}s. Máximo permitido: "
+                    f"{MAX_VIDEO_DURATION_SEC:.0f}s. Recórtalo y vuelve a subirlo."
+                ),
+            )
+        # Si duration == -1.0 (no se pudo medir) → aceptamos por defensa conservadora.
+
+        # ── Deduct token (DESPUÉS de duration check, así no cobramos rechazos) ──
+        deduct_token(authorization, db, amount=ANALYSIS_VIDEO_TOKEN_COST, require_auth=True)
+
+        # ── Shadow safety classifier (no bloquea, fire-and-forget) ───────────
+        safety_text = _anamnesis_text_for_safety(anamnesis)
+        if safety_text:
+            background_tasks.add_task(
+                log_classification_sync,
+                user_id=_extract_user_id(authorization),
+                endpoint="/analysis/video",
+                input_text=safety_text,
+            )
+
         try:
             frames = extract_frames(tmp_path)
         except RuntimeError as e:

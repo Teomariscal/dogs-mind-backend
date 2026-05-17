@@ -11652,12 +11652,49 @@ function getVal(id, fallback) {
     if (files && files[0]) attachVideo(files[0]);
   }
 
+  // MAX duration enforced (Teo 2026-05-17): 10s. Backend valida también con
+  // ffprobe/OpenCV y rechaza si > 10s ANTES de cobrar. Margen 10.5s aquí para
+  // tolerar pequeñas imprecisiones del HTMLVideoElement vs backend.
+  var MAX_VIDEO_DURATION_SEC = 10;
+
   function attachVideo(file) {
     var maxBytes = 200 * 1024 * 1024;
     if (file.size > maxBytes) {
-      alert('El vídeo supera el límite de 200 MB. Por favor, comprime el vídeo antes de adjuntarlo.');
+      var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+      alert(lang === 'en'
+        ? 'Video exceeds the 200 MB limit. Please compress it first.'
+        : 'El vídeo supera el límite de 200 MB. Por favor, comprime el vídeo antes de adjuntarlo.');
       return;
     }
+    // Duration check via HTMLVideoElement metadata. Async pero rápido (solo
+    // lee los primeros bytes del fichero, no carga el vídeo entero).
+    var probeUrl = URL.createObjectURL(file);
+    var probe = document.createElement('video');
+    probe.preload = 'metadata';
+    probe.muted = true;
+    probe.onloadedmetadata = function() {
+      var d = probe.duration;
+      URL.revokeObjectURL(probeUrl);
+      if (isFinite(d) && d > (MAX_VIDEO_DURATION_SEC + 0.5)) {
+        var lang2 = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+        alert(lang2 === 'en'
+          ? 'Video is ' + d.toFixed(1) + 's. Maximum allowed: ' + MAX_VIDEO_DURATION_SEC + ' seconds. Please trim it and try again.'
+          : 'El vídeo dura ' + d.toFixed(1) + 's. Máximo permitido: ' + MAX_VIDEO_DURATION_SEC + ' segundos. Recórtalo y vuelve a subirlo.');
+        // Limpiar input file para que puedan re-seleccionar el mismo nombre tras editar
+        try { document.getElementById('inp-video').value = ''; } catch(e) {}
+        return;
+      }
+      _doAttachVideo(file);
+    };
+    probe.onerror = function() {
+      // Si no podemos leer metadata (formato raro), aceptamos — backend validará y rechazará si procede.
+      URL.revokeObjectURL(probeUrl);
+      _doAttachVideo(file);
+    };
+    probe.src = probeUrl;
+  }
+
+  function _doAttachVideo(file) {
     window._attachedVideo = file;
 
     // Show preview
@@ -14109,7 +14146,7 @@ function endTourIntro() {
       anam_freq_occasion:      'Ocasionalmente',
       anam_freq_rare:          'Raramente',
       anam_drop_text:          'Pulsa o arrastra un vídeo aquí',
-      anam_drop_formats:       'MP4, MOV, AVI · Máx 200 MB',
+      anam_drop_formats:       'MP4, MOV, AVI · Máx 10 segundos · +1 token',
       anam_modal_title:        'Tokens insuficientes',
       anam_modal_text:         'Necesitas al menos <strong>10 tokens</strong> para adjuntar un video. Actualmente tienes <strong id="modal-token-count">0</strong> tokens.',
       anam_modal_btn_recharge: 'Recargar tokens',
@@ -14919,7 +14956,7 @@ function endTourIntro() {
       anam_freq_occasion:      'Occasionally',
       anam_freq_rare:          'Rarely',
       anam_drop_text:          'Tap or drag a video here',
-      anam_drop_formats:       'MP4, MOV, AVI · Max 200 MB',
+      anam_drop_formats:       'MP4, MOV, AVI · Max 10 seconds · +1 token',
       anam_modal_title:        'Not enough tokens',
       anam_modal_text:         'You need at least <strong>10 tokens</strong> to attach a video. You currently have <strong id="modal-token-count">0</strong> tokens.',
       anam_modal_btn_recharge: 'Top up tokens',

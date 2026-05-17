@@ -8180,21 +8180,44 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
         </div>
       </div>
 
-      <!-- Análisis multimodal con vídeo — BETA PRIVADA (acceso restringido) -->
+      <!-- Análisis multimodal con vídeo — upload funcional (activado 2026-05-17, Teo) -->
+      <!-- Sustituye al teaser BETA visual. JS attachVideo() + duration check
+           ya implementados arriba. capture="environment" abre la cámara trasera
+           en iOS para grabación directa; accept="video/*" permite elegir desde
+           galería también. Mismo espacio visual que el teaser anterior. -->
       <div style="margin-top:16px;margin-bottom:4px;">
-        <div style="position:relative;border-radius:14px;overflow:hidden;background:#1a1a1a;aspect-ratio:16/9;">
-          <img src="dog-observed.webp" alt="Perro siendo observado en su entorno natural" style="width:100%;height:100%;object-fit:cover;display:block;">
-          <!-- Overlay sutil para legibilidad del badge -->
-          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 50%,rgba(0,0,0,0.55) 100%);pointer-events:none;"></div>
-          <!-- Badge BETA PRIVADA -->
-          <div style="position:absolute;top:12px;left:12px;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.95);padding:5px 10px;border-radius:100px;box-shadow:0 2px 8px rgba(0,0,0,0.18);">
-            <div style="width:6px;height:6px;border-radius:50%;background:#dc2626;"></div>
-            <span style="font-size:9px;font-weight:800;letter-spacing:1.2px;color:#1a1a1a;" data-i18n="video_badge">BETA PRIVADA</span>
+        <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_attach_video">Adjuntar vídeo del comportamiento (opcional)</div>
+
+        <input type="file" id="inp-video"
+               accept="video/mp4,video/quicktime,video/x-msvideo,video/x-matroska,video/webm,video/mpeg"
+               capture="environment"
+               style="display:none;"
+               onchange="handleVideoSelect(this)">
+
+        <div id="video-drop-zone"
+             onclick="document.getElementById('inp-video').click()"
+             ondragover="event.preventDefault(); this.style.borderColor='#4a6741';"
+             ondragleave="this.style.borderColor='rgba(0,0,0,0.15)';"
+             ondrop="handleVideoDrop(event)"
+             style="border:2px dashed rgba(0,0,0,0.15); border-radius:14px; padding:24px 16px; text-align:center; cursor:pointer; background:rgba(74,103,65,0.03); transition:border-color .2s, background .2s; min-height:140px; display:flex; flex-direction:column; align-items:center; justify-content:center; box-sizing:border-box;">
+
+          <!-- Estado vacío -->
+          <div id="video-drop-label" style="display:block;">
+            <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="var(--green2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; margin:0 auto 10px;">
+              <rect x="2" y="6" width="14" height="12" rx="2" ry="2"/>
+              <polygon points="22 8 16 12 22 16 22 8"/>
+            </svg>
+            <div style="font-size:13px; font-weight:600; color:var(--dark); margin-bottom:4px;" data-i18n="anam_drop_text">Pulsa o arrastra un vídeo aquí</div>
+            <div style="font-size:11px; color:var(--grey);" data-i18n="anam_drop_formats">MP4, MOV, AVI · Máx 10 segundos · +1 token</div>
           </div>
-          <!-- Pie con texto explicativo -->
-          <div style="position:absolute;bottom:0;left:0;right:0;padding:14px 16px;color:#fff;">
-            <div style="font-size:13px;font-weight:700;letter-spacing:0.2px;line-height:1.3;margin-bottom:3px;" data-i18n="video_teaser_t">Análisis multimodal con vídeo</div>
-            <div style="font-size:11px;font-weight:500;color:rgba(255,255,255,0.85);line-height:1.4;" data-i18n="video_teaser_b">BETA PRIVADA · Solo profesionales acreditados</div>
+
+          <!-- Estado con preview -->
+          <div id="video-preview-wrap" style="display:none; width:100%;">
+            <video id="video-preview-el" controls playsinline preload="metadata" style="width:100%; max-height:200px; border-radius:8px; background:#000; display:block; margin-bottom:10px;"></video>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+              <div id="video-file-info" style="font-size:11px; color:var(--grey); flex:1; text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0;"></div>
+              <button type="button" onclick="event.stopPropagation(); removeVideo();" style="font-size:11px; padding:8px 14px; border-radius:8px; border:1px solid rgba(220,80,80,0.3); background:#fff5f5; color:#c03030; cursor:pointer; font-family:inherit; font-weight:600; min-height:44px; flex-shrink:0;" data-i18n="anam_video_remove">Quitar vídeo</button>
+            </div>
           </div>
         </div>
       </div>
@@ -14167,6 +14190,7 @@ function endTourIntro() {
       anam_freq_rare:          'Raramente',
       anam_drop_text:          'Pulsa o arrastra un vídeo aquí',
       anam_drop_formats:       'MP4, MOV, AVI · Máx 10 segundos · +1 token',
+      anam_video_remove:       'Quitar vídeo',
       anam_modal_title:        'Tokens insuficientes',
       anam_modal_text:         'Necesitas al menos <strong>10 tokens</strong> para adjuntar un video. Actualmente tienes <strong id="modal-token-count">0</strong> tokens.',
       anam_modal_btn_recharge: 'Recargar tokens',
@@ -14977,6 +15001,7 @@ function endTourIntro() {
       anam_freq_rare:          'Rarely',
       anam_drop_text:          'Tap or drag a video here',
       anam_drop_formats:       'MP4, MOV, AVI · Max 10 seconds · +1 token',
+      anam_video_remove:       'Remove video',
       anam_modal_title:        'Not enough tokens',
       anam_modal_text:         'You need at least <strong>10 tokens</strong> to attach a video. You currently have <strong id="modal-token-count">0</strong> tokens.',
       anam_modal_btn_recharge: 'Top up tokens',

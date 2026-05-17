@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v140 (mejora copy mensajes 402 'Sin tokens'): nuevo helper top-level _fmtInsufTokens(needed) que lee balance de localStorage por canal estable (evita scope IIFE bug) y devuelve "Necesitas N tokens, tienes M. Recarga para continuar." (ES) / "You need N tokens, you have M. Recharge to continue." (EN). Reemplaza el genérico "Sin tokens" en 3 handlers status===402: /avatar (0.10 tok), /analysis/chat (0.25 tok), /analysis (3 o 4 tok según _attachedVideo). El usuario ahora ve cuántos tokens le faltan exactamente.
+// Dogs Mind Service Worker — v141 (upload vídeo funcional en anamnesis activado): sustituye el teaser visual "BETA PRIVADA · Solo profesionales acreditados" por la zona de upload real conectada al JS attachVideo/handleVideoSelect/handleVideoDrop ya existente. Nuevos elementos HTML en s-anamnesis (#inp-video, #video-drop-zone, #video-drop-label, #video-preview-wrap, #video-preview-el, #video-file-info) que el JS llevaba referenciando pero NO existían (eran dead code hasta ahora). input file con capture="environment" para grabación directa desde cámara iPhone + accept multi-formato. Drop zone clickable + drag/drop. Preview con HTMLVideoElement controls + botón "Quitar vídeo" min-height 44px (touch target). i18n nuevo anam_video_remove ES+EN. Validación duración 10s (HTMLVideoElement metadata) y cobro 4 tokens ya implementados en v139. Mismo espacio visual aproximado que el teaser anterior. Revertible — para rollback basta git revert del commit.
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v140';
+const CACHE_NAME = 'dogs-mind-v141';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

@@ -317,11 +317,17 @@ def report_delegations(
 from app.models.usage_log import UsageLog
 
 
+import os as _os
+from fastapi import Header as _Header
+from app.api.routes.auth import decode_token as _decode_token
+
+
 @router.get("/admin/cfo-report")
 def cfo_report(
     from_: Optional[date] = Query(None, alias="from", description="YYYY-MM-DD"),
     to: Optional[date] = Query(None, description="YYYY-MM-DD inclusivo"),
-    current_user: User = Depends(get_current_user),
+    key: Optional[str] = Query(None, description="Bypass key (env CFO_REPORT_KEY) para uso CFO sin JWT"),
+    authorization: Optional[str] = _Header(None),
     db: Session = Depends(get_db),
 ):
     """
@@ -334,8 +340,32 @@ def cfo_report(
 
     Sin filtros temporales → lifetime. Con `from`/`to` → ventana.
     Solo el agregado, NUNCA filas individuales.
+
+    Auth (cualquiera vale):
+      A) JWT Bearer de un usuario con role='admin'.
+      B) Query param ?key= que coincida con env var CFO_REPORT_KEY.
+         Bypass temporal para análisis CFO sin pasar por DevTools.
+         Revisar y revertir tras completar el análisis.
     """
-    _require_admin(current_user)
+    # Bypass por key env var (más simple para uso CFO desde curl)
+    _cfo_key = (_os.environ.get("CFO_REPORT_KEY", "") or "").strip()
+    _key_provided = (key or "").strip()
+    _key_ok = bool(_cfo_key) and _key_provided == _cfo_key
+
+    if not _key_ok:
+        # Fallback: validar JWT admin manualmente (Header)
+        if not authorization or not authorization.startswith("Bearer "):
+            raise HTTPException(status_code=401, detail="Token requerido")
+        try:
+            user_id = _decode_token(authorization.split(" ", 1)[1])
+            user = db.query(User).filter(User.id == user_id).first()
+            if not user or user.deleted_at is not None:
+                raise HTTPException(status_code=401, detail="Usuario no encontrado")
+            _require_admin(user)
+        except HTTPException:
+            raise
+        except Exception:
+            raise HTTPException(status_code=401, detail="Token inválido")
 
     q_base = db.query(UsageLog)
     if from_:

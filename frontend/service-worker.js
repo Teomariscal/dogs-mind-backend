@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v143 (fix iOS picker vídeo: eliminar atributo capture="environment" del <input type="file" id="inp-video"> porque forzaba a iOS Safari a abrir directamente la cámara sin opción de elegir del carrete. Sin ese atributo, iOS muestra el action sheet completo: Photo Library / Take Video / Choose Files — UX correcta para vídeos ya grabados. Reportado por Teo en testing 2026-05-17.)
+// Dogs Mind Service Worker — v144 (markdownToHtml: handler nuevo para # (h1) + divider regex baja de {4,} a {1,} para chars decorativos en-dash/em-dash/box-drawing). Bug Teo: el plan de intervención empezaba con "# PLAN DE INTERVENCIÓN" y un "–" suelto que quedaban literales (el regex de markdown solo manejaba ## y ###, y el de divider exigía 4+ chars). Cambios estrictamente aditivos: ## y ### siguen comportándose idéntico, bullets ASCII '-' siguen funcionando (regex distinta a en-dash decorativo). Render del plan ahora 100% limpio sin artefactos markdown visibles.)
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v143';
+const CACHE_NAME = 'dogs-mind-v144';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

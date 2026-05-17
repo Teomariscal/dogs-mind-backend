@@ -13207,8 +13207,19 @@ function markdownToHtml(md) {
     // Empty line → paragraph break
     if (!l.trim()) { closePara(); return; }
 
-    // Decorative lines (════ or ────)
-    if (/^[═─]{4,}/.test(l.trim())) { closePara(); return; }
+    // Decorative lines (═══, ───, –, —, ─). Bajamos de {4,} a {1,} para que
+    // un solo carácter decorativo (en-dash, em-dash, box-drawing) suelto
+    // también se trate como divider y NO quede como texto literal. NO afecta
+    // a bullets '-' (regex ASCII dash) porque [═─–—] son chars distintos.
+    if (/^[═─–—]+$/.test(l.trim())) { closePara(); return; }
+
+    // ### sub-heading (debe matchearse ANTES que h2 porque ### empieza con ##)
+    var h3 = l.match(/^###\s+(.+)$/);
+    if (h3) {
+      closePara();
+      out.push('<h3 style="font-size:12px;font-weight:700;color:var(--green2);letter-spacing:.08em;text-transform:uppercase;margin:14px 0 4px;">' + h3[1] + '</h3>');
+      return;
+    }
 
     // ## heading
     var h2 = l.match(/^##\s+(.+)$/);
@@ -13218,11 +13229,12 @@ function markdownToHtml(md) {
       return;
     }
 
-    // ### sub-heading
-    var h3 = l.match(/^###\s+(.+)$/);
-    if (h3) {
+    // # heading (h1) — Claude a veces lo emite al principio del plan y antes
+    // quedaba literal. Render como h2 con estilo ligeramente mayor.
+    var h1 = l.match(/^#\s+(.+)$/);
+    if (h1) {
       closePara();
-      out.push('<h3 style="font-size:12px;font-weight:700;color:var(--green2);letter-spacing:.08em;text-transform:uppercase;margin:14px 0 4px;">' + h3[1] + '</h3>');
+      out.push('<h2 style="font-size:17px;font-weight:800;color:var(--dark);margin:18px 0 8px;letter-spacing:-0.2px;">' + h1[1] + '</h2>');
       return;
     }
 

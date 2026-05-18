@@ -110,6 +110,25 @@ if [ -f "$ICLOUD_DIR/CLAUDE.md" ]; then
   echo "    Symlink CLAUDE.md creado."
 fi
 
+# Sesiones JSONL recientes: COPIA (NO symlink) — cada Mac mantiene sus
+# propias sesiones después de la copia inicial. Symlink causaría conflicts
+# si ambos Macs escribieran a la vez en la misma sesión activa.
+if [ -d "$ICLOUD_DIR/sessions" ]; then
+  echo "    Copiando sesiones recientes desde iCloud al Air..."
+  local_count=0
+  for f in "$ICLOUD_DIR/sessions"/*.jsonl; do
+    if [ -f "$f" ]; then
+      base=$(basename "$f")
+      # Solo copiar si NO existe ya en el Air (no sobreescribir sesiones del Air)
+      if [ ! -f "$CLAUDE_PROJ_DIR/$base" ]; then
+        cp "$f" "$CLAUDE_PROJ_DIR/$base"
+        local_count=$((local_count + 1))
+      fi
+    fi
+  done
+  echo "    $local_count sesiones nuevas copiadas (las que ya existían se preservaron)."
+fi
+
 # ── PASO 7: Resumen ─────────────────────────────────────────────────
 echo "── [7/7] Setup completado."
 echo ""

@@ -21,12 +21,19 @@ echo ""
 # ── PASO 1: Homebrew ────────────────────────────────────────────────
 echo "── [1/7] Verificando Homebrew..."
 if ! command -v brew >/dev/null 2>&1; then
-  echo "    Instalando Homebrew (te pedirá password)..."
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  # Añadir brew al PATH del shell actual (Apple Silicon)
-  if [[ -d /opt/homebrew/bin ]]; then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-  fi
+  echo ""
+  echo "    [ATENCION] Homebrew no esta instalado."
+  echo "    No puedo instalarlo desde aquí porque este script se ejecuta via pipe"
+  echo "    (curl | bash) sin acceso a TTY, y Homebrew necesita pedirte el password."
+  echo ""
+  echo "    Ejecuta MANUALMENTE en tu Terminal:"
+  echo ""
+  echo "      /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+  echo ""
+  echo "    Cuando termine la instalacion (incluyendo los 2 comandos del PATH que"
+  echo "    Homebrew te diga al final), VUELVE A EJECUTAR este script."
+  echo ""
+  exit 1
 else
   echo "    Homebrew ya instalado."
 fi

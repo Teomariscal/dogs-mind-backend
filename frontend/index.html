@@ -375,6 +375,11 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   pointer-events:none;
   line-height:1.2;
 }
+/* Required-field visuals (#8 anamnesis). Asterisco en labels + borde rojo
+   on-blur si vacío. NO bloquea el submit — el backend valida vía Pydantic. */
+.req-star{ color:#c03030; margin-left:3px; font-weight:700; }
+.req-error{ color:#c03030; font-size:11px; margin-top:4px; min-height:14px; line-height:1.2; }
+input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
 .dog-img-hint{font-size:10px;color:var(--text3);text-align:center;max-width:64px;}
 /* Foto del perro dentro del círculo de la home */
 .dog-circle img{width:100%;height:100%;object-fit:cover;display:block;}
@@ -8005,18 +8010,21 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
           <div>
-            <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_name">Nombre</div>
-            <input id="inp-dog-name" type="text" data-i18n-placeholder="ph_dog_name" placeholder="Nombre del perro" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+            <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;"><span data-i18n="anam_lbl_name">Nombre</span><span class="req-star" aria-hidden="true">*</span></div>
+            <input id="inp-dog-name" type="text" data-i18n-placeholder="ph_dog_name" placeholder="Nombre del perro" aria-required="true" data-required="true" onblur="_anamRequiredCheck(this)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+            <div class="req-error" aria-live="polite"></div>
           </div>
           <div>
-            <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_age">Edad</div>
-            <input id="inp-dog-age" type="text" data-i18n-placeholder="ph_dog_age" placeholder="Ej: 3 a&ntilde;os" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+            <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;"><span data-i18n="anam_lbl_age">Edad</span><span class="req-star" aria-hidden="true">*</span></div>
+            <input id="inp-dog-age" type="text" data-i18n-placeholder="ph_dog_age" placeholder="Ej: 3 a&ntilde;os" aria-required="true" data-required="true" onblur="_anamRequiredCheck(this)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+            <div class="req-error" aria-live="polite"></div>
           </div>
         </div>
 
         <div style="margin-bottom:12px;">
-          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_breed">Tipolog&iacute;a racial</div>
-          <input id="inp-breed" type="text" data-i18n-placeholder="ph_breed" placeholder="Raza o raza a la que se parece m&aacute;s..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;"><span data-i18n="anam_lbl_breed">Tipolog&iacute;a racial</span><span class="req-star" aria-hidden="true">*</span></div>
+          <input id="inp-breed" type="text" data-i18n-placeholder="ph_breed" placeholder="Raza o raza a la que se parece m&aacute;s..." aria-required="true" data-required="true" onblur="_anamRequiredCheck(this)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+          <div class="req-error" aria-live="polite"></div>
         </div>
 
         <div style="margin-bottom:12px;">
@@ -8145,13 +8153,15 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
         <div style="font-size:10px;font-weight:700;color:#E8A020;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;" data-i18n="anam_sec_problem">&#9888;&#65039; La conducta problema</div>
 
         <div style="margin-bottom:12px;">
-          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_describe">Describe la conducta problema</div>
-          <textarea id="inp-problem" data-i18n-placeholder="ph_problem" placeholder="Describe con detalle el comportamiento que preocupa..." style="width:100%;min-height:90px;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;resize:none;"></textarea>
+          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;"><span data-i18n="anam_lbl_describe">Describe la conducta problema</span><span class="req-star" aria-hidden="true">*</span></div>
+          <textarea id="inp-problem" data-i18n-placeholder="ph_problem" placeholder="Describe con detalle el comportamiento que preocupa..." aria-required="true" data-required="true" onblur="_anamRequiredCheck(this)" style="width:100%;min-height:90px;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;resize:none;"></textarea>
+          <div class="req-error" aria-live="polite"></div>
         </div>
 
         <div style="margin-bottom:12px;">
-          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_since">&iquest;Desde cu&aacute;ndo ocurre?</div>
-          <input id="inp-since" type="text" data-i18n-placeholder="ph_since" placeholder="Ej: hace 6 meses, desde cachorro..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;"><span data-i18n="anam_lbl_since">&iquest;Desde cu&aacute;ndo ocurre?</span><span class="req-star" aria-hidden="true">*</span></div>
+          <input id="inp-since" type="text" data-i18n-placeholder="ph_since" placeholder="Ej: hace 6 meses, desde cachorro..." aria-required="true" data-required="true" onblur="_anamRequiredCheck(this)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+          <div class="req-error" aria-live="polite"></div>
         </div>
 
         <div style="margin-bottom:12px;">
@@ -11609,6 +11619,33 @@ function endTour() {
 
 
 // ── ANAMNESIS HELPERS ─────────────────────────────
+// Validación on-blur de los 5 campos requeridos en la anamnesis
+// (dog_name, dog_age, breed, problem_description, when_it_happens — coinciden
+// con Field(...) sin default en app/models/anamnesis.py). Marca con borde
+// rojo + mensaje "obligatorio" si vacío. NO bloquea el submit: el backend
+// sigue siendo la fuente de verdad (devuelve 422 si Pydantic falla).
+function _anamRequiredCheck(el) {
+  if (!el || !el.hasAttribute('data-required')) return;
+  var ok = !!(el.value || '').trim();
+  el.classList.toggle('req-invalid', !ok);
+  // Buscamos el sibling .req-error en el mismo wrapper (parentNode del input).
+  // Si no lo encuentra, no hace nada — defensa contra cambios futuros de DOM.
+  var wrap = el.parentNode;
+  var err = wrap ? wrap.querySelector('.req-error') : null;
+  if (err) {
+    if (ok) {
+      err.textContent = '';
+    } else {
+      var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+      err.textContent = _i18nText(
+        'anam_required_err',
+        lang === 'en' ? 'This field is required' : 'Este campo es obligatorio'
+      );
+    }
+  }
+}
+window._anamRequiredCheck = _anamRequiredCheck;
+
 function anam_toggle(activeId, inactiveId) {
   var a = document.getElementById(activeId);
   var b = document.getElementById(inactiveId);
@@ -14650,6 +14687,7 @@ function endTourIntro() {
       country_jp:            'Japón',
       country_ae:            'Emiratos Árabes Unidos',
       country_other:         'Otro',
+      anam_required_err:     'Este campo es obligatorio',
       login_register_btn:    'Crear mi cuenta →',
       login_already:         '¿Ya tienes cuenta? ',
       login_sign_in_link:    'Iniciar sesión',
@@ -15481,6 +15519,7 @@ function endTourIntro() {
       country_jp:            'Japan',
       country_ae:            'United Arab Emirates',
       country_other:         'Other',
+      anam_required_err:     'This field is required',
       login_register_btn:    'Create my account →',
       login_already:         'Already have an account? ',
       login_sign_in_link:    'Sign In',

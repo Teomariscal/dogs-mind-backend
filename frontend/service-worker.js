@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v149 (country i18n 2026-05-19): dropdown #reg-country tenía opciones hardcoded en ES ("Selecciona tu país...", "España", "Reino Unido", etc.). Ahora cada <option> tiene data-i18n + value estable, dict ES+EN completo. value preservado en castellano para estabilidad si alguna vez se envía a backend. v148 = invite pre-validation.
+// Dogs Mind Service Worker — v150 (anamnesis required UX 2026-05-19): asterisco rojo + on-blur check + mensaje "Este campo es obligatorio" en los 5 campos sin default del Pydantic schema (dog_name, dog_age, breed, problem_description, when_it_happens). aria-required + data-required + .req-invalid border-color. NO bloquea submit — el backend sigue siendo la fuente de verdad (Pydantic 422). v149 = country i18n.
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v149';
+const CACHE_NAME = 'dogs-mind-v150';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

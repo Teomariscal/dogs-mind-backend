@@ -362,6 +362,19 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   font-size:9px;color:#fff;
 }
 .dog-name{font-size:12px;color:var(--text2);font-weight:500;}
+/* Badge "Ejemplo" sobre perros demo (Buddy/Laika fallback) — UX onboarding:
+   evita que usuario nuevo confunda los placeholders con cuentas reales.
+   Banner inferior dentro del círculo (respeta overflow:hidden + border-radius).
+   Sin pointer-events para que el click del .dog-item siga funcionando. */
+.dog-demo-badge{
+  position:absolute;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.55);color:#fff;
+  font-size:8px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  padding:2px 0;
+  text-align:center;
+  pointer-events:none;
+  line-height:1.2;
+}
 .dog-img-hint{font-size:10px;color:var(--text3);text-align:center;max-width:64px;}
 /* Foto del perro dentro del círculo de la home */
 .dog-circle img{width:100%;height:100%;object-fit:cover;display:block;}
@@ -8232,6 +8245,9 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
       </div>
 
       <!-- submit -->
+      <!-- Cost notice (#10): el usuario ve coste ANTES de comprometer el click.
+           Texto cambia a "4 tokens" cuando hay vídeo adjunto (ver setVideoAttachedUI). -->
+      <div id="analyze-cost-notice" style="font-size:11px;color:var(--grey);text-align:center;margin-top:14px;margin-bottom:2px;" data-i18n="analyze_cost_notice">Este análisis consume 3 tokens</div>
       <button id="btn-analyze" onclick="analyzeWithAI()" style="background:var(--green2);color:#fff;border:none;border-radius:100px;padding:14px 24px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;margin-top:8px;" data-i18n="analyze_btn">Analizar con IA →</button>
 
     </div>
@@ -11782,6 +11798,8 @@ function getVal(id, fallback) {
     // Update drop zone border to green confirmation
     document.getElementById('video-drop-zone').style.borderColor = '#4a6741';
     document.getElementById('video-drop-zone').style.borderStyle = 'solid';
+
+    _updateAnalyzeCostNotice();
   }
 
   function removeVideo() {
@@ -11794,7 +11812,21 @@ function getVal(id, fallback) {
     document.getElementById('video-preview-wrap').style.display = 'none';
     document.getElementById('video-drop-zone').style.borderColor = 'rgba(0,0,0,0.15)';
     document.getElementById('video-drop-zone').style.borderStyle = 'dashed';
+
+    _updateAnalyzeCostNotice();
   }
+
+  // Sincroniza la nota de coste pre-análisis con el estado del vídeo adjunto.
+  // Llamado desde attachVideo / removeVideo y desde el cambio de idioma.
+  function _updateAnalyzeCostNotice() {
+    var el = document.getElementById('analyze-cost-notice');
+    if (!el) return;
+    var key = window._attachedVideo ? 'analyze_cost_notice_video' : 'analyze_cost_notice';
+    var fallback = window._attachedVideo ? 'Este análisis con vídeo consume 4 tokens' : 'Este análisis consume 3 tokens';
+    el.setAttribute('data-i18n', key);
+    el.textContent = _i18nText(key, fallback);
+  }
+  window._updateAnalyzeCostNotice = _updateAnalyzeCostNotice;
   // ─────────────────────────────────────────────────────────────────────────
 
   // ── RECORDS ─────────────────────────────────────────────────────────────────
@@ -13373,10 +13405,14 @@ function renderHomeDogs() {
       ? '<img src="' + _escapeAttr(imgSrc) + '" style="object-position:' + imgPos + ';" alt="">'
       : '';
     var name = _escapeText(d.name || '');
+    var demoBadgeHtml = isDemo
+      ? '<span class="dog-demo-badge" data-i18n="home_demo_badge" aria-hidden="true">' + _escapeText(_i18nText('home_demo_badge', 'Ejemplo')) + '</span>'
+      : '';
     return (
       '<div class="dog-item" ' + clickAttr + ' role="listitem">' +
         '<div class="dog-circle' + inactiveClass + '" style="background:none;padding:0;overflow:hidden;">' +
           imgHtml +
+          demoBadgeHtml +
         '</div>' +
         '<div class="dog-name">' + name + '</div>' +
       '</div>'
@@ -14525,6 +14561,9 @@ function endTourIntro() {
       // Login
       login_welcome_tokens:  '5 tokens de bienvenida',
       login_welcome_sub:     'Gratis al registrarte. Sin tarjeta de crédito.',
+      home_demo_badge:       'Ejemplo',
+      analyze_cost_notice:   'Este análisis consume 3 tokens',
+      analyze_cost_notice_video: 'Este análisis con vídeo consume 4 tokens',
       login_register_btn:    'Crear mi cuenta →',
       login_already:         '¿Ya tienes cuenta? ',
       login_sign_in_link:    'Iniciar sesión',
@@ -15341,6 +15380,9 @@ function endTourIntro() {
       // Login
       login_welcome_tokens:  '5 welcome tokens',
       login_welcome_sub:     'Free when you sign up. No credit card.',
+      home_demo_badge:       'Example',
+      analyze_cost_notice:   'This analysis uses 3 tokens',
+      analyze_cost_notice_video: 'This video analysis uses 4 tokens',
       login_register_btn:    'Create my account →',
       login_already:         'Already have an account? ',
       login_sign_in_link:    'Sign In',

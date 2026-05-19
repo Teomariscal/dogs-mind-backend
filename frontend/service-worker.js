@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v146 (fix tokens refund + UX error 2026-05-19): analyzeWithAI sustituye alert(stack) por toast i18n + return a s-anamnesis. Backend ya hace refund automático de tokens si la IA falla (token_utils.refund_token integrado en /analysis, /analysis/video, /analysis/chat, /avatar/chat) — el usuario NUNCA pierde saldo por errores de red/Anthropic. UX consistente con resto de la app (showToast verde, lang-aware ES/EN, console.warn en lugar de alert).
+// Dogs Mind Service Worker — v147 (onboarding UX 2026-05-19): cost notice pre-analyze ("Este análisis consume 3 tokens" / "4 tokens" si hay vídeo, i18n ES+EN, sync dinámico vía _updateAnalyzeCostNotice) + badge "Ejemplo" sobre perros demo Buddy/Laika (banner inferior dentro del círculo, no rompe overflow:hidden, evita que usuarios nuevos confundan placeholders con cuentas reales). v146 = refund tokens AI failure.
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v146';
+const CACHE_NAME = 'dogs-mind-v147';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

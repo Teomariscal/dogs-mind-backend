@@ -12962,9 +12962,16 @@ async function analyzeWithAI() {
     fetchBalance(); // refresh token count after deduction
 
   } catch (e) {
-    var msg = e && e.message ? e.message : String(e);
-    var stack = e && e.stack ? '\n\n' + e.stack.split('\n').slice(0,3).join('\n') : '';
-    alert('Error:\n' + msg + stack);
+    // Error de red o IA. El backend hace refund automático de los tokens
+    // (token_utils.refund_token) — el usuario NO pierde saldo.
+    // UX: mensaje claro sin stack trace + volver a anamnesis para reintentar.
+    var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+    var msg = (lang === 'en')
+      ? 'Connection error. Your tokens were not charged. Try again.'
+      : 'Error de conexión. No se han descontado tokens. Inténtalo de nuevo.';
+    try { showToast(msg); } catch(_) { alert(msg); }
+    goTo('s-anamnesis');
+    console.warn('analyzeWithAI error:', e && e.message ? e.message : e);
   } finally {
     btn.textContent = 'Analizar con IA →';
     btn.disabled = false;

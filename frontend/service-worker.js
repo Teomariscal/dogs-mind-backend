@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v145 (audit Tier 1+2 aprobado por Teo 2026-05-17): paquete de 7 fixes pre-submit App Store. BACKEND: #1 JWT_SECRET ahora ABORTA arranque si default/missing (auth.py), #4 safety classifier en /analysis/chat ya no es ciego (req.history → req.messages en analysis.py:324), #6 /auth/forgot-password usa func.lower para encontrar usuarios con email en mayúsculas, #7 _get_owned_case valida UUID antes de query para devolver 404 en lugar de 500. FRONTEND: #2 card Certified Professional ocultado por display:none (botón "Próximamente" violaba Apple Guideline 2.1, código preservado para v1.1), #9 video-token-modal padding-bottom usa env(safe-area-inset-bottom) para no tapar botón con home indicator iPhone, #12 modal texto stale "10 tokens" actualizado a "4 tokens (3 análisis + 1 vídeo)" alineado con ANALYSIS_VIDEO_TOKEN_COST real (ES + EN i18n).)
+// Dogs Mind Service Worker — v146 (fix tokens refund + UX error 2026-05-19): analyzeWithAI sustituye alert(stack) por toast i18n + return a s-anamnesis. Backend ya hace refund automático de tokens si la IA falla (token_utils.refund_token integrado en /analysis, /analysis/video, /analysis/chat, /avatar/chat) — el usuario NUNCA pierde saldo por errores de red/Anthropic. UX consistente con resto de la app (showToast verde, lang-aware ES/EN, console.warn en lugar de alert).
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v145';
+const CACHE_NAME = 'dogs-mind-v146';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

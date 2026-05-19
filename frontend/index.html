@@ -7937,7 +7937,10 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
         <!-- Invite code (optional) -->
         <div>
           <label style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;" data-i18n="form_invite_label">Código de invitación <span style="color:var(--grey);font-size:10px;text-transform:none;">(opcional)</span></label>
-          <input class="inp" type="text" placeholder="Si tienes un código, introdúcelo aquí" data-i18n-placeholder="form_invite_ph" id="reg-invite" autocomplete="off">
+          <input class="inp" type="text" placeholder="Si tienes un código, introdúcelo aquí" data-i18n-placeholder="form_invite_ph" id="reg-invite" autocomplete="off" onblur="validateInviteCode()">
+          <!-- Feedback inline tras blur: vacío inicialmente, se rellena con check/cross + label.
+               No bloquea el submit (el backend re-valida en /register). -->
+          <div id="reg-invite-feedback" style="font-size:11px;margin-top:6px;min-height:14px;line-height:1.2;" aria-live="polite"></div>
         </div>
 
         <!-- Token gift banner -->
@@ -9360,6 +9363,77 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
     setTimeout(fill, 3500);
   } catch(e) {}
 })();
+
+// ── INVITE CODE — PRE-VALIDATION ON BLUR ──────────────────────────────────
+// Pega contra POST /auth/validate-invite (read-only, no crea cuenta) y pinta
+// feedback inline bajo el input. NO bloquea el submit: el backend re-valida
+// en /register, así que esto es solo UX. Si el input es readonly (vino vía
+// URL ?invite=), saltamos — ya está visualmente marcado como aplicado.
+window._inviteValidateInFlight = null;
+async function validateInviteCode() {
+  var inp = document.getElementById('reg-invite');
+  var fb  = document.getElementById('reg-invite-feedback');
+  if (!inp || !fb) return;
+  // Si vino prellenado por URL (readonly) ya está marcado visualmente; no pegar contra el backend.
+  if (inp.hasAttribute('readonly')) { fb.textContent = ''; return; }
+
+  var code = (inp.value || '').trim();
+  var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+
+  if (!code) {
+    fb.textContent = '';
+    fb.style.color = '';
+    return;
+  }
+
+  // Loading state — no spinner pesado, solo un texto sutil
+  fb.style.color = 'var(--grey)';
+  fb.textContent = (lang === 'en') ? 'Checking…' : 'Comprobando…';
+
+  // Cancelamos vuelo previo si el usuario edita rápido
+  var thisCall = (window._inviteValidateInFlight = Math.random());
+
+  try {
+    var res = await fetch(API_BASE + '/auth/validate-invite', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ invite_code: code }),
+    });
+    // Si llegó una llamada posterior, esta queda obsoleta
+    if (window._inviteValidateInFlight !== thisCall) return;
+
+    if (res.status === 429) {
+      fb.style.color = 'var(--grey)';
+      fb.textContent = (lang === 'en')
+        ? 'Too many attempts. Try later.'
+        : 'Demasiados intentos. Inténtalo más tarde.';
+      return;
+    }
+    if (!res.ok) {
+      // Fallo red u otro 5xx → no decimos nada (backend revalidará al registrar)
+      fb.textContent = '';
+      return;
+    }
+
+    var data = await res.json();
+    if (data && data.valid) {
+      fb.style.color = '#2d5a2d';
+      var prefix = (lang === 'en') ? 'Code applied' : 'Código aplicado';
+      var suffix = (lang === 'en') ? 'welcome tokens' : 'tokens de bienvenida';
+      fb.textContent = '✓ ' + prefix + ' · ' + (data.tokens || '?') + ' ' + suffix;
+    } else {
+      fb.style.color = '#a04040';
+      fb.textContent = (lang === 'en')
+        ? '✗ Code not recognized. You can still register; you will get the default tokens.'
+        : '✗ Código no reconocido. Puedes registrarte igualmente; recibirás los tokens por defecto.';
+    }
+  } catch(_e) {
+    // Red caída: silenciamos para no asustar (backend valida al registrar)
+    if (window._inviteValidateInFlight !== thisCall) return;
+    fb.textContent = '';
+  }
+}
+window.validateInviteCode = validateInviteCode;
 
 // ── PRO COURTESY UI REACT ─────────────────────────────────────────────────
 // Cuando #ps-invite tiene contenido, el pago Stripe NO ocurre — el botón

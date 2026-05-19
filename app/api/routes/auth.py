@@ -63,6 +63,22 @@ class AuthResponse(BaseModel):
     delegation_name: Optional[str] = None
 
 
+class ValidateInviteRequest(BaseModel):
+    invite_code: str
+
+
+class ValidateInviteResponse(BaseModel):
+    """
+    Respuesta de pre-validación de invite_code (sin crear cuenta).
+    Si `valid` es False, los demás campos son None y el cliente debe mostrar
+    un mensaje neutro (no enumeramos qué tipo de código sería).
+    """
+    valid: bool
+    type: Optional[str] = None       # 'delegation' | 'ambassador' | None
+    label: Optional[str] = None      # nombre legible ("Bocalán Chile", "Embajador")
+    tokens: Optional[int] = None     # total welcome tokens si valid
+
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
@@ -166,6 +182,95 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
         account_type=user.account_type,
         delegation_name=(delegation_obj.name if delegation_obj else None),
     )
+
+
+# ── Rate limit pre-validación de invite_code ─────────────────────────────────
+# Sliding window in-memory por IP (mismo patrón que payments.pro-activate-cortesia
+# pero con tope más alto porque la UI llama on-blur del input — usuarios pueden
+# corregir varias veces). Se limpia al reiniciar Railway (aceptable para 1 worker).
+from collections import defaultdict as _defaultdict_inv
+from datetime import datetime as _dt_inv, timedelta as _td_inv
+from fastapi import Request as _Request_inv
+
+_INVITE_VALIDATE_FAILS: dict = _defaultdict_inv(list)
+INVITE_VALIDATE_MAX_FAILS_PER_HOUR = 30
+
+
+def _invite_client_ip(request: _Request_inv) -> str:
+    xff = request.headers.get("x-forwarded-for", "")
+    if xff:
+        return xff.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
+def _invite_is_blocked(ip: str) -> tuple[bool, int]:
+    now = _dt_inv.utcnow()
+    cutoff = now - _td_inv(hours=1)
+    fails = [t for t in _INVITE_VALIDATE_FAILS.get(ip, []) if t > cutoff]
+    _INVITE_VALIDATE_FAILS[ip] = fails
+    if len(fails) >= INVITE_VALIDATE_MAX_FAILS_PER_HOUR:
+        oldest = fails[0]
+        retry = int((oldest + _td_inv(hours=1) - now).total_seconds())
+        return True, max(retry, 60)
+    return False, 0
+
+
+@router.post("/validate-invite", response_model=ValidateInviteResponse)
+def validate_invite(
+    req: ValidateInviteRequest,
+    request: _Request_inv,
+    db: Session = Depends(get_db),
+):
+    """
+    Pre-validación de invite_code SIN crear cuenta.
+
+    Diseñado para feedback inline en el formulario de registro (on-blur del
+    input). Espeja exactamente la lógica de resolución que aplica `/register`:
+      1. Delegation activa → type='delegation', tokens=5+bonus
+      2. AMBASSADOR_CODE  → type='ambassador', tokens=8
+      3. Sin match        → valid=False (sin enumerar nada)
+
+    El endpoint NO escribe en DB. Rate-limit por IP anti brute-force.
+    """
+    ip = _invite_client_ip(request)
+    blocked, retry_after = _invite_is_blocked(ip)
+    if blocked:
+        raise HTTPException(
+            status_code=429,
+            detail="Demasiados intentos. Espera unos minutos.",
+            headers={"Retry-After": str(retry_after)},
+        )
+
+    code = (req.invite_code or "").strip()
+    if not code:
+        return ValidateInviteResponse(valid=False)
+
+    # Delegation primero (más específico)
+    delegation = db.query(Delegation).filter(
+        Delegation.code == code,
+        Delegation.active == True,
+    ).first()
+    if delegation:
+        return ValidateInviteResponse(
+            valid=True,
+            type="delegation",
+            label=delegation.name or delegation.code,
+            tokens=DEFAULT_TOKENS + int(delegation.welcome_bonus_tokens or 0),
+        )
+
+    # Ambassador después
+    if AMBASSADOR_CODE and code == AMBASSADOR_CODE:
+        return ValidateInviteResponse(
+            valid=True,
+            type="ambassador",
+            label="Embajador",
+            tokens=AMBASSADOR_TOKENS,
+        )
+
+    # Fallo: registramos para rate-limit (no devolvemos 4xx — el cliente
+    # necesita la respuesta 200 con valid=False para pintar el mensaje).
+    _INVITE_VALIDATE_FAILS[ip].append(_dt_inv.utcnow())
+    return ValidateInviteResponse(valid=False)
 
 
 @router.post("/login", response_model=AuthResponse)

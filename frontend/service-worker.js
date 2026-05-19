@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v147 (onboarding UX 2026-05-19): cost notice pre-analyze ("Este análisis consume 3 tokens" / "4 tokens" si hay vídeo, i18n ES+EN, sync dinámico vía _updateAnalyzeCostNotice) + badge "Ejemplo" sobre perros demo Buddy/Laika (banner inferior dentro del círculo, no rompe overflow:hidden, evita que usuarios nuevos confundan placeholders con cuentas reales). v146 = refund tokens AI failure.
+// Dogs Mind Service Worker — v148 (invite pre-validation 2026-05-19): POST /auth/validate-invite (read-only, rate-limited 30/h por IP, sliding window) espeja resolución de /register sin crear cuenta → delegation > ambassador > unknown. Frontend valida on-blur de #reg-invite, pinta ✓/✗ inline con tokens grant, no bloquea submit (backend re-valida al registrar). Skip si el input vino readonly por URL ?invite= (ya tiene badge "Código aplicado"). v147 = onboarding UX cost notice + demo badge.
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v147';
+const CACHE_NAME = 'dogs-mind-v148';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

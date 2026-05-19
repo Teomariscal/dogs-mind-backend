@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v148 (invite pre-validation 2026-05-19): POST /auth/validate-invite (read-only, rate-limited 30/h por IP, sliding window) espeja resolución de /register sin crear cuenta → delegation > ambassador > unknown. Frontend valida on-blur de #reg-invite, pinta ✓/✗ inline con tokens grant, no bloquea submit (backend re-valida al registrar). Skip si el input vino readonly por URL ?invite= (ya tiene badge "Código aplicado"). v147 = onboarding UX cost notice + demo badge.
+// Dogs Mind Service Worker — v149 (country i18n 2026-05-19): dropdown #reg-country tenía opciones hardcoded en ES ("Selecciona tu país...", "España", "Reino Unido", etc.). Ahora cada <option> tiene data-i18n + value estable, dict ES+EN completo. value preservado en castellano para estabilidad si alguna vez se envía a backend. v148 = invite pre-validation.
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v148';
+const CACHE_NAME = 'dogs-mind-v149';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

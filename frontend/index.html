@@ -7901,18 +7901,18 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
         <div>
           <label style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;" data-i18n="form_country">País de residencia</label>
           <select class="sel" id="reg-country" style="width:100%;">
-            <option value="">Selecciona tu país...</option>
-            <option>España</option>
-            <option>México</option>
-            <option>Argentina</option>
-            <option>Colombia</option>
-            <option>Chile</option>
-            <option>Perú</option>
-            <option>Estados Unidos</option>
-            <option>Reino Unido</option>
-            <option>Japón</option>
-            <option>Emiratos Árabes Unidos</option>
-            <option>Otro</option>
+            <option value="" data-i18n="country_placeholder">Selecciona tu país...</option>
+            <option value="España" data-i18n="country_es">España</option>
+            <option value="México" data-i18n="country_mx">México</option>
+            <option value="Argentina" data-i18n="country_ar">Argentina</option>
+            <option value="Colombia" data-i18n="country_co">Colombia</option>
+            <option value="Chile" data-i18n="country_cl">Chile</option>
+            <option value="Perú" data-i18n="country_pe">Perú</option>
+            <option value="Estados Unidos" data-i18n="country_us">Estados Unidos</option>
+            <option value="Reino Unido" data-i18n="country_gb">Reino Unido</option>
+            <option value="Japón" data-i18n="country_jp">Japón</option>
+            <option value="Emiratos Árabes Unidos" data-i18n="country_ae">Emiratos Árabes Unidos</option>
+            <option value="Otro" data-i18n="country_other">Otro</option>
           </select>
         </div>
 
@@ -14638,6 +14638,18 @@ function endTourIntro() {
       home_demo_badge:       'Ejemplo',
       analyze_cost_notice:   'Este análisis consume 3 tokens',
       analyze_cost_notice_video: 'Este análisis con vídeo consume 4 tokens',
+      country_placeholder:   'Selecciona tu país...',
+      country_es:            'España',
+      country_mx:            'México',
+      country_ar:            'Argentina',
+      country_co:            'Colombia',
+      country_cl:            'Chile',
+      country_pe:            'Perú',
+      country_us:            'Estados Unidos',
+      country_gb:            'Reino Unido',
+      country_jp:            'Japón',
+      country_ae:            'Emiratos Árabes Unidos',
+      country_other:         'Otro',
       login_register_btn:    'Crear mi cuenta →',
       login_already:         '¿Ya tienes cuenta? ',
       login_sign_in_link:    'Iniciar sesión',
@@ -15457,6 +15469,18 @@ function endTourIntro() {
       home_demo_badge:       'Example',
       analyze_cost_notice:   'This analysis uses 3 tokens',
       analyze_cost_notice_video: 'This video analysis uses 4 tokens',
+      country_placeholder:   'Select your country...',
+      country_es:            'Spain',
+      country_mx:            'Mexico',
+      country_ar:            'Argentina',
+      country_co:            'Colombia',
+      country_cl:            'Chile',
+      country_pe:            'Peru',
+      country_us:            'United States',
+      country_gb:            'United Kingdom',
+      country_jp:            'Japan',
+      country_ae:            'United Arab Emirates',
+      country_other:         'Other',
       login_register_btn:    'Create my account →',
       login_already:         'Already have an account? ',
       login_sign_in_link:    'Sign In',

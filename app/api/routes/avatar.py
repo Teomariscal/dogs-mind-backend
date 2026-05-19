@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.models.avatar import AvatarChatRequest, AvatarChatResponse
 from app.services.avatar_ai import chat
 from app.database import get_db
-from app.core.token_utils import deduct_token
+from app.core.token_utils import deduct_token, refund_token
 from app.core.usage_tracker import log_usage
 from app.core.case_persistence import persist_to_case_safely, get_user_from_authorization
 from app.core.anthropic_error import raise_http_for_anthropic
@@ -91,6 +91,8 @@ def avatar_chat(
             )
         return result
     except Exception as e:
+        # Refund: el usuario no paga por errores de IA/red.
+        refund_token(authorization, db, amount=0.10)
         background_tasks.add_task(
             log_usage,
             user_id=user_id_for_logs,

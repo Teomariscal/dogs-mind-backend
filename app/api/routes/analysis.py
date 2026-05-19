@@ -56,7 +56,7 @@ def _strip_markdown(text: str) -> str:
     text = _re.sub(r'\n{3,}', '\n\n', text)                  # max 2 newlines
     return text.strip()
 
-from app.core.token_utils import deduct_token
+from app.core.token_utils import deduct_token, refund_token
 
 # Max video size accepted: 200 MB
 MAX_VIDEO_BYTES = 200 * 1024 * 1024
@@ -140,6 +140,8 @@ def create_analysis(
             )
         return result
     except Exception as e:
+        # Refund tokens — no cobramos al usuario por errores de IA/red.
+        refund_token(authorization, db, amount=ANALYSIS_TEXT_TOKEN_COST)
         background_tasks.add_task(
             log_usage,
             user_id=user_id_for_logs,
@@ -200,6 +202,7 @@ async def create_analysis_with_video(
     # descontar tokens. Frontend valida también con metadata HTMLVideoElement.
     suffix = os.path.splitext(video.filename or "video.mp4")[1] or ".mp4"
     tmp_path = None
+    _charged = False  # se vuelve True tras deduct_token exitoso → habilita refund en error
     try:
         with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
             tmp.write(video_bytes)
@@ -222,6 +225,7 @@ async def create_analysis_with_video(
 
         # ── Deduct token (DESPUÉS de duration check, así no cobramos rechazos) ──
         deduct_token(authorization, db, amount=ANALYSIS_VIDEO_TOKEN_COST, require_auth=True)
+        _charged = True
 
         # ── Shadow safety classifier (no bloquea, fire-and-forget) ───────────
         safety_text = _anamnesis_text_for_safety(anamnesis)
@@ -254,6 +258,10 @@ async def create_analysis_with_video(
     except HTTPException:
         raise
     except Exception as e:
+        # Refund SOLO si llegamos a cobrar (errores previos a deduct_token no
+        # deben triggerar refund).
+        if _charged:
+            refund_token(authorization, db, amount=ANALYSIS_VIDEO_TOKEN_COST)
         raise_http_for_anthropic(e)
     finally:
         if tmp_path and os.path.exists(tmp_path):
@@ -388,6 +396,8 @@ def analysis_chat(
             success="ok",
         )
     except Exception as e:
+        # Refund: el usuario no paga por errores de IA/red.
+        refund_token(authorization, db, amount=0.25)
         background_tasks.add_task(
             log_usage,
             user_id=user_id_for_logs,

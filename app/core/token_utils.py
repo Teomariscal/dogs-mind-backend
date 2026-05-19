@@ -67,3 +67,43 @@ def deduct_token(
         if require_auth:
             raise HTTPException(status_code=500, detail="Error al verificar tokens.")
         return None
+
+
+def refund_token(
+    authorization: Optional[str],
+    db: Session,
+    amount: float = 1.0,
+) -> Optional[float]:
+    """
+    Refund `amount` tokens to the authenticated user.
+
+    Designed to roll back a `deduct_token` that succeeded immediately before an
+    AI call that then failed. Preserves the invariant: the user is never
+    charged for our errors.
+
+    - No auth header  → silent no-op (anonymous flows).
+    - Privileged role → silent no-op (they never spent anything to begin with).
+    - Any DB/JWT error inside the refund → logged but NEVER raised. The caller
+      is already in an error path; surfacing a refund error would mask the
+      original Anthropic error to the user.
+    """
+    if not authorization or not authorization.startswith("Bearer "):
+        return None
+    try:
+        from app.api.routes.auth import decode_token
+        from app.models.user import User
+
+        user_id = decode_token(authorization.split(" ", 1)[1])
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            return None
+        if getattr(user, "role", "user") in PRIVILEGED_ROLES:
+            return float(user.tokens)
+
+        user.tokens = float(user.tokens) + amount
+        db.commit()
+        _log.info("refund_token: +%.2f → %s (balance: %.2f)", amount, user.email, float(user.tokens))
+        return float(user.tokens)
+    except Exception as exc:
+        _log.exception("refund_token: failed to refund %.2f — %s", amount, exc)
+        return None

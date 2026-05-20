@@ -12773,7 +12773,7 @@ function getVal(id, fallback) {
   }
 
   // ────────────────────────────────────────────────────────────────────────────
-  function acceptIntervention() {
+  async function acceptIntervention() {
     // Save accepted case to localStorage behavioral records
     var record = {
       id:       Date.now(),
@@ -12802,6 +12802,45 @@ function getVal(id, fallback) {
       records.unshift(record);
       setRecords(records);
     } catch(e) {}
+
+    // ── Persistir SIEMPRE al backend al aceptar (durabilidad) ─────────────────
+    // Antes el caso solo llegaba al backend si el usuario pulsaba Explica/Plan
+    // simple/Seguimiento. Si no, vivía solo en localStorage → se perdía al
+    // cambiar de dispositivo o borrar caché, y no tenía seguimiento diario.
+    // Reutiliza /cases/migrate (account-type agnóstico: crea con dog_id=None).
+    // Defensivo: si falla, el caso queda en local (no se rompe el flujo) y se
+    // podrá migrar luego con cualquier acción secundaria.
+    if (!record.backend_case_id) {
+      try {
+        var jwtMig = localStorage.getItem('dm_jwt') || '';
+        if (jwtMig) {
+          var mres = await fetch(API_BASE + '/cases/migrate', {
+            method: 'POST', headers: authHeaders(),
+            body: JSON.stringify({ records: [{
+              id: record.id, date: record.date || null,
+              dog_name: record.dog_name || null, breed: record.breed || null,
+              dog_age: record.dog_age || null, problem: record.problem || null,
+              analysis: record.analysis || null, plan: record.plan || null,
+              status: record.status || 'active',
+              lang: record.lang || (window.getCurrentLang ? window.getCurrentLang() : null)
+            }]})
+          });
+          if (mres.ok) {
+            var mdata = await mres.json();
+            var mresult = (mdata.results && mdata.results[0]) || null;
+            if (mresult && mresult.case_id) {
+              record.backend_case_id = mresult.case_id;
+              // Persistir el backend_case_id en el record ya guardado
+              try {
+                var recsU = getRecords();
+                var idxU = recsU.findIndex(function(r){ return r.id === record.id; });
+                if (idxU >= 0) { recsU[idxU].backend_case_id = mresult.case_id; setRecords(recsU); }
+              } catch(e) {}
+            }
+          }
+        }
+      } catch(e) { /* sin red u otro: el caso queda en local, migrable luego */ }
+    }
 
     // Activar daily-followup en backend tras aceptar plan (idempotente).
     // No bloquea el flujo: si falla, el usuario podrá pulsar el botón

@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v152 (auto-persist al aceptar 2026-05-20): acceptIntervention ahora guarda SIEMPRE el caso en backend al aceptar (vía /cases/migrate, account-type agnóstico) si aún no tiene backend_case_id → cada caso es durable (no se pierde al cambiar de dispositivo/borrar caché) y tiene seguimiento diario desde el minuto uno. Defensivo: si falla la red, el caso queda en local y se migra luego. v151 = registros cross-device sync.
+// Dogs Mind Service Worker — v153 (límites de casos por cuenta 2026-05-20): backend aplica límite de casos activos por account_type — particular=2, professional=20, corporativo=ilimitado (cases.py _max_cases_for, en create_case y /cases/migrate). Frontend: acceptIntervention detecta skipped_quota y muestra toast "Has alcanzado el máximo de X casos. Borra uno". Particulares con >2 casos existentes quedan bloqueados para crear hasta borrar (no se borra nada retroactivo). v152 = auto-persist al aceptar.
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,7 +17,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v152';
+const CACHE_NAME = 'dogs-mind-v153';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

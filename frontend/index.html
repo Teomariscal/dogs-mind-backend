@@ -12836,6 +12836,11 @@ function getVal(id, fallback) {
                 var idxU = recsU.findIndex(function(r){ return r.id === record.id; });
                 if (idxU >= 0) { recsU[idxU].backend_case_id = mresult.case_id; setRecords(recsU); }
               } catch(e) {}
+            } else if (mresult && mresult.status === 'skipped_quota') {
+              // Límite de casos del plan alcanzado → aviso claro. El caso queda
+              // en local; el usuario debe borrar uno para guardarlo en backend.
+              var _qmsg = mresult.detail || _i18nText('case_quota_full', 'Has alcanzado tu límite de casos. Borra uno para guardar este.');
+              try { showToast(_qmsg); } catch(_) {}
             }
           }
         }

@@ -39,8 +39,26 @@ router = APIRouter(prefix="/cases", tags=["cases"])
 
 
 # ── Cuotas (validadas en endpoint) ───────────────────────────────────────────
+# Límite de casos activos por tipo de cuenta (decisión Teo 2026-05-20):
+#   particular   → 2   (borrar para añadir)
+#   professional → 20
+#   corporativo  → ilimitado (tope técnico alto)
+# MAX_CASES_PER_USER se mantiene como tope de seguridad global / fallback.
 MAX_CASES_PER_USER = 200
+MAX_CASES_PARTICULAR   = 2
+MAX_CASES_PROFESSIONAL = 20
+MAX_CASES_CORPORATE    = 1_000_000  # efectivamente ilimitado
 MAX_ENTRIES_PER_CASE = 500
+
+
+def _max_cases_for(user) -> int:
+    """Límite de casos activos según account_type. Default conservador = particular."""
+    at = (getattr(user, "account_type", "particular") or "particular").lower()
+    if at == "professional":
+        return MAX_CASES_PROFESSIONAL
+    if at in ("corporativo", "corporate"):
+        return MAX_CASES_CORPORATE
+    return MAX_CASES_PARTICULAR
 
 # ── Tarifas tokens (INVARIANTES FINANCIERAS — no tocar sin aprobación CFO) ──
 # Ver dogsmind-modelo-negocio-pricing.md y memoria CFO.
@@ -553,12 +571,13 @@ def create_case(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    # Cuota
+    # Cuota por tipo de cuenta
+    _limit = _max_cases_for(user)
     active_count = _count_active_cases(user, db)
-    if active_count >= MAX_CASES_PER_USER:
+    if active_count >= _limit:
         raise HTTPException(
             status_code=429,
-            detail=f"Has alcanzado el máximo de {MAX_CASES_PER_USER} casos activos.",
+            detail=f"Has alcanzado el máximo de {_limit} casos. Borra uno para crear otro.",
         )
 
     # Gating por tier (Particular: solo perros propios; Profesional: propios o cliente)
@@ -1331,6 +1350,7 @@ def migrate_legacy_records(
             existing_legacy.add(meta_legacy_id)
 
     active_count = len([c for c in existing_cases if c.deleted_at is None])
+    _migrate_limit = _max_cases_for(user)
 
     for rec in payload.records:
         # 1. Saltar duplicados ya migrados
@@ -1352,11 +1372,11 @@ def migrate_legacy_records(
             skipped += 1
             continue
 
-        # 3. Cuota
-        if active_count >= MAX_CASES_PER_USER:
+        # 3. Cuota por tipo de cuenta
+        if active_count >= _migrate_limit:
             results.append(MigrateResponseItem(
                 legacy_id=rec.id, status="skipped_quota",
-                detail=f"Cuota máxima alcanzada ({MAX_CASES_PER_USER}). Casos restantes no migrados."
+                detail=f"Has alcanzado el máximo de {_migrate_limit} casos. Borra uno para guardar este."
             ))
             skipped += 1
             continue

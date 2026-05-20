@@ -12,6 +12,6 @@ class Payment(Base):
     user_id            = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     stripe_session_id  = Column(String(255), unique=True, nullable=False)
     tokens             = Column(Integer, nullable=False)       # 10 / 50 / 200
-    amount_cents       = Column(Integer, nullable=False)       # 499 / 1999 / 5999
+    amount_cents       = Column(Integer, nullable=False)       # 499 / 1600 / 4200
     status             = Column(String(50), default="pending") # pending / paid
     created_at         = Column(DateTime, default=datetime.utcnow)

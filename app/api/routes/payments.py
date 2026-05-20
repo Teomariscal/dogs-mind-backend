@@ -19,8 +19,8 @@ APP_URL = os.environ.get("APP_URL", "https://thedogsmindbeta.netlify.app")
 # Packs disponibles (1 token ≈ €1 → análisis=3tok, chat=0.25tok, avatar=0.10tok)
 PACKS = {
     5:  {"tokens": 5,  "amount_cents": 499,  "label": "5 Tokens Dogs Mind"},
-    20: {"tokens": 20, "amount_cents": 1999, "label": "20 Tokens Dogs Mind"},
-    60: {"tokens": 60, "amount_cents": 5999, "label": "60 Tokens Dogs Mind"},
+    20: {"tokens": 20, "amount_cents": 1600, "label": "20 Tokens Dogs Mind"},
+    60: {"tokens": 60, "amount_cents": 4200, "label": "60 Tokens Dogs Mind"},
 }
 
 # ── Profesional flow ─────────────────────────────────────────────────────────

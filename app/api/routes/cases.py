@@ -1392,6 +1392,12 @@ def migrate_legacy_records(
             status=case_status,
             summary_abc=_summarize_text(rec.analysis),
             summary_plan=_summarize_text(rec.plan),
+            # Guardar nombre/raza/edad del perro en el propio caso para que viaje
+            # en GET /cases y se vea en cualquier dispositivo (antes solo quedaba
+            # en el meta de la entrada de anamnesis → "Sin nombre" cross-device).
+            client_dog_name=((rec.dog_name or "").strip() or None),
+            client_dog_breed=((rec.breed or "").strip() or None),
+            client_dog_age=((rec.dog_age or "").strip() or None),
             # Opción C: persistimos el lang del record si el cliente lo envió.
             # Records legacy sin lang quedan NULL → endpoints caen al fallback ?lang=
             lang=rec.lang,

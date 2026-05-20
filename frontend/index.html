@@ -9569,7 +9569,7 @@ function stepperDown(id) {
 function goTo(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  if (id === 's-records') renderRecords();
+  if (id === 's-records') { renderRecords(); syncBackendCases(); }
   if (id === 's-tokens') updateTokensScreen();
   if (id === 's-home') { fetchBalance(); loadDailyTip(); }
   if (id === 's-pro-company' && typeof _pcOnEnter === 'function') _pcOnEnter();
@@ -11979,6 +11979,58 @@ function getVal(id, fallback) {
   function setRecords(records) {
     try { localStorage.setItem(_recordsKey(), JSON.stringify(records)); } catch(e) {}
   }
+
+  // ── Sync casos del backend → localStorage (visibilidad cross-device) ─────────
+  // Problema que resuelve: la pantalla de registros leía SOLO de localStorage,
+  // así que un usuario logueado en un dispositivo nuevo / con caché borrada NO
+  // veía sus casos aunque están en la BD (recuperables vía GET /cases).
+  // Diseño defensivo: ADITIVO (solo añade casos del backend que no estén ya en
+  // local por backend_case_id; nunca borra ni pisa los locales con texto
+  // completo) y todo en try/catch (si falla red/parseo, la vista local intacta).
+  async function syncBackendCases() {
+    var jwt = '';
+    try { jwt = localStorage.getItem('dm_jwt') || ''; } catch(e) {}
+    if (!jwt) return;  // sin sesión: nada que sincronizar
+    try {
+      var res = await fetch(API_BASE + '/cases', {
+        headers: { 'Authorization': 'Bearer ' + jwt },
+        cache: 'no-store'
+      });
+      if (!res.ok) return;  // 401/5xx: no tocar la vista local
+      var cases = await res.json();
+      if (!Array.isArray(cases)) return;
+      var local = getRecords();
+      var haveIds = {};
+      local.forEach(function(r) { if (r && r.backend_case_id) haveIds[String(r.backend_case_id)] = true; });
+      var added = 0;
+      cases.forEach(function(c) {
+        if (!c || !c.id || haveIds[String(c.id)]) return;  // ya está local → no duplicar
+        var st = (c.status === 'resolved') ? 'resolved' : (c.status === 'closed' ? 'closed' : 'active');
+        var dateStr = '';
+        try { dateStr = new Date(c.created_at).toLocaleDateString('es-ES'); } catch(e) {}
+        local.push({
+          id:               c.id,
+          backend_case_id:  c.id,
+          date:             dateStr,
+          dog_name:         c.client_dog_name || '',
+          breed:            c.client_dog_breed || '',
+          dog_age:          c.client_dog_age || '',
+          problem:          c.title || c.motivo_consulta || '',
+          analysis:         c.summary_abc || c.summary_full || '',
+          plan:             c.summary_plan || '',
+          status:           st,
+          lang:             c.lang || 'es',
+          _fromBackend:     true
+        });
+        added++;
+      });
+      if (added > 0) {
+        setRecords(local);
+        renderRecords();
+      }
+    } catch(e) { /* red caída u otro: no rompemos la vista local */ }
+  }
+  window.syncBackendCases = syncBackendCases;
 
   // ── Abrir caso archivado: reusa s-abc / s-tracking / Cecilia handoff ────────
   function openRecord(idx) {

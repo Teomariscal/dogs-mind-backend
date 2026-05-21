@@ -1,18 +1,61 @@
 # Dogs Mind — Onboarding y estado del proyecto
 
-Última actualización: **2026-05-17**
+Última actualización: **2026-05-21**
 
-App SaaS de consultoría conductual canina con IA. Founder único: Teo Mariscal. Pre-launch App Store iOS.
+App SaaS de consultoría conductual canina con IA. Founder único: Teo Mariscal. **EN PRODUCCIÓN con usuarios DE PAGO desde 2026-05-20** (fin de pre-launch).
 
 ---
 
 ## Resumen rápido
 
 - **Producto**: análisis funcional ABC + plan de intervención LIMA con Claude Sonnet 4.6 + RAG. Avatares conversacionales con Haiku 4.5. Vídeo multimodal en anamnesis.
-- **URL prod**: https://thedogsmind.net (SW v145+)
-- **Backend**: https://dogs-mind-backend-production.up.railway.app
-- **Modelo de negocio**: prepago en tokens (NO suscripción).
+- **URL prod**: https://thedogsmind.net (SW **v154**)
+- **Backend**: https://dogs-mind-backend-production.up.railway.app (Railway plan **Pro** desde 2026-05-20)
+- **Modelo de negocio**: prepago en tokens (NO suscripción). **Stripe en LIVE.**
 - **Stack**: FastAPI + PostgreSQL (Railway) + Anthropic API + Voyage AI + Qdrant Cloud + Netlify + Stripe
+- **Modelos IA**: Sonnet 4.6 (`clinical_model`) para análisis/plan/seguimientos; Haiku 4.5 (`avatar_model`) para Aigents/explica/tips. NO se usa Opus (decisión coste/latencia; ver "Ideas post-launch").
+
+---
+
+## 🚀 Lanzamiento 2026-05-20/21 — cambios desplegados y verificados
+
+**Despliegue**: backend Railway (git-conectado, auto-deploy on push a `main`) + frontend Netlify (`netlify deploy --prod`, site `152389f9-0282-46b5-a929-db9f9b142912`). Repo `Teomariscal/dogs-mind-backend` sincronizado con prod.
+
+### Fixes del asesor (6 válidos de 10 prompts)
+- **#9** refund automático de tokens si la IA falla (`token_utils.refund_token` en /analysis, /analysis/video, /analysis/chat, /avatar/chat) + UI de error con toast (no alert).
+- **#10** aviso "Este análisis consume 3 tokens" pre-análisis + badge "Ejemplo" en perros demo.
+- **#3** endpoint `POST /auth/validate-invite` (valida código sin crear cuenta, rate-limit 30/h) + validación on-blur en registro.
+- **#7** dropdown país i18n ES/EN. **#8** campos obligatorios marcados + on-blur.
+- Falsos positivos descartados: mobile responsive (ya lo era), Aigents .map crash (no existía), legal pages (ya existían), submit loading (ya estaba).
+
+### Pricing (CRÍTICO corregido) — packs de tokens
+Backend cobraba importes desactualizados ≠ frontend. Corregido a los 3 canónicos:
+| Pack | Precio |
+|---|---|
+| 5 | 4,99 € |
+| 20 | 16,00 € |
+| 60 | 42,00 € |
+`APP_URL=https://thedogsmind.net` añadida en Railway (antes faltaba → redirect post-pago iba al beta viejo).
+
+### Casos: durabilidad + cross-device + límites
+- **Auto-guardado al aceptar**: `acceptIntervention` llama a `/cases/migrate` → todo caso se guarda en backend (durable + seguimiento diario) sin acciones secundarias.
+- **Cross-device**: `syncBackendCases()` baja `GET /cases` al entrar en registros (dedupe por backend_case_id, refresca nombres vacíos). `migrate` ahora guarda `client_dog_name/breed/age` + backfill aplicado a 21 casos existentes.
+- **Límites de casos por cuenta** (`cases.py _max_cases_for`): particular=**2**, professional=**20**, corporativo=**ilimitado**. Mensaje "Has alcanzado el máximo de X casos. Borra uno". NO borra nada retroactivo. Verificado en vivo.
+  - ⚠️ "corporativo" es account_type NUEVO sin flujo de asignación (a mano en DB por ahora).
+  - Nota: "perros" (perfiles, cap 2 todos) ≠ "casos". El límite es de CASOS.
+
+### Programa de delegaciones / tokens de bienvenida (links `?invite=`)
+| Cohorte | Código | Tokens | Comisión |
+|---|---|---|---|
+| Usuario normal | (sin código) | 5 | — |
+| Delegación país | `BOCALAN-XX` (CO/PE/EC/CL/UY/CR/IT/IL/ES) | 8 (5+3) | 10% web / 5% iOS |
+| Equipo técnico sede | `BOCALAN-TEC` | 10 | 0% |
+| Ambassador | `BOCALAN-AMB` | 12 | 0% |
+| Directores curso/sede | `BOCALAN-DIR` | 18 | 0% |
+Roles `ambassador`/`tech` son cosméticos (badge admin), no desbloquean features. El ambassador viejo `DogsmindAmb25@` (env) sigue dando 8 hasta retirarlo.
+
+### Pendientes post-launch (NO bloquean)
+Ver sección "Ideas post-launch" / memoria. Resumen: análisis premium Opus, flujo cuenta corporativo, retirar ambassador viejo, ajustar copy "20 perros", revocar token Netlify + rotar contraseña Postgres.
 
 ---
 
@@ -163,15 +206,16 @@ Devuelve agregados por endpoint y modelo (cero datos individuales). Requiere JWT
 
 ---
 
-## Estado deploys actuales (al 2026-05-17)
+## Estado deploys actuales (al 2026-05-21)
 
 | SW frontend | Backend | Status |
 |---|---|---|
-| **v145** | commit `5376196` | PROD vivo |
+| **v154** | commit `ce49dea` | PROD vivo · usuarios de pago |
 
 **Sesiones recientes documentadas en memory**:
 - 2026-05-16: delegaciones, Pro cortesía, lang per caso
 - 2026-05-17: vídeo upload completo, audit 2 agents + 7 fixes, análisis CFO con datos reales
+- 2026-05-20/21: **LANZAMIENTO con usuarios de pago** — 6 fixes asesor, fix pricing crítico, APP_URL, auto-guardado de casos al aceptar, sync cross-device + backfill nombres, límites de casos por cuenta (2/20/∞), estructura de tokens de bienvenida (5 niveles), Railway→Pro. Ver sección "Lanzamiento 2026-05-20/21" arriba.
 
 ---
 

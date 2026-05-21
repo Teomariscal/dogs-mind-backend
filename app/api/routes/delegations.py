@@ -43,6 +43,7 @@ class DelegationCreate(BaseModel):
     welcome_bonus_tokens: int = Field(3, ge=0, le=100)
     commission_pct_web: Decimal = Field(Decimal("10.00"), ge=0, le=100)
     commission_pct_ios: Decimal = Field(Decimal("5.00"), ge=0, le=100)
+    grants_professional: bool = False  # True → otorga account_type=professional gratis (socios)
     active: bool = True
 
     @field_validator("code")
@@ -62,6 +63,7 @@ class DelegationUpdate(BaseModel):
     welcome_bonus_tokens: Optional[int] = Field(None, ge=0, le=100)
     commission_pct_web: Optional[Decimal] = Field(None, ge=0, le=100)
     commission_pct_ios: Optional[Decimal] = Field(None, ge=0, le=100)
+    grants_professional: Optional[bool] = None
     active: Optional[bool] = None
     # NOTA: el `code` NO es editable después de crearse para preservar la
     # integridad de los links que ya se han compartido con clientes.
@@ -76,6 +78,7 @@ class DelegationResponse(BaseModel):
     welcome_bonus_tokens: int
     commission_pct_web: float
     commission_pct_ios: float
+    grants_professional: bool
     active: bool
     created_at: datetime
     updated_at: datetime
@@ -120,6 +123,7 @@ def _to_delegation_response(d: Delegation) -> DelegationResponse:
         welcome_bonus_tokens=int(d.welcome_bonus_tokens),
         commission_pct_web=float(d.commission_pct_web),
         commission_pct_ios=float(d.commission_pct_ios),
+        grants_professional=bool(getattr(d, "grants_professional", False)),
         active=bool(d.active),
         created_at=d.created_at,
         updated_at=d.updated_at,
@@ -159,6 +163,7 @@ def create_delegation(
         welcome_bonus_tokens=payload.welcome_bonus_tokens,
         commission_pct_web=payload.commission_pct_web,
         commission_pct_ios=payload.commission_pct_ios,
+        grants_professional=payload.grants_professional,
         active=payload.active,
     )
     db.add(d)

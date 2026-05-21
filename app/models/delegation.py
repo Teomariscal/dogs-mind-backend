@@ -44,6 +44,10 @@ class Delegation(Base):
     # Por canal de pago: web (Stripe) vs iOS IAP (Apple ya cobra 15-30%).
     commission_pct_web     = Column(Numeric(5, 2), nullable=False, default=10.00)
     commission_pct_ios     = Column(Numeric(5, 2), nullable=False, default=5.00)
+    # Si True, registrarse con este código otorga account_type='professional'
+    # GRATIS (sin pasar por el pago de membresía Pro). Para socios/colaboradores
+    # de TDM. Por defecto False (los códigos normales NO confieren profesional).
+    grants_professional = Column(Boolean, nullable=False, default=False)
     # Toggle para desactivar sin borrar (preserva atribución histórica).
     active          = Column(Boolean, nullable=False, default=True)
     created_at      = Column(DateTime, nullable=False, default=datetime.utcnow)

@@ -134,6 +134,9 @@ async def lifespan(app: FastAPI):
             "CREATE INDEX IF NOT EXISTS ix_users_delegation_id ON users(delegation_id)",
             "CREATE INDEX IF NOT EXISTS ix_delegations_code ON delegations(code)",
             "CREATE INDEX IF NOT EXISTS ix_delegations_active ON delegations(active)",
+            # grants_professional (2026-05-21): códigos de socios que dan
+            # account_type='professional' gratis al registrarse (ej. TDM-SOCIOS).
+            "ALTER TABLE delegations ADD COLUMN IF NOT EXISTS grants_professional BOOLEAN NOT NULL DEFAULT FALSE",
             # Tabla theory_questions — caché por diagnosis_type + question_type + lang.
             # init_db() crea la tabla via Base.metadata.create_all(); aquí garantizamos
             # los índices y constraints adicionales.

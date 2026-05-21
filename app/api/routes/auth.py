@@ -143,6 +143,7 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
     delegation_obj: Optional[Delegation] = None
     role = "user"
     tokens = DEFAULT_TOKENS
+    account_type = "particular"
 
     if invite_clean:
         # Resolución 1: delegation
@@ -152,7 +153,11 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
         ).first()
         if delegation_obj:
             tokens = DEFAULT_TOKENS + int(delegation_obj.welcome_bonus_tokens or 0)
-            # role queda 'user' — la delegación NO confiere role especial
+            # role queda 'user' — la delegación NO confiere role especial.
+            # Pero si el código es de socios (grants_professional), se otorga
+            # account_type='professional' GRATIS (sin pago de membresía Pro).
+            if getattr(delegation_obj, "grants_professional", False):
+                account_type = "professional"
         # Resolución 2: ambassador (solo si no fue delegation)
         elif AMBASSADOR_CODE and invite_clean == AMBASSADOR_CODE:
             role = "ambassador"
@@ -167,6 +172,7 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
         phone=phone_clean,
         tokens=tokens,
         role=role,
+        account_type=account_type,
         delegation_id=(delegation_obj.id if delegation_obj else None),
     )
     db.add(user)

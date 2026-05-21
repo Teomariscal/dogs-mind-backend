@@ -12000,8 +12000,24 @@ function getVal(id, fallback) {
       var cases = await res.json();
       if (!Array.isArray(cases)) return;
       var local = getRecords();
+      var byId = {};
+      cases.forEach(function(c){ if (c && c.id) byId[String(c.id)] = c; });
       var haveIds = {};
       local.forEach(function(r) { if (r && r.backend_case_id) haveIds[String(r.backend_case_id)] = true; });
+
+      // Refrescar nombre/raza/edad de records YA sincronizados que estén vacíos
+      // (p.ej. los que se sincronizaron antes del backfill de client_dog_name).
+      // Solo rellena huecos: nunca pisa un record local con nombre real.
+      var refreshed = 0;
+      local.forEach(function(r) {
+        if (!r || !r.backend_case_id) return;
+        var c = byId[String(r.backend_case_id)];
+        if (!c) return;
+        if ((!r.dog_name || r.dog_name === 'Sin nombre') && c.client_dog_name) { r.dog_name = c.client_dog_name; refreshed++; }
+        if (!r.breed && c.client_dog_breed) { r.breed = c.client_dog_breed; refreshed++; }
+        if (!r.dog_age && c.client_dog_age) { r.dog_age = c.client_dog_age; refreshed++; }
+      });
+
       var added = 0;
       cases.forEach(function(c) {
         if (!c || !c.id || haveIds[String(c.id)]) return;  // ya está local → no duplicar
@@ -12024,7 +12040,7 @@ function getVal(id, fallback) {
         });
         added++;
       });
-      if (added > 0) {
+      if (added > 0 || refreshed > 0) {
         setRecords(local);
         renderRecords();
       }

@@ -52,7 +52,12 @@ Backend cobraba importes desactualizados ≠ frontend. Corregido a los 3 canóni
 | Equipo técnico sede | `BOCALAN-TEC` | 10 | 0% |
 | Ambassador | `BOCALAN-AMB` | 12 | 0% |
 | Directores curso/sede | `BOCALAN-DIR` | 18 | 0% |
+| **Socios TDM** | `TDM-SOCIOS` | **40 + Profesional GRATIS** | 0% |
 Roles `ambassador`/`tech` son cosméticos (badge admin), no desbloquean features. El ambassador viejo `DogsmindAmb25@` (env) sigue dando 8 hasta retirarlo.
+
+**`grants_professional`** (2026-05-21): una delegación puede otorgar `account_type='professional'` gratis al registrarse (col `Delegation.grants_professional`). `TDM-SOCIOS` lo usa → socios entran como Profesional sin pagar la cuota Pro ni ver el botón "Pagar". Aditivo, no toca el flujo pro-courtesy (`PRO_INVITE_CODE`).
+
+**Fix bug pregunta del día (2026-05-21)**: la pregunta educativa diaria (`theory_questions`) se cachea global por `diagnosis_type` y se comparte entre casos/usuarios. El prompt metía el nombre del perro → se filtraba a otros casos (Nala veía "Loro"). Prompt `daily_followup_coach.py` ahora exige preguntas GENÉRICAS (sin nombre); caché purgada. Compartir entre casos es intencional mientras sean genéricas.
 
 ### Pendientes post-launch (NO bloquean)
 Ver sección "Ideas post-launch" / memoria. Resumen: análisis premium Opus, flujo cuenta corporativo, retirar ambassador viejo, ajustar copy "20 perros", revocar token Netlify + rotar contraseña Postgres.
@@ -210,7 +215,7 @@ Devuelve agregados por endpoint y modelo (cero datos individuales). Requiere JWT
 
 | SW frontend | Backend | Status |
 |---|---|---|
-| **v154** | commit `ce49dea` | PROD vivo · usuarios de pago |
+| **v154** | commit `a35635c` | PROD vivo · usuarios de pago |
 
 **Sesiones recientes documentadas en memory**:
 - 2026-05-16: delegaciones, Pro cortesía, lang per caso

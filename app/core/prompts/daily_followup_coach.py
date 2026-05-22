@@ -108,18 +108,25 @@ Ejemplo de chips bien diseñados (caso reactividad correa):
 FORMATO DE LA PREGUNTA DEL DÍA
 ═══════════════════════════════════════════════════════════════════════════════
 
+⚠️ IMPORTANTE — la pregunta del día se REUTILIZA en otros casos del mismo
+diagnóstico (es contenido educativo cacheado y compartido). Por eso la
+pregunta, las opciones y la explicación deben ser **GENÉRICAS**:
+NUNCA uses el nombre del perro de este caso ni datos concretos del tutor.
+Usa siempre "tu perro" / "el perro" / "un perro con este problema".
+
 - **question_type**: "theory" o "compliance".
 - **question**: una frase clara, 10-25 palabras, terminada en signo de
-  interrogación. Útil para el tutor de este perro concreto.
+  interrogación. Redactada en GENÉRICO (sin el nombre del perro), útil para
+  cualquier tutor cuyo perro tenga este diagnóstico.
 - **options**: array de 3 strings cortos (cada uno 4-15 palabras). Una
   correcta. Las distractoras deben ser plausibles, no obviamente falsas.
+  Sin nombres propios de perro.
 - **correct_index**: 0, 1 o 2.
 - **explanation**: 30-80 palabras. Explica por qué la correcta es la
-  correcta y por qué las otras no aplican o son menos completas. Adapta
-  la explicación al perro y al plan (usa el nombre del perro al menos
-  una vez si es natural). NO es un acertijo: la app mostrará la respuesta
-  correcta al tutor para que la lea, así que la explicación es lo que
-  realmente le enseña.
+  correcta y por qué las otras no aplican o son menos completas. En GENÉRICO,
+  **sin usar el nombre del perro** ("tu perro" / "el perro"). NO es un
+  acertijo: la app mostrará la respuesta correcta al tutor para que la lea,
+  así que la explicación es lo que realmente le enseña.
 
 ═══════════════════════════════════════════════════════════════════════════════
 REGLAS DURAS
@@ -250,13 +257,22 @@ Each exercise has:
 QUESTION-OF-THE-DAY FORMAT
 ═══════════════════════════════════════════════════════════════════════════════
 
+⚠️ IMPORTANT — the question of the day is REUSED across other cases with the
+same diagnosis (cached, shared educational content). So the question, options
+and explanation must be **GENERIC**: NEVER use this case's dog name or owner
+specifics. Always say "your dog" / "the dog" / "a dog with this issue".
+
 - **question_type**: "theory" or "compliance".
 - **question**: one clear sentence, 10-25 words, ending with question mark.
-- **options**: 3 short strings. One correct. Distractors plausible.
+  Written GENERICALLY (no dog name), useful for any owner whose dog has this
+  diagnosis.
+- **options**: 3 short strings. One correct. Distractors plausible. No dog
+  proper names.
 - **correct_index**: 0, 1, or 2.
 - **explanation**: 30-80 words. Explains why the correct one is correct.
-  The app reveals the correct answer to the owner — explanation is the
-  real teaching moment.
+  GENERIC, without using the dog's name ("your dog" / "the dog"). The app
+  reveals the correct answer to the owner — explanation is the real teaching
+  moment.
 
 ═══════════════════════════════════════════════════════════════════════════════
 HARD RULES

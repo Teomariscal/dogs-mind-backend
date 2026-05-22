@@ -9899,20 +9899,31 @@ function _resolveActiveRecord(kind) {
   // 1. Caso ya migrado y reflejado en localStorage (flujo seguimiento)
   if (window._seguimientoState && window._seguimientoState.caseId) {
     rec = records.find(function(r) { return r.backend_case_id === window._seguimientoState.caseId; }) || null;
+    if (rec) return rec;
   }
 
-  // 2. Record persistido más reciente con el contenido pedido
-  if (!rec) {
-    rec = records.find(function(r) {
-      if (kind === 'analysis') return r.analysis && r.analysis.length > 50;
-      return r.plan && r.plan.length > 50;
-    }) || null;
-  }
-  if (rec) return rec;
+  var curAnalysis = window._lastAnalysisText || '';
+  var curPlan     = window._lastInterventionPlan || '';
 
-  // 3. Caso aún no aceptado: construir record virtual desde los globales de la pantalla
-  var hasPlan      = window._lastInterventionPlan && window._lastInterventionPlan.length > 50;
-  var hasAnalysis  = window._lastAnalysisText && window._lastAnalysisText.length > 50;
+  // 2. Match EXACTO por el contenido que se está mostrando en pantalla.
+  //    FIX (bug Franklin/Bartolo): antes se devolvía "el record guardado más
+  //    reciente con análisis", así que un análisis NUEVO sin guardar (Bartolo)
+  //    resolvía al caso anterior guardado (Franklin). Ahora atamos la resolución
+  //    al contenido real en pantalla. Cubre casos archivados (openRecord pone
+  //    _lastAnalysisText = r.analysis) y recién generados ya guardados.
+  if (kind === 'analysis' && curAnalysis.length > 50) {
+    rec = records.find(function(r) { return r.analysis === curAnalysis; }) || null;
+    if (rec) return rec;
+  }
+  if (kind === 'plan' && curPlan.length > 50) {
+    rec = records.find(function(r) { return r.plan === curPlan; }) || null;
+    if (rec) return rec;
+  }
+
+  // 3. Caso recién generado y aún NO guardado: record virtual desde los
+  //    globales de la pantalla (el que el usuario está viendo ahora mismo).
+  var hasPlan      = curPlan.length > 50;
+  var hasAnalysis  = curAnalysis.length > 50;
   if (kind === 'plan' && !hasPlan) return null;
   if (kind === 'analysis' && !hasAnalysis) return null;
 

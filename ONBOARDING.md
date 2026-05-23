@@ -59,6 +59,8 @@ Roles `ambassador`/`tech` son cosméticos (badge admin), no desbloquean features
 
 **Fix bug pregunta del día (2026-05-21)**: la pregunta educativa diaria (`theory_questions`) se cachea global por `diagnosis_type` y se comparte entre casos/usuarios. El prompt metía el nombre del perro → se filtraba a otros casos (Nala veía "Loro"). Prompt `daily_followup_coach.py` ahora exige preguntas GENÉRICAS (sin nombre); caché purgada. Compartir entre casos es intencional mientras sean genéricas.
 
+**Fix bug caso activo en Explica/Plan simple (2026-05-23, verificado tester)**: `_resolveActiveRecord` (frontend) devolvía el último caso guardado en vez del que está en pantalla → al pulsar "Explica" sobre un análisis nuevo sin guardar (Bartolo) explicaba un caso anterior (Franklin). Ahora resuelve por MATCH EXACTO del contenido en pantalla; si no hay match (caso nuevo), usa el record virtual actual. Cubre abc-explained, plan-simple y seguimiento. SW v155.
+
 ### Pendientes post-launch (NO bloquean)
 Ver sección "Ideas post-launch" / memoria. Resumen: análisis premium Opus, flujo cuenta corporativo, retirar ambassador viejo, ajustar copy "20 perros", revocar token Netlify + rotar contraseña Postgres.
 
@@ -215,7 +217,7 @@ Devuelve agregados por endpoint y modelo (cero datos individuales). Requiere JWT
 
 | SW frontend | Backend | Status |
 |---|---|---|
-| **v154** | commit `a35635c` | PROD vivo · usuarios de pago |
+| **v155** | commit `0f1c83f` | PROD vivo · usuarios de pago |
 
 **Sesiones recientes documentadas en memory**:
 - 2026-05-16: delegaciones, Pro cortesía, lang per caso

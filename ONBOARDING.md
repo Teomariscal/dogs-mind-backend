@@ -61,6 +61,12 @@ Roles `ambassador`/`tech` son cosméticos (badge admin), no desbloquean features
 
 **Fix bug caso activo en Explica/Plan simple (2026-05-23, verificado tester)**: `_resolveActiveRecord` (frontend) devolvía el último caso guardado en vez del que está en pantalla → al pulsar "Explica" sobre un análisis nuevo sin guardar (Bartolo) explicaba un caso anterior (Franklin). Ahora resuelve por MATCH EXACTO del contenido en pantalla; si no hay match (caso nuevo), usa el record virtual actual. Cubre abc-explained, plan-simple y seguimiento. SW v155.
 
+**Mejoras clínicas síntesis ABC + intervención (2026-05-23, verificado tester)** — ver criterios completos en memoria `feedback_dogs_mind_analisis_abc.md`:
+- SÍNTESIS ABC concisa para las tarjetas A/B/C (bullets ~14 palabras, sin citas/jerga; detalle va en ANÁLISIS COMPLETO). `clinical.py`.
+- ED (estímulo discriminativo) SIEMPRE hipotetizado (nunca vacío). Definición: estímulo en cuya presencia esa conducta tiene más probabilidad de ser reforzada (y por eso la detona); no necesariamente el tutor — suele ser objeto/contexto disponible. EC≠ED. `clinical.py`.
+- renderItems oculta subsección vacía (caja+header) en vez de mostrar "—" (red de seguridad). SW v156.
+- Plan de intervención (principio 1.5 en `intervention.py`): debe lograr que cada ED pase a NEUTRO o a discriminativo de una conducta alternativa/incompatible/distinta (refuerzo diferencial DRA/DRI/DRO).
+
 ### Pendientes post-launch (NO bloquean)
 Ver sección "Ideas post-launch" / memoria. Resumen: análisis premium Opus, flujo cuenta corporativo, retirar ambassador viejo, ajustar copy "20 perros", revocar token Netlify + rotar contraseña Postgres.
 
@@ -217,7 +223,7 @@ Devuelve agregados por endpoint y modelo (cero datos individuales). Requiere JWT
 
 | SW frontend | Backend | Status |
 |---|---|---|
-| **v155** | commit `0f1c83f` | PROD vivo · usuarios de pago |
+| **v156** | commit `d37ac30` | PROD vivo · usuarios de pago |
 
 **Sesiones recientes documentadas en memory**:
 - 2026-05-16: delegaciones, Pro cortesía, lang per caso

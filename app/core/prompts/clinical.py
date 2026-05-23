@@ -244,14 +244,15 @@ desarrollo, estrés crónico, condición médica, privación. Una frase corta
 miedo/activación", SIN cadena US→UR→CS→CR ni siglas, sin citas.]
 
 ### ED — Estímulo Discriminativo (detonador)
-[1 bullet OBLIGATORIO — SIEMPRE existe un ED y debes hipotetizarlo. El ED es
-el estímulo concreto que SEÑALA la disponibilidad del reforzador y dispara la
-conducta operante (persona, sonido, lugar, postura, objeto, contexto). Como
-analista experto, propónlo aunque el tutor no lo nombre explícitamente,
-infiriéndolo de la información del caso. NUNCA dejes esta sección vacía ni
-pongas "—"/"ninguno". Ojo: no confundir con EC — el EC elicita la emoción
-(condicionamiento clásico); el ED señala que la conducta "funcionará" ahora
-(operante). Una frase corta, sin citas.]
+[1 bullet OBLIGATORIO — SIEMPRE existe un ED y debes hipotetizarlo. Definición
+exacta: el ED es el estímulo EN CUYA PRESENCIA esa conducta concreta tiene
+MAYOR probabilidad de ser reforzada, y por eso la detona/ocasiona. NO es
+necesariamente el tutor ni una persona: suele ser un objeto o contexto
+DISPONIBLE (p.ej. para una conducta de recoger objetos, el ED es "ropa/objetos
+al alcance", no la persona). Como analista experto, propónlo aunque el tutor no
+lo nombre, infiriéndolo del caso. NUNCA dejes esta sección vacía ni pongas
+"—"/"ninguno". No confundir con EC: el EC elicita la emoción (clásico); el ED
+ocasiona la conducta operante. Una frase corta, sin citas.]
 
 ## BLOQUE B — CONDUCTA
 [2–3 bullets máximo. Descripción observable y concreta de la conducta
@@ -292,13 +293,15 @@ emotional/physiological response description.]
 ### ED — Estímulo Discriminativo
 [Full analysis of proximal triggers with context and topography. There is
 ALWAYS a discriminative stimulus: as the expert analyst you must identify and
-hypothesize it from the available information — never omit it. The ED is the
-stimulus that signals reinforcement is available NOW and occasions the operant
-response (a person, sound, place, posture, object or context). Distinguish it
-clearly from the conditioned stimulus (EC): the EC elicits the emotional
-response (classical), the ED occasions the operant behavior. If the owner did
-not state it explicitly, infer the most plausible ED and label it as a
-hypothesis.]
+hypothesize it from the available information — never omit it. Exact
+definition: the ED is the stimulus IN WHOSE PRESENCE this specific behavior is
+MORE LIKELY to be reinforced, and which therefore occasions it. It is NOT
+necessarily the owner or a person — it is often an AVAILABLE object or context
+(e.g. for an object-collecting behavior the ED is "clothing/objects within
+reach", not the person). Distinguish it clearly from the conditioned stimulus
+(EC): the EC elicits the emotional response (classical), the ED occasions the
+operant behavior. If the owner did not state it explicitly, infer the most
+plausible ED and label it as a hypothesis.]
 
 ## B — CONDUCTA (descripción completa)
 [Full topographic description with duration, frequency, intensity,

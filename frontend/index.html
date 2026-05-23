@@ -13388,10 +13388,12 @@ function cleanInlineMarkdown(text) {
 function renderItems(containerId, sectionText) {
   var el = document.getElementById(containerId);
   if (!el) return;
-  if (!sectionText) { el.innerHTML = '<div class="abc-sec-item" style="color:#aaa;">—</div>'; return; }
+  // Header de la subsección (eyebrow) justo antes del contenedor, si existe.
+  var prev = el.previousElementSibling;
+  var isEyebrow = !!(prev && prev.classList && prev.classList.contains('cm-eyebrow'));
 
-  var lines = sectionText.split('\n').map(function(l) { return l.trim(); }).filter(function(l) {
-    return l && !l.startsWith('#') && !l.match(/^[-─══]+$/) && l.length > 2;
+  var lines = (sectionText || '').split('\n').map(function(l) { return l.trim(); }).filter(function(l) {
+    return l && !l.startsWith('#') && !l.match(/^[-─══—–]+$/) && l.length > 2;
   });
 
   var html = lines.map(function(l) {
@@ -13400,9 +13402,21 @@ function renderItems(containerId, sectionText) {
     text = cleanInlineMarkdown(text);
     if (text.length < 3) return '';
     return '<div class="abc-sec-item">' + text + '</div>';
-  }).join('');
+  }).filter(Boolean).join('');
 
-  el.innerHTML = html || '<div class="abc-sec-item" style="color:#aaa;">—</div>';
+  if (!html) {
+    // Subsección vacía (sin contenido o solo "—"): ocultar la caja Y su header
+    // en vez de mostrar un bullet vacío "—" (p.ej. ED en casos sin detonante
+    // discreto). Evita que el resumen se vea roto/cortado.
+    el.style.display = 'none';
+    el.innerHTML = '';
+    if (isEyebrow) prev.style.display = 'none';
+    return;
+  }
+  // Hay contenido: asegurar visibilidad (por si un render previo lo ocultó).
+  el.style.display = '';
+  if (isEyebrow) prev.style.display = '';
+  el.innerHTML = html;
 }
 
 // ── FILL ABC SCREEN WITH ANALYSIS RESULT ─────────────

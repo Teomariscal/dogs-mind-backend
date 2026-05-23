@@ -220,38 +220,44 @@ clinical language in the language of the user's anamnesis (Spanish or English).
 
 ════════════════════════════ SÍNTESIS ABC ════════════════════════════
 
+⚠️ FORMATO DE LA SÍNTESIS — LÉELO: esta síntesis se renderiza en TARJETAS
+COMPACTAS de móvil (una caja pequeña por subsección). DEBE ser un resumen
+escaneable de un vistazo, NO un texto clínico extenso:
+  • Cada bullet: UNA frase corta, máximo ~14 palabras (~100 caracteres).
+  • Lenguaje llano para el tutor. NADA de cadenas tipo "US→UR→CS→CR" ni
+    paréntesis con jerga (RC, EI, etc.) en la síntesis.
+  • PROHIBIDO incluir marcadores de cita [1], [2], [1, 3]… en la síntesis
+    (las citas van SOLO en el ANÁLISIS COMPLETO).
+  • El detalle clínico extenso, las cadenas de condicionamiento y las citas
+    van en el ANÁLISIS COMPLETO, no aquí.
+
 ## BLOQUE A — ANTECEDENTE
 
 ### Variables disposicionales
-[2–4 bullet points maximum. Dispositional and predisposing variables that
-increase vulnerability: genetic/breed factors, developmental history,
-chronic stress, medical conditions, environmental deprivation. Keep each
-point to one concise sentence.]
+[2–3 bullets máximo. Factores que aumentan la vulnerabilidad: raza/genética,
+desarrollo, estrés crónico, condición médica, privación. Una frase corta
+(~14 palabras) por bullet, lenguaje llano, sin citas.]
 
 ### Estímulos condicionados (EC)
-[2–3 bullet points maximum. Conditioned stimuli that now elicit automatic
-emotional-reflexive responses (fear, arousal, frustration) through classical
-conditioning. Identify the US→UR→CS→CR chain briefly.]
+[1–2 bullets máximo. Qué estímulo dispara la reacción emocional automática
+(miedo/activación/frustración). Frase corta y llana — di "se ha asociado a
+miedo/activación", SIN cadena US→UR→CS→CR ni siglas, sin citas.]
 
 ### ED — Estímulo Discriminativo (detonador)
-[1–2 bullet points maximum. The specific discriminative stimulus(i) that
-immediately signals the availability of reinforcement and triggers the
-operant behavior. Be precise: person, sound, location, posture, object.]
+[1 bullet. El detonador concreto que dispara la conducta (persona, sonido,
+lugar, postura, objeto). Una frase corta, sin citas.]
 
 ## BLOQUE B — CONDUCTA
-[3–5 bullet points maximum. Topographically precise, observable description
-of the problem behavior. Dead-man's test. Duration, intensity, frequency
-if known. No mentalistic language.]
+[2–3 bullets máximo. Descripción observable y concreta de la conducta
+problema (test del hombre muerto). Una frase corta por bullet, sin lenguaje
+mentalista, sin citas.]
 
 ## BLOQUE C — HIPÓTESIS REFORZADORA
-[3–4 bullet points maximum. Identify which reinforcers are operating and
-whether they are POSITIVE (access to something: attention, food, play,
-social contact) or NEGATIVE (escape/avoidance of something: aversive
-stimulus, fear, discomfort). State the maintaining contingency explicitly.
-Format each bullet as plain text without any emoji or icon. Start the bullet
-with the label "Reforzamiento positivo:" or "Reforzamiento negativo:" followed
-by the explanation. Do NOT prepend coloured circles, warning signs, or any
-other Unicode emoji — the rendering layer adds visual cues if needed.]
+[2–3 bullets máximo. Qué reforzadores la mantienen: POSITIVO (acceso a algo:
+atención, comida, juego) o NEGATIVO (escape/evitación de algo aversivo).
+Una frase corta por bullet, sin citas. Empieza cada bullet con la etiqueta
+"Reforzamiento positivo:" o "Reforzamiento negativo:" seguida de la
+explicación breve. Sin emojis ni iconos — la capa de render añade lo visual.]
 
 ════════════════════════════ ANÁLISIS COMPLETO ════════════════════════════
 
@@ -334,7 +340,9 @@ SECTION 5 — QUALITY STANDARDS & CONSTRAINTS
     children or humans), flag this prominently at the top of the analysis
     before all other sections.
   • Maintain clinical tone. Avoid colloquialisms.
-  • The SÍNTESIS ABC must not exceed 250 words.
+  • The SÍNTESIS ABC must not exceed 130 words total (it renders in compact
+    mobile cards — keep it tight and scannable; full detail goes in the
+    ANÁLISIS COMPLETO).
   • The ANÁLISIS COMPLETO must not exceed 1 000 words (excluding references).
   • ALWAYS include both parts separated by the exact delimiters shown above.
 

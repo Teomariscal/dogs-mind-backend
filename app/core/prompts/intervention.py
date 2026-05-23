@@ -48,6 +48,21 @@ SECTION 1 — INTERVENTION PRINCIPLES
   unless strictly necessary. Assume 2 practice sessions per day of
   5–10 minutes each unless otherwise indicated.
 
+1.5  TRABAJO SOBRE EL ED — clave del plan:
+  El objetivo central de la intervención es actuar sobre los estímulos
+  discriminativos (ED) identificados en el análisis funcional. Cada ED que hoy
+  ocasiona la conducta problema debe pasar a una de estas dos situaciones:
+    (a) NEUTRO — deja de ocasionar la conducta problema (vía gestión ambiental,
+        desensibilización/contracondicionamiento, o retirando el ED), o
+    (b) DISCRIMINATIVO DE OTRA CONDUCTA — ante el MISMO estímulo que antes
+        detonaba el problema, el perro aprende y es reforzado por hacer una
+        conducta ALTERNATIVA, INCOMPATIBLE o distinta a la problema, mediante
+        refuerzo diferencial (DRA/DRI/DRO).
+  Diseña los ejercicios explícitamente para lograr (a) o (b) sobre los ED del
+  caso. Ejemplo: si el ED es "ropa al alcance" para una conducta de recoger
+  objetos, el plan o retira/neutraliza ese ED (gestión) o lo convierte en señal
+  de una conducta alternativa reforzada (ir a su sitio, coger un juguete propio).
+
 ═══════════════════════════════════════════════════════════════════════════════
 SECTION 2 — OUTPUT FORMAT
 ═══════════════════════════════════════════════════════════════════════════════
@@ -67,7 +82,10 @@ de X/día a ≤1/día en un plazo de 8–12 semanas mediante DS+CC sistematizado
 
 ## MARCO TÉCNICO
 [2–3 bullet points listing the main techniques to be used and why they were
-chosen based on the functional analysis. Reference the maintaining reinforcer.]
+chosen based on the functional analysis. Reference the maintaining reinforcer
+AND, explícitamente, los ED del caso: cómo el plan los neutraliza o los
+reconvierte en señal de una conducta alternativa/incompatible vía refuerzo
+diferencial (ver principio 1.5).]
 
 ## GESTIÓN AMBIENTAL INMEDIATA
 [2–4 bullet points of immediate management changes to prevent further

@@ -147,6 +147,16 @@ def update_account_type(
     Cambia el tipo de cuenta. Vuelta atrás profesional → particular preserva los datos
     de empresa (no se borran), pero deja de ser editable hasta volver a profesional.
     """
+    # ── Seguridad: la SUBIDA a 'professional' NUNCA es auto-servicio ──
+    # La membresía profesional se activa solo por pago Stripe o canje de código
+    # validado (que modifican account_type server-side). Aquí solo se permite la
+    # BAJADA a 'particular' (o no-op). Sin esto, cualquier usuario autenticado
+    # podía auto-promocionarse a profesional gratis con un PUT directo.
+    if payload.account_type == "professional" and user.account_type != "professional":
+        raise HTTPException(
+            status_code=403,
+            detail="La membresía profesional se activa mediante pago o código, no desde aquí.",
+        )
     if user.account_type != payload.account_type:
         user.account_type = payload.account_type
         db.commit()

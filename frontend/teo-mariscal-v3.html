@@ -362,6 +362,24 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   font-size:9px;color:#fff;
 }
 .dog-name{font-size:12px;color:var(--text2);font-weight:500;}
+/* Badge "Ejemplo" sobre perros demo (Buddy/Laika fallback) — UX onboarding:
+   evita que usuario nuevo confunda los placeholders con cuentas reales.
+   Banner inferior dentro del círculo (respeta overflow:hidden + border-radius).
+   Sin pointer-events para que el click del .dog-item siga funcionando. */
+.dog-demo-badge{
+  position:absolute;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.55);color:#fff;
+  font-size:8px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  padding:2px 0;
+  text-align:center;
+  pointer-events:none;
+  line-height:1.2;
+}
+/* Required-field visuals (#8 anamnesis). Asterisco en labels + borde rojo
+   on-blur si vacío. NO bloquea el submit — el backend valida vía Pydantic. */
+.req-star{ color:#c03030; margin-left:3px; font-weight:700; }
+.req-error{ color:#c03030; font-size:11px; margin-top:4px; min-height:14px; line-height:1.2; }
+input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
 .dog-img-hint{font-size:10px;color:var(--text3);text-align:center;max-width:64px;}
 /* Foto del perro dentro del círculo de la home */
 .dog-circle img{width:100%;height:100%;object-fit:cover;display:block;}
@@ -576,6 +594,226 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   .home-pro-badge-text { animation:none; color:#5d8c5e; text-shadow:0 0 8px rgba(124,220,160,0.35); }
   .home-pro-badge::after { animation:none; opacity:0.7; }
 }
+
+/* ══════════════════════════════════════
+   INSPIRACIÓN PROFESIONAL (beta) — card home + pantalla #s-training
+   Espejo exacto de la maqueta aprobada /tdm-mockups/index.html.
+   TODO el CSS está scoped a #s-home .insp-card y a #s-training para
+   no afectar selectores globales. Tokens reales: --green #4a6741,
+   --cm-cyan #5ec8e6, --ff-serif (Cormorant), --ff-sans (Jost).
+══════════════════════════════════════ */
+/* --- Card en el Home (solo profesionales) --- */
+#s-home .insp-card{
+  margin:16px 16px 0;
+  background:linear-gradient(135deg,#17271f 0%,#0e1f1a 100%);
+  border:1px solid rgba(94,200,230,.32);
+  border-radius:16px;
+  padding:15px 16px;
+  display:flex;align-items:center;gap:14px;
+  cursor:pointer;position:relative;overflow:hidden;
+  box-shadow:0 8px 22px rgba(14,31,26,.20);
+}
+#s-home .insp-card::after{
+  content:"";position:absolute;top:-40px;right:-30px;
+  width:120px;height:120px;border-radius:50%;
+  background:radial-gradient(circle,rgba(94,200,230,.25) 0%,rgba(94,200,230,0) 70%);
+}
+#s-home .insp-card .insp-ic{
+  width:46px;height:46px;border-radius:13px;
+  background:rgba(94,200,230,.16);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--cm-cyan);flex:0 0 auto;position:relative;z-index:1;
+}
+#s-home .insp-card .insp-tx{position:relative;z-index:1;}
+#s-home .insp-card .insp-t1{
+  font-family:var(--ff-serif);font-size:21px;font-weight:600;
+  color:#fff;line-height:1.05;
+}
+#s-home .insp-card .insp-t2{font-size:12.5px;color:#9bb0a0;margin-top:3px;}
+#s-home .insp-card .insp-tag{
+  position:absolute;top:11px;right:13px;
+  font-size:9px;font-weight:700;letter-spacing:.1em;
+  color:var(--cm-cyan);text-transform:uppercase;z-index:1;
+}
+
+/* --- Pantalla #s-training (ficha + resultado) --- */
+/* Variables locales: replican el :root de la maqueta SIN tocar el global. */
+#s-training{
+  --tr-bg:#0e1f1a;     /* verde-negro profundo */
+  --tr-card:#17271f;   /* card elevada sobre oscuro */
+  --tr-ink:#eaf0e6;    /* texto claro */
+  --tr-muted:#93a596;  /* secundario sage */
+  --tr-line:rgba(255,255,255,.10);
+  --tr-soft:#12211b;   /* track segmentado oscuro */
+  --tr-accent:#4a6741; /* --green */
+  --tr-accent-dark:#2d3a26;
+  --tr-cyan:#5ec8e6;   /* --cm-cyan */
+  --tr-vibrant:#7eb86a;
+  background:var(--tr-bg);
+  color:var(--tr-ink);
+  overflow-y:auto;
+  font-family:var(--ff-sans);
+}
+#s-training .tr-form{flex:1 0 auto;display:flex;flex-direction:column;}
+/* Hero con vídeo */
+#s-training .tr-hero{
+  background:#22302a;color:#fff;padding:18px 20px 30px;
+  position:relative;overflow:hidden;min-height:360px;
+  display:flex;flex-direction:column;
+}
+#s-training .tr-hero-vid{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;z-index:0;
+}
+#s-training .tr-hero-scrim{
+  position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg,rgba(18,31,26,.30) 0%,rgba(18,31,26,.30) 36%,rgba(18,31,26,.78) 100%);
+}
+#s-training .tr-hero-top{display:flex;align-items:center;position:relative;z-index:2;}
+#s-training .tr-hero-top .tr-back{
+  width:44px;height:44px;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:24px;cursor:pointer;margin-left:-10px;
+  background:none;border:0;font-family:inherit;
+}
+#s-training .tr-hero-top .tr-badge{
+  margin-left:auto;background:rgba(94,200,230,.22);color:#eafaff;
+  border:1px solid rgba(94,200,230,.55);
+  font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  padding:6px 12px;border-radius:999px;
+}
+#s-training .tr-hero-copy{position:relative;z-index:2;margin-top:auto;}
+#s-training .tr-hero h1{
+  font-family:var(--ff-serif);font-size:40px;font-weight:600;
+  line-height:1.02;margin:16px 0 10px;position:relative;z-index:2;letter-spacing:-.01em;
+}
+#s-training .tr-hero .tr-tag{
+  font-size:14.5px;line-height:1.5;color:rgba(255,255,255,.92);
+  margin:0;position:relative;z-index:2;
+}
+/* Hoja sobre el hero */
+#s-training .tr-sheet{
+  background:var(--tr-bg);
+  background-image:linear-gradient(rgba(94,200,230,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(94,200,230,.05) 1px,transparent 1px);
+  background-size:34px 34px;
+  border-radius:22px 22px 0 0;margin-top:-24px;position:relative;z-index:3;padding-top:4px;
+  flex:1 1 auto;display:flex;flex-direction:column;
+}
+#s-training .tr-sheet .tr-gate{
+  font-size:12.5px;line-height:1.45;color:var(--tr-muted);padding:16px 16px 0;
+}
+#s-training .tr-sheet .tr-gate b{color:var(--tr-cyan);}
+#s-training .tr-body{padding:16px;}
+#s-training .tr-label{
+  font-size:12px;font-weight:600;color:var(--tr-cyan);
+  text-transform:uppercase;letter-spacing:.12em;margin:4px 0 8px;
+}
+#s-training .tr-req{color:var(--tr-cyan);}
+#s-training .tr-textarea{
+  width:100%;border:1px solid var(--tr-line);border-radius:14px;padding:14px;
+  font-size:16px;font-family:inherit;color:var(--tr-ink);resize:none;min-height:78px;
+  background:var(--tr-card);
+}
+#s-training .tr-textarea::placeholder{color:#6f7d70;}
+#s-training .tr-textarea:focus{
+  outline:none;border-color:var(--tr-cyan);box-shadow:0 0 0 3px rgba(94,200,230,.28);
+}
+/* Plegable Ajustes */
+#s-training .tr-adjust{
+  margin-top:18px;border:1px solid var(--tr-line);border-radius:16px;
+  background:var(--tr-card);overflow:hidden;
+}
+#s-training .tr-adjust-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;cursor:pointer;font-size:15px;font-weight:600;min-height:48px;
+  background:none;border:0;width:100%;color:var(--tr-ink);font-family:inherit;text-align:left;
+}
+#s-training .tr-adjust-head .tr-chev{transition:transform .2s;color:var(--tr-muted);}
+#s-training .tr-adjust.open .tr-chev{transform:rotate(180deg);}
+#s-training .tr-adjust-body{display:none;padding:4px 16px 16px;}
+#s-training .tr-adjust.open .tr-adjust-body{display:block;}
+#s-training .tr-field{margin-top:14px;}
+#s-training .tr-field .tr-flabel{
+  font-size:13.5px;font-weight:600;color:var(--tr-ink);margin-bottom:8px;
+}
+/* Segmentado */
+#s-training .tr-seg{display:flex;background:var(--tr-soft);border-radius:11px;padding:3px;gap:3px;}
+#s-training .tr-seg button{
+  flex:1;border:0;background:transparent;padding:9px 4px;border-radius:9px;
+  font-size:13.5px;color:var(--tr-muted);font-family:inherit;cursor:pointer;min-height:44px;
+}
+#s-training .tr-seg button.on{
+  background:#284035;color:#fff;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.35);
+}
+/* Chips */
+#s-training .tr-chips{display:flex;flex-wrap:wrap;gap:8px;}
+#s-training .tr-chip{
+  border:1px solid var(--tr-line);background:var(--tr-card);border-radius:999px;
+  padding:9px 14px;font-size:13.5px;color:var(--tr-muted);cursor:pointer;
+  min-height:44px;display:flex;align-items:center;
+}
+#s-training .tr-chip.on{
+  border-color:var(--tr-vibrant);color:var(--tr-vibrant);
+  background:rgba(126,184,106,.12);font-weight:600;
+}
+/* Checks */
+#s-training .tr-checks{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+#s-training .tr-chk{display:flex;align-items:center;gap:9px;font-size:14px;cursor:pointer;min-height:44px;}
+#s-training .tr-chk .tr-box{
+  width:22px;height:22px;border-radius:7px;border:1.6px solid var(--tr-line);
+  display:flex;align-items:center;justify-content:center;flex:0 0 auto;
+}
+#s-training .tr-chk.on .tr-box{background:var(--tr-accent);border-color:var(--tr-accent);}
+#s-training .tr-chk.on .tr-box::after{
+  content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.4px 2.4px 0;
+  transform:rotate(45deg) translateY(-1px);
+}
+/* CTA */
+#s-training .tr-cta{margin:auto 16px calc(18px + env(safe-area-inset-bottom));}
+#s-training .tr-cta button{
+  width:100%;border:0;background:var(--tr-accent);color:#fff;font-size:17px;font-weight:600;
+  padding:16px;border-radius:16px;font-family:inherit;cursor:pointer;min-height:52px;
+  box-shadow:0 6px 16px rgba(74,103,65,.3);
+}
+#s-training .tr-cta button:active{background:var(--tr-accent-dark);}
+/* Resultado */
+#s-training .tr-result{display:none;}
+#s-training.tr-show-result .tr-form{display:none;}
+#s-training.tr-show-result .tr-result{display:flex;flex-direction:column;flex:1 0 auto;}
+#s-training .tr-nav{
+  display:flex;align-items:center;gap:8px;padding:14px 16px;
+  background:var(--tr-card);border-bottom:1px solid var(--tr-line);
+}
+#s-training .tr-nav .tr-back{
+  width:44px;height:44px;display:flex;align-items:center;justify-content:center;
+  color:var(--tr-cyan);font-size:22px;cursor:pointer;margin-left:-10px;
+  background:none;border:0;font-family:inherit;
+}
+#s-training .tr-nav .tr-nav-title{font-size:17px;font-weight:600;}
+#s-training .tr-nav .tr-dot{width:9px;height:9px;border-radius:50%;background:var(--tr-accent);margin-left:auto;}
+#s-training .tr-tagchip{
+  display:inline-block;margin:10px 16px 0;background:rgba(94,200,230,.14);color:var(--tr-cyan);
+  font-size:12px;font-weight:600;padding:5px 11px;border-radius:999px;
+}
+#s-training .tr-res-sub{font-size:13px;color:var(--tr-muted);padding:0 16px;margin-top:6px;}
+#s-training .tr-ex{
+  background:var(--tr-card);border:1px solid var(--tr-line);border-radius:16px;
+  padding:14px;margin:12px 16px;display:flex;gap:12px;
+}
+#s-training .tr-ex .tr-n{
+  flex:0 0 auto;width:28px;height:28px;border-radius:50%;
+  background:rgba(94,200,230,.14);color:var(--tr-cyan);font-weight:700;
+  display:flex;align-items:center;justify-content:center;font-size:14px;
+}
+#s-training .tr-ex .tr-ex-c{flex:1;min-width:0;}
+#s-training .tr-ex .tr-t{font-size:14.5px;line-height:1.45;font-weight:600;color:var(--tr-ink);}
+#s-training .tr-ex .tr-why{font-size:12.5px;line-height:1.45;color:var(--tr-muted);margin-top:5px;}
+#s-training .tr-res-actions{display:flex;gap:10px;padding:8px 16px 22px;}
+#s-training .tr-res-actions button{
+  flex:1;border-radius:14px;padding:13px;font-size:15px;font-weight:600;
+  font-family:inherit;cursor:pointer;min-height:48px;
+}
+#s-training .tr-btn-ghost{background:var(--tr-card);border:1px solid var(--tr-line);color:var(--tr-cyan);}
+#s-training .tr-btn-solid{background:var(--tr-accent);border:0;color:#fff;}
 
 /* ══════════════════════════════════════
    S3 — ABC ANALYSIS
@@ -6743,6 +6981,18 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 
       <button class="btn-new-consult" onclick="goTo('s-anamnesis')" data-i18n="new_consultation">Nueva Consulta</button>
 
+      <!-- Card "Inspiración Profesional" (beta) — solo visible si account_type='professional'.
+           Display lo controla renderHomeInspBtn() leyendo window._myAccount,
+           mismo gating que renderHomeProBadge(). TODO i18n (textos ES directos en beta). -->
+      <div id="home-insp-btn" class="insp-card" style="display:none;" onclick="goTo('s-training')" role="button" tabindex="0" aria-label="Inspiración Profesional">
+        <div class="insp-ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l1.7 4.6 4.6 1.7-4.6 1.7L12 15.1l-1.7-4.6L5.7 8.8l4.6-1.7z"/><path d="M18.5 13.5l.9 2.4 2.4.9-2.4.9-.9 2.4-.9-2.4-2.4-.9 2.4-.9z"/></svg></div>
+        <div class="insp-tx">
+          <div class="insp-t1">Inspiración Profesional</div>
+          <div class="insp-t2">Genera la clase de hoy en segundos</div>
+        </div>
+        <span class="insp-tag">Profesional</span>
+      </div>
+
       <!-- Badge "Usuario Profesional" — solo visible si account_type='professional'.
            Display lo controla renderHomeProBadge() leyendo window._myAccount. -->
       <div id="home-pro-badge" class="home-pro-badge" style="display:none;" aria-live="polite">
@@ -7888,18 +8138,18 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
         <div>
           <label style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;" data-i18n="form_country">País de residencia</label>
           <select class="sel" id="reg-country" style="width:100%;">
-            <option value="">Selecciona tu país...</option>
-            <option>España</option>
-            <option>México</option>
-            <option>Argentina</option>
-            <option>Colombia</option>
-            <option>Chile</option>
-            <option>Perú</option>
-            <option>Estados Unidos</option>
-            <option>Reino Unido</option>
-            <option>Japón</option>
-            <option>Emiratos Árabes Unidos</option>
-            <option>Otro</option>
+            <option value="" data-i18n="country_placeholder">Selecciona tu país...</option>
+            <option value="España" data-i18n="country_es">España</option>
+            <option value="México" data-i18n="country_mx">México</option>
+            <option value="Argentina" data-i18n="country_ar">Argentina</option>
+            <option value="Colombia" data-i18n="country_co">Colombia</option>
+            <option value="Chile" data-i18n="country_cl">Chile</option>
+            <option value="Perú" data-i18n="country_pe">Perú</option>
+            <option value="Estados Unidos" data-i18n="country_us">Estados Unidos</option>
+            <option value="Reino Unido" data-i18n="country_gb">Reino Unido</option>
+            <option value="Japón" data-i18n="country_jp">Japón</option>
+            <option value="Emiratos Árabes Unidos" data-i18n="country_ae">Emiratos Árabes Unidos</option>
+            <option value="Otro" data-i18n="country_other">Otro</option>
           </select>
         </div>
 
@@ -7924,7 +8174,10 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
         <!-- Invite code (optional) -->
         <div>
           <label style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;" data-i18n="form_invite_label">Código de invitación <span style="color:var(--grey);font-size:10px;text-transform:none;">(opcional)</span></label>
-          <input class="inp" type="text" placeholder="Si tienes un código, introdúcelo aquí" data-i18n-placeholder="form_invite_ph" id="reg-invite" autocomplete="off">
+          <input class="inp" type="text" placeholder="Si tienes un código, introdúcelo aquí" data-i18n-placeholder="form_invite_ph" id="reg-invite" autocomplete="off" onblur="validateInviteCode()">
+          <!-- Feedback inline tras blur: vacío inicialmente, se rellena con check/cross + label.
+               No bloquea el submit (el backend re-valida en /register). -->
+          <div id="reg-invite-feedback" style="font-size:11px;margin-top:6px;min-height:14px;line-height:1.2;" aria-live="polite"></div>
         </div>
 
         <!-- Token gift banner -->
@@ -7989,18 +8242,21 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
           <div>
-            <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_name">Nombre</div>
-            <input id="inp-dog-name" type="text" data-i18n-placeholder="ph_dog_name" placeholder="Nombre del perro" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+            <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;"><span data-i18n="anam_lbl_name">Nombre</span><span class="req-star" aria-hidden="true">*</span></div>
+            <input id="inp-dog-name" type="text" data-i18n-placeholder="ph_dog_name" placeholder="Nombre del perro" aria-required="true" data-required="true" onblur="_anamRequiredCheck(this)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+            <div class="req-error" aria-live="polite"></div>
           </div>
           <div>
-            <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_age">Edad</div>
-            <input id="inp-dog-age" type="text" data-i18n-placeholder="ph_dog_age" placeholder="Ej: 3 a&ntilde;os" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+            <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;"><span data-i18n="anam_lbl_age">Edad</span><span class="req-star" aria-hidden="true">*</span></div>
+            <input id="inp-dog-age" type="text" data-i18n-placeholder="ph_dog_age" placeholder="Ej: 3 a&ntilde;os" aria-required="true" data-required="true" onblur="_anamRequiredCheck(this)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+            <div class="req-error" aria-live="polite"></div>
           </div>
         </div>
 
         <div style="margin-bottom:12px;">
-          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_breed">Tipolog&iacute;a racial</div>
-          <input id="inp-breed" type="text" data-i18n-placeholder="ph_breed" placeholder="Raza o raza a la que se parece m&aacute;s..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;"><span data-i18n="anam_lbl_breed">Tipolog&iacute;a racial</span><span class="req-star" aria-hidden="true">*</span></div>
+          <input id="inp-breed" type="text" data-i18n-placeholder="ph_breed" placeholder="Raza o raza a la que se parece m&aacute;s..." aria-required="true" data-required="true" onblur="_anamRequiredCheck(this)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+          <div class="req-error" aria-live="polite"></div>
         </div>
 
         <div style="margin-bottom:12px;">
@@ -8129,13 +8385,15 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
         <div style="font-size:10px;font-weight:700;color:#E8A020;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;" data-i18n="anam_sec_problem">&#9888;&#65039; La conducta problema</div>
 
         <div style="margin-bottom:12px;">
-          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_describe">Describe la conducta problema</div>
-          <textarea id="inp-problem" data-i18n-placeholder="ph_problem" placeholder="Describe con detalle el comportamiento que preocupa..." style="width:100%;min-height:90px;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;resize:none;"></textarea>
+          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;"><span data-i18n="anam_lbl_describe">Describe la conducta problema</span><span class="req-star" aria-hidden="true">*</span></div>
+          <textarea id="inp-problem" data-i18n-placeholder="ph_problem" placeholder="Describe con detalle el comportamiento que preocupa..." aria-required="true" data-required="true" onblur="_anamRequiredCheck(this)" style="width:100%;min-height:90px;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;resize:none;"></textarea>
+          <div class="req-error" aria-live="polite"></div>
         </div>
 
         <div style="margin-bottom:12px;">
-          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_since">&iquest;Desde cu&aacute;ndo ocurre?</div>
-          <input id="inp-since" type="text" data-i18n-placeholder="ph_since" placeholder="Ej: hace 6 meses, desde cachorro..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;"><span data-i18n="anam_lbl_since">&iquest;Desde cu&aacute;ndo ocurre?</span><span class="req-star" aria-hidden="true">*</span></div>
+          <input id="inp-since" type="text" data-i18n-placeholder="ph_since" placeholder="Ej: hace 6 meses, desde cachorro..." aria-required="true" data-required="true" onblur="_anamRequiredCheck(this)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+          <div class="req-error" aria-live="polite"></div>
         </div>
 
         <div style="margin-bottom:12px;">
@@ -8232,6 +8490,9 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
       </div>
 
       <!-- submit -->
+      <!-- Cost notice (#10): el usuario ve coste ANTES de comprometer el click.
+           Texto cambia a "4 tokens" cuando hay vídeo adjunto (ver setVideoAttachedUI). -->
+      <div id="analyze-cost-notice" style="font-size:11px;color:var(--grey);text-align:center;margin-top:14px;margin-bottom:2px;" data-i18n="analyze_cost_notice">Este análisis consume 3 tokens</div>
       <button id="btn-analyze" onclick="analyzeWithAI()" style="background:var(--green2);color:#fff;border:none;border-radius:100px;padding:14px 24px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;margin-top:8px;" data-i18n="analyze_btn">Analizar con IA →</button>
 
     </div>
@@ -9175,6 +9436,125 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
     </div>
   </div><!-- /s-pro-activate -->
 
+  <!-- ══ S-TRAINING — INSPIRACIÓN PROFESIONAL / Adiestramiento Avanzado (beta) ══
+       Espejo exacto de la maqueta aprobada. Tiene su propio back en el hero,
+       por eso s-training está en el array noNav (sin #global-nav).
+       TODO i18n: en esta etapa beta los textos visibles van en ES directo. -->
+  <div id="s-training" class="screen">
+    <!-- ── FORM (ficha) ── -->
+    <div class="tr-form">
+      <div class="tr-hero">
+        <video class="tr-hero-vid" autoplay muted loop playsinline>
+          <source src="assets/videos/inspiracion-hero.mp4" type="video/mp4">
+        </video>
+        <div class="tr-hero-scrim"></div>
+        <div class="tr-hero-top">
+          <button class="tr-back" onclick="goTo('s-home')" aria-label="Volver">&#8249;</button>
+          <span class="tr-badge">Profesional</span><!-- TODO i18n -->
+        </div>
+        <div class="tr-hero-copy">
+          <h1>Adiestramiento Avanzado</h1><!-- TODO i18n -->
+          <p class="tr-tag">Si eres profesional, la IA te ayuda a generar miles de clases con ideas nuevas para conseguir tus objetivos.</p><!-- TODO i18n -->
+        </div>
+      </div>
+
+      <div class="tr-sheet">
+        <!-- TODO i18n -->
+        <div class="tr-gate">Esta opción está destinada a adiestramiento profesional. Si tienes un caso de modificación de conducta, vuelve a Inicio y pulsa <b>"Nueva Consulta"</b>.</div>
+
+        <div class="tr-body">
+          <div class="tr-label">Objetivo de hoy <span class="tr-req">*</span></div><!-- TODO i18n -->
+          <textarea class="tr-textarea" id="tr-goal" placeholder="p. ej. mejorar la llamada con distracciones"></textarea><!-- TODO i18n -->
+
+          <div class="tr-adjust" id="tr-adj">
+            <button type="button" class="tr-adjust-head" onclick="document.getElementById('tr-adj').classList.toggle('open')" aria-expanded="false">
+              <span>Ajustes (opcional)</span><!-- TODO i18n -->
+              <span class="tr-chev">&#9662;</span>
+            </button>
+            <div class="tr-adjust-body">
+
+              <div class="tr-field">
+                <div class="tr-flabel">Nivel del perro</div><!-- TODO i18n -->
+                <div class="tr-seg"><button type="button">Básico</button><button type="button" class="on">Medio</button><button type="button">Avanzado</button></div>
+              </div>
+
+              <div class="tr-field">
+                <div class="tr-flabel">Nivel de los guías</div><!-- TODO i18n -->
+                <div class="tr-seg"><button type="button">Básico</button><button type="button" class="on">Medio</button><button type="button">Avanzado</button></div>
+              </div>
+
+              <div class="tr-field">
+                <div class="tr-flabel">Tiempo disponible</div><!-- TODO i18n -->
+                <div class="tr-seg"><button type="button">15</button><button type="button" class="on">30</button><button type="button">45</button><button type="button">60 min</button></div>
+              </div>
+
+              <div class="tr-field">
+                <div class="tr-flabel">Dónde será la clase</div><!-- TODO i18n -->
+                <div class="tr-chips">
+                  <div class="tr-chip">Interior</div>
+                  <div class="tr-chip on">Ext. tranquilo</div>
+                  <div class="tr-chip">Ext. con distracciones</div>
+                  <div class="tr-chip">Pista</div>
+                </div>
+              </div>
+
+              <div class="tr-field">
+                <div class="tr-flabel">Recursos disponibles</div><!-- TODO i18n -->
+                <div class="tr-checks">
+                  <label class="tr-chk on"><span class="tr-box"></span>Clicker</label>
+                  <label class="tr-chk"><span class="tr-box"></span>Mordedor</label>
+                  <label class="tr-chk on"><span class="tr-box"></span>Correa larga</label>
+                  <label class="tr-chk on"><span class="tr-box"></span>Comida</label>
+                  <label class="tr-chk"><span class="tr-box"></span>Otro</label>
+                </div>
+              </div>
+
+              <div class="tr-field">
+                <div class="tr-flabel">Reforzadores más válidos para el perro</div><!-- TODO i18n -->
+                <div class="tr-checks">
+                  <label class="tr-chk on"><span class="tr-box"></span>Comida</label>
+                  <label class="tr-chk on"><span class="tr-box"></span>Pelota</label>
+                  <label class="tr-chk"><span class="tr-box"></span>Mordedor</label>
+                  <label class="tr-chk"><span class="tr-box"></span>Otro juguete</label>
+                  <label class="tr-chk"><span class="tr-box"></span>Caricias</label>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="tr-cta">
+          <button type="button" onclick="trGenerate()">Generar 5 ejercicios</button><!-- TODO i18n -->
+        </div>
+      </div>
+    </div><!-- /tr-form -->
+
+    <!-- ── RESULT (resultado) ── -->
+    <div class="tr-result">
+      <div class="tr-nav">
+        <button class="tr-back" onclick="trShowForm()" aria-label="Volver">&#8249;</button>
+        <div class="tr-nav-title">Sesión de hoy</div><!-- TODO i18n -->
+        <div class="tr-dot"></div>
+      </div>
+
+      <span class="tr-tagchip">Llamada con distracciones</span><!-- TODO i18n -->
+      <div class="tr-res-sub">Perro: medio · Guías: medio · Ext. tranquilo · 30 min</div><!-- TODO i18n -->
+
+      <!-- TODO i18n — ejercicios de ejemplo (stub). En Etapa 2 vendrán del backend. -->
+      <div class="tr-ex"><div class="tr-n">1</div><div class="tr-ex-c"><div class="tr-t">Llamada en zona tranquila con premio de alto valor. 8–10 repeticiones; sube al 80% de aciertos.</div><div class="tr-why">Asienta la base sin distracciones.</div></div></div>
+      <div class="tr-ex"><div class="tr-n">2</div><div class="tr-ex-c"><div class="tr-t">Llamada con un distractor suave: una persona quieta a 5 m.</div><div class="tr-why">Primera distracción, mínima y superable.</div></div></div>
+      <div class="tr-ex"><div class="tr-n">3</div><div class="tr-ex-c"><div class="tr-t">Llamada interrumpiendo un olfateo de baja intensidad.</div><div class="tr-why">Redirige la atención de algo que se autorrefuerza.</div></div></div>
+      <div class="tr-ex"><div class="tr-n">4</div><div class="tr-ex-c"><div class="tr-t">Llamada "ping-pong" entre dos guías a 10 m, alternando turnos.</div><div class="tr-why">Gana velocidad y motivación con dos guías.</div></div></div>
+      <div class="tr-ex"><div class="tr-n">5</div><div class="tr-ex-c"><div class="tr-t">Llamada con un distractor en movimiento: una pelota rodando a distancia controlada.</div><div class="tr-why">Sube el criterio: el movimiento, lo más difícil.</div></div></div>
+
+      <div class="tr-res-actions">
+        <button type="button" class="tr-btn-ghost" onclick="trShowForm()">Regenerar</button><!-- TODO i18n -->
+        <button type="button" class="tr-btn-solid">Guardar sesión</button><!-- TODO i18n -->
+      </div>
+    </div><!-- /tr-result -->
+  </div><!-- /s-training -->
+
   <!-- ══ S-ACCOUNT-TYPE — Pantalla intermedia: Particular vs Profesional ══ -->
   <div id="s-account-type" class="screen">
     <button class="at-back" onclick="goTo('s-splash')" aria-label="Volver">&#8592;</button>
@@ -9345,6 +9725,77 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   } catch(e) {}
 })();
 
+// ── INVITE CODE — PRE-VALIDATION ON BLUR ──────────────────────────────────
+// Pega contra POST /auth/validate-invite (read-only, no crea cuenta) y pinta
+// feedback inline bajo el input. NO bloquea el submit: el backend re-valida
+// en /register, así que esto es solo UX. Si el input es readonly (vino vía
+// URL ?invite=), saltamos — ya está visualmente marcado como aplicado.
+window._inviteValidateInFlight = null;
+async function validateInviteCode() {
+  var inp = document.getElementById('reg-invite');
+  var fb  = document.getElementById('reg-invite-feedback');
+  if (!inp || !fb) return;
+  // Si vino prellenado por URL (readonly) ya está marcado visualmente; no pegar contra el backend.
+  if (inp.hasAttribute('readonly')) { fb.textContent = ''; return; }
+
+  var code = (inp.value || '').trim();
+  var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+
+  if (!code) {
+    fb.textContent = '';
+    fb.style.color = '';
+    return;
+  }
+
+  // Loading state — no spinner pesado, solo un texto sutil
+  fb.style.color = 'var(--grey)';
+  fb.textContent = (lang === 'en') ? 'Checking…' : 'Comprobando…';
+
+  // Cancelamos vuelo previo si el usuario edita rápido
+  var thisCall = (window._inviteValidateInFlight = Math.random());
+
+  try {
+    var res = await fetch(API_BASE + '/auth/validate-invite', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ invite_code: code }),
+    });
+    // Si llegó una llamada posterior, esta queda obsoleta
+    if (window._inviteValidateInFlight !== thisCall) return;
+
+    if (res.status === 429) {
+      fb.style.color = 'var(--grey)';
+      fb.textContent = (lang === 'en')
+        ? 'Too many attempts. Try later.'
+        : 'Demasiados intentos. Inténtalo más tarde.';
+      return;
+    }
+    if (!res.ok) {
+      // Fallo red u otro 5xx → no decimos nada (backend revalidará al registrar)
+      fb.textContent = '';
+      return;
+    }
+
+    var data = await res.json();
+    if (data && data.valid) {
+      fb.style.color = '#2d5a2d';
+      var prefix = (lang === 'en') ? 'Code applied' : 'Código aplicado';
+      var suffix = (lang === 'en') ? 'welcome tokens' : 'tokens de bienvenida';
+      fb.textContent = '✓ ' + prefix + ' · ' + (data.tokens || '?') + ' ' + suffix;
+    } else {
+      fb.style.color = '#a04040';
+      fb.textContent = (lang === 'en')
+        ? '✗ Code not recognized. You can still register; you will get the default tokens.'
+        : '✗ Código no reconocido. Puedes registrarte igualmente; recibirás los tokens por defecto.';
+    }
+  } catch(_e) {
+    // Red caída: silenciamos para no asustar (backend valida al registrar)
+    if (window._inviteValidateInFlight !== thisCall) return;
+    fb.textContent = '';
+  }
+}
+window.validateInviteCode = validateInviteCode;
+
 // ── PRO COURTESY UI REACT ─────────────────────────────────────────────────
 // Cuando #ps-invite tiene contenido, el pago Stripe NO ocurre — el botón
 // "Pagar 20,00 €" pasa a "Activar gratis (cortesía)" y el subtítulo "Pago
@@ -9469,9 +9920,18 @@ function stepperDown(id) {
 function goTo(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  if (id === 's-records') renderRecords();
+  if (id === 's-records') { renderRecords(); syncBackendCases(); }
   if (id === 's-tokens') updateTokensScreen();
   if (id === 's-home') { fetchBalance(); loadDailyTip(); }
+  if (id === 's-training') {
+    // Siempre entrar en la ficha (no en la vista resultado) y arrancar el vídeo.
+    var trScr = document.getElementById('s-training');
+    if (trScr) {
+      trScr.classList.remove('tr-show-result');
+      var trVid = trScr.querySelector('video');
+      if (trVid) { try { trVid.play(); } catch(e) {} }
+    }
+  }
   if (id === 's-pro-company' && typeof _pcOnEnter === 'function') _pcOnEnter();
   if (id === 's-pro-area' && typeof renderProAreaAuthCTA === 'function') renderProAreaAuthCTA();
   if (id === 's-pro-signup' && typeof psHydrate === 'function') psHydrate();
@@ -9486,7 +9946,7 @@ function goTo(id) {
   // Global nav show/hide.
   // - Pantallas que NUNCA muestran nav (incluso logueado): splash, login, refine, tour, account-type select, área pro hero (es full-screen).
   // - Si el usuario NO tiene sesión, NO mostramos nav en ningún sitio (confunde ver "Progreso/Teo/Registro" sin ser nadie).
-  var noNav = ['s-splash','s-login','s-refine','s-tour-intro','s-account-type','s-pro-area','s-pro-activate','s-pro-company','s-chat'];
+  var noNav = ['s-splash','s-login','s-refine','s-tour-intro','s-account-type','s-pro-area','s-pro-activate','s-pro-company','s-chat','s-training'];
   var nav = document.getElementById('global-nav');
   // Leer JWT directo de localStorage para evitar problema de scope con la IIFE.
   var hasJWT = false;
@@ -9799,20 +10259,31 @@ function _resolveActiveRecord(kind) {
   // 1. Caso ya migrado y reflejado en localStorage (flujo seguimiento)
   if (window._seguimientoState && window._seguimientoState.caseId) {
     rec = records.find(function(r) { return r.backend_case_id === window._seguimientoState.caseId; }) || null;
+    if (rec) return rec;
   }
 
-  // 2. Record persistido más reciente con el contenido pedido
-  if (!rec) {
-    rec = records.find(function(r) {
-      if (kind === 'analysis') return r.analysis && r.analysis.length > 50;
-      return r.plan && r.plan.length > 50;
-    }) || null;
-  }
-  if (rec) return rec;
+  var curAnalysis = window._lastAnalysisText || '';
+  var curPlan     = window._lastInterventionPlan || '';
 
-  // 3. Caso aún no aceptado: construir record virtual desde los globales de la pantalla
-  var hasPlan      = window._lastInterventionPlan && window._lastInterventionPlan.length > 50;
-  var hasAnalysis  = window._lastAnalysisText && window._lastAnalysisText.length > 50;
+  // 2. Match EXACTO por el contenido que se está mostrando en pantalla.
+  //    FIX (bug Franklin/Bartolo): antes se devolvía "el record guardado más
+  //    reciente con análisis", así que un análisis NUEVO sin guardar (Bartolo)
+  //    resolvía al caso anterior guardado (Franklin). Ahora atamos la resolución
+  //    al contenido real en pantalla. Cubre casos archivados (openRecord pone
+  //    _lastAnalysisText = r.analysis) y recién generados ya guardados.
+  if (kind === 'analysis' && curAnalysis.length > 50) {
+    rec = records.find(function(r) { return r.analysis === curAnalysis; }) || null;
+    if (rec) return rec;
+  }
+  if (kind === 'plan' && curPlan.length > 50) {
+    rec = records.find(function(r) { return r.plan === curPlan; }) || null;
+    if (rec) return rec;
+  }
+
+  // 3. Caso recién generado y aún NO guardado: record virtual desde los
+  //    globales de la pantalla (el que el usuario está viendo ahora mismo).
+  var hasPlan      = curPlan.length > 50;
+  var hasAnalysis  = curAnalysis.length > 50;
   if (kind === 'plan' && !hasPlan) return null;
   if (kind === 'analysis' && !hasAnalysis) return null;
 
@@ -11519,6 +11990,33 @@ function endTour() {
 
 
 // ── ANAMNESIS HELPERS ─────────────────────────────
+// Validación on-blur de los 5 campos requeridos en la anamnesis
+// (dog_name, dog_age, breed, problem_description, when_it_happens — coinciden
+// con Field(...) sin default en app/models/anamnesis.py). Marca con borde
+// rojo + mensaje "obligatorio" si vacío. NO bloquea el submit: el backend
+// sigue siendo la fuente de verdad (devuelve 422 si Pydantic falla).
+function _anamRequiredCheck(el) {
+  if (!el || !el.hasAttribute('data-required')) return;
+  var ok = !!(el.value || '').trim();
+  el.classList.toggle('req-invalid', !ok);
+  // Buscamos el sibling .req-error en el mismo wrapper (parentNode del input).
+  // Si no lo encuentra, no hace nada — defensa contra cambios futuros de DOM.
+  var wrap = el.parentNode;
+  var err = wrap ? wrap.querySelector('.req-error') : null;
+  if (err) {
+    if (ok) {
+      err.textContent = '';
+    } else {
+      var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+      err.textContent = _i18nText(
+        'anam_required_err',
+        lang === 'en' ? 'This field is required' : 'Este campo es obligatorio'
+      );
+    }
+  }
+}
+window._anamRequiredCheck = _anamRequiredCheck;
+
 function anam_toggle(activeId, inactiveId) {
   var a = document.getElementById(activeId);
   var b = document.getElementById(inactiveId);
@@ -11782,6 +12280,8 @@ function getVal(id, fallback) {
     // Update drop zone border to green confirmation
     document.getElementById('video-drop-zone').style.borderColor = '#4a6741';
     document.getElementById('video-drop-zone').style.borderStyle = 'solid';
+
+    _updateAnalyzeCostNotice();
   }
 
   function removeVideo() {
@@ -11794,7 +12294,21 @@ function getVal(id, fallback) {
     document.getElementById('video-preview-wrap').style.display = 'none';
     document.getElementById('video-drop-zone').style.borderColor = 'rgba(0,0,0,0.15)';
     document.getElementById('video-drop-zone').style.borderStyle = 'dashed';
+
+    _updateAnalyzeCostNotice();
   }
+
+  // Sincroniza la nota de coste pre-análisis con el estado del vídeo adjunto.
+  // Llamado desde attachVideo / removeVideo y desde el cambio de idioma.
+  function _updateAnalyzeCostNotice() {
+    var el = document.getElementById('analyze-cost-notice');
+    if (!el) return;
+    var key = window._attachedVideo ? 'analyze_cost_notice_video' : 'analyze_cost_notice';
+    var fallback = window._attachedVideo ? 'Este análisis con vídeo consume 4 tokens' : 'Este análisis consume 3 tokens';
+    el.setAttribute('data-i18n', key);
+    el.textContent = _i18nText(key, fallback);
+  }
+  window._updateAnalyzeCostNotice = _updateAnalyzeCostNotice;
   // ─────────────────────────────────────────────────────────────────────────
 
   // ── RECORDS ─────────────────────────────────────────────────────────────────
@@ -11836,6 +12350,74 @@ function getVal(id, fallback) {
   function setRecords(records) {
     try { localStorage.setItem(_recordsKey(), JSON.stringify(records)); } catch(e) {}
   }
+
+  // ── Sync casos del backend → localStorage (visibilidad cross-device) ─────────
+  // Problema que resuelve: la pantalla de registros leía SOLO de localStorage,
+  // así que un usuario logueado en un dispositivo nuevo / con caché borrada NO
+  // veía sus casos aunque están en la BD (recuperables vía GET /cases).
+  // Diseño defensivo: ADITIVO (solo añade casos del backend que no estén ya en
+  // local por backend_case_id; nunca borra ni pisa los locales con texto
+  // completo) y todo en try/catch (si falla red/parseo, la vista local intacta).
+  async function syncBackendCases() {
+    var jwt = '';
+    try { jwt = localStorage.getItem('dm_jwt') || ''; } catch(e) {}
+    if (!jwt) return;  // sin sesión: nada que sincronizar
+    try {
+      var res = await fetch(API_BASE + '/cases', {
+        headers: { 'Authorization': 'Bearer ' + jwt },
+        cache: 'no-store'
+      });
+      if (!res.ok) return;  // 401/5xx: no tocar la vista local
+      var cases = await res.json();
+      if (!Array.isArray(cases)) return;
+      var local = getRecords();
+      var byId = {};
+      cases.forEach(function(c){ if (c && c.id) byId[String(c.id)] = c; });
+      var haveIds = {};
+      local.forEach(function(r) { if (r && r.backend_case_id) haveIds[String(r.backend_case_id)] = true; });
+
+      // Refrescar nombre/raza/edad de records YA sincronizados que estén vacíos
+      // (p.ej. los que se sincronizaron antes del backfill de client_dog_name).
+      // Solo rellena huecos: nunca pisa un record local con nombre real.
+      var refreshed = 0;
+      local.forEach(function(r) {
+        if (!r || !r.backend_case_id) return;
+        var c = byId[String(r.backend_case_id)];
+        if (!c) return;
+        if ((!r.dog_name || r.dog_name === 'Sin nombre') && c.client_dog_name) { r.dog_name = c.client_dog_name; refreshed++; }
+        if (!r.breed && c.client_dog_breed) { r.breed = c.client_dog_breed; refreshed++; }
+        if (!r.dog_age && c.client_dog_age) { r.dog_age = c.client_dog_age; refreshed++; }
+      });
+
+      var added = 0;
+      cases.forEach(function(c) {
+        if (!c || !c.id || haveIds[String(c.id)]) return;  // ya está local → no duplicar
+        var st = (c.status === 'resolved') ? 'resolved' : (c.status === 'closed' ? 'closed' : 'active');
+        var dateStr = '';
+        try { dateStr = new Date(c.created_at).toLocaleDateString('es-ES'); } catch(e) {}
+        local.push({
+          id:               c.id,
+          backend_case_id:  c.id,
+          date:             dateStr,
+          dog_name:         c.client_dog_name || '',
+          breed:            c.client_dog_breed || '',
+          dog_age:          c.client_dog_age || '',
+          problem:          c.title || c.motivo_consulta || '',
+          analysis:         c.summary_abc || c.summary_full || '',
+          plan:             c.summary_plan || '',
+          status:           st,
+          lang:             c.lang || 'es',
+          _fromBackend:     true
+        });
+        added++;
+      });
+      if (added > 0 || refreshed > 0) {
+        setRecords(local);
+        renderRecords();
+      }
+    } catch(e) { /* red caída u otro: no rompemos la vista local */ }
+  }
+  window.syncBackendCases = syncBackendCases;
 
   // ── Abrir caso archivado: reusa s-abc / s-tracking / Cecilia handoff ────────
   function openRecord(idx) {
@@ -12578,7 +13160,7 @@ function getVal(id, fallback) {
   }
 
   // ────────────────────────────────────────────────────────────────────────────
-  function acceptIntervention() {
+  async function acceptIntervention() {
     // Save accepted case to localStorage behavioral records
     var record = {
       id:       Date.now(),
@@ -12607,6 +13189,50 @@ function getVal(id, fallback) {
       records.unshift(record);
       setRecords(records);
     } catch(e) {}
+
+    // ── Persistir SIEMPRE al backend al aceptar (durabilidad) ─────────────────
+    // Antes el caso solo llegaba al backend si el usuario pulsaba Explica/Plan
+    // simple/Seguimiento. Si no, vivía solo en localStorage → se perdía al
+    // cambiar de dispositivo o borrar caché, y no tenía seguimiento diario.
+    // Reutiliza /cases/migrate (account-type agnóstico: crea con dog_id=None).
+    // Defensivo: si falla, el caso queda en local (no se rompe el flujo) y se
+    // podrá migrar luego con cualquier acción secundaria.
+    if (!record.backend_case_id) {
+      try {
+        var jwtMig = localStorage.getItem('dm_jwt') || '';
+        if (jwtMig) {
+          var mres = await fetch(API_BASE + '/cases/migrate', {
+            method: 'POST', headers: authHeaders(),
+            body: JSON.stringify({ records: [{
+              id: record.id, date: record.date || null,
+              dog_name: record.dog_name || null, breed: record.breed || null,
+              dog_age: record.dog_age || null, problem: record.problem || null,
+              analysis: record.analysis || null, plan: record.plan || null,
+              status: record.status || 'active',
+              lang: record.lang || (window.getCurrentLang ? window.getCurrentLang() : null)
+            }]})
+          });
+          if (mres.ok) {
+            var mdata = await mres.json();
+            var mresult = (mdata.results && mdata.results[0]) || null;
+            if (mresult && mresult.case_id) {
+              record.backend_case_id = mresult.case_id;
+              // Persistir el backend_case_id en el record ya guardado
+              try {
+                var recsU = getRecords();
+                var idxU = recsU.findIndex(function(r){ return r.id === record.id; });
+                if (idxU >= 0) { recsU[idxU].backend_case_id = mresult.case_id; setRecords(recsU); }
+              } catch(e) {}
+            } else if (mresult && mresult.status === 'skipped_quota') {
+              // Límite de casos del plan alcanzado → aviso claro. El caso queda
+              // en local; el usuario debe borrar uno para guardarlo en backend.
+              var _qmsg = mresult.detail || _i18nText('case_quota_full', 'Has alcanzado tu límite de casos. Borra uno para guardar este.');
+              try { showToast(_qmsg); } catch(_) {}
+            }
+          }
+        }
+      } catch(e) { /* sin red u otro: el caso queda en local, migrable luego */ }
+    }
 
     // Activar daily-followup en backend tras aceptar plan (idempotente).
     // No bloquea el flujo: si falla, el usuario podrá pulsar el botón
@@ -12962,9 +13588,16 @@ async function analyzeWithAI() {
     fetchBalance(); // refresh token count after deduction
 
   } catch (e) {
-    var msg = e && e.message ? e.message : String(e);
-    var stack = e && e.stack ? '\n\n' + e.stack.split('\n').slice(0,3).join('\n') : '';
-    alert('Error:\n' + msg + stack);
+    // Error de red o IA. El backend hace refund automático de los tokens
+    // (token_utils.refund_token) — el usuario NO pierde saldo.
+    // UX: mensaje claro sin stack trace + volver a anamnesis para reintentar.
+    var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+    var msg = (lang === 'en')
+      ? 'Connection error. Your tokens were not charged. Try again.'
+      : 'Error de conexión. No se han descontado tokens. Inténtalo de nuevo.';
+    try { showToast(msg); } catch(_) { alert(msg); }
+    goTo('s-anamnesis');
+    console.warn('analyzeWithAI error:', e && e.message ? e.message : e);
   } finally {
     btn.textContent = 'Analizar con IA →';
     btn.disabled = false;
@@ -13115,10 +13748,12 @@ function cleanInlineMarkdown(text) {
 function renderItems(containerId, sectionText) {
   var el = document.getElementById(containerId);
   if (!el) return;
-  if (!sectionText) { el.innerHTML = '<div class="abc-sec-item" style="color:#aaa;">—</div>'; return; }
+  // Header de la subsección (eyebrow) justo antes del contenedor, si existe.
+  var prev = el.previousElementSibling;
+  var isEyebrow = !!(prev && prev.classList && prev.classList.contains('cm-eyebrow'));
 
-  var lines = sectionText.split('\n').map(function(l) { return l.trim(); }).filter(function(l) {
-    return l && !l.startsWith('#') && !l.match(/^[-─══]+$/) && l.length > 2;
+  var lines = (sectionText || '').split('\n').map(function(l) { return l.trim(); }).filter(function(l) {
+    return l && !l.startsWith('#') && !l.match(/^[-─══—–]+$/) && l.length > 2;
   });
 
   var html = lines.map(function(l) {
@@ -13127,9 +13762,21 @@ function renderItems(containerId, sectionText) {
     text = cleanInlineMarkdown(text);
     if (text.length < 3) return '';
     return '<div class="abc-sec-item">' + text + '</div>';
-  }).join('');
+  }).filter(Boolean).join('');
 
-  el.innerHTML = html || '<div class="abc-sec-item" style="color:#aaa;">—</div>';
+  if (!html) {
+    // Subsección vacía (sin contenido o solo "—"): ocultar la caja Y su header
+    // en vez de mostrar un bullet vacío "—" (p.ej. ED en casos sin detonante
+    // discreto). Evita que el resumen se vea roto/cortado.
+    el.style.display = 'none';
+    el.innerHTML = '';
+    if (isEyebrow) prev.style.display = 'none';
+    return;
+  }
+  // Hay contenido: asegurar visibilidad (por si un render previo lo ocultó).
+  el.style.display = '';
+  if (isEyebrow) prev.style.display = '';
+  el.innerHTML = html;
 }
 
 // ── FILL ABC SCREEN WITH ANALYSIS RESULT ─────────────
@@ -13366,10 +14013,14 @@ function renderHomeDogs() {
       ? '<img src="' + _escapeAttr(imgSrc) + '" style="object-position:' + imgPos + ';" alt="">'
       : '';
     var name = _escapeText(d.name || '');
+    var demoBadgeHtml = isDemo
+      ? '<span class="dog-demo-badge" data-i18n="home_demo_badge" aria-hidden="true">' + _escapeText(_i18nText('home_demo_badge', 'Ejemplo')) + '</span>'
+      : '';
     return (
       '<div class="dog-item" ' + clickAttr + ' role="listitem">' +
         '<div class="dog-circle' + inactiveClass + '" style="background:none;padding:0;overflow:hidden;">' +
           imgHtml +
+          demoBadgeHtml +
         '</div>' +
         '<div class="dog-name">' + name + '</div>' +
       '</div>'
@@ -13412,6 +14063,7 @@ async function loadAccountInfo() {
     window._myCompanyLogo = null;
     renderHomeDogs();
     renderHomeProBadge();
+    renderHomeInspBtn();
     return;
   }
   try {
@@ -13422,6 +14074,7 @@ async function loadAccountInfo() {
       window._myAccount = null;
       renderHomeDogs();
       renderHomeProBadge();
+      renderHomeInspBtn();
       return;
     }
     window._myAccount = await res.json();
@@ -13442,11 +14095,13 @@ async function loadAccountInfo() {
     }
     renderHomeDogs();
     renderHomeProBadge();
+    renderHomeInspBtn();
   } catch (e) {
     console.warn('loadAccountInfo error:', e);
     window._myAccount = null;
     renderHomeDogs();
     renderHomeProBadge();
+    renderHomeInspBtn();
   }
 }
 window.loadAccountInfo = loadAccountInfo;
@@ -13461,6 +14116,70 @@ function renderHomeProBadge() {
   el.style.display = isPro ? 'flex' : 'none';
 }
 window.renderHomeProBadge = renderHomeProBadge;
+
+// Muestra/oculta la card "Inspiración Profesional" en el home según el tier.
+// Mismo gating que renderHomeProBadge(): solo account_type === 'professional'.
+function renderHomeInspBtn() {
+  var el = document.getElementById('home-insp-btn');
+  if (!el) return;
+  var acc = window._myAccount || null;
+  var isPro = !!(acc && acc.account_type === 'professional');
+  el.style.display = isPro ? 'flex' : 'none';
+}
+window.renderHomeInspBtn = renderHomeInspBtn;
+
+// ── #s-training: interacciones locales (scope-locked) ──────────────────────
+// Genera 5 ejercicios. En esta ETAPA 1 es un STUB que muestra los ejemplos
+// de la maqueta (ya están en el DOM dentro de .tr-result).
+function trGenerate() {
+  // TODO Etapa 2: fetch real al endpoint Sesión diaria (Haiku) con goal + ajustes.
+  var scr = document.getElementById('s-training');
+  if (scr) scr.classList.add('tr-show-result');
+  if (scr) scr.scrollTop = 0;
+  window.scrollTo(0, 0);
+}
+window.trGenerate = trGenerate;
+
+// Vuelve de la vista resultado a la ficha (Regenerar / back del resultado).
+function trShowForm() {
+  var scr = document.getElementById('s-training');
+  if (scr) scr.classList.remove('tr-show-result');
+  if (scr) scr.scrollTop = 0;
+  window.scrollTo(0, 0);
+}
+window.trShowForm = trShowForm;
+
+// Toggles de los controles dentro de #s-training (segmentados, chips, checks).
+// Scope estricto a #s-training para no tocar ningún selector global.
+(function trWireControls() {
+  function wire() {
+    var scr = document.getElementById('s-training');
+    if (!scr || scr._trWired) return;
+    scr._trWired = true;
+    // Segmentados: selección única por grupo
+    scr.querySelectorAll('.tr-seg').forEach(function(seg) {
+      seg.querySelectorAll('button').forEach(function(b) {
+        b.addEventListener('click', function() {
+          seg.querySelectorAll('button').forEach(function(x) { x.classList.remove('on'); });
+          b.classList.add('on');
+        });
+      });
+    });
+    // Chips: multi-selección
+    scr.querySelectorAll('.tr-chip').forEach(function(c) {
+      c.addEventListener('click', function() { c.classList.toggle('on'); });
+    });
+    // Checks: multi-selección (evitar doble toggle del <label>)
+    scr.querySelectorAll('.tr-chk').forEach(function(c) {
+      c.addEventListener('click', function(e) { e.preventDefault(); c.classList.toggle('on'); });
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', wire);
+  } else {
+    wire();
+  }
+})();
 
 // ── Menú hamburguesa del home (dropdown) + Cerrar sesión ──────────────────
 function toggleHomeMenu(event) {
@@ -13536,6 +14255,7 @@ function logout() {
   // Refresh visual del slot Entidad / badge / dogs row
   if (typeof renderHomeDogs === 'function')      renderHomeDogs();
   if (typeof renderHomeProBadge === 'function')  renderHomeProBadge();
+  if (typeof renderHomeInspBtn === 'function')   renderHomeInspBtn();
 
   showToast(_i18nText('menu_logout_done', 'Sesión cerrada.'));
   goTo('s-splash');
@@ -14518,6 +15238,22 @@ function endTourIntro() {
       // Login
       login_welcome_tokens:  '5 tokens de bienvenida',
       login_welcome_sub:     'Gratis al registrarte. Sin tarjeta de crédito.',
+      home_demo_badge:       'Ejemplo',
+      analyze_cost_notice:   'Este análisis consume 3 tokens',
+      analyze_cost_notice_video: 'Este análisis con vídeo consume 4 tokens',
+      country_placeholder:   'Selecciona tu país...',
+      country_es:            'España',
+      country_mx:            'México',
+      country_ar:            'Argentina',
+      country_co:            'Colombia',
+      country_cl:            'Chile',
+      country_pe:            'Perú',
+      country_us:            'Estados Unidos',
+      country_gb:            'Reino Unido',
+      country_jp:            'Japón',
+      country_ae:            'Emiratos Árabes Unidos',
+      country_other:         'Otro',
+      anam_required_err:     'Este campo es obligatorio',
       login_register_btn:    'Crear mi cuenta →',
       login_already:         '¿Ya tienes cuenta? ',
       login_sign_in_link:    'Iniciar sesión',
@@ -15334,6 +16070,22 @@ function endTourIntro() {
       // Login
       login_welcome_tokens:  '5 welcome tokens',
       login_welcome_sub:     'Free when you sign up. No credit card.',
+      home_demo_badge:       'Example',
+      analyze_cost_notice:   'This analysis uses 3 tokens',
+      analyze_cost_notice_video: 'This video analysis uses 4 tokens',
+      country_placeholder:   'Select your country...',
+      country_es:            'Spain',
+      country_mx:            'Mexico',
+      country_ar:            'Argentina',
+      country_co:            'Colombia',
+      country_cl:            'Chile',
+      country_pe:            'Peru',
+      country_us:            'United States',
+      country_gb:            'United Kingdom',
+      country_jp:            'Japan',
+      country_ae:            'United Arab Emirates',
+      country_other:         'Other',
+      anam_required_err:     'This field is required',
       login_register_btn:    'Create my account →',
       login_already:         'Already have an account? ',
       login_sign_in_link:    'Sign In',

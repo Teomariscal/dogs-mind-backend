@@ -1,4 +1,4 @@
-// Dogs Mind Service Worker — v156 (síntesis ABC: ocultar subsección vacía 2026-05-23): renderItems oculta la caja Y su header cuando la subsección viene vacía o solo '—' (p.ej. ED sin detonante discreto), en vez de mostrar un bullet '—' que se veía roto. Complementa el fix de prompt (síntesis concisa, v backend). v155 = fix caso activo por contenido. (fix caso activo 2026-05-23): _resolveActiveRecord ahora ata la resolución al contenido EN PANTALLA (match exacto por analysis/plan) en vez de 'el último guardado con análisis'. Bug: al pulsar Explica/Plan simple sobre un análisis NUEVO sin guardar (Bartolo), resolvía al caso anterior guardado (Franklin). Afecta a abc-explained, plan-simple y seguimiento (resolución compartida). v154 = refresh nombres en sync. (refresh nombres en sync 2026-05-21): syncBackendCases ahora refresca nombre/raza/edad de records ya sincronizados que estaban vacíos (rellena huecos desde GET /cases tras el backfill de client_dog_name), sin pisar records locales con nombre real. Resuelve casos que quedaron 'Sin nombre' en dispositivos sincronizados antes del backfill. Backend: migrate guarda client_dog_* + backfill aplicado. v153 = límites de casos por cuenta. (límites de casos por cuenta 2026-05-20): backend aplica límite de casos activos por account_type — particular=2, professional=20, corporativo=ilimitado (cases.py _max_cases_for, en create_case y /cases/migrate). Frontend: acceptIntervention detecta skipped_quota y muestra toast "Has alcanzado el máximo de X casos. Borra uno". Particulares con >2 casos existentes quedan bloqueados para crear hasta borrar (no se borra nada retroactivo). v152 = auto-persist al aceptar.
+// Dogs Mind Service Worker — v161 (módulo Inspiración Profesional (beta) 2026-05-24): card home solo-profesionales + pantalla #s-training (Adiestramiento Avanzado) con hero vídeo precacheado. v156 = síntesis ABC: ocultar subsección vacía. (síntesis ABC: ocultar subsección vacía 2026-05-23): renderItems oculta la caja Y su header cuando la subsección viene vacía o solo '—' (p.ej. ED sin detonante discreto), en vez de mostrar un bullet '—' que se veía roto. Complementa el fix de prompt (síntesis concisa, v backend). v155 = fix caso activo por contenido. (fix caso activo 2026-05-23): _resolveActiveRecord ahora ata la resolución al contenido EN PANTALLA (match exacto por analysis/plan) en vez de 'el último guardado con análisis'. Bug: al pulsar Explica/Plan simple sobre un análisis NUEVO sin guardar (Bartolo), resolvía al caso anterior guardado (Franklin). Afecta a abc-explained, plan-simple y seguimiento (resolución compartida). v154 = refresh nombres en sync. (refresh nombres en sync 2026-05-21): syncBackendCases ahora refresca nombre/raza/edad de records ya sincronizados que estaban vacíos (rellena huecos desde GET /cases tras el backfill de client_dog_name), sin pisar records locales con nombre real. Resuelve casos que quedaron 'Sin nombre' en dispositivos sincronizados antes del backfill. Backend: migrate guarda client_dog_* + backfill aplicado. v153 = límites de casos por cuenta. (límites de casos por cuenta 2026-05-20): backend aplica límite de casos activos por account_type — particular=2, professional=20, corporativo=ilimitado (cases.py _max_cases_for, en create_case y /cases/migrate). Frontend: acceptIntervention detecta skipped_quota y muestra toast "Has alcanzado el máximo de X casos. Borra uno". Particulares con >2 casos existentes quedan bloqueados para crear hasta borrar (no se borra nada retroactivo). v152 = auto-persist al aceptar.
 //
 // ESTRATEGIA:
 //   • Navegaciones / HTML same-origin: NETWORK-FIRST con fallback a cache.
@@ -17,24 +17,30 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v156';
+const CACHE_NAME = 'dogs-mind-v161';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [
   '/manifest.json',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png',
+  '/assets/videos/inspiracion-hero.mp4',
 ];
 
 const API_ORIGIN = 'https://dogs-mind-backend-production.up.railway.app';
 
-// ── INSTALL: pre-cache shell + saltar espera del SW antiguo ───────────────
+// ── INSTALL: pre-cache shell. NO skipWaiting: el SW nuevo ESPERA hasta que ──
+// el usuario pulse "Actualizar" (postMessage SKIP_WAITING) o cierre la app.
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(PRECACHE_ASSETS))
-      .then(() => self.skipWaiting())
   );
+});
+
+// ── MESSAGE: el banner "Actualizar" pide activar el SW nuevo bajo demanda ──
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 // ── ACTIVATE: borrar caches antiguos + tomar control ──────────────────────

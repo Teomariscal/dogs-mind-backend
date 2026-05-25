@@ -6344,7 +6344,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
   flex-shrink:0;
 }
 #s-home .token-recharge-label{
-  font-size:10px;
+  font-size:11px;
   font-weight:600;
   color:#1f2e1c;
   letter-spacing:0.02em;
@@ -6968,14 +6968,14 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
       <div class="insight-row">
         <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.7.6 1 1.5 1 2.3v1h6v-1c0-.8.3-1.7 1-2.3A7 7 0 0 0 12 2z"/></svg></div>
         <div class="insight-text" data-i18n="tip_of_day">Consejo del día: El refuerzo positivo consistente es clave para el cambio conductual a largo plazo. Recompensa las acciones deseadas de inmediato.</div>
-        <button class="token-slot" onclick="goTo('s-tokens')" type="button" aria-label="Recargar tokens" title="Recargar tokens">
+        <button class="token-slot" onclick="goTo('s-tokens')" type="button" aria-label="Comprar tokens" title="Comprar tokens">
           <div class="token-ring">
             <div class="token-inner">
               <div class="token-num" id="tok-home">5</div>
               <div class="token-lbl">Tokens</div>
             </div>
           </div>
-          <span class="token-recharge-label" data-i18n="recharge_tokens">Recargar tokens</span>
+          <span class="token-recharge-label" data-i18n="recharge_tokens">Comprar tokens</span>
         </button>
       </div>
 
@@ -14128,17 +14128,183 @@ function renderHomeInspBtn() {
 }
 window.renderHomeInspBtn = renderHomeInspBtn;
 
-// ── #s-training: interacciones locales (scope-locked) ──────────────────────
-// Genera 5 ejercicios. En esta ETAPA 1 es un STUB que muestra los ejemplos
-// de la maqueta (ya están en el DOM dentro de .tr-result).
-function trGenerate() {
-  // TODO Etapa 2: fetch real al endpoint Sesión diaria (Haiku) con goal + ajustes.
+// ── #s-training: motor IA (Etapa 2) ────────────────────────────────────────
+// Lee el objetivo + ajustes del form #s-training y llama al endpoint real
+// POST /training/daily-session (Haiku) para generar 5 ejercicios reales.
+// Scope estricto a #s-training — reusa las clases .tr-* existentes para el render.
+
+// Lee el botón seleccionado (.on) de un grupo segmentado por su .tr-flabel.
+function _trSegValue(scr, labelText) {
+  var fields = scr.querySelectorAll('.tr-field');
+  for (var i = 0; i < fields.length; i++) {
+    var fl = fields[i].querySelector('.tr-flabel');
+    if (fl && fl.textContent.trim().indexOf(labelText) === 0) {
+      var on = fields[i].querySelector('.tr-seg button.on');
+      return on ? on.textContent.trim() : '';
+    }
+  }
+  return '';
+}
+
+// Lee los labels (.on) de un grupo de checks por su .tr-flabel.
+function _trChecks(scr, labelText) {
+  var fields = scr.querySelectorAll('.tr-field');
+  for (var i = 0; i < fields.length; i++) {
+    var fl = fields[i].querySelector('.tr-flabel');
+    if (fl && fl.textContent.trim().indexOf(labelText) === 0) {
+      var out = [];
+      fields[i].querySelectorAll('.tr-chk.on').forEach(function(c) {
+        out.push((c.textContent || '').trim());
+      });
+      return out;
+    }
+  }
+  return [];
+}
+
+// Mapea la etiqueta del segmentado de nivel a la clave del backend.
+function _trLevelKey(label) {
+  var l = (label || '').toLowerCase();
+  if (l.indexOf('básico') === 0 || l.indexOf('basico') === 0) return 'basico';
+  if (l.indexOf('avanzado') === 0) return 'avanzado';
+  return 'medio';
+}
+
+async function trGenerate() {
   var scr = document.getElementById('s-training');
-  if (scr) scr.classList.add('tr-show-result');
-  if (scr) scr.scrollTop = 0;
-  window.scrollTo(0, 0);
+  if (!scr) return;
+  var lang = (typeof window.getCurrentLang === 'function') ? window.getCurrentLang() : 'es';
+
+  // Objetivo (obligatorio)
+  var goalEl = document.getElementById('tr-goal');
+  var objetivo = goalEl ? (goalEl.value || '').trim() : '';
+  if (!objetivo) {
+    if (typeof showToast === 'function') {
+      showToast(lang === 'en' ? 'Write today\'s goal first.' : 'Escribe primero el objetivo de hoy.');
+    }
+    if (goalEl) goalEl.focus();
+    return;
+  }
+
+  // Ajustes
+  var nivelPerro = _trLevelKey(_trSegValue(scr, 'Nivel del perro'));
+  var nivelGuias = _trLevelKey(_trSegValue(scr, 'Nivel de los guías'));
+  var tiempoTxt  = _trSegValue(scr, 'Tiempo disponible');   // "15" | "30" | "45" | "60 min"
+  var tiempo     = parseInt((tiempoTxt || '').replace(/\D/g, ''), 10);
+  if ([15, 30, 45, 60].indexOf(tiempo) === -1) tiempo = null;
+  var dondeEl    = scr.querySelector('.tr-chips .tr-chip.on');
+  var donde      = dondeEl ? (dondeEl.textContent || '').trim() : '';
+  var recursos     = _trChecks(scr, 'Recursos disponibles');
+  var reforzadores = _trChecks(scr, 'Reforzadores');
+
+  // Botón en estado "Generando…"
+  var btn = scr.querySelector('.tr-cta button');
+  var btnTxt = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = (lang === 'en' ? 'Generating…' : 'Generando…'); }
+
+  try {
+    var res = await fetch(API_BASE + '/training/daily-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('dm_jwt') || '') },
+      body: JSON.stringify({
+        objetivo: objetivo,
+        nivel_perro: nivelPerro,
+        nivel_guias: nivelGuias,
+        tiempo: tiempo,
+        donde: donde || null,
+        recursos: recursos,
+        reforzadores: reforzadores,
+        lang: lang
+      })
+    });
+
+    if (!res.ok) {
+      var detail = '';
+      try { var ed = await res.json(); detail = ed.detail || ''; } catch(e) {}
+      if (res.status === 401) {
+        if (typeof showToast === 'function') showToast(_i18nText('session_expired', lang === 'en' ? 'Session expired.' : 'Sesión caducada.'));
+      } else if (res.status === 402) {
+        if (typeof showToast === 'function') showToast(lang === 'en' ? 'Not enough tokens. Top up to continue.' : 'Sin tokens. Recarga para continuar.');
+      } else if (res.status === 403) {
+        if (typeof showToast === 'function') showToast(detail || (lang === 'en' ? 'Professionals only.' : 'Solo profesionales.'));
+      } else {
+        if (typeof showToast === 'function') showToast(detail || (lang === 'en' ? 'Could not generate the session.' : 'No se pudo generar la sesión.'));
+      }
+      return; // no cambia de vista
+    }
+
+    var data = await res.json();
+    var ejercicios = (data && data.ejercicios) || [];
+    if (!ejercicios.length) {
+      if (typeof showToast === 'function') showToast(lang === 'en' ? 'Could not generate the session.' : 'No se pudo generar la sesión.');
+      return;
+    }
+
+    _trRenderResult(scr, data.objetivo || objetivo, ejercicios, {
+      nivelPerro: nivelPerro, nivelGuias: nivelGuias, donde: donde, tiempo: tiempo, lang: lang
+    });
+
+    scr.classList.add('tr-show-result');
+    scr.scrollTop = 0;
+    window.scrollTo(0, 0);
+  } catch (e) {
+    console.error('training/daily-session:', e);
+    if (typeof showToast === 'function') showToast(lang === 'en' ? 'Network error. Try again.' : 'Error de red. Inténtalo de nuevo.');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = btnTxt; }
+  }
 }
 window.trGenerate = trGenerate;
+
+// Rellena la vista resultado (.tr-result) con los 5 ejercicios del backend.
+// Reusa las clases existentes: .tr-tagchip, .tr-res-sub, .tr-ex/.tr-n/.tr-t/.tr-why.
+function _trRenderResult(scr, objetivo, ejercicios, meta) {
+  var result = scr.querySelector('.tr-result');
+  if (!result) return;
+
+  // Tag (objetivo) y subtítulo (resumen de ajustes).
+  var tag = result.querySelector('.tr-tagchip');
+  if (tag) tag.textContent = objetivo;
+
+  var sub = result.querySelector('.tr-res-sub');
+  if (sub) {
+    var levelLabel = function(k) {
+      if (meta.lang === 'en') return { basico: 'basic', medio: 'intermediate', avanzado: 'advanced' }[k] || k;
+      return { basico: 'básico', medio: 'medio', avanzado: 'avanzado' }[k] || k;
+    };
+    var parts = [];
+    parts.push((meta.lang === 'en' ? 'Dog: ' : 'Perro: ') + levelLabel(meta.nivelPerro));
+    parts.push((meta.lang === 'en' ? 'Handlers: ' : 'Guías: ') + levelLabel(meta.nivelGuias));
+    if (meta.donde) parts.push(meta.donde);
+    if (meta.tiempo) parts.push(meta.tiempo + ' min');
+    sub.textContent = parts.join(' · ');
+  }
+
+  // Construir los .tr-ex y reemplazar SOLO los previos (mantener nav/tag/sub/actions).
+  result.querySelectorAll('.tr-ex').forEach(function(el) { el.remove(); });
+  var actions = result.querySelector('.tr-res-actions');
+  ejercicios.slice(0, 5).forEach(function(ex, i) {
+    var row = document.createElement('div');
+    row.className = 'tr-ex';
+    var n = document.createElement('div');
+    n.className = 'tr-n';
+    n.textContent = String(i + 1);
+    var c = document.createElement('div');
+    c.className = 'tr-ex-c';
+    var t = document.createElement('div');
+    t.className = 'tr-t';
+    t.textContent = ex.instruccion || '';
+    var why = document.createElement('div');
+    why.className = 'tr-why';
+    why.textContent = ex.explicacion || '';
+    c.appendChild(t);
+    c.appendChild(why);
+    row.appendChild(n);
+    row.appendChild(c);
+    if (actions) result.insertBefore(row, actions);
+    else result.appendChild(row);
+  });
+}
 
 // Vuelve de la vista resultado a la ficha (Regenerar / back del resultado).
 function trShowForm() {
@@ -15227,7 +15393,7 @@ function endTourIntro() {
       new_analysis:           'Nuevo Análisis',
       continue_case:          'Continuar caso',
       tip_of_day:             'Consejo del día: El refuerzo positivo consistente es clave para el cambio conductual a largo plazo. Recompensa las acciones deseadas de inmediato.',
-      recharge_tokens:        'Recargar tokens',
+      recharge_tokens:        'Comprar tokens',
       new_consultation:       'Nueva Consulta',
       // Nav
       nav_home:    'Inicio',
@@ -16059,7 +16225,7 @@ function endTourIntro() {
       new_analysis:           'New Analysis',
       continue_case:          'Continue Case',
       tip_of_day:             'Tip of the day: Consistent positive reinforcement is key to long-term behavioral change. Reward desired actions immediately.',
-      recharge_tokens:        'Recharge tokens',
+      recharge_tokens:        'Buy tokens',
       new_consultation:       'New Consultation',
       // Nav
       nav_home:    'Home',

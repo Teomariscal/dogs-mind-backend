@@ -12,6 +12,7 @@ from app.api.routes import account as account_router
 from app.api.routes import daily_followup as daily_followup_router
 from app.api.routes import daily_tip as daily_tip_router
 from app.api.routes import delegations as delegations_router
+from app.api.routes import training as training_router
 
 # Path to the frontend HTML — override via FRONTEND_HTML env var
 FRONTEND_HTML = os.environ.get(
@@ -280,6 +281,7 @@ app.include_router(account_router.router)
 app.include_router(daily_followup_router.router)
 app.include_router(daily_tip_router.router)
 app.include_router(delegations_router.router)
+app.include_router(training_router.router)
 
 
 @app.get("/", include_in_schema=False)

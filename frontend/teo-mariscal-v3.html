@@ -9981,6 +9981,8 @@ function goTo(id) {
     var msg = document.getElementById('pa-msg');
     if (msg) msg.textContent = '';
     if (typeof paUpdateTotal === 'function') paUpdateTotal();
+    // Detectar si hay promo activa en backend → pintar UI sin pago
+    if (typeof _paCheckPromoStatus === 'function') _paCheckPromoStatus();
   }
   // Global nav show/hide.
   // - Pantallas que NUNCA muestran nav (incluso logueado): splash, login, refine, tour, account-type select, área pro hero (es full-screen).
@@ -11412,6 +11414,10 @@ function psHydrate() {
   var err = document.getElementById('ps-error');
   if (err) { err.style.display = 'none'; err.textContent = ''; }
 
+  // Detectar promo Profesional GRATIS (toggle por env var backend)
+  // → si activa, ocultar empresa/logo/bundle y CTA pasa a "Activar GRATIS"
+  if (typeof _psCheckPromoStatus === 'function') _psCheckPromoStatus();
+
   // Prerellenar empresa si tenemos _myAccount.company
   if (hasSession && window._myAccount && window._myAccount.company) {
     var c = window._myAccount.company;
@@ -11453,6 +11459,14 @@ function _psFmtEur(n) {
 }
 
 function psUpdateTotal() {
+  // Si la promo GRATIS está activa, total y CTA siempre fijos en GRATIS
+  if (window._proPromoActive) {
+    var totalElP = document.getElementById('ps-total-amount');
+    var btnElP = document.getElementById('ps-pay-btn');
+    if (totalElP) totalElP.textContent = _i18nText('pa_promo_total', 'GRATIS');
+    if (btnElP) btnElP.textContent = _i18nText('pa_btn_activate_promo', 'Activar GRATIS');
+    return;
+  }
   var bundle = document.getElementById('ps-bundle');
   var withBundle = !!(bundle && bundle.checked);
   var total = PS_PRICE_BASE + (withBundle ? PS_PRICE_BUNDLE : 0);
@@ -11465,6 +11479,70 @@ function psUpdateTotal() {
   }
 }
 window.psUpdateTotal = psUpdateTotal;
+
+// ── Promo Profesional GRATIS en s-pro-signup ─────────────────────────────────
+// Mismo patrón que _paCheckPromoStatus / _paApplyPromoUI para s-pro-activate.
+// Al estar la promo activa: ocultamos empresa, logo y bundle; el flujo queda
+// sólo email + password (si no hay sesión) + botón "Activar GRATIS".
+async function _psCheckPromoStatus() {
+  try {
+    var res = await fetch(API_BASE + '/payments/pro-promo-status');
+    if (!res.ok) { _psApplyPromoUI(false); return; }
+    var data = await res.json();
+    _psApplyPromoUI(!!data.promo_active);
+  } catch (e) {
+    console.warn('ps pro-promo-status fetch failed:', e);
+    _psApplyPromoUI(false);
+  }
+}
+window._psCheckPromoStatus = _psCheckPromoStatus;
+
+function _psApplyPromoUI(active) {
+  window._proPromoActive = !!active;
+  // Secciones 2, 3 y 4 del formulario (empresa, logo, bundle)
+  var sections = document.querySelectorAll('#s-pro-signup .ps-section');
+  // sections[0] = "Datos de tu cuenta" (NUNCA ocultar — siempre necesario si no hay sesión)
+  // sections[1] = "Datos de tu empresa"
+  // sections[2] = "Logo de tu empresa" (.ps-logo-section)
+  // sections[3] = "Tu membresía" (contiene bundle)
+  // Ojo: si no se renderizan los 4, sections.length puede ser menor.
+  var empresaSec  = sections && sections[1];
+  var logoSec     = sections && sections[2];
+  var membresiaSec = sections && sections[3];
+  // Dentro de la sección de membresía: el bundle, el "incluye 10 tokens cortesía" y el price base
+  var bundleEl   = document.querySelector('#s-pro-signup .ps-bundle');
+  var courtesyEl = document.querySelector('#s-pro-signup .ps-courtesy');
+  var planPriceEl = document.getElementById('ps-plan-base-price');
+  var secureEl   = document.querySelector('#s-pro-signup .ps-secure');
+  var inviteField = document.getElementById('ps-invite');
+  var inviteWrap = inviteField ? inviteField.closest('.ps-field') : null;
+
+  if (active) {
+    if (empresaSec)   empresaSec.style.display   = 'none';
+    if (logoSec)      logoSec.style.display      = 'none';
+    if (bundleEl)     bundleEl.style.display     = 'none';
+    if (courtesyEl)   courtesyEl.style.display   = 'none';
+    if (planPriceEl)  planPriceEl.textContent    = _i18nText('pa_promo_total', 'GRATIS');
+    if (secureEl)     secureEl.textContent       = _i18nText('pa_promo_badge', 'PROMO LANZAMIENTO');
+    // Durante la promo NO hace falta código de invitación — lo ocultamos para no confundir
+    if (inviteWrap)   inviteWrap.style.display   = 'none';
+    // Vaciar invite si quedó en la URL (single-use) para que la validación no lo lea
+    if (inviteField)  inviteField.value          = '';
+    // Total + CTA
+    psUpdateTotal();
+  } else {
+    // Restaurar UI normal (idempotencia)
+    if (empresaSec)   empresaSec.style.display   = '';
+    if (logoSec)      logoSec.style.display      = '';
+    if (bundleEl)     bundleEl.style.display     = '';
+    if (courtesyEl)   courtesyEl.style.display   = '';
+    if (planPriceEl)  planPriceEl.textContent    = '20,00 €';
+    if (secureEl)     secureEl.textContent       = _i18nText('ps_secure', 'Pago seguro vía Stripe.');
+    if (inviteWrap)   inviteWrap.style.display   = '';
+    psUpdateTotal();
+  }
+}
+window._psApplyPromoUI = _psApplyPromoUI;
 
 function _psShowError(text) {
   var el = document.getElementById('ps-error');
@@ -11501,11 +11579,12 @@ function _psValidate(hasSession) {
     if (!tos || !tos.checked) errors.push(_i18nText('ps_err_tos', 'Debes aceptar los Términos y la Política de Privacidad.'));
   }
 
-  // Flujo cortesía: si hay invite_code, los datos de empresa son OPCIONALES
-  // (se completan luego desde el área Pro). Si NO hay invite, son obligatorios
-  // como en el flujo Stripe estándar.
+  // Flujo cortesía (invite_code) y flujo promo (PRO_PROMO_FREE): los datos de
+  // empresa son OPCIONALES — se completan luego desde el área Pro. Sólo se
+  // exigen empresa+logo en el flujo Stripe estándar.
   var hasInvite = !!_v('ps-invite');
-  if (!hasInvite) {
+  var isPromo = !!window._proPromoActive;
+  if (!hasInvite && !isPromo) {
     if (!_v('ps-company-name')) errors.push(_i18nText('ps_err_company_name', 'Indica el nombre de la empresa.'));
     if (!_v('ps-legal-rep')) errors.push(_i18nText('ps_err_legal_rep', 'Indica el nombre del representante legal.'));
     var billing = _v('ps-billing-email');
@@ -11601,6 +11680,37 @@ async function psSubmit() {
     }
 
     var jwt = localStorage.getItem('dm_jwt');
+
+    // ─── FLUJO PROMO LANZAMIENTO (PRO_PROMO_FREE=true, sin Stripe, sin empresa) ───
+    // Igual que cortesía pero sin código de invitación y sin tokens cortesía.
+    if (window._proPromoActive && !isCourtesyFlow) {
+      var promoRes = await fetch(API_BASE + '/payments/pro-activate-promo', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + jwt }
+      });
+      if (!promoRes.ok) {
+        var promoMsg = '';
+        try { promoMsg = await promoRes.text(); } catch(e) {}
+        if (promoRes.status === 400) {
+          _psShowError(_i18nText('ps_err_invite_already_pro', 'Tu cuenta ya es Profesional.'));
+        } else if (promoRes.status === 503) {
+          // La promo se desactivó mid-flow → reaplicar UI normal y avisar
+          _psApplyPromoUI(false);
+          _psShowError(_i18nText('pa_err_promo_off', 'La promo ya no está disponible. Vuelve a intentarlo desde el flujo de pago.'));
+        } else {
+          _psShowError(_i18nText('ps_err_invite_unexpected', 'No se pudo activar la cuenta.') + ' ' + (promoMsg || ''));
+        }
+        _psSetBusy(false);
+        return;
+      }
+      try { if (typeof loadAccountInfo === 'function') await loadAccountInfo(); } catch(e) {}
+      if (typeof showToast === 'function') {
+        showToast(_i18nText('pa_success_promo_done', '¡Bienvenido a Profesional! Tu cuenta está lista.'));
+      }
+      _psSetBusy(false);
+      if (typeof goTo === 'function') goTo('s-home');
+      return;
+    }
 
     // ─── FLUJO CORTESÍA (invite-only, sin Stripe, sin datos empresa) ───
     if (isCourtesyFlow) {
@@ -11727,11 +11837,81 @@ function paUpdateTotal() {
   var cb = document.getElementById('pa-bundle-cb');
   var totalEl = document.getElementById('pa-total');
   if (!totalEl) return;
+  // Si la promo GRATIS está activa, el total siempre es GRATIS
+  if (window._proPromoActive) {
+    totalEl.textContent = _i18nText('pa_promo_total', 'GRATIS');
+    return;
+  }
   var withBundle = !!(cb && cb.checked);
   // 20,00 € + 37,80 € (si bundle) — formato europeo
   totalEl.textContent = withBundle ? '57,80 €' : '20,00 €';
 }
 window.paUpdateTotal = paUpdateTotal;
+
+// ── Promo Profesional GRATIS (toggle por env var PRO_PROMO_FREE en backend) ──
+// Al entrar a s-pro-activate, consultamos /payments/pro-promo-status (público,
+// sin auth). Si promo_active=true:
+//   - Ocultamos el bundle opcional (no aplica sin pago).
+//   - Cambiamos el total a "GRATIS" y el disclaimer al texto de la promo.
+//   - Botón → "Activar GRATIS · Promo" → llama /payments/pro-activate-promo.
+// Si promo_active=false: flujo Stripe normal sin cambios.
+// Diseño: idempotente — si se llama varias veces, no acumula efectos.
+async function _paCheckPromoStatus() {
+  try {
+    var res = await fetch(API_BASE + '/payments/pro-promo-status');
+    if (!res.ok) { _paApplyPromoUI(false); return; }
+    var data = await res.json();
+    _paApplyPromoUI(!!data.promo_active);
+  } catch (e) {
+    // Si falla el fetch, asumimos promo OFF (fallback al flujo Stripe).
+    console.warn('pro-promo-status fetch failed:', e);
+    _paApplyPromoUI(false);
+  }
+}
+window._paCheckPromoStatus = _paCheckPromoStatus;
+
+function _paApplyPromoUI(active) {
+  window._proPromoActive = !!active;
+  var bundleCard = document.querySelector('#s-pro-activate .pa-bundle-card');
+  var bundleLabel = document.querySelector('#s-pro-activate [data-i18n="pa_addon_section"]');
+  var summaryAmount = document.querySelector('#s-pro-activate .pa-summary-amount');
+  var membershipHint = document.querySelector('#s-pro-activate [data-i18n="pa_membership_hint"]');
+  var disclaimer = document.querySelector('#s-pro-activate [data-i18n="pa_disclaimer"]');
+  var btn = document.getElementById('pa-checkout-btn');
+  var totalEl = document.getElementById('pa-total');
+
+  if (active) {
+    // Ocultar bundle (no aplica sin pago)
+    if (bundleCard) bundleCard.style.display = 'none';
+    if (bundleLabel) bundleLabel.style.display = 'none';
+    // Cambiar el precio del summary a GRATIS
+    if (summaryAmount) {
+      summaryAmount.textContent = _i18nText('pa_promo_total', 'GRATIS');
+      summaryAmount.dataset._origText = summaryAmount.dataset._origText || '';
+    }
+    // Hint del summary: no prometer 10 tokens cortesía (la promo no los da)
+    if (membershipHint) membershipHint.textContent = _i18nText('pa_promo_badge', 'PROMO LANZAMIENTO');
+    // Disclaimer → texto de promo
+    if (disclaimer) disclaimer.textContent = _i18nText('pa_promo_disclaimer', 'Activación inmediata, sin pago.');
+    // Total → GRATIS
+    if (totalEl) totalEl.textContent = _i18nText('pa_promo_total', 'GRATIS');
+    // Botón: copy + el onclick sigue siendo paGoToCheckout (interno ramifica)
+    if (btn) btn.textContent = _i18nText('pa_btn_activate_promo', 'Activar GRATIS');
+  } else {
+    // Restaurar UI normal (por si se llamó previamente con active=true)
+    if (bundleCard) bundleCard.style.display = '';
+    if (bundleLabel) bundleLabel.style.display = '';
+    if (summaryAmount) summaryAmount.textContent = '20,00 €';
+    if (membershipHint && membershipHint.getAttribute('data-i18n') === 'pa_membership_hint') {
+      // Restaurar texto i18n correcto
+      membershipHint.textContent = _i18nText('pa_membership_hint', 'Acceso a todas las funciones Profesional + 10 tokens de cortesía.');
+    }
+    if (disclaimer) disclaimer.textContent = _i18nText('pa_disclaimer', 'Pago único, no se renueva automáticamente.');
+    if (btn) btn.textContent = _i18nText('pa_btn_checkout', 'Continuar al pago');
+    if (typeof paUpdateTotal === 'function') paUpdateTotal();
+  }
+}
+window._paApplyPromoUI = _paApplyPromoUI;
 
 async function paGoToCheckout() {
   var btn = document.getElementById('pa-checkout-btn');
@@ -11743,6 +11923,12 @@ async function paGoToCheckout() {
     return;
   }
   if (msg) msg.textContent = '';
+
+  // ── Branching: si la promo GRATIS está activa, activación directa sin Stripe ──
+  if (window._proPromoActive) {
+    return _paActivatePromo();
+  }
+
   var cb = document.getElementById('pa-bundle-cb');
   var withBundle = !!(cb && cb.checked);
 
@@ -11783,6 +11969,63 @@ async function paGoToCheckout() {
   }
 }
 window.paGoToCheckout = paGoToCheckout;
+
+// ── Activación Profesional GRATIS (modo promo) ──────────────────────────────
+// Llamada desde paGoToCheckout cuando window._proPromoActive=true (set por
+// _paApplyPromoUI tras consultar /payments/pro-promo-status). NO pasa por
+// Stripe, NO añade tokens cortesía — solo cambia account_type a 'professional'.
+// Tras éxito: refrescamos account info y enviamos al home con toast.
+async function _paActivatePromo() {
+  var btn = document.getElementById('pa-checkout-btn');
+  var msg = document.getElementById('pa-msg');
+  var prevText = btn ? btn.textContent : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = _i18nText('pa_btn_activating_promo', 'Activando tu cuenta Profesional…');
+  }
+  try {
+    var res = await fetch(API_BASE + '/payments/pro-activate-promo', {
+      method: 'POST',
+      headers: authHeaders(),
+    });
+    if (!res.ok) {
+      var detail = '';
+      try { var ed = await res.json(); detail = ed.detail || ''; } catch(e) {}
+      if (res.status === 401) {
+        showToast(_i18nText('session_expired', 'Sesión caducada.'));
+        goTo('s-splash');
+        return;
+      }
+      if (res.status === 400) {
+        if (msg) msg.textContent = detail || _i18nText('pa_err_already_pro', 'Tu cuenta ya es Profesional.');
+        return;
+      }
+      if (res.status === 503) {
+        // La promo se acaba de desactivar en el backend mientras el user estaba en la pantalla
+        // → caer al flujo Stripe normal sin perder al usuario.
+        _paApplyPromoUI(false);
+        if (msg) msg.textContent = detail || _i18nText('pa_err_promo_off', 'La promo ya no está disponible. Vuelve a intentarlo.');
+        return;
+      }
+      if (msg) msg.textContent = detail || _i18nText('pa_err_checkout', 'No se pudo activar la cuenta.');
+      return;
+    }
+    // Éxito: refrescar /me/account + saldo de tokens
+    if (typeof loadAccountInfo === 'function') await loadAccountInfo();
+    if (typeof fetchBalance === 'function') await fetchBalance();
+    showToast(_i18nText('pa_success_promo_done', '¡Bienvenido a Profesional! Tu cuenta está lista.'));
+    goTo('s-home');
+  } catch (e) {
+    console.error('pa promo activate:', e);
+    if (msg) msg.textContent = _i18nText('pa_err_checkout', 'No se pudo activar la cuenta.');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = prevText || _i18nText('pa_btn_activate_promo', 'Activar GRATIS');
+    }
+  }
+}
+window._paActivatePromo = _paActivatePromo;
 
 // Detección al cargar: si volvemos de Stripe con success, refrescar account
 // hasta que el webhook haya activado el tier (poll suave ~10s).
@@ -16112,9 +16355,17 @@ function endTourIntro() {
       pa_btn_cancel:           'Cancelar',
       pa_err_already_pro:      'Tu cuenta ya es Profesional.',
       pa_err_checkout:         'No se pudo crear la sesión de pago.',
+      pa_err_promo_off:        'La promo ya no está disponible. Vuelve a intentarlo desde el flujo de pago.',
       pa_success_processing:   'Confirmando tu pago…',
       pa_success_done:         '¡Bienvenido a Profesional! Tokens acreditados.',
       pa_success_pending:      'Tu pago está procesándose. Recarga en unos segundos.',
+      // Promo Profesional GRATIS (toggle por PRO_PROMO_FREE en backend)
+      pa_promo_badge:          'PROMO LANZAMIENTO',
+      pa_promo_total:          'GRATIS',
+      pa_promo_disclaimer:     'Activación inmediata, sin pago. Durante el periodo promocional puedes activar tu cuenta Profesional sin coste. Membresía permanente. Mantienes los tokens que ya tengas; cuando los gastes, puedes recargar como cualquier otro usuario.',
+      pa_btn_activate_promo:   'Activar GRATIS',
+      pa_btn_activating_promo: 'Activando tu cuenta Profesional…',
+      pa_success_promo_done:   '¡Bienvenido a Profesional! Tu cuenta está lista.',
       pa_cancelled:            'Activación cancelada.',
       pp_btn_pdf:           'Descargar PDF',
       pp_btn_print:         'Imprimir',
@@ -16958,9 +17209,17 @@ function endTourIntro() {
       pa_btn_cancel:           'Cancel',
       pa_err_already_pro:      'Your account is already Professional.',
       pa_err_checkout:         'Could not create the payment session.',
+      pa_err_promo_off:        'The promo is no longer available. Try again via the payment flow.',
       pa_success_processing:   'Confirming your payment…',
       pa_success_done:         'Welcome to Professional! Tokens credited.',
       pa_success_pending:      'Your payment is being processed. Refresh in a few seconds.',
+      // Professional GRATIS promo (toggle via PRO_PROMO_FREE in backend)
+      pa_promo_badge:          'LAUNCH PROMO',
+      pa_promo_total:          'FREE',
+      pa_promo_disclaimer:     'Instant activation, no payment. During the promotional period you can activate your Professional account at no cost. Membership is permanent. You keep the tokens you already have; once you use them, you can top up like any other user.',
+      pa_btn_activate_promo:   'Activate FREE',
+      pa_btn_activating_promo: 'Activating your Professional account…',
+      pa_success_promo_done:   'Welcome to Professional! Your account is ready.',
       pa_cancelled:            'Activation cancelled.',
       pp_btn_pdf:           'Download PDF',
       pp_btn_print:         'Print',

@@ -50,6 +50,21 @@ PRO_BUNDLE_TOKENS     = 60  # tokens del pack promo si compra bundle
 # Pro pagador. Membresía permanente (no caduca).
 PRO_INVITE_CODE = os.environ.get("PRO_INVITE_CODE", "").strip()
 
+# ── Promo Profesional GRATIS (toggleable por env var) ────────────────────────
+# Mientras esta env var sea true, CUALQUIER usuario autenticado puede activar
+# Profesional sin pagar los 20€ vía POST /payments/pro-activate-promo. NO recibe
+# tokens cortesía extra: mantiene únicamente los tokens que tiene por su signup
+# (el welcome bonus normal). El frontend consulta GET /payments/pro-promo-status
+# (público, sin auth) para saber si pintar el botón "Activar GRATIS · Promo" en
+# lugar del flujo Stripe. Para terminar la promo: PRO_PROMO_FREE=false (o sin
+# definir) en Railway → redeploy del backend → frontend detecta automáticamente
+# y vuelve al flujo Stripe normal sin redeploy de frontend.
+#
+# IMPORTANTE: este flujo es paralelo al de PRO_INVITE_CODE (BOCALAN-AMB) y NO
+# lo sustituye. Los embajadores siguen entrando con código + reciben sus
+# PRO_MEMBERSHIP_TOKENS. La promo abierta es para captación durante el lanzamiento.
+PRO_PROMO_FREE = os.environ.get("PRO_PROMO_FREE", "").strip().lower() in ("1", "true", "yes", "on")
+
 
 class CheckoutRequest(BaseModel):
     pack: int  # 5, 20 o 60
@@ -121,7 +136,18 @@ def create_pro_checkout(
     """
     Crea una Stripe Checkout Session para activar la cuenta Profesional.
     Pago único (no suscripción) — el webhook activa el tier al confirmarse.
+
+    Salvaguarda promo: si PRO_PROMO_FREE=true en Railway, este endpoint queda
+    deshabilitado (503) para que ningún flujo cobre durante la promo, incluso
+    si el frontend tuviese un bug o un usuario hiciese curl directo. El cliente
+    debe usar /payments/pro-activate-promo en su lugar.
     """
+    # ── Salvaguarda: durante la promo GRATIS no se cobra a nadie ──
+    if PRO_PROMO_FREE:
+        raise HTTPException(
+            status_code=503,
+            detail="Promo Profesional GRATIS activa: la activación pasa por /payments/pro-activate-promo en lugar de Stripe.",
+        )
     if not stripe.api_key:
         raise HTTPException(status_code=500, detail="STRIPE_SECRET_KEY no configurada en el servidor")
     if not PRICE_PRO_MEMBERSHIP:
@@ -299,6 +325,72 @@ def pro_activate_courtesy(
         "account_type": "professional",
         "tokens": float(current_user.tokens),
         "credited": PRO_MEMBERSHIP_TOKENS,
+    }
+
+
+# ── Promo Profesional GRATIS ──────────────────────────────────────────────────
+@router.get("/payments/pro-promo-status")
+def pro_promo_status():
+    """
+    Endpoint público (sin auth) que indica si la promo Profesional GRATIS está
+    activa en el backend. El frontend lo consulta al cargar s-pro-activate para
+    decidir entre pintar el botón "Activar GRATIS · Promo" o el flujo Stripe.
+
+    No expone nada sensible: solo un boolean. Útil para que el frontend pueda
+    enseñar el copy adecuado SIN tener que esperar a clickar el botón.
+    """
+    return {"promo_active": PRO_PROMO_FREE}
+
+
+@router.post("/payments/pro-activate-promo")
+def pro_activate_promo(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Activa cuenta Profesional GRATIS durante la promo (sin código de invitación,
+    sin Stripe). Disponible mientras PRO_PROMO_FREE=true en Railway.
+
+    Diferencias respecto a /pro-activate-courtesy:
+      - NO requiere invite_code (la promo es abierta).
+      - NO suma PRO_MEMBERSHIP_TOKENS — el usuario mantiene únicamente los
+        tokens que ya tiene por su signup (decisión Teo 2026-05-26: durante la
+        promo solo regalamos el ESTATUS, no tokens extra).
+
+    Flujo:
+      1. Verificar que la promo está activa (PRO_PROMO_FREE).
+      2. Idempotencia: si ya es Pro, 400.
+      3. Activar account_type='professional'. NO tocar tokens.
+
+    Cuando se acabe la promo: PRO_PROMO_FREE=false → este endpoint devuelve 503.
+    Membresía permanente: NO se programa caducidad.
+    """
+    # 1. Servicio activo
+    if not PRO_PROMO_FREE:
+        raise HTTPException(
+            status_code=503,
+            detail="La promo Profesional GRATIS no está activa.",
+        )
+
+    # 2. Idempotencia
+    if current_user.account_type == "professional":
+        raise HTTPException(
+            status_code=400,
+            detail="Tu cuenta ya es Profesional.",
+        )
+
+    # 3. Activar (sin tocar tokens — solo el estatus, ver docstring)
+    current_user.account_type = "professional"
+    db.commit()
+    print(
+        f"[Pro-Promo] {current_user.email} activado Profesional GRATIS · "
+        f"saldo tokens sin cambios={current_user.tokens}"
+    )
+    return {
+        "ok": True,
+        "account_type": "professional",
+        "tokens": float(current_user.tokens),
+        "credited": 0,
     }
 
 

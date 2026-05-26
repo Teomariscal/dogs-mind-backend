@@ -95,7 +95,18 @@ Documento interno de referencia. Mapea cada guideline relevante de [App Store Re
 
 ### 3.1.1 In-App Purchase ⚠️ BLOQUEANTE
 **Requisito:** "If you want to unlock features or functionality within your app… you must use in-app purchase."
-**Estado:** ❌ **BLOQUEANTE para iOS App Store.** Hoy todos los pagos (tokens packs, activación Profesional) van por Stripe Checkout. En iOS esto se rechazaría.
+**Estado:** ❌ **BLOQUEANTE para iOS App Store.** Hoy los packs de tokens van por Stripe Checkout. En iOS esto se rechazaría.
+
+**Nota estratégica (decisión Teo 2026-05-26):** Mientras esté ACTIVA la promo de
+lanzamiento `PRO_PROMO_FREE=true` (Railway), la activación Profesional NO cobra a
+nadie (`/payments/pro-checkout` devuelve 503, `/payments/pro-activate-promo` activa
+sin pago). La promo se MANTENDRÁ hasta justo antes de subir a App Store, momento
+en que se apagará (env var → false) y los nuevos profesionales volverán a pagar
+los 20€. Coincidencia útil: cuando apaguemos la promo, ya tenemos que tener el
+IAP integrado para Pro también — el orden natural es:
+  1. Hoy → promo ON, tokens via Stripe en web (sin App Store)
+  2. Pre-launch App Store → integrar IAP (StoreKit2) en Capacitor wrapper
+  3. Launch → promo OFF, Stripe en web (sigue), IAP en iOS
 **Excepciones que NO aplican:**
 - 3.1.3(a) Reader app: no aplica (no es contenido editorial).
 - 3.1.3(b) Multiplatform service: aplicable PARCIALMENTE — podemos seguir vendiendo en web Y tener IAP en iOS, pero la iOS NO puede tener UI/link/copy que sugiera comprar en otro sitio.

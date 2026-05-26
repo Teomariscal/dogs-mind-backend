@@ -6922,6 +6922,22 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
         </div>
       </div>
 
+      <!-- ── Tarjeta análisis pendiente (pagado, sin aceptar) ─────────────────
+           Discreta, inline, scopeada a #s-home. Oculta por defecto;
+           maybeShowPendingAnalysisCard() la muestra al entrar a s-home si hay
+           un análisis previamente cobrado pero sin aceptar. "Ver" rehidrata el
+           texto en s-abc SIN llamar a /analysis (no se vuelve a cobrar).
+           Se distingue del borrador de anamnesis (Part A, en #s-anamnesis): aquí
+           el análisis YA está pagado y generado; allí solo es el formulario. -->
+      <div id="pending-analysis-card" style="display:none;background:#fff;border:1px solid rgba(74,103,65,0.28);border-radius:14px;padding:14px 16px;box-shadow:0 2px 10px rgba(74,103,65,0.08);margin:14px 16px 0;">
+        <div style="font-size:13.5px;font-weight:600;color:var(--dark);line-height:1.4;" data-i18n="pending_analysis_title">Tienes un análisis sin terminar.</div>
+        <div id="pending-analysis-sub" style="font-size:12px;color:var(--grey);margin-top:3px;line-height:1.4;" data-i18n="pending_analysis_sub">Lo recuperamos en este dispositivo, sin volver a cobrar.</div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button type="button" onclick="_pendingAnalysisView()" data-i18n="pending_analysis_view" style="flex:1;padding:9px 14px;border-radius:100px;border:none;background:var(--green2);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;min-height:40px;">Ver</button>
+          <button type="button" onclick="_pendingAnalysisDiscard()" data-i18n="pending_analysis_discard" style="padding:9px 16px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;min-height:40px;">Descartar</button>
+        </div>
+      </div>
+
       <!-- My Dogs (renderizado dinámicamente desde el backend; fallback Buddy/Laika
            si no hay sesión o usuario aún sin perros — ver renderHomeDogs() en JS) -->
       <div class="section">
@@ -8223,6 +8239,19 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
     </div>
 
     <div style="padding:18px 16px 32px;display:flex;flex-direction:column;gap:20px;">
+
+      <!-- ── Tarjeta retomar borrador (autoguardado local) ─────────────────
+           Discreta, inline, scopeada a #s-anamnesis. Oculta por defecto;
+           maybeShowAnamResumeCard() la muestra al entrar si hay borrador con
+           contenido real. NO autorestaura: el usuario decide Continuar/Descartar. -->
+      <div id="anam-resume-card" style="display:none;background:#fff;border:1px solid rgba(74,103,65,0.28);border-radius:14px;padding:14px 16px;box-shadow:0 2px 10px rgba(74,103,65,0.08);">
+        <div style="font-size:13.5px;font-weight:600;color:var(--dark);line-height:1.4;" data-i18n="anam_resume_title">Tienes una consulta sin terminar.</div>
+        <div style="font-size:12px;color:var(--grey);margin-top:3px;line-height:1.4;" data-i18n="anam_resume_sub">Guardamos lo que escribiste en este dispositivo.</div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button type="button" onclick="_anamResumeContinue()" data-i18n="anam_resume_continue" style="flex:1;padding:9px 14px;border-radius:100px;border:none;background:var(--green2);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;min-height:40px;">Continuar</button>
+          <button type="button" onclick="_anamResumeDiscard()" data-i18n="anam_resume_discard" style="padding:9px 16px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;min-height:40px;">Descartar</button>
+        </div>
+      </div>
 
       <!-- analisis basado en -->
       <div>
@@ -9921,8 +9950,9 @@ function goTo(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if (id === 's-records') { renderRecords(); syncBackendCases(); }
+  if (id === 's-anamnesis' && typeof maybeShowAnamResumeCard === 'function') maybeShowAnamResumeCard();
   if (id === 's-tokens') updateTokensScreen();
-  if (id === 's-home') { fetchBalance(); loadDailyTip(); }
+  if (id === 's-home') { fetchBalance(); loadDailyTip(); if (typeof maybeShowPendingAnalysisCard === 'function') maybeShowPendingAnalysisCard(); }
   if (id === 's-training') {
     // Siempre entrar en la ficha (no en la vista resultado) y arrancar el vídeo.
     var trScr = document.getElementById('s-training');
@@ -12113,6 +12143,324 @@ function anam_choose_training(value) {
   if (wrap) wrap.style.display = value === true ? 'block' : 'none';
 }
 
+// ── ANAMNESIS DRAFT: autoguardado + retomar (solo local, este dispositivo) ──
+// Problema (testers): si el usuario rellena la anamnesis y cierra la app / pierde
+// red antes de enviar, perdía todo lo escrito. Guardamos un borrador en
+// localStorage (debounced) y, al volver a la pantalla, ofrecemos retomarlo.
+// NO persiste el vídeo (File en RAM). Un único borrador por usuario.
+
+// Clave por usuario, mismo patrón que _recordsKey (_hashEmail sobre dm_email).
+function _anamDraftKey() {
+  var email = '';
+  try { email = (localStorage.getItem('dm_email') || '').trim().toLowerCase(); } catch(e) {}
+  if (!email) return 'dm_anam_draft_guest'; // sin sesión: bucket neutro
+  return 'dm_anam_draft_' + _hashEmail(email);
+}
+
+// IDs de inputs de texto/número/textarea de la anamnesis (sin vídeo).
+var _ANAM_TEXT_IDS = [
+  'inp-dog-name','inp-dog-age','inp-breed','inp-weaning','inp-dolencia-detail',
+  'inp-convive-detail','inp-other-problems','inp-training-result','inp-problem',
+  'inp-since','inp-where','inp-who','inp-agresion-dist','inp-history','inp-theory',
+  'inp-evento-previo'
+];
+
+// Serializa el estado del formulario a un objeto plano JSON-able.
+function collectAnamDraft() {
+  var d = { texts: {}, toggles: {}, flags: {} };
+  // Inputs de texto
+  _ANAM_TEXT_IDS.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && (el.value || '').trim()) d.texts[id] = el.value;
+  });
+  // Toggles binarios/triples (guardamos qué id está activo, o null)
+  d.toggles.sexo      = isActive('sexo-macho') ? 'sexo-macho' : (isActive('sexo-hembra') ? 'sexo-hembra' : null);
+  d.toggles.dolencia  = isActive('dolencia-si') ? 'si' : (isActive('dolencia-no') ? 'no' : null);
+  d.toggles.vive      = isActive('vive-dentro') ? 'vive-dentro' : (isActive('vive-fuera') ? 'vive-fuera' : (isActive('vive-ambos') ? 'vive-ambos' : null));
+  d.toggles.entorno   = isActive('entorno-campo') ? 'entorno-campo' : (isActive('entorno-periferia') ? 'entorno-periferia' : (isActive('entorno-ciudad') ? 'entorno-ciudad' : null));
+  d.toggles.ninios    = isActive('ninios-si') ? 'si' : (isActive('ninios-no') ? 'no' : null);
+  d.toggles.convive   = isActive('convive-si') ? 'si' : (isActive('convive-no') ? 'no' : null);
+  d.toggles.agresion  = isActive('agresion-si') ? 'si' : (isActive('agresion-no') ? 'no' : null);
+  // Frecuencia: índice del botón activo dentro de #frecuencia-group
+  d.toggles.frecuenciaIdx = null;
+  var fg = document.getElementById('frecuencia-group');
+  if (fg) {
+    var fb = Array.from(fg.querySelectorAll('button'));
+    for (var i = 0; i < fb.length; i++) { if (fb[i].style.color === '#fff') { d.toggles.frecuenciaIdx = i; break; } }
+  }
+  // Flags globales (mismos valores que lee analyzeWithAI)
+  d.flags.walksPerDay      = (typeof window._walksPerDay === 'number') ? window._walksPerDay : null;
+  d.flags.favReward        = (typeof window._favReward === 'string') ? window._favReward : null;
+  d.flags.attendedTraining = (typeof window._attendedTraining === 'boolean') ? window._attendedTraining : null;
+  // Contador miembros
+  var mEl = document.getElementById('miembros-val');
+  d.flags.miembros = mEl ? (parseInt(mEl.textContent) || 1) : 1;
+  return d;
+}
+
+// ¿El borrador tiene contenido real? (evita guardar/ofrecer un form vacío)
+function _anamDraftHasContent(d) {
+  if (!d) return false;
+  if (d.texts && Object.keys(d.texts).length > 0) return true;
+  var t = d.toggles || {};
+  if (t.sexo || t.dolencia === 'si' || t.vive || t.entorno || t.ninios === 'si' ||
+      t.convive === 'si' || t.agresion === 'si' || t.frecuenciaIdx !== null) return true;
+  var f = d.flags || {};
+  if (f.walksPerDay !== null || f.favReward !== null || f.attendedTraining !== null) return true;
+  if (f.miembros && f.miembros > 1) return true;
+  return false;
+}
+
+// Guarda el borrador (sólo si hay algo escrito). Borra la clave si está vacío.
+function _saveAnamDraftNow() {
+  try {
+    var d = collectAnamDraft();
+    var key = _anamDraftKey();
+    if (_anamDraftHasContent(d)) {
+      localStorage.setItem(key, JSON.stringify(d));
+    } else {
+      localStorage.removeItem(key);
+    }
+  } catch(e) { /* silencioso: nunca romper el flujo */ }
+}
+
+// Debounce ~500ms — el listener input/change llama a esto.
+var _anamDraftTimer = null;
+function saveAnamDraft() {
+  if (_anamDraftTimer) clearTimeout(_anamDraftTimer);
+  _anamDraftTimer = setTimeout(_saveAnamDraftNow, 500);
+}
+
+// Borra el borrador guardado (al enviar con éxito o al descartar).
+function clearAnamDraft() {
+  try {
+    if (_anamDraftTimer) { clearTimeout(_anamDraftTimer); _anamDraftTimer = null; }
+    localStorage.removeItem(_anamDraftKey());
+  } catch(e) {}
+}
+
+// Rehidrata el formulario desde el borrador guardado.
+function restoreAnamDraft() {
+  var d = null;
+  try { d = JSON.parse(localStorage.getItem(_anamDraftKey()) || 'null'); } catch(e) { d = null; }
+  if (!d) return;
+  // Inputs de texto
+  if (d.texts) {
+    Object.keys(d.texts).forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.value = d.texts[id];
+    });
+  }
+  var t = d.toggles || {};
+  // Reutilizamos las MISMAS funciones que los onclick (respeta DESIGN-LOCK).
+  if (t.sexo === 'sexo-macho')  anam_toggle('sexo-macho','sexo-hembra');
+  if (t.sexo === 'sexo-hembra') anam_toggle('sexo-hembra','sexo-macho');
+  if (t.dolencia === 'si') anam_toggle_cond('dolencia-si','dolencia-no','inp-dolencia-wrap');
+  if (t.dolencia === 'no') anam_toggle('dolencia-no','dolencia-si');
+  if (t.vive === 'vive-dentro') anam_toggle3('vive-dentro','vive-fuera','vive-ambos');
+  if (t.vive === 'vive-fuera')  anam_toggle3('vive-fuera','vive-dentro','vive-ambos');
+  if (t.vive === 'vive-ambos')  anam_toggle3('vive-ambos','vive-dentro','vive-fuera');
+  if (t.entorno === 'entorno-campo')     anam_toggle3('entorno-campo','entorno-periferia','entorno-ciudad');
+  if (t.entorno === 'entorno-periferia') anam_toggle3('entorno-periferia','entorno-campo','entorno-ciudad');
+  if (t.entorno === 'entorno-ciudad')    anam_toggle3('entorno-ciudad','entorno-campo','entorno-periferia');
+  if (t.ninios === 'si') anam_toggle('ninios-si','ninios-no');
+  if (t.ninios === 'no') anam_toggle('ninios-no','ninios-si');
+  if (t.convive === 'si') anam_toggle_cond('convive-si','convive-no','inp-convive-wrap');
+  if (t.convive === 'no') anam_toggle('convive-no','convive-si');
+  if (t.agresion === 'si') anam_toggle_cond('agresion-si','agresion-no','agresion-dist-wrap');
+  if (t.agresion === 'no') anam_toggle_cond('agresion-no','agresion-si','agresion-dist-wrap');
+  // Frecuencia: re-clic sobre el botón guardado por índice
+  if (t.frecuenciaIdx !== null && t.frecuenciaIdx !== undefined) {
+    var fg = document.getElementById('frecuencia-group');
+    if (fg) {
+      var fb = fg.querySelectorAll('button');
+      if (fb[t.frecuenciaIdx]) anam_select(fb[t.frecuenciaIdx]);
+    }
+  }
+  // Flags — llamar a los mismos setters que usan los botones, pasando su elemento.
+  var f = d.flags || {};
+  if (typeof f.walksPerDay === 'number') {
+    var wg = document.getElementById('paseos-group');
+    var wbtn = wg ? wg.querySelector('button[data-walks="' + f.walksPerDay + '"]') : null;
+    if (wbtn) anam_choose_walks(wbtn, f.walksPerDay);
+  }
+  if (typeof f.favReward === 'string') {
+    var rg = document.getElementById('reward-group');
+    if (rg) {
+      var rbtn = Array.from(rg.querySelectorAll('button')).find(function(b) {
+        return (b.getAttribute('onclick') || '').indexOf("'" + f.favReward + "'") !== -1;
+      });
+      if (rbtn) anam_choose_reward(rbtn, f.favReward);
+    }
+  }
+  if (typeof f.attendedTraining === 'boolean') anam_choose_training(f.attendedTraining);
+  // Contador miembros
+  if (typeof f.miembros === 'number' && f.miembros >= 1) {
+    _miembros = f.miembros;
+    var mEl = document.getElementById('miembros-val');
+    if (mEl) mEl.textContent = f.miembros;
+  }
+}
+
+// Al entrar a #s-anamnesis: si hay borrador con contenido real, mostrar la
+// tarjeta discreta de retomar (NO autorestaura). Si no, ocultarla.
+function maybeShowAnamResumeCard() {
+  var card = document.getElementById('anam-resume-card');
+  if (!card) return;
+  var d = null;
+  try { d = JSON.parse(localStorage.getItem(_anamDraftKey()) || 'null'); } catch(e) { d = null; }
+  card.style.display = (d && _anamDraftHasContent(d)) ? 'block' : 'none';
+}
+
+function _anamResumeContinue() {
+  restoreAnamDraft();
+  var card = document.getElementById('anam-resume-card');
+  if (card) card.style.display = 'none';
+}
+
+function _anamResumeDiscard() {
+  var msg = _i18nText('anam_resume_discard_confirm', '¿Descartar la consulta sin terminar?');
+  if (!confirm(msg)) return;
+  clearAnamDraft();
+  _resetAnamForm();
+  var card = document.getElementById('anam-resume-card');
+  if (card) card.style.display = 'none';
+}
+
+// Limpia los campos del formulario al estado inicial (para Descartar).
+function _resetAnamForm() {
+  _ANAM_TEXT_IDS.forEach(function(id) { var el = document.getElementById(id); if (el) el.value = ''; });
+  // Toggles a su default (verde en "No"/"Dentro"/"Campo" según el HTML inicial)
+  anam_toggle('dolencia-no','dolencia-si');  var dw = document.getElementById('inp-dolencia-wrap'); if (dw) dw.style.display = 'none';
+  anam_toggle('ninios-no','ninios-si');
+  anam_toggle('convive-no','convive-si');    var cw = document.getElementById('inp-convive-wrap'); if (cw) cw.style.display = 'none';
+  anam_toggle_cond('agresion-no','agresion-si','agresion-dist-wrap');
+  anam_toggle3('vive-dentro','vive-fuera','vive-ambos');
+  anam_toggle3('entorno-campo','entorno-periferia','entorno-ciudad');
+  // Sexo no tiene default: lo dejamos como esté (ambos en blanco) reseteando estilo
+  ['sexo-macho','sexo-hembra'].forEach(function(id){ var b=document.getElementById(id); if(b){ b.style.background='#fff'; b.style.borderColor='rgba(0,0,0,0.15)'; b.style.color='var(--dark)'; } });
+  // Frecuencia: limpiar selección
+  var fg = document.getElementById('frecuencia-group');
+  if (fg) fg.querySelectorAll('button').forEach(function(b){ b.style.background='#fff'; b.style.borderColor='rgba(0,0,0,0.15)'; b.style.color='var(--dark)'; });
+  // Flags → estado inicial null + UI de los grupos a blanco
+  window._walksPerDay = null;
+  var wg = document.getElementById('paseos-group'); if (wg) wg.querySelectorAll('button').forEach(function(b){ b.style.background='#fff'; b.style.borderColor='rgba(0,0,0,0.15)'; b.style.color='var(--dark)'; });
+  window._favReward = null;
+  var rg = document.getElementById('reward-group'); if (rg) rg.querySelectorAll('button').forEach(function(b){ b.style.background='#fff'; b.style.borderColor='rgba(0,0,0,0.15)'; b.style.color='var(--dark)'; });
+  anam_choose_training(null);  // tri-state: vuelve a sin elegir y oculta el wrap
+  // Contador miembros
+  _miembros = 1;
+  var mEl = document.getElementById('miembros-val'); if (mEl) mEl.textContent = '1';
+}
+
+// ── PENDING ANALYSIS: persistencia del análisis pagado (Part B, 2026-05-25) ──
+// Problema (testers / usuarios de pago): tras lanzar el análisis se cobran 3
+// tokens (o 4 con vídeo). Si la IA responde bien pero el usuario se va antes
+// de pulsar "Aceptar plan" en s-abc (cierra app / pierde red / cambia de
+// pantalla y olvida volver), el resultado solo vivía en window._lastAnalysisText
+// y se PERDÍA al recargar — el usuario pagaba dos veces para verlo.
+// Solución: guardar el análisis en localStorage en cuanto llega de /analysis y
+// ofrecer recuperarlo desde s-home con una tarjeta inline discreta.
+// Distinción con Part A:
+//   - Part A (dm_anam_draft_<userHash>) → borrador del FORMULARIO sin enviar.
+//   - Part B (dm_pending_analysis_<userHash>) → análisis YA pagado sin aceptar.
+// Coexisten sin pisarse. NO persiste vídeo (File en RAM); el análisis ya está
+// hecho y no se vuelve a llamar a /analysis al "Ver".
+
+function _pendingAnalysisKey() {
+  var email = '';
+  try { email = (localStorage.getItem('dm_email') || '').trim().toLowerCase(); } catch(e) {}
+  if (!email) return 'dm_pending_analysis_guest';
+  return 'dm_pending_analysis_' + _hashEmail(email);
+}
+
+// Guarda el análisis recién devuelto por /analysis. Sobrescribe si ya había uno
+// (solo un análisis pendiente a la vez por usuario / dispositivo).
+function savePendingAnalysis(payload) {
+  try {
+    if (!payload || !payload.analysisText) return;
+    localStorage.setItem(_pendingAnalysisKey(), JSON.stringify({
+      anamnesis:    payload.anamnesis    || null,
+      analysisText: payload.analysisText || '',
+      sources:      payload.sources      || [],
+      dogName:      payload.dogName      || '',
+      ts:           Date.now()
+    }));
+  } catch(e) { /* silencioso: nunca romper el flujo de pago */ }
+}
+
+function getPendingAnalysis() {
+  try {
+    var raw = localStorage.getItem(_pendingAnalysisKey());
+    if (!raw) return null;
+    var p = JSON.parse(raw);
+    // Sanidad: sin texto, no hay análisis útil que ofrecer.
+    if (!p || !p.analysisText) return null;
+    return p;
+  } catch(e) { return null; }
+}
+
+function clearPendingAnalysis() {
+  try { localStorage.removeItem(_pendingAnalysisKey()); } catch(e) {}
+}
+
+// Al entrar a #s-home: si hay análisis pendiente, mostrar la tarjeta. Si no,
+// ocultarla. NO autorestaura: el usuario decide Ver / Descartar.
+function maybeShowPendingAnalysisCard() {
+  var card = document.getElementById('pending-analysis-card');
+  if (!card) return;
+  var p = getPendingAnalysis();
+  card.style.display = p ? 'block' : 'none';
+}
+
+// "Ver": rehidrata s-abc sin llamar a /analysis (no se vuelve a cobrar).
+function _pendingAnalysisView() {
+  var p = getPendingAnalysis();
+  if (!p) {
+    var card0 = document.getElementById('pending-analysis-card');
+    if (card0) card0.style.display = 'none';
+    return;
+  }
+  // Rehidratar estado global que s-abc / acceptIntervention esperan.
+  window._lastAnamnesisData = p.anamnesis || null;
+  window._lastAnalysisText  = p.analysisText || '';
+  window._lastDogName       = p.dogName || (p.anamnesis && p.anamnesis.dog_name) || '';
+  try {
+    fillABCScreen(window._lastDogName, p.analysisText, p.sources || []);
+  } catch(e) { /* si fillABCScreen falla, no perdemos el dato — sigue en localStorage */ }
+  goTo('s-abc');
+}
+
+// "Descartar": confirmación suave y borrar la clave. El usuario asume la pérdida.
+function _pendingAnalysisDiscard() {
+  var msg = _i18nText('pending_analysis_discard_confirm', '¿Descartar el análisis sin terminar? No podrás recuperarlo después.');
+  if (!confirm(msg)) return;
+  clearPendingAnalysis();
+  var card = document.getElementById('pending-analysis-card');
+  if (card) card.style.display = 'none';
+}
+
+// Listener de autosave: input/change en el contenedor de la anamnesis.
+// Capturado al cargar el DOM. Debounced para no escribir en cada tecla.
+(function _wireAnamAutosave() {
+  function attach() {
+    var scr = document.getElementById('s-anamnesis');
+    if (!scr || scr._anamAutosaveWired) return;
+    scr._anamAutosaveWired = true;
+    scr.addEventListener('input',  saveAnamDraft, true);
+    scr.addEventListener('change', saveAnamDraft, true);
+    // Los toggles cambian estado por onclick sin disparar input → escuchamos click.
+    scr.addEventListener('click',  function(ev){
+      if (ev.target && ev.target.closest && ev.target.closest('button')) saveAnamDraft();
+    }, true);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attach);
+  } else {
+    attach();
+  }
+})();
+
 // ── BACKEND API URL ──────────────────────────────────
 // Auto-detect: file:// → localhost dev, otherwise → Railway backend
 var API_BASE = window.location.protocol === 'file:'
@@ -13190,6 +13538,12 @@ function getVal(id, fallback) {
       setRecords(records);
     } catch(e) {}
 
+    // Análisis pendiente (Part B 2026-05-25): a partir de aquí el caso ya está
+    // guardado como record local (y se intentará migrar al backend abajo). El
+    // análisis ya NO está "pagado-sin-aceptar" → borramos la clave para que la
+    // tarjeta de recuperación deje de aparecer en s-home.
+    if (typeof clearPendingAnalysis === 'function') clearPendingAnalysis();
+
     // ── Persistir SIEMPRE al backend al aceptar (durabilidad) ─────────────────
     // Antes el caso solo llegaba al backend si el usuario pulsaba Explica/Plan
     // simple/Seguimiento. Si no, vivía solo en localStorage → se perdía al
@@ -13583,6 +13937,20 @@ async function analyzeWithAI() {
     }
 
     var data = await res.json();
+    // Envío con éxito: el borrador ya no hace falta → lo limpiamos antes de
+    // navegar. (NO se limpia en el catch: ahí queremos conservarlo para reintentar.)
+    if (typeof clearAnamDraft === 'function') clearAnamDraft();
+    // Análisis pendiente (Part B 2026-05-25): persistir el resultado YA pagado
+    // antes de pintar/navegar. Si el usuario cierra la app antes de "Aceptar
+    // plan", podrá recuperarlo desde s-home sin pagar otra vez los 3 tokens.
+    if (typeof savePendingAnalysis === 'function') {
+      savePendingAnalysis({
+        anamnesis:    window._lastAnamnesisData || null,
+        analysisText: data.analysis || '',
+        sources:      data.sources  || [],
+        dogName:      dogName || ''
+      });
+    }
     fillABCScreen(dogName, data.analysis, data.sources || []);
     goTo('s-abc');
     fetchBalance(); // refresh token count after deduction
@@ -14377,6 +14745,13 @@ document.addEventListener('keydown', function(e) {
 function logout() {
   if (!confirm(_i18nText('menu_logout_confirm', '¿Seguro que quieres cerrar sesión?'))) return;
   try {
+    // Borrador de anamnesis: cancelar el debounce pendiente + borrar la clave
+    // ANTES del sweep (si no, un _saveAnamDraftNow en cola podría re-crearla).
+    if (typeof clearAnamDraft === 'function') clearAnamDraft();
+    // Análisis pendiente (Part B): borrado explícito. El sweep dm_* de abajo
+    // también lo cubre, pero dejamos esta llamada para claridad y como red de
+    // seguridad si en el futuro el sweep se vuelve más selectivo.
+    if (typeof clearPendingAnalysis === 'function') clearPendingAnalysis();
     // Auth + role
     localStorage.removeItem('dm_jwt');
     localStorage.removeItem('dm_role');
@@ -15910,6 +16285,18 @@ function endTourIntro() {
       // Refine
       refine_title: 'IA Analítica',
       refine_sub:   'by Teo Mariscal · Refinamiento del plan',
+      // Anamnesis draft (Part A): retomar borrador sin enviar
+      anam_resume_title:           'Tienes una consulta sin terminar.',
+      anam_resume_sub:             'Guardamos lo que escribiste en este dispositivo.',
+      anam_resume_continue:        'Continuar',
+      anam_resume_discard:         'Descartar',
+      anam_resume_discard_confirm: '¿Descartar la consulta sin terminar?',
+      // Pending analysis (Part B): análisis ya pagado, sin aceptar
+      pending_analysis_title:           'Tienes un análisis sin terminar.',
+      pending_analysis_sub:             'Lo recuperamos en este dispositivo, sin volver a cobrar.',
+      pending_analysis_view:            'Ver',
+      pending_analysis_discard:         'Descartar',
+      pending_analysis_discard_confirm: '¿Descartar el análisis sin terminar? No podrás recuperarlo después.',
     },
     en: {
       // Anamnesis
@@ -16742,6 +17129,18 @@ function endTourIntro() {
       // Refine
       refine_title: 'Analytical AI',
       refine_sub:   'by Teo Mariscal · Plan refinement',
+      // Anamnesis draft (Part A): resume unfinished form
+      anam_resume_title:           'You have an unfinished consultation.',
+      anam_resume_sub:             'We saved what you wrote on this device.',
+      anam_resume_continue:        'Continue',
+      anam_resume_discard:         'Discard',
+      anam_resume_discard_confirm: 'Discard the unfinished consultation?',
+      // Pending analysis (Part B): paid analysis, not yet accepted
+      pending_analysis_title:           'You have an unfinished analysis.',
+      pending_analysis_sub:             'Recovered on this device — no extra charge.',
+      pending_analysis_view:            'View',
+      pending_analysis_discard:         'Discard',
+      pending_analysis_discard_confirm: 'Discard the unfinished analysis? You won\'t be able to recover it later.',
     }
   };
 

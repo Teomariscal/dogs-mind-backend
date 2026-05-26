@@ -7516,6 +7516,9 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
         <button id="btn-full-analysis" onclick="goTo('s-full-analysis')" style="width:100%;padding:15px;border:none;border-radius:100px;background:#c8962a;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.02em;" data-i18n="abc_btn_full">Análisis completo &#8594;</button>
         <button class="btn-outline" onclick="goTo('s-anamnesis')" data-i18n="abc_btn_new">Nuevo análisis</button>
       </div>
+
+      <!-- Disclaimer App Store / GDPR (no sustituye veterinario) -->
+      <p style="margin:18px 16px 0;font-size:11px;line-height:1.55;color:rgba(0,0,0,0.55);font-style:italic;text-align:center;" data-i18n="analysis_footer_disclaimer">Análisis generado por IA basado en la información que has proporcionado. Puede contener errores. No sustituye consulta presencial con etólogo o veterinario titulado.</p>
     </div>
   </div>
 
@@ -7538,9 +7541,12 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
     </div>
 
     <!-- CTA igual que en ABC -->
-    <div style="padding:0 16px 40px;">
+    <div style="padding:0 16px 12px;">
       <button class="btn-orange" onclick="generateInterventionPlan()" style="width:100%;padding:15px;border:none;border-radius:100px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;" data-i18n="abc_btn_plan">Ver Plan de Intervención</button>
     </div>
+
+    <!-- Disclaimer App Store / GDPR (no sustituye veterinario) -->
+    <p style="margin:0 16px 32px;font-size:11px;line-height:1.55;color:rgba(0,0,0,0.55);font-style:italic;text-align:center;" data-i18n="analysis_footer_disclaimer">Análisis generado por IA basado en la información que has proporcionado. Puede contener errores. No sustituye consulta presencial con etólogo o veterinario titulado.</p>
   </div>
 
   <!-- ══ S4: TRACKING ══ -->
@@ -7596,6 +7602,9 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
       <button onclick="goTo('s-anamnesis')" style="width:100%;padding:16px;border:2px solid #4a6741;border-radius:100px;background:transparent;color:#4a6741;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.02em;" data-i18n="tracking_second">Pedir segunda opinión</button>
       <!-- Plan sencillo / Pet Owners — outline cyan (tech accent del área pro) -->
       <button class="cm-btn-secondary cm-btn-cyan-outline cm-btn-block" style="padding:16px;font-size:15px;" onclick="onPlanSimple()" data-i18n="tracking_simple_plan">Plan sencillo · Pet Owners</button>
+
+      <!-- Disclaimer App Store / GDPR (no sustituye veterinario) -->
+      <p style="margin:14px 0 0;font-size:11px;line-height:1.55;color:rgba(0,0,0,0.55);font-style:italic;text-align:center;" data-i18n="analysis_footer_disclaimer">Análisis generado por IA basado en la información que has proporcionado. Puede contener errores. No sustituye consulta presencial con etólogo o veterinario titulado.</p>
     </div>
 
   </div>
@@ -8209,7 +8218,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
         <label for="reg-accept" style="display:flex;align-items:flex-start;gap:10px;margin-top:8px;cursor:pointer;font-size:12px;color:var(--text2);line-height:1.55;">
           <input type="checkbox" id="reg-accept" required style="width:18px;height:18px;flex-shrink:0;margin-top:2px;cursor:pointer;accent-color:var(--green);">
           <span data-i18n="form_consent_html">
-            He leído y acepto la <a onclick="event.stopPropagation();goTo('s-privacy')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Política de Privacidad</a> y los <a onclick="event.stopPropagation();goTo('s-terms')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Términos de Servicio</a>. Consiento el tratamiento de mis datos personales (email, teléfono) para los fines descritos.
+            He leído y acepto la <a onclick="event.stopPropagation();goTo('s-privacy')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Política de Privacidad</a> y los <a onclick="event.stopPropagation();goTo('s-terms')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Términos de Servicio</a>. Consiento el tratamiento de mis datos personales (email, teléfono) y entiendo que el texto que escriba sobre mi perro (anamnesis, conversaciones) se enviará a <strong>Anthropic (Claude AI, USA)</strong> para generar los análisis. Sin este consentimiento la app no puede generar análisis.
           </span>
         </label>
 
@@ -15534,10 +15543,15 @@ function endTourIntro() {
       pp_l3_3:                 'Mejorar la calidad del servicio (análisis de uso agregado, sin identificarte).',
       pp_l3_4:                 'Enviarte comunicaciones relacionadas con tu cuenta si es necesario.',
       pp_h4:                   '4. Terceros que intervienen',
-      pp_l4_1:                 '<strong style="color:var(--text);">Anthropic</strong> — procesa el texto de los análisis e IA conversacional. <a href="https://www.anthropic.com/privacy" target="_blank" style="color:var(--green);">Su política de privacidad →</a>',
-      pp_l4_2:                 '<strong style="color:var(--text);">Railway</strong> — alojamiento del servidor y base de datos en Europa.',
-      pp_l4_3:                 '<strong style="color:var(--text);">Qdrant</strong> — base de conocimiento vectorial (textos clínicos, sin datos de usuarios).',
-      pp_l4_4:                 '<strong style="color:var(--text);">Plausible Analytics</strong> — analítica web sin cookies y sin datos personales. <a href="https://plausible.io/privacy" target="_blank" style="color:var(--green);">Su política →</a>',
+      pp_l4_1:                 '<strong style="color:var(--text);">Anthropic</strong> (USA) — IA clínica (Claude Sonnet) y avatares (Claude Haiku). Recibe el texto de la anamnesis y las conversaciones para generar respuestas. <a href="https://www.anthropic.com/privacy" target="_blank" style="color:var(--green);">Su política →</a>',
+      pp_l4_2:                 '<strong style="color:var(--text);">Voyage AI</strong> (USA) — embeddings vectoriales para RAG. NO recibe tus datos; sólo procesa el corpus clínico interno. <a href="https://www.voyageai.com/privacy" target="_blank" style="color:var(--green);">Su política →</a>',
+      pp_l4_3:                 '<strong style="color:var(--text);">Qdrant Cloud</strong> (UE) — almacenamiento vectorial del corpus clínico. NO guarda datos de usuarios.',
+      pp_l4_4:                 '<strong style="color:var(--text);">Railway</strong> (UE) — alojamiento del backend y base de datos PostgreSQL donde residen tu cuenta y los registros de pago. <a href="https://railway.com/legal/privacy" target="_blank" style="color:var(--green);">Su política →</a>',
+      pp_l4_5:                 '<strong style="color:var(--text);">Netlify</strong> (USA, CDN global) — hosting del frontend. Sirve archivos estáticos; no procesa tus datos personales.',
+      pp_l4_6:                 '<strong style="color:var(--text);">Resend</strong> (USA) — email transaccional (recuperación de contraseña). Recibe tu email y el contenido del mensaje. <a href="https://resend.com/legal/privacy-policy" target="_blank" style="color:var(--green);">Su política →</a>',
+      pp_l4_7:                 '<strong style="color:var(--text);">Plausible Analytics</strong> (UE) — analítica web sin cookies y sin datos personales. <a href="https://plausible.io/privacy" target="_blank" style="color:var(--green);">Su política →</a>',
+      pp_l4_8:                 '<strong style="color:var(--text);">Stripe</strong> (USA/UE) — pagos en web. Los datos de tu tarjeta NO pasan por nuestros servidores; los gestiona Stripe directamente. <a href="https://stripe.com/privacy" target="_blank" style="color:var(--green);">Su política →</a>',
+      pp_l4_9:                 '<strong style="color:var(--text);">Apple</strong> (USA/UE) — In-App Purchase en iOS cuando aplique. Los pagos en App Store los gestiona Apple. <a href="https://www.apple.com/legal/privacy/es-ww/" target="_blank" style="color:var(--green);">Su política →</a>',
       pp_h5:                   '5. Cuánto tiempo guardamos tus datos',
       pp_p5:                   'Conservamos tus datos personales (email, teléfono, contraseña) mientras tu cuenta esté activa. Puedes eliminar tu cuenta directamente en la app desde <em>Mis Tokens → Eliminar mi cuenta</em>, o exportar todos tus datos en JSON desde <em>Mis Tokens → Descargar mis datos</em>. Tras eliminar la cuenta, los registros de pago se conservan anonimizados durante 4 años por requisito fiscal español (Ley 58/2003 General Tributaria).',
       pp_h_lawful:             '4b. Base legal del tratamiento (RGPD)',
@@ -16230,7 +16244,7 @@ function endTourIntro() {
       form_submit:           'Crear mi cuenta →',
       form_terms_pre:        'Al registrarte aceptas nuestra ',
       form_terms_link:       'Política de Privacidad',
-      form_consent_html:     'He leído y acepto la <a onclick="event.stopPropagation();goTo(\'s-privacy\')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Política de Privacidad</a> y los <a onclick="event.stopPropagation();goTo(\'s-terms\')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Términos de Servicio</a>. Consiento el tratamiento de mis datos personales (email, teléfono) para los fines descritos.',
+      form_consent_html:     'He leído y acepto la <a onclick="event.stopPropagation();goTo(\'s-privacy\')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Política de Privacidad</a> y los <a onclick="event.stopPropagation();goTo(\'s-terms\')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Términos de Servicio</a>. Consiento el tratamiento de mis datos personales (email, teléfono) y entiendo que el texto que escriba sobre mi perro (anamnesis, conversaciones) se enviará a <strong>Anthropic (Claude AI, USA)</strong> para generar los análisis. Sin este consentimiento la app no puede generar análisis.',
       form_err_required:     'Por favor introduce tu email y una contraseña.',
       form_err_password_short:'La contraseña debe tener al menos 6 caracteres.',
       form_err_terms:        'Para crear tu cuenta debes aceptar la Política de Privacidad y los Términos de Servicio.',
@@ -16285,6 +16299,8 @@ function endTourIntro() {
       // Refine
       refine_title: 'IA Analítica',
       refine_sub:   'by Teo Mariscal · Refinamiento del plan',
+      // Disclaimer general en pantallas de análisis (App Store + GDPR + medical-adjacent)
+      analysis_footer_disclaimer: 'Análisis generado por IA basado en la información que has proporcionado. Puede contener errores. No sustituye consulta presencial con etólogo o veterinario titulado.',
       // Anamnesis draft (Part A): retomar borrador sin enviar
       anam_resume_title:           'Tienes una consulta sin terminar.',
       anam_resume_sub:             'Guardamos lo que escribiste en este dispositivo.',
@@ -17074,7 +17090,7 @@ function endTourIntro() {
       form_submit:           'Create my account →',
       form_terms_pre:        'By registering you accept our ',
       form_terms_link:       'Privacy Policy',
-      form_consent_html:     'I have read and accept the <a onclick="event.stopPropagation();goTo(\'s-privacy\')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Privacy Policy</a> and the <a onclick="event.stopPropagation();goTo(\'s-terms\')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Terms of Service</a>. I consent to the processing of my personal data (email, phone) for the purposes described.',
+      form_consent_html:     'I have read and accept the <a onclick="event.stopPropagation();goTo(\'s-privacy\')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Privacy Policy</a> and the <a onclick="event.stopPropagation();goTo(\'s-terms\')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Terms of Service</a>. I consent to the processing of my personal data (email, phone) and understand that the text I write about my dog (anamnesis, conversations) will be sent to <strong>Anthropic (Claude AI, USA)</strong> to generate the analyses. Without this consent the app cannot generate analyses.',
       form_err_required:     'Please enter your email and a password.',
       form_err_password_short:'Password must be at least 6 characters.',
       form_err_terms:        'To create your account you must accept the Privacy Policy and Terms of Service.',
@@ -17129,6 +17145,8 @@ function endTourIntro() {
       // Refine
       refine_title: 'Analytical AI',
       refine_sub:   'by Teo Mariscal · Plan refinement',
+      // General disclaimer on analysis screens (App Store + GDPR + medical-adjacent)
+      analysis_footer_disclaimer: 'AI-generated analysis based on the information you provided. May contain errors. Does not replace in-person consultation with a licensed veterinary ethologist.',
       // Anamnesis draft (Part A): resume unfinished form
       anam_resume_title:           'You have an unfinished consultation.',
       anam_resume_sub:             'We saved what you wrote on this device.',
@@ -17334,15 +17352,15 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
 
       <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="pp_h4">4. Terceros que intervienen</h3>
       <ul style="margin:0 0 20px;padding-left:18px;color:var(--text2);">
-        <li style="margin-bottom:8px;" data-i18n="pp_l4_1"><strong style="color:var(--text);">Anthropic</strong> — procesa el texto de los análisis e IA conversacional. <a href="https://www.anthropic.com/privacy" target="_blank" style="color:var(--green);">Su política de privacidad →</a></li>
-        <li style="margin-bottom:8px;" data-i18n="pp_l4_2"><strong style="color:var(--text);">Railway</strong> — alojamiento del servidor y base de datos en Europa.</li>
-        <li style="margin-bottom:8px;" data-i18n="pp_l4_3"><strong style="color:var(--text);">Qdrant</strong> — base de conocimiento vectorial (textos clínicos, sin datos de usuarios).</li>
-        <li style="margin-bottom:8px;" data-i18n="pp_l4_4"><strong style="color:var(--text);">Railway</strong> (UE) — backend hosting y base de datos PostgreSQL donde reside tu cuenta y los registros de pago.</li>
-        <li style="margin-bottom:8px;" data-i18n="pp_l4_5"><strong style="color:var(--text);">Netlify</strong> (USA, CDN global) — hosting del frontend de la app.</li>
-        <li style="margin-bottom:8px;" data-i18n="pp_l4_6"><strong style="color:var(--text);">Resend</strong> (USA) — email transaccional (recuperación de contraseña).</li>
-        <li style="margin-bottom:8px;" data-i18n="pp_l4_7"><strong style="color:var(--text);">Plausible Analytics</strong> (UE) — analítica web sin cookies y sin datos personales.</li>
-        <li style="margin-bottom:8px;" data-i18n="pp_l4_8"><strong style="color:var(--text);">Stripe</strong> (USA/UE) — pagos en web; los datos de tarjeta NO pasan por nuestros servidores.</li>
-        <li style="margin-bottom:8px;" data-i18n="pp_l4_9"><strong style="color:var(--text);">Apple</strong> (USA/UE) — In-App Purchase en iOS cuando aplique.</li>
+        <li style="margin-bottom:8px;" data-i18n="pp_l4_1"><strong style="color:var(--text);">Anthropic</strong> (USA) — IA clínica (Claude Sonnet) y avatares (Claude Haiku). Recibe el texto de la anamnesis y las conversaciones para generar respuestas. <a href="https://www.anthropic.com/privacy" target="_blank" style="color:var(--green);">Su política →</a></li>
+        <li style="margin-bottom:8px;" data-i18n="pp_l4_2"><strong style="color:var(--text);">Voyage AI</strong> (USA) — embeddings vectoriales para RAG. NO recibe tus datos; sólo procesa el corpus clínico interno. <a href="https://www.voyageai.com/privacy" target="_blank" style="color:var(--green);">Su política →</a></li>
+        <li style="margin-bottom:8px;" data-i18n="pp_l4_3"><strong style="color:var(--text);">Qdrant Cloud</strong> (UE) — almacenamiento vectorial del corpus clínico. NO guarda datos de usuarios.</li>
+        <li style="margin-bottom:8px;" data-i18n="pp_l4_4"><strong style="color:var(--text);">Railway</strong> (UE) — alojamiento del backend y base de datos PostgreSQL donde residen tu cuenta y los registros de pago. <a href="https://railway.com/legal/privacy" target="_blank" style="color:var(--green);">Su política →</a></li>
+        <li style="margin-bottom:8px;" data-i18n="pp_l4_5"><strong style="color:var(--text);">Netlify</strong> (USA, CDN global) — hosting del frontend. Sirve archivos estáticos; no procesa tus datos personales.</li>
+        <li style="margin-bottom:8px;" data-i18n="pp_l4_6"><strong style="color:var(--text);">Resend</strong> (USA) — email transaccional (recuperación de contraseña). Recibe tu email y el contenido del mensaje. <a href="https://resend.com/legal/privacy-policy" target="_blank" style="color:var(--green);">Su política →</a></li>
+        <li style="margin-bottom:8px;" data-i18n="pp_l4_7"><strong style="color:var(--text);">Plausible Analytics</strong> (UE) — analítica web sin cookies y sin datos personales. <a href="https://plausible.io/privacy" target="_blank" style="color:var(--green);">Su política →</a></li>
+        <li style="margin-bottom:8px;" data-i18n="pp_l4_8"><strong style="color:var(--text);">Stripe</strong> (USA/UE) — pagos en web. Los datos de tu tarjeta NO pasan por nuestros servidores; los gestiona Stripe directamente. <a href="https://stripe.com/privacy" target="_blank" style="color:var(--green);">Su política →</a></li>
+        <li style="margin-bottom:8px;" data-i18n="pp_l4_9"><strong style="color:var(--text);">Apple</strong> (USA/UE) — In-App Purchase en iOS cuando aplique. Los pagos en App Store los gestiona Apple. <a href="https://www.apple.com/legal/privacy/es-ww/" target="_blank" style="color:var(--green);">Su política →</a></li>
       </ul>
 
       <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="pp_h_lawful">4b. Base legal del tratamiento (RGPD)</h3>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="index, follow">
+  <title>Privacy Policy · The Dogs Mind</title>
+  <meta name="description" content="The Dogs Mind privacy policy — what data we collect, how we use it, and your rights under GDPR and CCPA.">
+  <link rel="icon" href="/icons/icon-192x192.png">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;}
+    html{-webkit-text-size-adjust:100%;}
+    body{
+      margin:0;padding:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:16px;line-height:1.65;
+      color:#1a1a1a;background:#fafaf7;
+    }
+    .wrap{max-width:760px;margin:0 auto;padding:32px 22px 80px;}
+    .langbar{
+      display:flex;justify-content:flex-end;gap:8px;
+      margin-bottom:24px;padding-bottom:16px;
+      border-bottom:1px solid rgba(0,0,0,0.08);
+    }
+    .langbtn{
+      padding:7px 14px;font-size:13px;font-weight:600;
+      border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:#444;
+      border-radius:100px;cursor:pointer;
+      font-family:inherit;letter-spacing:0.3px;
+    }
+    .langbtn.active{background:#4a6741;color:#fff;border-color:#4a6741;}
+    .langbtn:hover{background:#eef0ec;}
+    .langbtn.active:hover{background:#3c5634;}
+    h1{
+      font-family:Georgia,"Times New Roman",serif;
+      font-weight:600;font-size:36px;line-height:1.2;
+      margin:0 0 6px;color:#1a1a1a;
+    }
+    .subtitle{
+      font-size:13.5px;color:#777;margin:0 0 22px;
+      letter-spacing:0.2px;
+    }
+    .intro{font-size:16.5px;color:#333;margin:0 0 28px;}
+    h2{
+      font-family:Georgia,"Times New Roman",serif;
+      font-weight:600;font-size:22px;line-height:1.3;
+      margin:32px 0 12px;color:#1a1a1a;
+    }
+    p{margin:0 0 14px;}
+    ul{margin:0 0 18px;padding-left:22px;}
+    li{margin-bottom:9px;}
+    a{color:#4a6741;text-decoration:underline;}
+    a:hover{color:#3c5634;}
+    strong{color:#1a1a1a;font-weight:600;}
+    em{font-style:italic;color:#444;}
+    .box{
+      background:#fff;border:1px solid rgba(74,103,65,0.18);
+      border-radius:12px;padding:18px 20px;
+      margin-top:36px;
+    }
+    .box-label{
+      font-size:11px;font-weight:700;letter-spacing:1.2px;
+      text-transform:uppercase;color:#4a6741;margin-bottom:8px;
+    }
+    .box-text{font-size:14px;color:#333;margin:0;}
+    .footer{
+      margin-top:48px;padding-top:20px;
+      border-top:1px solid rgba(0,0,0,0.08);
+      font-size:12.5px;color:#888;text-align:center;
+    }
+    .footer a{color:#4a6741;text-decoration:none;}
+    .footer a:hover{text-decoration:underline;}
+    /* Switcher de idioma: por defecto se ve ES y se oculta EN. Cuando html lang="en",
+       se ve EN y se oculta ES. IMPORTANTE: scope a section[lang=...] para NO impactar
+       al propio elemento <html lang=...>, que si se ve afectado colapsa la página. */
+    section[lang="en"]{display:none;}
+    html[lang="en"] section[lang="en"]{display:block;}
+    html[lang="en"] section[lang="es"]{display:none;}
+    @media print{
+      .langbar{display:none;}
+      body{background:#fff;color:#000;}
+      a{color:#000;text-decoration:underline;}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <div class="langbar" role="tablist" aria-label="Language selector">
+      <button type="button" class="langbtn active" data-lang="es" onclick="setLang('es')" aria-pressed="true">Español</button>
+      <button type="button" class="langbtn" data-lang="en" onclick="setLang('en')" aria-pressed="false">English</button>
+    </div>
+
+    <!-- ── ES ── -->
+    <section lang="es">
+      <h1>Política de Privacidad</h1>
+      <p class="subtitle">Dogs Mind · Última actualización: abril 2026</p>
+      <p class="intro">Esta política explica qué datos recogemos, cómo los usamos y cómo los protegemos cuando usas Dogs Mind.</p>
+
+      <h2>1. Quién es el responsable</h2>
+      <p>The Dogs Mind es un servicio operado por <strong>Teodoro Mariscal Diaz</strong>, especialista en conducta canina con más de 25 años de experiencia, con domicilio en Perales 15, 28609 Villamantilla, España. Para asuntos de privacidad y datos personales escríbenos a <a href="mailto:privacy@thedogsmind.net">privacy@thedogsmind.net</a>. Soporte general: <a href="mailto:info@thedogsmind.net">info@thedogsmind.net</a>.</p>
+
+      <h2>2. Qué datos recogemos</h2>
+      <ul>
+        <li><strong>Cuenta:</strong> email, contraseña (encriptada con bcrypt) y, opcionalmente, número de teléfono. Nunca vemos tu contraseña en claro.</li>
+        <li><strong>Datos de tu perro:</strong> nombre, raza, edad, historial conductual que introduces en los formularios.</li>
+        <li><strong>Conversaciones:</strong> los mensajes que envías a los Aigents y los análisis generados.</li>
+        <li><strong>Uso:</strong> páginas visitadas y acciones dentro de la app (a través de Plausible Analytics, sin cookies).</li>
+        <li><strong>Errores técnicos:</strong> logs automáticos si algo falla en la app, sin datos personales.</li>
+      </ul>
+
+      <h2>3. Para qué usamos tus datos</h2>
+      <ul>
+        <li>Generar análisis conductuales y planes de intervención mediante IA.</li>
+        <li>Gestionar tu cuenta y tus tokens.</li>
+        <li>Mejorar la calidad del servicio (análisis de uso agregado, sin identificarte).</li>
+        <li>Enviarte comunicaciones relacionadas con tu cuenta si es necesario.</li>
+      </ul>
+
+      <h2>4. Terceros que intervienen</h2>
+      <ul>
+        <li><strong>Anthropic</strong> (USA) — IA clínica (Claude Sonnet) y avatares (Claude Haiku). Recibe el texto de la anamnesis y las conversaciones para generar respuestas. <a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener">Su política →</a></li>
+        <li><strong>Voyage AI</strong> (USA) — embeddings vectoriales para RAG. NO recibe tus datos; sólo procesa el corpus clínico interno. <a href="https://www.voyageai.com/privacy" target="_blank" rel="noopener">Su política →</a></li>
+        <li><strong>Qdrant Cloud</strong> (UE) — almacenamiento vectorial del corpus clínico. NO guarda datos de usuarios.</li>
+        <li><strong>Railway</strong> (UE) — alojamiento del backend y base de datos PostgreSQL donde residen tu cuenta y los registros de pago. <a href="https://railway.com/legal/privacy" target="_blank" rel="noopener">Su política →</a></li>
+        <li><strong>Netlify</strong> (USA, CDN global) — hosting del frontend. Sirve archivos estáticos; no procesa tus datos personales.</li>
+        <li><strong>Resend</strong> (USA) — email transaccional (recuperación de contraseña). Recibe tu email y el contenido del mensaje. <a href="https://resend.com/legal/privacy-policy" target="_blank" rel="noopener">Su política →</a></li>
+        <li><strong>Plausible Analytics</strong> (UE) — analítica web sin cookies y sin datos personales. <a href="https://plausible.io/privacy" target="_blank" rel="noopener">Su política →</a></li>
+        <li><strong>Stripe</strong> (USA/UE) — pagos en web. Los datos de tu tarjeta NO pasan por nuestros servidores; los gestiona Stripe directamente. <a href="https://stripe.com/privacy" target="_blank" rel="noopener">Su política →</a></li>
+        <li><strong>Apple</strong> (USA/UE) — In-App Purchase en iOS cuando aplique. Los pagos en App Store los gestiona Apple. <a href="https://www.apple.com/legal/privacy/es-ww/" target="_blank" rel="noopener">Su política →</a></li>
+      </ul>
+
+      <h2>4b. Base legal del tratamiento (RGPD)</h2>
+      <p>Tratamos tus datos personales basándonos en (a) <strong>tu consentimiento</strong> al registrarte y aceptar esta política, (b) <strong>la ejecución del contrato</strong> de servicio (gestión de la cuenta, entrega de análisis y planes), y (c) <strong>interés legítimo</strong> en mejorar la calidad del servicio, prevenir fraudes y mantener la seguridad. Puedes retirar tu consentimiento en cualquier momento eliminando tu cuenta.</p>
+
+      <h2>5. Cuánto tiempo guardamos tus datos</h2>
+      <p>Conservamos tus datos personales (email, teléfono, contraseña) mientras tu cuenta esté activa. Puedes eliminar tu cuenta directamente en la app desde <em>Mis Tokens → Eliminar mi cuenta</em>, o exportar todos tus datos en JSON desde <em>Mis Tokens → Descargar mis datos</em>. Tras eliminar la cuenta, los registros de pago se conservan anonimizados durante 4 años por requisito fiscal español (Ley 58/2003 General Tributaria).</p>
+
+      <h2>6. Tus derechos (RGPD)</h2>
+      <p>Si resides en la UE tienes derecho a:</p>
+      <ul>
+        <li>Acceder a tus datos.</li>
+        <li>Rectificarlos si son incorrectos.</li>
+        <li>Solicitar su eliminación.</li>
+        <li>Oponerte a su tratamiento.</li>
+        <li>Presentar una reclamación ante la autoridad de protección de datos de tu país.</li>
+      </ul>
+      <p>Para ejercer cualquiera de estos derechos escríbenos a <a href="mailto:info@thedogsmind.net">info@thedogsmind.net</a>.</p>
+
+      <h2>6b. Residentes de California (CCPA/CPRA)</h2>
+      <p>Si resides en California (EE. UU.) tienes derechos adicionales: (a) saber qué información personal recogemos sobre ti y con quién la compartimos, (b) eliminar tu información personal, (c) corregir información inexacta, (d) limitar el uso de información sensible, y (e) no ser discriminado por ejercer estos derechos. <strong>NO vendemos ni compartimos tu información personal con fines publicitarios.</strong> Para ejercer estos derechos contacta con <a href="mailto:privacy@thedogsmind.net">privacy@thedogsmind.net</a>.</p>
+
+      <h2>7. Seguridad</h2>
+      <p>Todas las conexiones van cifradas con HTTPS. Las contraseñas se almacenan con hash bcrypt. Nunca vendemos ni compartimos tus datos con terceros con fines comerciales.</p>
+
+      <h2>8. Cambios en esta política</h2>
+      <p>Si realizamos cambios relevantes te lo comunicaremos dentro de la app. La fecha de la última actualización siempre aparece en el encabezado de esta página.</p>
+
+      <div class="box">
+        <div class="box-label">¿Alguna duda?</div>
+        <p class="box-text">Escríbenos a <a href="mailto:info@thedogsmind.net">info@thedogsmind.net</a> — respondemos en menos de 48 horas.</p>
+      </div>
+    </section>
+
+    <!-- ── EN ── -->
+    <section lang="en">
+      <h1>Privacy Policy</h1>
+      <p class="subtitle">Dogs Mind · Last updated: April 2026</p>
+      <p class="intro">This policy explains what data we collect, how we use it and how we protect it when you use Dogs Mind.</p>
+
+      <h2>1. Who is responsible</h2>
+      <p>The Dogs Mind is a service operated by <strong>Teodoro Mariscal Diaz</strong>, canine behavior specialist with over 25 years of experience, registered at Perales 15, 28609 Villamantilla, Spain. For privacy and data matters write to <a href="mailto:privacy@thedogsmind.net">privacy@thedogsmind.net</a>. General support: <a href="mailto:info@thedogsmind.net">info@thedogsmind.net</a>.</p>
+
+      <h2>2. What data we collect</h2>
+      <ul>
+        <li><strong>Account:</strong> email, password (bcrypt-hashed) and, optionally, phone number. We never see your password in plaintext.</li>
+        <li><strong>Your dog&rsquo;s data:</strong> name, breed, age, behavioral history you enter in the forms.</li>
+        <li><strong>Conversations:</strong> messages you send to the Aigents and the analyses generated.</li>
+        <li><strong>Usage:</strong> pages visited and actions inside the app (via Plausible Analytics, no cookies).</li>
+        <li><strong>Technical errors:</strong> automatic logs if something fails in the app, no personal data.</li>
+      </ul>
+
+      <h2>3. How we use your data</h2>
+      <ul>
+        <li>Generate behavioral analyses and intervention plans through AI.</li>
+        <li>Manage your account and tokens.</li>
+        <li>Improve service quality (aggregate usage analytics, without identifying you).</li>
+        <li>Send communications related to your account when needed.</li>
+      </ul>
+
+      <h2>4. Third parties involved</h2>
+      <ul>
+        <li><strong>Anthropic</strong> (USA) — clinical AI (Claude Sonnet) and avatars (Claude Haiku). Receives the anamnesis text and conversations to generate responses. <a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener">Their policy →</a></li>
+        <li><strong>Voyage AI</strong> (USA) — vector embeddings for RAG. Does NOT receive user data; only processes the internal clinical corpus. <a href="https://www.voyageai.com/privacy" target="_blank" rel="noopener">Their policy →</a></li>
+        <li><strong>Qdrant Cloud</strong> (EU) — vector storage of the clinical corpus. Does NOT store user data.</li>
+        <li><strong>Railway</strong> (EU) — backend hosting and PostgreSQL database that stores your account and payment records. <a href="https://railway.com/legal/privacy" target="_blank" rel="noopener">Their policy →</a></li>
+        <li><strong>Netlify</strong> (USA, global CDN) — frontend hosting. Serves static files; does not process your personal data.</li>
+        <li><strong>Resend</strong> (USA) — transactional email (password recovery). Receives your email and the message content. <a href="https://resend.com/legal/privacy-policy" target="_blank" rel="noopener">Their policy →</a></li>
+        <li><strong>Plausible Analytics</strong> (EU) — cookie-less web analytics with no personal data. <a href="https://plausible.io/privacy" target="_blank" rel="noopener">Their policy →</a></li>
+        <li><strong>Stripe</strong> (USA/EU) — web payments. Card data does NOT pass through our servers; Stripe handles it directly. <a href="https://stripe.com/privacy" target="_blank" rel="noopener">Their policy →</a></li>
+        <li><strong>Apple</strong> (USA/EU) — In-App Purchase on iOS where applicable. App Store payments are handled by Apple. <a href="https://www.apple.com/legal/privacy/en-ww/" target="_blank" rel="noopener">Their policy →</a></li>
+      </ul>
+
+      <h2>4b. Legal basis for processing (GDPR)</h2>
+      <p>We process your personal data based on (a) <strong>your consent</strong> upon registration and acceptance of this policy, (b) <strong>contract performance</strong> (account management, delivery of analyses and plans), and (c) <strong>legitimate interest</strong> in improving service quality, preventing fraud, and maintaining security. You can withdraw consent at any time by deleting your account.</p>
+
+      <h2>5. How long we keep your data</h2>
+      <p>We keep your personal data (email, phone, password) while your account is active. You can delete your account directly in-app from <em>My Tokens → Delete my account</em>, or export all your data as JSON from <em>My Tokens → Download my data</em>. After account deletion, payment records are kept anonymized for 4 years per Spanish tax law (Law 58/2003).</p>
+
+      <h2>6. Your rights (GDPR)</h2>
+      <p>If you reside in the EU you have the right to:</p>
+      <ul>
+        <li>Access your data.</li>
+        <li>Rectify it if incorrect.</li>
+        <li>Request its deletion.</li>
+        <li>Object to its processing.</li>
+        <li>File a complaint with the data protection authority of your country.</li>
+      </ul>
+      <p>To exercise any of these rights write us at <a href="mailto:info@thedogsmind.net">info@thedogsmind.net</a>.</p>
+
+      <h2>6b. California residents (CCPA/CPRA)</h2>
+      <p>If you reside in California (USA) you have additional rights: (a) to know what personal information we collect about you and with whom we share it, (b) to delete your personal information, (c) to correct inaccurate information, (d) to limit the use of sensitive information, and (e) not to be discriminated against for exercising these rights. <strong>We do NOT sell or share your personal information for advertising purposes.</strong> To exercise these rights contact us at <a href="mailto:privacy@thedogsmind.net">privacy@thedogsmind.net</a>.</p>
+
+      <h2>7. Security</h2>
+      <p>All connections are encrypted with HTTPS. Passwords are stored with bcrypt hash. We never sell or share your data with third parties for commercial purposes.</p>
+
+      <h2>8. Changes to this policy</h2>
+      <p>If we make significant changes we will notify you within the app. The last update date always appears in the header of this page.</p>
+
+      <div class="box">
+        <div class="box-label">Any questions?</div>
+        <p class="box-text">Write us at <a href="mailto:info@thedogsmind.net">info@thedogsmind.net</a> — we reply within 48 hours.</p>
+      </div>
+    </section>
+
+    <div class="footer">
+      <a href="/">← The Dogs Mind</a> &nbsp;·&nbsp;
+      <a href="/terms.html">Terms of Service</a>
+    </div>
+
+  </div>
+
+  <script>
+    (function(){
+      function detect(){
+        try{
+          var s = (localStorage.getItem('dm_lang') || '').toLowerCase();
+          if (s === 'es' || s === 'en') return s;
+        }catch(e){}
+        var n = (navigator.language || navigator.userLanguage || 'es').toLowerCase();
+        return n.indexOf('es') === 0 ? 'es' : 'en';
+      }
+      window.setLang = function(lang){
+        if (lang !== 'es' && lang !== 'en') lang = 'es';
+        document.documentElement.setAttribute('lang', lang);
+        try{ localStorage.setItem('dm_lang', lang); }catch(e){}
+        document.querySelectorAll('.langbtn').forEach(function(b){
+          var active = b.getAttribute('data-lang') === lang;
+          b.classList.toggle('active', active);
+          b.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+        document.title = (lang === 'en') ? 'Privacy Policy · The Dogs Mind' : 'Política de Privacidad · The Dogs Mind';
+      };
+      setLang(detect());
+    })();
+  </script>
+</body>
+</html>

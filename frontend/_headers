@@ -28,6 +28,14 @@
 /teo-mariscal-v3.html
   Cache-Control: no-cache, must-revalidate
 
+# ─── Páginas legales (App Store Connect requiere URL pública estable) ──────
+# privacy.html y terms.html son HTML estáticos independientes de la SPA.
+# Apple revisores las abren directamente; deben servirse siempre frescas.
+/privacy.html
+  Cache-Control: no-cache, must-revalidate
+/terms.html
+  Cache-Control: no-cache, must-revalidate
+
 # ─── Service Worker — crítico ──────────────────────────────────────────────
 # El navegador no debe cachear el SW más de 0 segundos. Esto garantiza que
 # detecta versiones nuevas del SW al instante (lo que dispara skipWaiting +

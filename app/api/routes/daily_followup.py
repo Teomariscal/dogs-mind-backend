@@ -96,6 +96,14 @@ class DailyFollowupTodayResponse(BaseModel):
     current_badge: Optional[str]
     exercises: list[ExerciseDTO]
     theory_question: TheoryQuestionDTO
+    # Respuestas del usuario si el día ya está completado (None en placeholder
+    # pendiente). Añadidos 2026-05-27 para que el frontend pueda rehidratar
+    # chips/textareas al re-entrar al check-in completado — antes el usuario
+    # veía los ejercicios "como si no los hubiera rellenado" porque la
+    # response no incluía sus respuestas y `loadToday` reseteaba
+    # `_state.results` a objetos vacíos.
+    exercises_results: Optional[list[dict]] = None
+    theory_answer_index: Optional[int] = None
 
 
 class ExerciseResultIn(BaseModel):
@@ -509,17 +517,28 @@ def _today_response_from_entry(
         )
 
     day_index = _compute_day_index(case.id, db, today)
+
+    # Si el día ya está completado, devolver también las respuestas que dio
+    # el usuario para que el frontend rehidrate la UI (chips marcados,
+    # textareas con texto, opción de teoría seleccionada). Si la entry es
+    # un placeholder pendiente, ambos campos van como None.
+    completed = bool(entry.is_complete)
+    results_payload = entry.exercises_results if completed else None
+    theory_answer  = entry.theory_answer_index if completed else None
+
     return DailyFollowupTodayResponse(
         case_id=str(case.id),
         daily_followup_enabled=bool(case.daily_followup_enabled),
         day_index=day_index,
-        already_completed_today=bool(entry.is_complete),
+        already_completed_today=completed,
         in_recovery=bool(case.in_recovery),
         current_streak=case.current_streak or 0,
         longest_streak=case.longest_streak or 0,
         current_badge=case.current_badge,
         exercises=exercises,
         theory_question=theory,
+        exercises_results=results_payload,
+        theory_answer_index=theory_answer,
     )
 
 

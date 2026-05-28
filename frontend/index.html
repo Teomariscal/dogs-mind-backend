@@ -17892,8 +17892,26 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
       }
       var data = await res.json();
       _state.today = data;
-      _state.results = (data.exercises || []).map(function(){ return {}; });
-      _state.theoryAnswer = null;
+      // Si el día ya está completado, rehidratar las respuestas que dio el
+      // usuario para que la UI muestre los chips marcados y los textareas
+      // rellenos (en estado disabled, gestionado por renderExercise con
+      // locked=true). Backend devuelve `exercises_results` y
+      // `theory_answer_index` en este caso (2026-05-27). Para placeholder
+      // pendiente, ambos vienen null → reset a objetos vacíos como antes.
+      if (data.already_completed_today && Array.isArray(data.exercises_results)) {
+        _state.results = (data.exercises || []).map(function(_ex, i){
+          var r = data.exercises_results[i] || {};
+          var out = {};
+          if (typeof r.result_chip_index === 'number') out.result_chip_index = r.result_chip_index;
+          if (r.result_text) out.result_text = r.result_text;
+          return out;
+        });
+      } else {
+        _state.results = (data.exercises || []).map(function(){ return {}; });
+      }
+      _state.theoryAnswer = (typeof data.theory_answer_index === 'number')
+        ? data.theory_answer_index
+        : null;
       _state.revealed = !!data.already_completed_today; // si ya completó, mostrar respuesta directamente
       _show('df-loading', false);
       _show('df-error', false);

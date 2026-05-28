@@ -1329,11 +1329,15 @@ def migrate_legacy_records(
 
     # Pre-cargar legacy_ids ya migrados del usuario para detectar duplicados sin
     # hacer N queries (uno por record).
+    # Mapeo legacy_id → case_id (no solo set) — necesario para que el branch
+    # skipped_duplicate devuelva el case_id del Case existente y el frontend
+    # pueda reparar records huérfanos (con backend_case_id perdido por glitch
+    # de red al aceptar plan, etc.). Fix self-healing 2026-05-28.
     existing_cases = db.query(Case).filter(
         Case.user_id == user.id,
         Case.deleted_at.is_(None),
     ).all()
-    existing_legacy = set()
+    existing_legacy: dict[int, str] = {}
     for c in existing_cases:
         if c.summary_abc is None and c.summary_plan is None and c.title is None:
             continue
@@ -1347,16 +1351,20 @@ def migrate_legacy_records(
                 meta_legacy_id = e.meta["legacy_id"]
                 break
         if meta_legacy_id is not None:
-            existing_legacy.add(meta_legacy_id)
+            existing_legacy[meta_legacy_id] = str(c.id)
 
     active_count = len([c for c in existing_cases if c.deleted_at is None])
     _migrate_limit = _max_cases_for(user)
 
     for rec in payload.records:
-        # 1. Saltar duplicados ya migrados
+        # 1. Saltar duplicados ya migrados — devolver case_id para que el
+        #    frontend pueda reparar records con backend_case_id perdido
+        #    (self-healing de huérfanos, fix 2026-05-28).
         if rec.id in existing_legacy:
             results.append(MigrateResponseItem(
-                legacy_id=rec.id, status="skipped_duplicate",
+                legacy_id=rec.id,
+                case_id=existing_legacy[rec.id],
+                status="skipped_duplicate",
                 detail="Ya migrado en una sincronización anterior."
             ))
             skipped += 1

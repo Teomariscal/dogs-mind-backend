@@ -9958,7 +9958,7 @@ function stepperDown(id) {
 function goTo(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  if (id === 's-records') { renderRecords(); syncBackendCases(); }
+  if (id === 's-records') { renderRecords(); syncBackendCases(); if (typeof reconcileOrphanCases === 'function') reconcileOrphanCases(); }
   if (id === 's-anamnesis' && typeof maybeShowAnamResumeCard === 'function') maybeShowAnamResumeCard();
   if (id === 's-tokens') updateTokensScreen();
   if (id === 's-home') { fetchBalance(); loadDailyTip(); if (typeof maybeShowPendingAnalysisCard === 'function') maybeShowPendingAnalysisCard(); }
@@ -11294,6 +11294,9 @@ async function plSubmit() {
     }
     try { localStorage.setItem('dm_jwt', data.token); } catch(e) {}
     try { if (typeof loadAccountInfo === 'function') await loadAccountInfo(); } catch(e) {}
+    // Reconciliar huérfanos (casos sin backend_case_id por glitch de red al
+    // aceptar plan, etc.). Background, no bloquea el flujo del login.
+    try { if (typeof reconcileOrphanCases === 'function') reconcileOrphanCases(); } catch(e) {}
     if (window._pendingActivatePro && typeof _consumePendingActivatePro === 'function') {
       var consumed = await _consumePendingActivatePro();
       if (consumed) return;
@@ -13018,6 +13021,97 @@ function getVal(id, fallback) {
     } catch(e) { /* red caída u otro: no rompemos la vista local */ }
   }
   window.syncBackendCases = syncBackendCases;
+
+  // ── Reconciliación automática de casos huérfanos (self-healing 2026-05-28) ──
+  // Recorre records locales sin `backend_case_id` (huérfanos por glitch de red
+  // al aceptar plan, casos pre-v152, etc.) e intenta migrarlos al backend de
+  // forma silenciosa. El endpoint /cases/migrate es idempotente: si el caso ya
+  // existe en backend (por anamnesis.meta.legacy_id), devuelve skipped_duplicate
+  // con el case_id existente — el frontend persiste ese case_id y deja de
+  // tratarlo como huérfano (sin duplicar).
+  //
+  // Throttle: una vez por sesión (sessionStorage) y máximo 10 huérfanos por
+  // pasada para no bombardear backend. El resto en siguiente arranque.
+  // Defensivo: errores no interrumpen UX (catch silencioso en cada record).
+  async function reconcileOrphanCases() {
+    try {
+      if (sessionStorage.getItem('dm_reconciled_this_session') === '1') return;
+    } catch(e) {}
+    var jwt = '';
+    try { jwt = localStorage.getItem('dm_jwt') || ''; } catch(e) {}
+    if (!jwt) return;
+
+    var records = getRecords();
+    var orphans = records.filter(function(r){
+      return r && r.id && !r.backend_case_id;
+    });
+    if (!orphans.length) {
+      try { sessionStorage.setItem('dm_reconciled_this_session', '1'); } catch(e) {}
+      return;
+    }
+
+    var quotaToastShown = false;
+    var batch = orphans.slice(0, 10);  // cap para no saturar backend
+    for (var i = 0; i < batch.length; i++) {
+      var rec = batch[i];
+      try {
+        var mres = await fetch(API_BASE + '/cases/migrate', {
+          method: 'POST',
+          headers: Object.assign({'Content-Type':'application/json'}, authHeaders()),
+          body: JSON.stringify({ records: [{
+            id: rec.id,
+            date: rec.date || null,
+            dog_name: rec.dog_name || null,
+            breed: rec.breed || null,
+            dog_age: rec.dog_age || null,
+            problem: rec.problem || null,
+            analysis: rec.analysis || null,
+            plan: rec.plan || null,
+            status: rec.status || 'active',
+            lang: rec.lang || null,
+          }]})
+        });
+        if (!mres.ok) continue;  // 401/5xx → próximo arranque reintentará
+        var mdata = await mres.json();
+        var item = (mdata.results && mdata.results[0]) || null;
+        if (!item) continue;
+        // created o skipped_duplicate → ambos traen case_id ahora (backend fix
+        // 2026-05-28 hace que skipped_duplicate también incluya case_id).
+        if (item.case_id) {
+          try {
+            var recsU = getRecords();
+            var idxU = recsU.findIndex(function(r){ return r.id === rec.id; });
+            if (idxU >= 0 && !recsU[idxU].backend_case_id) {
+              recsU[idxU].backend_case_id = item.case_id;
+              setRecords(recsU);
+            }
+          } catch(e) {}
+        } else if (item.status === 'skipped_quota' && !quotaToastShown) {
+          // Toast 1×sesión solo. El caso queda huérfano hasta que el usuario
+          // borre uno para liberar quota.
+          quotaToastShown = true;
+          try {
+            if (typeof showToast === 'function') {
+              showToast(item.detail || _i18nText('case_quota_full', 'Has alcanzado tu límite de casos. Borra uno para guardar este.'));
+            }
+          } catch(e) {}
+        }
+        // skipped_empty → no es huérfano útil, ignorar.
+      } catch(e) { /* network: próximo arranque */ }
+    }
+
+    try { sessionStorage.setItem('dm_reconciled_this_session', '1'); } catch(e) {}
+
+    // Re-render Records si está visible — para que el banner "Seguimiento
+    // diario" aparezca inmediatamente en los huérfanos recién curados.
+    try {
+      var recScr = document.getElementById('s-records');
+      if (recScr && recScr.classList.contains('active') && typeof renderRecords === 'function') {
+        renderRecords();
+      }
+    } catch(e) {}
+  }
+  window.reconcileOrphanCases = reconcileOrphanCases;
 
   // ── Abrir caso archivado: reusa s-abc / s-tracking / Cecilia handoff ────────
   function openRecord(idx) {

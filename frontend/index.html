@@ -8688,6 +8688,12 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
         <!-- Botones de acción -->
         <button id="dog-save-btn" type="button" onclick="saveDogFromForm()" style="margin-top:18px;width:100%;padding:14px;border:none;border-radius:100px;background:var(--green);color:#fff;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;" data-i18n="dog_save_btn_create">Crear perro</button>
 
+        <!-- Nueva consulta contextual: solo visible en modo 'edit' del perro
+             (la mostramos en openDogProfile y la ocultamos en openCreateDog).
+             Pre-rellena nombre, raza y edad en s-anamnesis vía
+             window._anamnesisPrefillFromDog. 2026-05-28. -->
+        <button id="dog-new-consult-btn" type="button" onclick="startConsultFromDog()" style="margin-top:10px;width:100%;padding:13px;border:2px solid var(--green);border-radius:100px;background:transparent;color:var(--green);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;display:none;">+ Nueva consulta</button>
+
         <button id="dog-delete-btn" type="button" onclick="confirmDeleteDog()" style="margin-top:10px;width:100%;padding:12px;border:1px solid #d05050;border-radius:100px;background:transparent;color:#d05050;font-size:13px;font-family:inherit;cursor:pointer;display:none;" data-i18n="dog_delete_btn">Eliminar perro</button>
 
       </div>
@@ -9960,6 +9966,21 @@ function goTo(id) {
   document.getElementById(id).classList.add('active');
   if (id === 's-records') { renderRecords(); syncBackendCases(); if (typeof reconcileOrphanCases === 'function') reconcileOrphanCases(); }
   if (id === 's-anamnesis' && typeof maybeShowAnamResumeCard === 'function') maybeShowAnamResumeCard();
+  // Pre-fill desde ficha del perro: solo activo si startConsultFromDog() lo seteó.
+  // Aplica únicamente a inputs vacíos para no pisar el borrador (sistema v162).
+  if (id === 's-anamnesis' && window._anamnesisPrefillFromDog) {
+    try {
+      var pf = window._anamnesisPrefillFromDog;
+      var setIfEmpty = function(elId, val) {
+        var el = document.getElementById(elId);
+        if (el && !el.value && val) el.value = val;
+      };
+      setIfEmpty('inp-dog-name', pf.name);
+      setIfEmpty('inp-breed',    pf.breed);
+      setIfEmpty('inp-dog-age',  pf.age);
+    } catch(e) {}
+    window._anamnesisPrefillFromDog = null;
+  }
   if (id === 's-tokens') updateTokensScreen();
   if (id === 's-home') { fetchBalance(); loadDailyTip(); if (typeof maybeShowPendingAnalysisCard === 'function') maybeShowPendingAnalysisCard(); }
   if (id === 's-training') {
@@ -15166,6 +15187,9 @@ function openCreateDog() {
   document.getElementById('dog-delete-btn').style.display = 'none';
   document.getElementById('dog-save-btn').textContent = _i18nText('dog_save_btn_create', 'Crear perro');
   document.getElementById('dog-photo-remove-btn').style.display = 'none';
+  // Botón "+ Nueva consulta": oculto en modo crear (el perro aún no existe).
+  var ncBtnC = document.getElementById('dog-new-consult-btn');
+  if (ncBtnC) ncBtnC.style.display = 'none';
   goTo('s-dog-profile');
 }
 window.openCreateDog = openCreateDog;
@@ -15190,11 +15214,59 @@ async function openDogProfile(dogId) {
     _showDogProfileLoading(false);
     document.getElementById('dog-delete-btn').style.display = 'block';
     document.getElementById('dog-save-btn').textContent = _i18nText('dog_save_btn_edit', 'Guardar cambios');
+    // Botón "+ Nueva consulta para [nombre]": visible solo cuando hay perro
+    // cargado en modo edit. Pre-rellena nombre/raza/edad en s-anamnesis.
+    var ncBtnE = document.getElementById('dog-new-consult-btn');
+    if (ncBtnE) {
+      var dogNameForBtn = (dog && dog.name) ? String(dog.name).trim() : '';
+      var label = _i18nText('dog_new_consult_btn', '+ Nueva consulta');
+      if (dogNameForBtn) {
+        label = _i18nText('dog_new_consult_btn_for', '+ Nueva consulta para {name}')
+                  .replace('{name}', dogNameForBtn);
+      }
+      ncBtnE.textContent = label;
+      ncBtnE.style.display = 'block';
+    }
   } catch (e) {
     _showDogProfileError(true);
   }
 }
 window.openDogProfile = openDogProfile;
+
+// Lanza la consulta desde la ficha del perro: pre-rellena nombre, raza y
+// edad en s-anamnesis. Otros entry-points a s-anamnesis NO se ven afectados
+// porque el prefill se activa solo si window._anamnesisPrefillFromDog está
+// seteado (lo limpiamos tras aplicar). Decisiones UX 2026-05-28:
+//   - Edad calculada desde `birth_year` ("X años" / "X year(s)"); si no hay
+//     birth_year, dejamos el campo vacío.
+//   - El sistema de borrador (v162) tiene prioridad: el prefill solo escribe
+//     en inputs vacíos.
+function startConsultFromDog() {
+  try {
+    var nameEl  = document.getElementById('dog-field-name');
+    var breedEl = document.getElementById('dog-field-breed');
+    var birthEl = document.getElementById('dog-field-birth-year');
+    var name  = nameEl  ? (nameEl.value  || '').trim() : '';
+    var breed = breedEl ? (breedEl.value || '').trim() : '';
+    var birth = birthEl ? parseInt(birthEl.value, 10) : NaN;
+    var age = '';
+    if (!isNaN(birth) && birth >= 1990 && birth <= 2100) {
+      var diff = new Date().getFullYear() - birth;
+      if (diff < 0) diff = 0;
+      var lang = (typeof getCurrentLang === 'function') ? getCurrentLang() : 'es';
+      if (lang === 'en') {
+        age = diff === 1 ? '1 year' : (diff + ' years');
+      } else {
+        age = diff === 1 ? '1 año' : (diff + ' años');
+      }
+    }
+    window._anamnesisPrefillFromDog = { name: name, breed: breed, age: age };
+  } catch(e) {
+    window._anamnesisPrefillFromDog = null;
+  }
+  goTo('s-anamnesis');
+}
+window.startConsultFromDog = startConsultFromDog;
 
 function _showDogProfileLoading(on) {
   document.getElementById('dog-profile-loading').style.display = on ? 'block' : 'none';
@@ -16229,6 +16301,8 @@ function endTourIntro() {
       dog_save_btn_create:         'Crear perro',
       dog_save_btn_edit:           'Guardar cambios',
       dog_delete_btn:              'Eliminar perro',
+      dog_new_consult_btn:         '+ Nueva consulta',
+      dog_new_consult_btn_for:     '+ Nueva consulta para {name}',
       dog_login_required:          'Inicia sesión para crear un perro.',
       dog_login_required_view:     'Inicia sesión para ver la ficha.',
       dog_quota_full_short:        'Máximo 2 perros activos.',
@@ -17083,6 +17157,8 @@ function endTourIntro() {
       dog_save_btn_create:         'Create dog',
       dog_save_btn_edit:           'Save changes',
       dog_delete_btn:              'Delete dog',
+      dog_new_consult_btn:         '+ New consultation',
+      dog_new_consult_btn_for:     '+ New consultation for {name}',
       dog_login_required:          'Sign in to create a dog.',
       dog_login_required_view:     'Sign in to see the profile.',
       dog_quota_full_short:        'Maximum 2 active dogs.',

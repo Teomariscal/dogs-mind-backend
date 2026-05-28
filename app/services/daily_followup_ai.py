@@ -22,6 +22,7 @@ import logging
 import random
 import re
 from dataclasses import dataclass
+from datetime import date, datetime
 from typing import Any
 
 from sqlalchemy.orm import Session
@@ -129,6 +130,7 @@ def generate_daily_checkin(
     day_index: int,
     history: list[dict[str, Any]],
     lang: str = "es",
+    today: date | None = None,
 ) -> DailyCheckin:
     """
     Genera el check-in del día N para un caso concreto.
@@ -143,6 +145,10 @@ def generate_daily_checkin(
       history: lista cronológica con los últimos days, cada uno con
                {day_n, exercises_generated, exercises_results, observation?}.
       lang: 'es' | 'en'.
+      today: fecha local del día actual (ancla de variación en el prompt).
+             Si None, se resuelve a UTC-day-bucket (mismo comportamiento que
+             _today_local en el endpoint). Pasar `today` explícitamente desde
+             el endpoint mantiene coherencia con _compute_day_index/_build_history.
 
     Returns: DailyCheckin con N ejercicios + pregunta del día.
     """
@@ -155,7 +161,12 @@ def generate_daily_checkin(
         else DAILY_FOLLOWUP_COACH_PROMPT_ES
     )
 
+    today_iso = (today or datetime.utcnow().date()).isoformat()
+
     # Construir el mensaje de usuario con plan + histórico + día actual.
+    # Inyectamos `today_iso` para dar al coach un ancla de variación diaria:
+    # sin fecha, dos días con el mismo plan + mismo histórico vacío daban
+    # outputs casi idénticos al LLM (ver fix 2026-05-27 sobre repetición).
     history_block = _format_history(history, lang_norm)
     if lang_norm == "en":
         user_msg = (
@@ -166,10 +177,10 @@ def generate_daily_checkin(
             f"English.\n\n"
             f"Dog's name: {dog_name}\n"
             f"Diagnosis type: {diagnosis_type}\n"
-            f"Today is day {day_index} of the follow-up.\n\n"
+            f"Today is day {day_index} of the follow-up (local date: {today_iso}).\n\n"
             f"INTERVENTION PLAN:\n\n{plan_text.strip()}\n\n"
             f"PREVIOUS DAYS HISTORY:\n\n{history_block}\n\n"
-            f"Generate today's check-in (day {day_index}) as JSON, ALL FIELDS IN ENGLISH."
+            f"Generate today's check-in (day {day_index}, {today_iso}) as JSON, ALL FIELDS IN ENGLISH."
         )
     else:
         user_msg = (
@@ -178,10 +189,10 @@ def generate_daily_checkin(
             f"explicación) DEBE estar en ESPAÑOL.\n\n"
             f"Nombre del perro: {dog_name}\n"
             f"Tipo de diagnóstico: {diagnosis_type}\n"
-            f"Hoy es el día {day_index} del seguimiento.\n\n"
+            f"Hoy es el día {day_index} del seguimiento (fecha local: {today_iso}).\n\n"
             f"PLAN DE INTERVENCIÓN:\n\n{plan_text.strip()}\n\n"
             f"HISTÓRICO DE DÍAS ANTERIORES:\n\n{history_block}\n\n"
-            f"Genera el check-in de hoy (día {day_index}) en JSON, TODO EN ESPAÑOL."
+            f"Genera el check-in de hoy (día {day_index}, {today_iso}) en JSON, TODO EN ESPAÑOL."
         )
 
     response = client.messages.create(

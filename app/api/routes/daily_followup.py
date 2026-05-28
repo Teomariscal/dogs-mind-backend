@@ -165,11 +165,21 @@ def _get_plan_text(case: Case, db: Session) -> str:
 
 
 def _build_history(case_id, db: Session, exclude_today: date) -> list[dict[str, Any]]:
-    """Histórico de entries previas (excluyendo today) en orden cronológico."""
+    """Histórico de entries previas (excluyendo today) en orden cronológico.
+
+    NOTA (variación de ejercicios, 2026-05-27): se INCLUYEN también los días
+    con placeholder pendiente (is_complete=False). Antes filtrábamos por
+    is_complete=True, lo que dejaba al coach sin saber qué propuso ayer
+    cuando el tutor abría el plan pero no completaba el check-in. Resultado:
+    el LLM recibía inputs idénticos varios días → ejercicios casi iguales.
+    Ahora, en _format_history (daily_followup_ai.py), los días sin reportar
+    aparecen como "(sin reportar)" — señal informativa válida para el coach
+    y suficiente para que rote/varíe títulos. El streak sigue usando
+    is_complete=True (regla intacta en _recompute_streak).
+    """
     rows = db.query(DailyFollowupEntry).filter(
         DailyFollowupEntry.case_id == case_id,
         DailyFollowupEntry.day_local_date < exclude_today,
-        DailyFollowupEntry.is_complete.is_(True),
     ).order_by(DailyFollowupEntry.day_local_date.asc()).all()
     out = []
     # Calcular day_n relativo a la primera entry del histórico.
@@ -397,6 +407,7 @@ def get_daily_followup_today(
             day_index=day_index,
             history=history,
             lang=effective_lang,
+            today=today,
         )
     except ValueError as e:
         logger.error(f"[daily-followup-today] coach validation error case={case.id}: {e}")

@@ -159,6 +159,15 @@ REGLAS DURAS
 7. SOLO devuelve JSON válido. Sin texto antes ni después. Sin markdown.
    Sin ```json fences```. Sin comentarios. JSON parseable directo.
 
+8. ANTI-REPETICIÓN (regla crítica): los `title` de los ejercicios de hoy
+   NO deben coincidir literalmente con los `title` de NINGUNO de los
+   últimos 3 días del HISTÓRICO. Antes de componer los títulos, mira la
+   sección "HISTÓRICO DE DÍAS ANTERIORES" y compáralos. Si un ejercicio
+   sigue siendo necesario, varíalo de forma sustantiva (otro contexto,
+   otra duración, otro nivel de distracción, otro material) y renómbralo
+   en consecuencia. Repetir un título tal cual es el peor síntoma de un
+   coach que no está leyendo el histórico — evítalo.
+
 ═══════════════════════════════════════════════════════════════════════════════
 SCHEMA DE OUTPUT (estricto)
 ═══════════════════════════════════════════════════════════════════════════════
@@ -293,6 +302,14 @@ HARD RULES
 
 6. Return ONLY valid JSON. No text before or after. No markdown fences.
    Directly parseable.
+
+7. ANTI-REPETITION (critical rule): today's exercise `title`s MUST NOT
+   match literally any `title` from the LAST 3 DAYS in the history.
+   Before composing titles, read the "PREVIOUS DAYS HISTORY" section and
+   compare. If an exercise is still needed, vary it substantively
+   (different context, duration, distractor level, material) and rename
+   it accordingly. Repeating a title verbatim is the worst symptom of a
+   coach ignoring the history — avoid it.
 
 ═══════════════════════════════════════════════════════════════════════════════
 OUTPUT SCHEMA (strict)

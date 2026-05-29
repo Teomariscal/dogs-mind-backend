@@ -269,10 +269,22 @@ def generate_training_session(
     client = get_anthropic_client()
     settings = get_settings()
 
+    # Modelo y parámetros (cambio 2026-05-28): Haiku 4.5 daba respuestas de
+    # adiestramiento doméstico genérico cuando se le preguntaba por disciplinas
+    # de élite (Mondioring, IGP, RCI, Ringfrancés…) — mezclaba retrieve con
+    # envío hacia delante, ignoraba reglamento, no respetaba sus propias reglas
+    # del system prompt. Subimos a Sonnet 4.6 para razonamiento técnico real.
+    # Temperature baja para precisión técnica (antes 0.8 = inventaba). Tokens
+    # un poco más altos porque Sonnet desarrolla más cada ejercicio.
+    # Coste aproximado por consulta: ~$0.008 (Haiku) → ~$0.023 (Sonnet),
+    # ~3× más caro pero sigue cómodo dentro del margen de la membresía Pro.
+    # Próximo paso: RAG con literatura de élite (Bellon NePoPo, Raiser,
+    # Ellis, manuales Mondioring/IGP/RCI) para que el modelo se ancle en
+    # reglamento real en vez de inferir.
     response = client.messages.create(
-        model=settings.avatar_model,  # Haiku 4.5
-        max_tokens=1200,
-        temperature=0.8,
+        model=settings.clinical_model,  # Sonnet 4.6
+        max_tokens=1800,
+        temperature=0.4,
         system=system,
         messages=[{"role": "user", "content": user_prompt}],
     )

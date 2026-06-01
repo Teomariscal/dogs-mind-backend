@@ -13,6 +13,7 @@ from app.api.routes import daily_followup as daily_followup_router
 from app.api.routes import daily_tip as daily_tip_router
 from app.api.routes import delegations as delegations_router
 from app.api.routes import training as training_router
+from app.api.routes import training_consult as training_consult_router
 
 # Path to the frontend HTML — override via FRONTEND_HTML env var
 FRONTEND_HTML = os.environ.get(
@@ -86,6 +87,13 @@ async def lifespan(app: FastAPI):
             "ALTER TABLE cases ADD COLUMN IF NOT EXISTS client_dog_name VARCHAR(80)",
             "ALTER TABLE cases ADD COLUMN IF NOT EXISTS client_dog_breed VARCHAR(120)",
             "ALTER TABLE cases ADD COLUMN IF NOT EXISTS client_dog_age VARCHAR(80)",
+
+            # case_type: flujo Entrenamiento Específico (2026-05-29). Default
+            # "behavior" para casos pre-existentes (cero regresión). Indexado
+            # porque se filtra en s-records (badge "Entrenamiento") y porque
+            # el coach del daily-followup lo lee para elegir prompt.
+            "ALTER TABLE cases ADD COLUMN IF NOT EXISTS case_type VARCHAR(20) NOT NULL DEFAULT 'behavior'",
+            "CREATE INDEX IF NOT EXISTS ix_cases_case_type ON cases(case_type)",
 
             # Daily Follow-up — feature seguimiento diario tipo Duolingo.
             # Spec en memoria: project_dogs_mind_daily_followup.md (9-may-2026).
@@ -282,6 +290,7 @@ app.include_router(daily_followup_router.router)
 app.include_router(daily_tip_router.router)
 app.include_router(delegations_router.router)
 app.include_router(training_router.router)
+app.include_router(training_consult_router.router)
 
 
 @app.get("/", include_in_schema=False)

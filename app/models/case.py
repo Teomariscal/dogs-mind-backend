@@ -47,6 +47,13 @@ ENTRY_TYPES = ("anamnesis", "abc", "intervention", "seguimiento", "chat_aigent",
 # Estados válidos del caso.
 CASE_STATUSES = ("open", "archived")
 
+# Tipos de caso. "behavior" = anamnesis clínica + análisis ABC + plan LIMA (flujo
+# original). "training" = entrenamiento específico (UN ejercicio, plan operante
+# por fases). Decisión 2026-05-29: separar para que el análisis no se contamine
+# entre dominios y para que el coach del daily-followup detecte el tipo y use
+# el prompt adecuado. Backfill: todos los casos existentes pasan a "behavior".
+CASE_TYPES = ("behavior", "training")
+
 # Estados de badge en seguimiento diario.
 BADGE_TIERS = (None, "silver", "gold")
 
@@ -74,6 +81,13 @@ class Case(Base):
     title           = Column(String(150), nullable=False)
     motivo_consulta = Column(Text, nullable=True)
     status          = Column(String(20), nullable=False, default="open", index=True)
+
+    # Tipo de caso. Default "behavior" para compat retro: todos los casos
+    # creados antes de 2026-05-29 (fecha del feature de entrenamiento
+    # específico) se asumen del flujo clínico/conductual. Indexado porque
+    # se filtra en s-records (badge "Entrenamiento" vs análisis ABC) y
+    # porque el coach del daily-followup lo lee para elegir prompt.
+    case_type       = Column(String(20), nullable=False, default="behavior", index=True)
 
     # Identidad del perro cuando NO está en el perfil del usuario (solo profesionales).
     # Si el caso está sobre un perro propio del usuario, dog_id apunta al Dog y estos

@@ -15865,10 +15865,24 @@ window.startConsultFromDog = startConsultFromDog;
 // Gate frontend: si Pro → muestra selector. Si particular → directo a anamnesis
 // clínica (cero cambio respecto al flujo de hoy). El backend tiene su propio
 // gate (HTTP 403) por si el frontend se cuela.
-window.goToConsultType = function() {
+window.goToConsultType = async function() {
   try {
+    // Si _myAccount aún no se ha cargado (justo tras login, fallo previo de
+    // /me/account, etc.) intentamos cargarla AHORA para no cortar al usuario
+    // Pro a la anamnesis clínica por error de timing. Si no hay JWT, va a
+    // splash. Si carga falla, fallback a anamnesis (comportamiento previo).
+    if (!window._myAccount) {
+      if (typeof getJWT === 'function' && !getJWT()) {
+        goTo('s-splash');
+        return;
+      }
+      if (typeof loadAccountInfo === 'function') {
+        try { await loadAccountInfo(); } catch(e) {}
+      }
+    }
     var acc = window._myAccount || {};
-    if (acc.account_type === 'professional') {
+    var at = (acc.account_type || '').toString().toLowerCase();
+    if (at === 'professional') {
       goTo('s-consult-type');
       return;
     }

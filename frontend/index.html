@@ -3596,7 +3596,11 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 0 32px 8px;
+  /* Padding lateral reducido de 32→16px para dar al Floating Dock margen
+     real (antes el contenido del dock quedaba a 6px del borde y se cortaba
+     "Profesional · Área Pro" por subpixel). splash-tagline + title siguen
+     con sus max-widths propios, no se ven afectados. */
+  padding: 0 16px 8px;
   width: 100%;
 }
 
@@ -4143,7 +4147,11 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
 ──────────────────────────────────────────────────────────────── */
 .splash-dock {
   width: 100%;
-  max-width: 320px;
+  /* max-width subido de 320→358px (cabe en .phone 390 con padding 16×2):
+     el contenido interior (Comenzar · Log In + flecha + divider + Profesional
+     + Área Pro) necesita ~319px mínimo. Con max 320 quedaba justo y se
+     cortaba por subpixel rendering. Founder 2026-06-02. */
+  max-width: 358px;
   margin: 0 auto;
   background: linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.09) 100%);
   border: 1px solid rgba(255,255,255,0.22);

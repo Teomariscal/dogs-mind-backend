@@ -271,8 +271,17 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
        fluido, en viewports grandes (≥1016px alto) el phone llega al tope
        960×443. Margen 56px = 28px padding body + 24px ring bezel + 4px
        buffer. (Founder 2026-06-02: quería más presencia.) */
+    /* Width con clamp 390-467: nunca menos de 390px (el ancho mobile-first
+       de diseño de TODAS las pantallas internas — splash dock, formularios,
+       headers, etc.). Si el alto del viewport es muy bajo, el phone se ve
+       "achatado" (aspect ratio ya no es 390:844 del iPhone) pero el
+       contenido sigue legible — preferible a recortar texto. Fix del bug
+       2026-06-02: con min() el ancho caía por debajo de 390 en viewports
+       bajos (e.g. viewport 700px alto → width 297px) y el contenido se
+       desbordaba por la derecha (founder reportó dock cortado en splash
+       + ¿HAY NIÑOS? cortado en s-anamnesis). */
     height: min(1010px, calc(100dvh - 56px));
-    width: min(467px, calc((100dvh - 56px) * 390 / 844));
+    width: clamp(390px, calc((100dvh - 56px) * 390 / 844), 467px);
     max-width: 467px;
     border-radius: 50px;
     box-shadow:

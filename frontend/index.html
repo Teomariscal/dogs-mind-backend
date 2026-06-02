@@ -4173,12 +4173,16 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
   overflow: hidden;
 }
 .splash-dock-cta {
-  flex: 1.6;
+  /* Proporción del bloque CTA primario. Reducido de 1.6 → 1.4 para dar
+     más espacio al bloque Pro (founder 2026-06-02: "divide mejor el
+     espacio"). Padding horizontal compactado para que el texto + flecha
+     sigan cabiendo en el nuevo flex. */
+  flex: 1.4;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 16px 14px 18px;
+  padding: 14px 10px 14px 14px;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -4240,18 +4244,23 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
   flex-shrink: 0;
 }
 .splash-dock-pro {
+  /* Centrado horizontalmente en su mitad del dock (asimetría intencional
+     respecto al bloque Comenzar, que tiene flecha justificada a la dcha
+     por space-between). Da balance visual sin tener que recortar nada.
+     Founder 2026-06-02: "divide mejor el espacio". */
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   gap: 2px;
-  padding: 14px 16px;
+  padding: 14px 14px;
   background: transparent;
   border: none;
   cursor: pointer;
   transition: background 0.15s ease;
   font-family: 'Jost', sans-serif;
+  text-align: center;
   text-align: left;
 }
 .splash-dock-pro:hover { background: rgba(94,200,230,0.06); }

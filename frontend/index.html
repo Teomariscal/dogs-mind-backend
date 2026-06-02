@@ -4013,10 +4013,10 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
   color: #fffaf0;
   border: none;
   border-radius: 999px;
-  padding: 16px 24px;
+  padding: 13px 22px;
   font-family: var(--ff-sans);
   font-weight: 500;
-  font-size: 15px;
+  font-size: 14px;
   letter-spacing: 0.03em;
   cursor: pointer;
   width: 100%;
@@ -4033,10 +4033,49 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
 
 .splash-cta-wrap {
   width: 100%;
+  max-width: 280px;
+  margin: 0 auto 18px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 20px;
+  align-items: stretch;
+  gap: 10px;
+}
+
+/* Fila de links secundarios (Inicio · Ver el tour) — sin pills, jerarquía
+   por debajo del primario y por encima del footer. Sustituyen visualmente
+   a .splash-ghost-link (20px underlined) y .splash-tour-link (chip glass),
+   que quedan en el CSS como huérfanas por reversibilidad inmediata. */
+.splash-links-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 4px 0 2px;
+}
+.splash-link {
+  background: none;
+  border: none;
+  padding: 6px 4px;
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.82);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+.splash-link:hover { color: #fff; }
+.splash-link--tour::before {
+  content: '▶';
+  font-size: 9px;
+  opacity: 0.75;
+  margin-right: 6px;
+  vertical-align: 1px;
+}
+.splash-link-sep {
+  color: rgba(255,255,255,0.30);
+  font-size: 13px;
+  user-select: none;
 }
 
 .splash-ghost-link {
@@ -6099,10 +6138,10 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
   color: #e8efea;
   border: 1px solid rgba(94, 200, 230, 0.28);
   border-radius: 999px;
-  padding: 16px 24px;
+  padding: 13px 22px;
   font-family: var(--ff-sans);
   font-weight: 500;
-  font-size: 15px;
+  font-size: 13.5px;
   letter-spacing: 0.03em;
   cursor: pointer;
   width: 100%;
@@ -7339,8 +7378,11 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
       <p class="splash-tagline" data-i18n="splash_sub">Análisis funcional experto para entender y mejorar el comportamiento de tu perro</p>
       <div class="splash-cta-wrap">
         <button class="btn-primary" onclick="goTo('s-account-type')" data-i18n="get_started">Comenzar · Log In</button>
-        <button class="splash-ghost-link" onclick="goTo('s-home')" data-i18n="splash_home">Inicio</button>
-        <button class="splash-tour-link" onclick="openTourIntro()"><span data-i18n="take_tour">Ver el tour</span></button>
+        <div class="splash-links-row">
+          <button class="splash-link" onclick="goTo('s-home')" data-i18n="splash_home">Inicio</button>
+          <span class="splash-link-sep" aria-hidden="true">·</span>
+          <button class="splash-link splash-link--tour" onclick="openTourIntro()"><span data-i18n="take_tour">Ver el tour</span></button>
+        </div>
         <button class="splash-pro-link" onclick="goTo('s-pro-area')" data-i18n="splash_pro_area">Área profesional</button>
       </div>
       <button class="splash-privacy" onclick="goTo('s-privacy')">Política de Privacidad</button>

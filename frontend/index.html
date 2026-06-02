@@ -202,14 +202,16 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
     display:flex;
     align-items:center;
     justify-content:center;
-    padding:20px 0;
+    /* Padding reducido de 20→14px para que el phone gane ~12px de altura
+       y aproveche mejor el viewport sin tocar los anillos del bezel. */
+    padding:14px 0;
     background:
       linear-gradient(135deg, transparent 0%, transparent 30%, rgba(94,200,230,0.06) 45%, rgba(126,184,106,0.04) 55%, transparent 70%, transparent 100%),
       radial-gradient(ellipse at 50% 100%, #0b1518 0%, #06090b 70%);
     background-color:#06090b;
     position:relative;
     /* Bloquear scroll del NAVEGADOR en desktop. El phone es ahora de
-       tamaño adaptativo (height:min(844px, 100dvh-80px)) y siempre cabe
+       tamaño adaptativo (height:min(844px, 100dvh-56px)) y siempre cabe
        en el viewport. El scroll necesario para contenido largo vive
        dentro de cada .screen (no afecta a la ventana del navegador). */
     overflow:hidden;
@@ -262,17 +264,16 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
     z-index:0;
   }
   .phone{
-    /* Tamaño REAL adaptativo al viewport (no solo visual): la altura se
-       limita a (100dvh - 80px de padding+bezel) y el ancho se deriva para
-       preservar el aspect ratio del iPhone (390:844). En viewports altos
-       (≥924px) el phone se queda en su tamaño nativo 390×844. En viewports
-       menores se encoge fluidamente. Esto elimina el scroll del NAVEGADOR
-       (el body cabe siempre). El scroll INTERNO de las screens que tienen
-       contenido largo (s-home, s-records, etc.) sigue funcionando — eso
-       NO es scroll del navegador. */
-    height: min(844px, calc(100dvh - 80px));
-    width: min(390px, calc((100dvh - 80px) * 390 / 844));
-    max-width: 390px;
+    /* Tamaño REAL adaptativo al viewport con CRECIMIENTO permitido por
+       encima del iPhone nativo (390×844) para ganar presencia en pantallas
+       grandes. Topes: 960px alto, 443px ancho (≈ +13.7% sobre nativo,
+       aspect ratio 390:844 preservado). En viewports menores se encoge
+       fluido, en viewports grandes (≥1016px alto) el phone llega al tope
+       960×443. Margen 56px = 28px padding body + 24px ring bezel + 4px
+       buffer. (Founder 2026-06-02: quería más presencia.) */
+    height: min(960px, calc(100dvh - 56px));
+    width: min(443px, calc((100dvh - 56px) * 390 / 844));
+    max-width: 443px;
     border-radius: 50px;
     box-shadow:
       0 0 0 10px #1a1a1a,

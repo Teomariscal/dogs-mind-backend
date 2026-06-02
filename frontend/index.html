@@ -7370,7 +7370,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
       <div class="hero-banner">
         <div class="hero-overlay">
           <div class="hero-title" data-i18n="hero_title">Start a new behavioral analysis</div>
-          <button class="btn-hero" onclick="goTo('s-anamnesis')" data-i18n="begin_consultation">Begin Consultation</button>
+          <button class="btn-hero" onclick="goToConsultType()" data-i18n="begin_consultation">Begin Consultation</button>
         </div>
       </div>
 
@@ -7426,7 +7426,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
 
         <div class="teo-card">
           <div class="teo-card-title" data-i18n="home_teo_title">Analysis by Teo Mariscal</div>
-          <button class="teo-btn primary" onclick="goTo('s-anamnesis')" data-i18n="new_analysis">Nuevo Análisis</button>
+          <button class="teo-btn primary" onclick="goToConsultType()" data-i18n="new_analysis">Nuevo Análisis</button>
           <button class="teo-btn secondary" onclick="goTo('s-abc')" data-i18n="continue_case">Continuar caso</button>
           <div class="teo-sub" data-i18n="home_teo_sub">Expert human review and functional analysis</div>
         </div>
@@ -7447,7 +7447,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
         </button>
       </div>
 
-      <button class="btn-new-consult" onclick="goTo('s-anamnesis')" data-i18n="new_consultation">Nueva Consulta</button>
+      <button class="btn-new-consult" onclick="goToConsultType()" data-i18n="new_consultation">Nueva Consulta</button>
 
       <!-- Card "Inspiración Profesional" (beta) — solo visible si account_type='professional'.
            Display lo controla renderHomeInspBtn() leyendo window._myAccount,
@@ -7606,7 +7606,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
 
     <!-- Sticky CTA -->
     <div class="cv-cta-wrap">
-      <button class="cv-cta" onclick="goTo('s-anamnesis')">
+      <button class="cv-cta" onclick="goToConsultType()">
         <span data-i18n="cv_cta">Consultar a Teo</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </button>
@@ -7620,7 +7620,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
         </span>
         <span class="nav-label">Inicio</span>
       </button>
-      <button class="nav-item" onclick="goTo('s-anamnesis')">
+      <button class="nav-item" onclick="goToConsultType()">
         <span class="nav-icon nav-icon-consultas" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
         </span>
@@ -7966,7 +7966,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
       <div class="abc-btns">
         <button class="btn-orange" onclick="generateInterventionPlan()" data-i18n="abc_btn_plan">Ver Plan de Intervención</button>
         <button id="btn-full-analysis" onclick="goTo('s-full-analysis')" style="width:100%;padding:15px;border:none;border-radius:100px;background:#c8962a;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.02em;" data-i18n="abc_btn_full">Análisis completo &#8594;</button>
-        <button class="btn-outline" onclick="goTo('s-anamnesis')" data-i18n="abc_btn_new">Nuevo análisis</button>
+        <button class="btn-outline" onclick="goToConsultType()" data-i18n="abc_btn_new">Nuevo análisis</button>
       </div>
 
       <!-- Disclaimer App Store / GDPR (no sustituye veterinario) -->
@@ -8051,7 +8051,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
       <!-- acceptIntervention y openRefineChat heredan overrides #s-tracking [onclick=...] (verde y azul vibrant ya validados). Solo se les quitan los emojis. -->
       <button onclick="acceptIntervention()" style="width:100%;padding:16px;border:none;border-radius:100px;background:#4a6741;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.02em;box-shadow:0 4px 16px rgba(74,103,65,0.25);" data-i18n="tracking_accept">Aceptar intervención</button>
       <button onclick="openRefineChat()" style="width:100%;padding:16px;border:none;border-radius:100px;background:#2a4a8a;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.02em;box-shadow:0 4px 16px rgba(42,74,138,0.25);"><span data-i18n="tracking_refine">Afinar plan con IA</span> <span style="font-size:12px;opacity:0.8;">(−0.25 tok.)</span></button>
-      <button onclick="goTo('s-anamnesis')" style="width:100%;padding:16px;border:2px solid #4a6741;border-radius:100px;background:transparent;color:#4a6741;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.02em;" data-i18n="tracking_second">Pedir segunda opinión</button>
+      <button onclick="goToConsultType()" style="width:100%;padding:16px;border:2px solid #4a6741;border-radius:100px;background:transparent;color:#4a6741;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.02em;" data-i18n="tracking_second">Pedir segunda opinión</button>
       <!-- Plan sencillo / Pet Owners — outline cyan (tech accent del área pro) -->
       <button class="cm-btn-secondary cm-btn-cyan-outline cm-btn-block" style="padding:16px;font-size:15px;" onclick="onPlanSimple()" data-i18n="tracking_simple_plan">Plan sencillo · Pet Owners</button>
 
@@ -9400,7 +9400,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
         <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border);font-size:13px;color:var(--text2);text-align:center;" data-i18n="seg_thanks">Gracias por confiar en The Dogs Mind.</div>
 
         <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px;">
-          <button type="button" onclick="goTo('s-anamnesis')" style="width:100%;padding:13px;border:none;border-radius:100px;background:var(--green);color:#fff;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;" data-i18n="seg_btn_new_consult">+ Nueva Consulta</button>
+          <button type="button" onclick="goToConsultType()" style="width:100%;padding:13px;border:none;border-radius:100px;background:var(--green);color:#fff;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;" data-i18n="seg_btn_new_consult">+ Nueva Consulta</button>
           <button type="button" onclick="goTo('s-avatars')" style="width:100%;padding:13px;border:1px solid var(--green);border-radius:100px;background:var(--white);color:var(--green2);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;" data-i18n="seg_btn_chat_aigent">Chatea con tu Aigent preferido</button>
         </div>
       </div>

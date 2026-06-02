@@ -4173,11 +4173,12 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
   overflow: hidden;
 }
 .splash-dock-cta {
-  /* Proporción del bloque CTA primario. Reducido de 1.6 → 1.4 para dar
-     más espacio al bloque Pro (founder 2026-06-02: "divide mejor el
-     espacio"). Padding horizontal compactado para que el texto + flecha
-     sigan cabiendo en el nuevo flex. */
-  flex: 1.4;
+  /* Bloque CTA primary. Cuando el dock tenía 2 columnas (CTA + Pro), este
+     bloque usaba flex 1. Founder 2026-06-02 eliminó "Área Profesional"
+     por redundancia (s-account-type ya divide particular/profesional tras
+     login). Ahora el CTA es ÚNICO en el dock — `.splash-dock-cta--solo`
+     más abajo lo hace full-width centrado. flex 1 queda como fallback. */
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -4192,6 +4193,24 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
 }
 .splash-dock-cta:hover { background: rgba(255,255,255,0.06); }
 .splash-dock-cta:active { background: rgba(255,255,255,0.10); }
+/* CTA único en el dock (sin bloque Pro al lado) — full-width centrado.
+   Borde redondeado interior para que mantenga la sensación "rebajado"
+   del dock contenedor. Founder 2026-06-02 eliminó el bloque Pro. */
+.splash-dock-cta--solo {
+  flex: none;
+  width: 100%;
+  justify-content: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 20px;
+}
+.splash-dock-cta--solo .splash-dock-main-label {
+  font-size: 16px;
+  letter-spacing: 0.02em;
+}
+.splash-dock-cta--solo .splash-dock-arrow {
+  font-size: 17px;
+}
 .splash-dock-text {
   display: flex;
   flex-direction: column;
@@ -4244,11 +4263,10 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
   flex-shrink: 0;
 }
 .splash-dock-pro {
-  /* Centrado horizontalmente en su mitad del dock (asimetría intencional
-     respecto al bloque Comenzar, que tiene flecha justificada a la dcha
-     por space-between). Da balance visual sin tener que recortar nada.
-     Founder 2026-06-02: "divide mejor el espacio". */
-  flex: 1;
+  /* Bloque Pro con flex 1.3 (más espacio que el CTA flex 1) porque
+     "Área Profesional" es texto más largo que "Log In". Centrado
+     horizontalmente para balance visual. */
+  flex: 1.3;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -7601,20 +7619,10 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
       <p class="splash-tagline" data-i18n="splash_sub">Análisis funcional experto para entender y mejorar el comportamiento de tu perro</p>
       <div class="splash-cta-wrap">
         <div class="splash-dock">
-          <div class="splash-dock-main">
-            <button class="splash-dock-cta" type="button" onclick="goTo('s-account-type')">
-              <span class="splash-dock-text">
-                <span class="splash-dock-top" data-i18n="splash_dock_start_eyebrow">Empieza</span>
-                <span class="splash-dock-main-label" data-i18n="get_started">Comenzar · Log In</span>
-              </span>
-              <span class="splash-dock-arrow" aria-hidden="true">→</span>
-            </button>
-            <div class="splash-dock-divider" aria-hidden="true"></div>
-            <button class="splash-dock-pro" type="button" onclick="goTo('s-pro-area')">
-              <span class="splash-dock-top splash-dock-top--pro" data-i18n="splash_dock_pro_eyebrow">Pro</span>
-              <span class="splash-dock-main-label" data-i18n="splash_pro_area">Área Pro</span>
-            </button>
-          </div>
+          <button class="splash-dock-cta splash-dock-cta--solo" type="button" onclick="goTo('s-account-type')">
+            <span class="splash-dock-main-label" data-i18n="get_started">Log In</span>
+            <span class="splash-dock-arrow" aria-hidden="true">→</span>
+          </button>
           <div class="splash-dock-secondary">
             <button class="splash-dock-sec" type="button" onclick="goTo('s-home')" data-i18n="splash_home">Inicio</button>
             <span class="splash-dock-sec-sep" aria-hidden="true">·</span>
@@ -17514,10 +17522,10 @@ function endTourIntro() {
       // Splash
       splash_title:           'AI for<br>Canine Behavior',
       splash_sub:             'Análisis funcional experto para entender<br>y mejorar el comportamiento de tu perro',
-      get_started:            'Comenzar · Log In',
+      get_started:            'Log In',
       log_in:                 'Iniciar sesión',
       take_tour:              'Ver el tour',
-      splash_pro_area:        'Área Pro',
+      splash_pro_area:        'Área Profesional',
       splash_dock_start_eyebrow: 'Empieza',
       splash_dock_pro_eyebrow:   'Pro',
       splash_dock_tour:          'Tour',
@@ -18436,10 +18444,10 @@ function endTourIntro() {
       // Splash
       splash_title:           'AI for<br>Canine Behavior',
       splash_sub:             "Expert functional analysis to understand<br>and improve your dog's behavior",
-      get_started:            'Get Started',
+      get_started:            'Log In',
       log_in:                 'Log In',
       take_tour:              'Take a Tour',
-      splash_pro_area:        'Pro area',
+      splash_pro_area:        'Professional Area',
       splash_dock_start_eyebrow: 'Get started',
       splash_dock_pro_eyebrow:   'Pro',
       splash_dock_tour:          'Tour',

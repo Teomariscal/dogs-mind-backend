@@ -4,7 +4,7 @@
   "description": "Análisis de conducta canina con IA por Teo Mariscal",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f0ece3",
+  "background_color": "#0a1a14",
   "theme_color": "#4a6741",
   "orientation": "portrait-primary",
   "lang": "es",

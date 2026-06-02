@@ -33,7 +33,11 @@ from app.models.anamnesis import RetrievedChunk
 
 logger = logging.getLogger(__name__)
 
-MAX_OUTPUT_TOKENS = 2600  # Output más largo: ABA + 3-5 fases con ejercicios varios
+MAX_OUTPUT_TOKENS = 2800  # ABA breve + EXACTAMENTE 3 fases concisas. El prompt
+                          # impone cuota de ~1100 palabras (ES) / ~900 (EN); 2800
+                          # tokens es margen para que nunca se corte aunque el
+                          # modelo se exceda 10-15% por encima del objetivo.
+                          # (v1 era 2600 y se cortó en Fase 2 — fix 2026-06-02.)
 TEMPERATURE = 0.4
 
 # Top-K chunks RAG. La RAG clínica está alimentada con literatura de

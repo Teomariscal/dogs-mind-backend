@@ -1,14 +1,18 @@
 {
-  "name": "Dogs Mind",
-  "short_name": "Dogs Mind",
-  "description": "Análisis de conducta canina con IA por Teo Mariscal",
+  "name": "The Dogs’ Mind",
+  "short_name": "Dogs’ Mind",
+  "description": "AI for Canine Behavior — Análisis de conducta canina por Teo Mariscal",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a1a14",
   "theme_color": "#4a6741",
   "orientation": "portrait-primary",
   "lang": "es",
-  "categories": ["lifestyle", "health", "education"],
+  "categories": [
+    "lifestyle",
+    "health",
+    "education"
+  ],
   "icons": [
     {
       "src": "/icons/icon-72x72.png",

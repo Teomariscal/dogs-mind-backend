@@ -208,7 +208,13 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
       radial-gradient(ellipse at 50% 100%, #0b1518 0%, #06090b 70%);
     background-color:#06090b;
     position:relative;
-    overflow-x:hidden;
+    /* Bloquear scroll del NAVEGADOR en desktop. El phone es ahora de
+       tamaño adaptativo (height:min(844px, 100dvh-80px)) y siempre cabe
+       en el viewport. El scroll necesario para contenido largo vive
+       dentro de cada .screen (no afecta a la ventana del navegador). */
+    overflow:hidden;
+    height:100vh;
+    height:100dvh;
   }
   body::before{
     content:'';
@@ -256,23 +262,23 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
     z-index:0;
   }
   .phone{
-    width:390px;
-    height:844px;
-    max-width:390px;
-    border-radius:50px;
+    /* Tamaño REAL adaptativo al viewport (no solo visual): la altura se
+       limita a (100dvh - 80px de padding+bezel) y el ancho se deriva para
+       preservar el aspect ratio del iPhone (390:844). En viewports altos
+       (≥924px) el phone se queda en su tamaño nativo 390×844. En viewports
+       menores se encoge fluidamente. Esto elimina el scroll del NAVEGADOR
+       (el body cabe siempre). El scroll INTERNO de las screens que tienen
+       contenido largo (s-home, s-records, etc.) sigue funcionando — eso
+       NO es scroll del navegador. */
+    height: min(844px, calc(100dvh - 80px));
+    width: min(390px, calc((100dvh - 80px) * 390 / 844));
+    max-width: 390px;
+    border-radius: 50px;
     box-shadow:
       0 0 0 10px #1a1a1a,
       0 0 0 12px #2a2a2a,
       0 30px 80px rgba(0,0,0,0.5),
       0 10px 30px rgba(0,0,0,0.3);
-    /* Escala proporcional por altura del viewport: si el alto disponible
-       es ≥ 924px (844 mockup + 80 de padding+bezel+margen), el phone se
-       muestra tamaño nativo (scale 1). Si el viewport es más bajo (laptops
-       13"/14", ventanas no maximizadas), se encoge fluidamente preservando
-       el aspect ratio para que todo el splash/home se vea a golpe de vista
-       sin scroll. Mobile (<768px) no se afecta. */
-    transform: scale(min(1, (100dvh - 80px) / 844));
-    transform-origin: center center;
   }
   .notch{
     display:block !important;

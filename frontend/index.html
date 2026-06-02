@@ -15866,28 +15866,38 @@ window.startConsultFromDog = startConsultFromDog;
 // clínica (cero cambio respecto al flujo de hoy). El backend tiene su propio
 // gate (HTTP 403) por si el frontend se cuela.
 window.goToConsultType = async function() {
+  // GATE "NO ES particular" (en lugar de "ES professional"): más robusto
+  // ante (a) race conditions de _myAccount no cargada al click, (b) futuros
+  // account_type distintos de 'professional' (corporativo, admin, internal),
+  // (c) variantes de capitalización del backend, (d) fallos silenciosos
+  // de /me/account. La verificación definitiva la hace el backend al
+  // submit (HTTP 403 con copy claro si no es 'professional'). El frontend
+  // solo evita mostrar el selector a particulares confirmados.
   try {
-    // Si _myAccount aún no se ha cargado (justo tras login, fallo previo de
-    // /me/account, etc.) intentamos cargarla AHORA para no cortar al usuario
-    // Pro a la anamnesis clínica por error de timing. Si no hay JWT, va a
-    // splash. Si carga falla, fallback a anamnesis (comportamiento previo).
-    if (!window._myAccount) {
-      if (typeof getJWT === 'function' && !getJWT()) {
-        goTo('s-splash');
-        return;
-      }
-      if (typeof loadAccountInfo === 'function') {
-        try { await loadAccountInfo(); } catch(e) {}
-      }
-    }
-    var acc = window._myAccount || {};
-    var at = (acc.account_type || '').toString().toLowerCase();
-    if (at === 'professional') {
-      goTo('s-consult-type');
+    if (typeof getJWT === 'function' && !getJWT()) {
+      goTo('s-splash');
       return;
     }
-  } catch(e) {}
-  goTo('s-anamnesis');
+    // Intentar cargar info de cuenta si todavía no está, para no decidir
+    // sobre datos vacíos. Si falla, asumimos NO-particular (optimista) y
+    // mostramos selector — el backend filtra al submit.
+    if (!window._myAccount && typeof loadAccountInfo === 'function') {
+      try { await loadAccountInfo(); } catch(e) {}
+    }
+    var acc = window._myAccount || {};
+    var at = (acc.account_type || '').toString().toLowerCase().trim();
+    // Solo "particular" CONFIRMADO va directo a anamnesis clínica.
+    // Todo lo demás (incluido string vacío por fallo de red) ve el selector.
+    if (at === 'particular') {
+      goTo('s-anamnesis');
+      return;
+    }
+    goTo('s-consult-type');
+  } catch(e) {
+    // Cualquier excepción inesperada: fallback a anamnesis (comportamiento
+    // previo, cero regresión para nadie).
+    goTo('s-anamnesis');
+  }
 };
 
 // Reforzadores: "nada le motiva" es excluyente con el resto.

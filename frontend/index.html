@@ -170,7 +170,11 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
      centrado en la ventana, restaura el diseno original 390x844 con bezel
      iPhone, notch, status-bar y sombra. */
 .phone{
-  background:var(--cream);
+  /* Vibrant emerald deep por defecto (#0a1a14 = mismo color que el inicio
+     del gradient de las pantallas Pro/training, para que el status-bar del
+     mockup desktop se funda visualmente con el contenido). Norma "nunca
+     cream" del founder. Mobile mantiene su override !important más abajo. */
+  background:#0a1a14;
   overflow:hidden;
   position:relative;
   display:flex;flex-direction:column;
@@ -271,7 +275,9 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   .status-bar{
     display:flex !important;
     height:32px;align-items:flex-end;justify-content:space-between;
-    padding:0 24px 4px;font-size:12px;font-weight:600;color:var(--text2);
+    padding:0 24px 4px;font-size:12px;font-weight:600;
+    /* Texto blanco translúcido — el .phone ahora es vibrant emerald dark */
+    color:rgba(255,255,255,0.92);
     position:relative;z-index:10;flex-shrink:0;
   }
 }
@@ -9048,7 +9054,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
   </div><!-- /s-training-loading -->
 
   <!-- ══ S-TRAINING-RESULT — Render del markdown devuelto por /training-analysis ══ -->
-  <div id="s-training-result" class="screen" style="overflow-y:auto;background:var(--cream);">
+  <div id="s-training-result" class="screen" style="overflow-y:auto;">
     <header class="tc-header">
       <button class="tc-back" onclick="goTo('s-records')" aria-label="Volver">&#8592;</button>
       <div class="tc-header-text">

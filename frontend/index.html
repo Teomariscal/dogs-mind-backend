@@ -8889,7 +8889,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
        a s-anamnesis como hasta ahora. Decisión founder 2026-05-29 Fase 2.0.
   -->
   <div id="s-consult-type" class="screen">
-    <button class="ct-back" onclick="history.back ? history.back() : goTo('s-records')" aria-label="Volver">&#8592;</button>
+    <button class="ct-back" onclick="goTo(window._consultTypeReturnTo || 's-home')" aria-label="Volver">&#8592;</button>
     <div class="ct-hero">
       <p class="ct-eyebrow" data-i18n="ct_eyebrow">Nueva consulta</p>
       <h1 class="ct-headline" data-i18n="ct_headline">¿Qué necesitas hoy?</h1>
@@ -16123,6 +16123,19 @@ window.goToConsultType = async function() {
   // submit (HTTP 403 con copy claro si no es 'professional'). El frontend
   // solo evita mostrar el selector a particulares confirmados.
   try {
+    // Captura la pantalla activa ANTES de navegar para que el botón "atrás"
+    // de s-consult-type vuelva exactamente a donde venía el usuario (s-home,
+    // s-records, s-dog-profile, s-abc, s-tracking, s-seguimiento, s-training-result…).
+    // Se evita capturar las pantallas del propio flujo (s-consult-type y
+    // s-anamnesis-training) para no crear loops si el usuario rebota entre
+    // selector y formulario. Fallback global: s-home.
+    try {
+      var _curScr = document.querySelector('.screen.active');
+      if (_curScr && _curScr.id && _curScr.id !== 's-consult-type' && _curScr.id !== 's-anamnesis-training') {
+        window._consultTypeReturnTo = _curScr.id;
+      }
+    } catch(_) {}
+
     if (typeof getJWT === 'function' && !getJWT()) {
       goTo('s-splash');
       return;

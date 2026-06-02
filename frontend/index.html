@@ -4109,6 +4109,157 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
   user-select: none;
 }
 
+/* ─────────────────────────────────────────────────────────────
+   "Floating Dock" — Vision Pro / Apple Maps panel pattern.
+   Material continuo, asimetría 60/40 (Comenzar | Pro), hairline
+   vertical interno, microfila secundaria dentro del mismo material.
+   Sustituye al pill Perla líquida + micro-row (que quedan como
+   reglas huérfanas arriba por reversibilidad).
+   Decisión founder 2026-06-02 tras preview v2.
+──────────────────────────────────────────────────────────────── */
+.splash-dock {
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  background: linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.09) 100%);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 26px;
+  backdrop-filter: blur(30px) saturate(1.7);
+  -webkit-backdrop-filter: blur(30px) saturate(1.7);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.28) inset,
+    0 -1px 0 rgba(0,0,0,0.08) inset,
+    0 18px 40px rgba(0,0,0,0.34),
+    0 0 28px rgba(255,255,255,0.06);
+  padding: 6px;
+  overflow: hidden;
+}
+.splash-dock-main {
+  display: flex;
+  align-items: stretch;
+  border-radius: 20px;
+  overflow: hidden;
+}
+.splash-dock-cta {
+  flex: 1.6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 14px 18px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  font-family: 'Jost', sans-serif;
+  text-align: left;
+}
+.splash-dock-cta:hover { background: rgba(255,255,255,0.06); }
+.splash-dock-cta:active { background: rgba(255,255,255,0.10); }
+.splash-dock-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+}
+.splash-dock-top {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+}
+.splash-dock-top--pro { color: #5ec8e6; }
+.splash-dock-main-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+.splash-dock-pro .splash-dock-main-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #a8e2f2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.splash-dock-pro .splash-dock-main-label::after {
+  content: '→';
+  font-size: 13px;
+  color: #80d6ee;
+  font-weight: 300;
+  opacity: 0.85;
+}
+.splash-dock-arrow {
+  font-size: 18px;
+  color: #fff;
+  font-weight: 300;
+  opacity: 0.85;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+.splash-dock-cta:hover .splash-dock-arrow { transform: translateX(3px); }
+.splash-dock-divider {
+  width: 1px;
+  background: rgba(255,255,255,0.12);
+  flex-shrink: 0;
+}
+.splash-dock-pro {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  padding: 14px 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  font-family: 'Jost', sans-serif;
+  text-align: left;
+}
+.splash-dock-pro:hover { background: rgba(94,200,230,0.06); }
+.splash-dock-pro:active { background: rgba(94,200,230,0.10); }
+.splash-dock-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 10px 12px 8px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  margin-top: 4px;
+}
+.splash-dock-sec {
+  background: none;
+  border: none;
+  padding: 4px 2px;
+  font-family: 'Jost', sans-serif;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.72);
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.splash-dock-sec:hover { color: #fff; }
+.splash-dock-sec--tour::before {
+  content: '▶';
+  font-size: 8px;
+  opacity: 0.80;
+}
+.splash-dock-sec-sep {
+  color: rgba(255,255,255,0.22);
+  font-size: 11.5px;
+  user-select: none;
+}
+
 .splash-ghost-link {
   font-family: 'Jost', sans-serif;
   font-size: 20px;
@@ -7408,13 +7559,26 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
       <p class="splash-by">by Teo Mariscal</p>
       <p class="splash-tagline" data-i18n="splash_sub">Análisis funcional experto para entender y mejorar el comportamiento de tu perro</p>
       <div class="splash-cta-wrap">
-        <button class="btn-primary" onclick="goTo('s-account-type')" data-i18n="get_started">Comenzar · Log In</button>
-        <div class="splash-links-row">
-          <button class="splash-link" onclick="goTo('s-home')" data-i18n="splash_home">Inicio</button>
-          <span class="splash-link-sep" aria-hidden="true">·</span>
-          <button class="splash-link splash-link--tour" onclick="openTourIntro()"><span data-i18n="take_tour">Ver el tour</span></button>
-          <span class="splash-link-sep" aria-hidden="true">·</span>
-          <button class="splash-link splash-link--pro" onclick="goTo('s-pro-area')" data-i18n="splash_pro_area">Área Pro</button>
+        <div class="splash-dock">
+          <div class="splash-dock-main">
+            <button class="splash-dock-cta" type="button" onclick="goTo('s-account-type')">
+              <span class="splash-dock-text">
+                <span class="splash-dock-top" data-i18n="splash_dock_start_eyebrow">Empieza</span>
+                <span class="splash-dock-main-label" data-i18n="get_started">Comenzar · Log In</span>
+              </span>
+              <span class="splash-dock-arrow" aria-hidden="true">→</span>
+            </button>
+            <div class="splash-dock-divider" aria-hidden="true"></div>
+            <button class="splash-dock-pro" type="button" onclick="goTo('s-pro-area')">
+              <span class="splash-dock-top splash-dock-top--pro" data-i18n="splash_dock_pro_eyebrow">Profesional</span>
+              <span class="splash-dock-main-label" data-i18n="splash_pro_area">Área Pro</span>
+            </button>
+          </div>
+          <div class="splash-dock-secondary">
+            <button class="splash-dock-sec" type="button" onclick="goTo('s-home')" data-i18n="splash_home">Inicio</button>
+            <span class="splash-dock-sec-sep" aria-hidden="true">·</span>
+            <button class="splash-dock-sec splash-dock-sec--tour" type="button" onclick="openTourIntro()"><span data-i18n="splash_dock_tour">Tour</span></button>
+          </div>
         </div>
       </div>
       <button class="splash-privacy" onclick="goTo('s-privacy')">Política de Privacidad</button>
@@ -17313,6 +17477,9 @@ function endTourIntro() {
       log_in:                 'Iniciar sesión',
       take_tour:              'Ver el tour',
       splash_pro_area:        'Área Pro',
+      splash_dock_start_eyebrow: 'Empieza',
+      splash_dock_pro_eyebrow:   'Profesional',
+      splash_dock_tour:          'Tour',
       // Account type select (s-account-type)
       account_type_eyebrow:   'Perfil de Usuario',
       at_headline:            '¿Cuál es tu perfil?',
@@ -18232,6 +18399,9 @@ function endTourIntro() {
       log_in:                 'Log In',
       take_tour:              'Take a Tour',
       splash_pro_area:        'Pro area',
+      splash_dock_start_eyebrow: 'Get started',
+      splash_dock_pro_eyebrow:   'Professional',
+      splash_dock_tour:          'Tour',
       // Account type select (s-account-type)
       account_type_eyebrow:   'User Profile',
       at_headline:            "What's your profile?",

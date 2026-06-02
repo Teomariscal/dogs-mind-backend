@@ -95,9 +95,11 @@ class TrainingConsultInput(BaseModel):
 
 class TrainingConsultResponse(BaseModel):
     """Respuesta del endpoint."""
-    analysis: str = Field(..., description="Markdown del análisis técnico + plan operante por fases")
+    analysis: str = Field(..., description="Markdown del análisis funcional ABA + plan operante por fases")
+    sources: list = Field(default_factory=list, description="Fragmentos de literatura RAG citados [1], [2], …")
     input_tokens: int
     output_tokens: int
+    cache_hit: bool = False
     case_type: Literal["training"] = "training"
 
 
@@ -192,8 +194,10 @@ def create_training_consult(
 
         return TrainingConsultResponse(
             analysis=result.analysis_markdown,
+            sources=[s.model_dump() for s in result.sources],
             input_tokens=result.input_tokens,
             output_tokens=result.output_tokens,
+            cache_hit=result.cache_hit,
         )
     except Exception as e:
         # Refund: no cobramos al usuario por errores de IA/red.

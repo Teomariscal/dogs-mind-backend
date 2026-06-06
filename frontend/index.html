@@ -14372,6 +14372,9 @@ function getVal(id, fallback) {
         if ((!r.dog_name || r.dog_name === 'Sin nombre') && c.client_dog_name) { r.dog_name = c.client_dog_name; refreshed++; }
         if (!r.breed && c.client_dog_breed) { r.breed = c.client_dog_breed; refreshed++; }
         if (!r.dog_age && c.client_dog_age) { r.dog_age = c.client_dog_age; refreshed++; }
+        // case_type: rellenar si el record local lo perdió (sync cross-device).
+        // 'behavior' es legacy/default, no pinta tag → solo guardamos si es 'training'.
+        if (!r.case_type && c.case_type) { r.case_type = c.case_type; refreshed++; }
       });
 
       var added = 0;
@@ -14392,6 +14395,7 @@ function getVal(id, fallback) {
           plan:             c.summary_plan || '',
           status:           st,
           lang:             c.lang || 'es',
+          case_type:        c.case_type || 'behavior',
           _fromBackend:     true
         });
         added++;
@@ -14612,8 +14616,15 @@ function getVal(id, fallback) {
         '<div style="font-size:11px;color:var(--grey);line-height:1.5;margin-bottom:10px;">' + shortProblem + '</div>' +
         '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">' +
           '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
-            '<span style="font-size:10px;background:rgba(42,90,42,0.07);color:var(--green2);padding:3px 8px;border-radius:6px;">' + _i18nText('rec_tag_abc','ABC Análisis') + '</span>' +
-            (r.plan ? '<span style="font-size:10px;background:rgba(42,90,42,0.07);color:var(--green2);padding:3px 8px;border-radius:6px;">' + _i18nText('rec_tag_plan_lima','Plan LIMA') + '</span>' : '') +
+            // Tag distintivo por tipo de caso (v196 2026-06-04). Training: cyan
+            // (paleta vibrant Pro). Behavior/legacy: olivo (igual que antes, cero
+            // regresión visual para clínicos). Se prioriza tipo de caso: training
+            // muestra "Adiestramiento" en vez de "ABC Análisis".
+            (r.case_type === 'training'
+              ? '<span style="font-size:10px;background:rgba(94,200,230,0.12);color:#2a6f88;padding:3px 8px;border-radius:6px;font-weight:600;">' + _i18nText('rec_tag_training','Adiestramiento') + '</span>'
+              : '<span style="font-size:10px;background:rgba(42,90,42,0.07);color:var(--green2);padding:3px 8px;border-radius:6px;">' + _i18nText('rec_tag_abc','ABC Análisis') + '</span>'
+              + (r.plan ? '<span style="font-size:10px;background:rgba(42,90,42,0.07);color:var(--green2);padding:3px 8px;border-radius:6px;">' + _i18nText('rec_tag_plan_lima','Plan LIMA') + '</span>' : '')
+            ) +
           '</div>' +
           '<div style="display:flex;align-items:center;gap:8px;">' +
             '<div style="font-size:10px;color:var(--grey);">' + (r.date || '') + '</div>' +
@@ -17955,6 +17966,7 @@ function endTourIntro() {
       tr_save_plan:             'Guardar plan',
       tr_saved_toast:           'Plan de entrenamiento guardado',
       tr_err_no_plan:           'No hay plan que guardar.',
+      rec_tag_training:         'Adiestramiento',
       pending_training_title:   'Tienes un plan de entrenamiento sin guardar.',
       pending_training_sub:     'Lo recuperamos en este dispositivo, sin volver a cobrar.',
       pending_training_view:    'Ver',
@@ -18883,6 +18895,7 @@ function endTourIntro() {
       tr_save_plan:             'Save plan',
       tr_saved_toast:           'Training plan saved',
       tr_err_no_plan:           'No plan to save.',
+      rec_tag_training:         'Training',
       pending_training_title:   'You have an unsaved training plan.',
       pending_training_sub:     'We recover it on this device, without charging again.',
       pending_training_view:    'View',

@@ -145,6 +145,10 @@ class CaseResponse(BaseModel):
     # Frontend usa esto para decidir si pintar el badge "Este caso está en EN/ES"
     # cuando difiere del idioma de UI actual.
     lang: Optional[str] = None
+    # Tipo de caso para distinguir flujos en el listado de records.
+    # 'behavior' (ABC clínico, default y legacy) | 'training' (Adiestramiento Pro).
+    # Frontend usa esto para pintar el tag "Adiestramiento" en s-records.
+    case_type: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 

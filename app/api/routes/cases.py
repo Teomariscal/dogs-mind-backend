@@ -228,6 +228,13 @@ class LegacyRecord(BaseModel):
     # NULL si el record fue creado antes de esta feature → case.lang queda NULL,
     # endpoints caen al fallback ?lang= (cero regresión).
     lang: Optional[Literal["es", "en"]] = Field(None, description="'es' | 'en' si se conoce; NULL para records legacy.")
+    # Distinción de flujo: 'behavior' (ABC clínico, default) | 'training' (consulta
+    # de Entrenamiento Específico). Optional; NULL/missing → default Case.case_type
+    # ('behavior') y comportamiento idéntico al previo (cero regresión).
+    case_type: Optional[Literal["behavior", "training"]] = Field(
+        None,
+        description="'behavior' (ABC clínico) | 'training' (Adiestramiento Pro). NULL → 'behavior' (default).",
+    )
 
 
 class MigrateRequest(BaseModel):
@@ -1390,7 +1397,13 @@ def migrate_legacy_records(
             continue
 
         # 4. Crear Case
-        title = (rec.problem or rec.dog_name or "Caso clínico").strip()[:150]
+        # case_type opcional desde el record (NULL → 'behavior', preserva legacy).
+        _ctype = (rec.case_type or "behavior").strip().lower()
+        if _ctype not in ("behavior", "training"):
+            _ctype = "behavior"
+        # Título por defecto distingue tipo cuando no hay problem/dog_name.
+        _default_title = "Plan de entrenamiento" if _ctype == "training" else "Caso clínico"
+        title = (rec.problem or rec.dog_name or _default_title).strip()[:150]
         case_status = "archived" if (rec.status or "").lower() in {"archived", "closed", "resolved"} else "open"
         case = Case(
             user_id=user.id,
@@ -1398,6 +1411,7 @@ def migrate_legacy_records(
             title=title,
             motivo_consulta=rec.problem,
             status=case_status,
+            case_type=_ctype,
             summary_abc=_summarize_text(rec.analysis),
             summary_plan=_summarize_text(rec.plan),
             # Guardar nombre/raza/edad del perro en el propio caso para que viaje

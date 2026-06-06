@@ -7875,6 +7875,22 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
         </div>
       </div>
 
+      <!-- ── Tarjeta plan de entrenamiento pendiente (Pro, v195 2026-06-04) ──
+           Espejo de pending-analysis-card pero para el flujo de Entrenamiento
+           Específico (/training-analysis). Se distingue visualmente con borde
+           cyan (paleta vibrant del módulo training) en vez de verde olivo.
+           maybeShowPendingTrainingCard() la muestra al entrar a s-home si hay
+           un plan generado pero sin guardar. "Ver" rehidrata s-training-result
+           sin volver a llamar al endpoint (no se vuelve a cobrar 3 tokens). -->
+      <div id="pending-training-card" style="display:none;background:#fff;border:1px solid rgba(94,200,230,0.42);border-radius:14px;padding:14px 16px;box-shadow:0 2px 10px rgba(94,200,230,0.10);margin:14px 16px 0;">
+        <div style="font-size:13.5px;font-weight:600;color:var(--dark);line-height:1.4;" data-i18n="pending_training_title">Tienes un plan de entrenamiento sin guardar.</div>
+        <div style="font-size:12px;color:var(--grey);margin-top:3px;line-height:1.4;" data-i18n="pending_training_sub">Lo recuperamos en este dispositivo, sin volver a cobrar.</div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button type="button" onclick="_pendingTrainingView()" data-i18n="pending_training_view" style="flex:1;padding:9px 14px;border-radius:100px;border:none;background:#4a6741;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;min-height:40px;">Ver</button>
+          <button type="button" onclick="_pendingTrainingDiscard()" data-i18n="pending_training_discard" style="padding:9px 16px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;min-height:40px;">Descartar</button>
+        </div>
+      </div>
+
       <!-- My Dogs (renderizado dinámicamente desde el backend; fallback Buddy/Laika
            si no hay sesión o usuario aún sin perros — ver renderHomeDogs() en JS) -->
       <div class="section">
@@ -9352,8 +9368,16 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
     <article id="tr-content" class="tr-content">
       <!-- markdown renderizado dinámicamente en submitTrainingConsult() -->
     </article>
-    <div class="tr-actions">
-      <button class="tc-submit-btn" onclick="goToConsultType()" data-i18n="tr_new_consult">Nueva consulta</button>
+    <!-- ── Acciones: Guardar plan + Nueva consulta (v195 2026-06-04) ───────────
+         Antes solo había "Nueva consulta". Si el usuario pulsaba ahí o cerraba,
+         el plan se perdía (3 tokens evaporados). Patrón espejo de acceptIntervention()
+         + savePendingAnalysis() del ABC clínico: autosave al recibir respuesta +
+         botón "Guardar plan" que migra a backend con case_type='training' y
+         aparece en s-records. -->
+    <div class="tr-actions" style="display:flex;flex-direction:column;gap:10px;">
+      <button class="tc-submit-btn" onclick="acceptTrainingPlan()" data-i18n="tr_save_plan">Guardar plan</button>
+      <button class="tc-submit-btn" onclick="goToConsultType()" data-i18n="tr_new_consult"
+              style="background:transparent;color:var(--cyan, #5ec8e6);border:1.5px solid rgba(94,200,230,0.5);">Nueva consulta</button>
     </div>
   </div><!-- /s-training-result -->
 
@@ -11106,7 +11130,7 @@ function goTo(id) {
     window._anamnesisPrefillFromDog = null;
   }
   if (id === 's-tokens') updateTokensScreen();
-  if (id === 's-home') { fetchBalance(); loadDailyTip(); if (typeof maybeShowPendingAnalysisCard === 'function') maybeShowPendingAnalysisCard(); }
+  if (id === 's-home') { fetchBalance(); loadDailyTip(); if (typeof maybeShowPendingAnalysisCard === 'function') maybeShowPendingAnalysisCard(); if (typeof maybeShowPendingTrainingCard === 'function') maybeShowPendingTrainingCard(); }
   if (id === 's-training') {
     // Siempre entrar en la ficha (no en la vista resultado) y arrancar el vídeo.
     var trScr = document.getElementById('s-training');
@@ -12900,6 +12924,10 @@ async function psSubmit() {
     }
 
     // ─── FLUJO STRIPE ESTÁNDAR (con pago de membresía) ───
+    // D-002: en iOS la membresía Pro va por IAP (Fase 2), nunca por Stripe. Si
+    // se llega aquí en iOS (promo OFF, sin código cortesía) → fail-closed: no se
+    // crea sesión Stripe. La promo/cortesía se resuelven en ramas anteriores.
+    if (dmIsIosNative()) { _psSetBusy(false); return; } // TODO Fase 2 (IAP): compra Pro RevenueCat aquí.
     // Paso 2 — Guardar datos de empresa (PUT /me/company).
     var companyPayload = _psBuildCompanyPayload();
     var compRes = await fetch(API_BASE + '/me/company', {
@@ -13076,6 +13104,10 @@ async function paGoToCheckout() {
   if (window._proPromoActive) {
     return _paActivatePromo();
   }
+
+  // D-002: en iOS la membresía Pro va por IAP (Fase 2), nunca por Stripe.
+  // Fail-closed: con promo OFF, el binario iOS no crea sesión Stripe.
+  if (dmIsIosNative()) { return; } // TODO Fase 2 (IAP): compra Pro RevenueCat aquí.
 
   var cb = document.getElementById('pa-bundle-cb');
   var withBundle = !!(cb && cb.checked);
@@ -13840,6 +13872,179 @@ function _pendingAnalysisDiscard() {
   if (card) card.style.display = 'none';
 }
 
+// ── Plan de entrenamiento pendiente (paralelo a Part B 2026-05-25) ───────────
+// Problema 2026-06-04 (feedback Teo): tras /training-analysis, el plan se renderiza
+// en s-training-result PERO el usuario solo tiene "Nueva consulta" como salida.
+// Si cierra la app o navega → 3 tokens evaporados + plan perdido.
+// Solución (v195): autosave del markdown en localStorage al recibir respuesta,
+// tarjeta de recuperación en s-home, y acceptTrainingPlan() que migra a backend
+// con case_type='training' para que aparezca en s-records permanentemente.
+// Distinción con dm_pending_analysis (Part B): aquí guardamos un PLAN DE
+// ENTRENAMIENTO completo (markdown), no un análisis ABC.
+
+function _pendingTrainingKey() {
+  var email = '';
+  try { email = (localStorage.getItem('dm_email') || '').trim().toLowerCase(); } catch(e) {}
+  if (!email) return 'dm_pending_training_guest';
+  return 'dm_pending_training_' + _hashEmail(email);
+}
+
+function savePendingTraining(payload) {
+  try {
+    if (!payload || !payload.planMarkdown) return;
+    localStorage.setItem(_pendingTrainingKey(), JSON.stringify({
+      formData:     payload.formData     || null,  // {dog_name, breed, age, goal, ...}
+      planMarkdown: payload.planMarkdown || '',
+      sources:      payload.sources      || [],
+      dogName:      payload.dogName      || '',
+      ts:           Date.now()
+    }));
+  } catch(e) { /* silencioso: no romper flujo de pago */ }
+}
+
+function getPendingTraining() {
+  try {
+    var raw = localStorage.getItem(_pendingTrainingKey());
+    if (!raw) return null;
+    var p = JSON.parse(raw);
+    if (!p || !p.planMarkdown) return null;
+    return p;
+  } catch(e) { return null; }
+}
+
+function clearPendingTraining() {
+  try { localStorage.removeItem(_pendingTrainingKey()); } catch(e) {}
+}
+
+// Muestra/oculta la tarjeta de recuperación de plan de entrenamiento en s-home.
+// Llamada desde el handler de navegación a s-home (junto a maybeShowPendingAnalysisCard).
+function maybeShowPendingTrainingCard() {
+  var card = document.getElementById('pending-training-card');
+  if (!card) return;
+  var p = getPendingTraining();
+  card.style.display = p ? 'block' : 'none';
+}
+
+// "Ver": rehidrata s-training-result con el markdown guardado SIN volver a llamar
+// a /training-analysis (no se vuelve a cobrar). Repinta el HTML y navega.
+function _pendingTrainingView() {
+  var p = getPendingTraining();
+  if (!p) {
+    var card0 = document.getElementById('pending-training-card');
+    if (card0) card0.style.display = 'none';
+    return;
+  }
+  // Rehidratar estado global que acceptTrainingPlan() espera
+  window._lastTrainingData = p.formData || null;
+  window._lastTrainingPlan = p.planMarkdown || '';
+  window._lastTrainingDogName = p.dogName || (p.formData && p.formData.dog_name) || '';
+  // Repintar el contenido
+  try {
+    var tr = document.getElementById('tr-content');
+    if (tr) tr.innerHTML = window._mdToHtml(p.planMarkdown);
+  } catch(e) {}
+  goTo('s-training-result');
+}
+
+// "Descartar": confirmación + borrar. Usuario asume la pérdida del plan.
+function _pendingTrainingDiscard() {
+  var msg = _i18nText('pending_training_discard_confirm', '¿Descartar el plan de entrenamiento sin guardar? No podrás recuperarlo después.');
+  if (!confirm(msg)) return;
+  clearPendingTraining();
+  var card = document.getElementById('pending-training-card');
+  if (card) card.style.display = 'none';
+}
+
+// Persistir plan de entrenamiento en records + backend (espejo de acceptIntervention).
+// Se llama desde el botón "Guardar plan" en s-training-result. Idempotente: si el
+// usuario pulsa varias veces, crea un solo caso (backend deduplicación por id+user).
+async function acceptTrainingPlan() {
+  var formData = window._lastTrainingData || {};
+  var planMd = window._lastTrainingPlan || '';
+  if (!planMd) {
+    // Defensa: no hay plan en memoria → intentar rescatar del localStorage
+    var p = getPendingTraining();
+    if (p && p.planMarkdown) {
+      planMd = p.planMarkdown;
+      formData = p.formData || formData;
+    }
+  }
+  if (!planMd) {
+    try { showToast(_i18nText('tr_err_no_plan', 'No hay plan que guardar.')); } catch(_) {}
+    return;
+  }
+  var lang = (formData && formData.lang) || (window.getCurrentLang ? window.getCurrentLang() : 'es');
+  // El "problema" en training = objetivo de entrenamiento. analysis vacío (la
+  // estructura ABA va embebida en el markdown del plan).
+  var record = {
+    id:        Date.now(),
+    date:      new Date().toLocaleDateString(lang === 'en' ? 'en-GB' : 'es-ES'),
+    dog_name:  (formData.dog_name || window._lastTrainingDogName || 'Sin nombre'),
+    breed:     formData.breed     || '',
+    dog_age:   formData.age       || formData.dog_age || '',
+    problem:   formData.goal      || '',
+    analysis:  '',
+    plan:      planMd,
+    status:    'active',
+    case_type: 'training',
+    lang:      lang
+  };
+  try {
+    var records = getRecords();
+    records.unshift(record);
+    setRecords(records);
+  } catch(e) {}
+  // Limpiar pending: ya está aceptado, no debe aparecer la tarjeta de recuperación
+  clearPendingTraining();
+  // Migrar a backend (mismo endpoint que ABC, con case_type='training' añadido)
+  try {
+    var jwtMig = localStorage.getItem('dm_jwt') || '';
+    if (jwtMig) {
+      var mres = await fetch(API_BASE + '/cases/migrate', {
+        method: 'POST', headers: authHeaders(),
+        body: JSON.stringify({ records: [{
+          id: record.id, date: record.date || null,
+          dog_name: record.dog_name || null, breed: record.breed || null,
+          dog_age: record.dog_age || null, problem: record.problem || null,
+          analysis: record.analysis || null, plan: record.plan || null,
+          status: record.status || 'active',
+          lang: record.lang || null,
+          case_type: 'training'
+        }]})
+      });
+      if (mres.ok) {
+        var mdata = await mres.json();
+        var mresult = (mdata.results && mdata.results[0]) || null;
+        if (mresult && mresult.case_id) {
+          try {
+            var recsU = getRecords();
+            var idxU = recsU.findIndex(function(r){ return r.id === record.id; });
+            if (idxU >= 0) { recsU[idxU].backend_case_id = mresult.case_id; setRecords(recsU); }
+          } catch(e) {}
+        } else if (mresult && mresult.status === 'skipped_quota') {
+          var _qmsg = mresult.detail || _i18nText('case_quota_full', 'Has alcanzado tu límite de casos. Borra uno para guardar este.');
+          try { showToast(_qmsg); } catch(_) {}
+        }
+      }
+    }
+  } catch(e) { /* sin red: queda en local, se podrá migrar en otra acción */ }
+  // Refresh balance defensivo (no se cobra aquí, solo por si quedó stale)
+  try { if (typeof fetchBalance === 'function') fetchBalance(); } catch(e) {}
+  goTo('s-records');
+  setTimeout(function() {
+    var toast = document.createElement('div');
+    toast.textContent = _i18nText('tr_saved_toast', 'Plan de entrenamiento guardado');
+    toast.style.cssText = 'position:absolute;bottom:80px;left:50%;transform:translateX(-50%);background:#4a6741;color:#fff;padding:12px 24px;border-radius:100px;font-size:14px;font-weight:600;z-index:9999;font-family:inherit;box-shadow:0 4px 16px rgba(0,0,0,0.2);white-space:nowrap;';
+    document.querySelector('.phone').appendChild(toast);
+    setTimeout(function(){ toast.style.opacity='0'; toast.style.transition='opacity 0.4s'; setTimeout(function(){ toast.remove(); }, 400); }, 2500);
+  }, 300);
+}
+// Expose para handlers HTML inline
+window.acceptTrainingPlan = acceptTrainingPlan;
+window._pendingTrainingView = _pendingTrainingView;
+window._pendingTrainingDiscard = _pendingTrainingDiscard;
+window.maybeShowPendingTrainingCard = maybeShowPendingTrainingCard;
+
 // Listener de autosave: input/change en el contenedor de la anamnesis.
 // Capturado al cargar el DOM. Debounced para no escribir en cada tecla.
 (function _wireAnamAutosave() {
@@ -13866,6 +14071,38 @@ function _pendingAnalysisDiscard() {
 var API_BASE = window.location.protocol === 'file:'
   ? 'http://localhost:8000'
   : 'https://dogs-mind-backend-production.up.railway.app';
+
+// ── App Store compliance · D-002 (3.1.1) ────────────────────────────────────
+// En el binario iOS nativo (Capacitor) Stripe debe quedar COMPLETAMENTE oculto:
+// ni botón, ni link, ni copy. Las compras irán por IAP (RevenueCat, Fase 2).
+// En web y Android este flag es false → el flujo Stripe queda intacto (INERTE).
+function dmIsIosNative() {
+  try {
+    return !!(window.Capacitor && window.Capacitor.getPlatform
+      && window.Capacitor.getPlatform() === 'ios');
+  } catch (e) { return false; }
+}
+window.dmIsIosNative = dmIsIosNative;
+
+// Oculta toda la superficie Stripe del binario iOS (botones de compra + copy de
+// pago). No-op en web/Android. Idempotente. La vía de compra iOS (IAP) se cablea
+// en Fase 2 sobre estos mismos puntos.
+function dmApplyIosNativeUI() {
+  if (!dmIsIosNative()) return;
+  try {
+    // Tokens: los packs son compra Stripe pura → ocultar las 3 filas.
+    document.querySelectorAll('#s-tokens [onclick^="recargar"]').forEach(function(el){ el.style.display = 'none'; });
+    // Tokens: ocultar el bloque "Pago seguro con tarjeta".
+    var pmt = document.querySelector('#s-tokens [data-i18n="tokens_secure_payment"]');
+    if (pmt && pmt.parentElement) pmt.parentElement.style.display = 'none';
+    // Pro: ocultar el copy "Pago seguro vía Stripe." (el botón Pro se mantiene:
+    // sirve a promo/cortesía; su rama Stripe queda guardada en los handlers).
+    document.querySelectorAll('.ps-secure').forEach(function(el){ el.style.display = 'none'; });
+  } catch (e) {}
+}
+window.dmApplyIosNativeUI = dmApplyIosNativeUI;
+if (document.readyState !== 'loading') { dmApplyIosNativeUI(); }
+else { document.addEventListener('DOMContentLoaded', dmApplyIosNativeUI); }
 
 // ── DAILY TIP (Consejo del día generado por backend) ─────────────────────
 // Fetch /tip/today para el lang actual, cachea en localStorage por fecha.
@@ -14613,6 +14850,10 @@ function getVal(id, fallback) {
 
   // ── Pago con Stripe Checkout (automático, <30 seg) ────────────────────────
   function recargar(pack) {
+    // D-002: en iOS la compra de tokens va por IAP (Fase 2), nunca por Stripe.
+    // Fail-closed: aunque la UI de packs queda oculta (dmApplyIosNativeUI), no
+    // se inicia ninguna sesión de pago Stripe en el binario iOS.
+    if (dmIsIosNative()) return; // TODO Fase 2 (IAP): iniciar compra RevenueCat aquí.
     var jwt = getJWT();
     if (!jwt) { alert('Inicia sesión para comprar tokens.'); goToLogin('s-tokens'); return; }
 
@@ -16646,6 +16887,26 @@ window.submitTrainingConsult = async function() {
     // Renderizar markdown en s-training-result
     var tr = document.getElementById('tr-content');
     if (tr) tr.innerHTML = window._mdToHtml(md);
+    // ── Autosave del plan (v195 2026-06-04, paralelo a Part B del ABC) ──────
+    // Guardamos el plan EN CUANTO llega del backend, antes incluso de pintar la
+    // siguiente pantalla. Si el usuario cierra la app o navega, podrá recuperar
+    // el plan desde la tarjeta "Plan de entrenamiento sin guardar" en s-home
+    // sin volver a pagar los 3 tokens. Se limpia al pulsar "Guardar plan".
+    var _trainingFormData = {
+      dog_name: dogName, breed: breed, age: age,
+      dog_level: dogLvl, handler_level: hndLvl,
+      reinforcers: reinf, goal: goal, context: ctx,
+      uses_clicker: clicker === 'yes', lang: lang
+    };
+    window._lastTrainingData = _trainingFormData;
+    window._lastTrainingPlan = md;
+    window._lastTrainingDogName = dogName;
+    try { savePendingTraining({
+      formData: _trainingFormData,
+      planMarkdown: md,
+      sources: data.sources || [],
+      dogName: dogName
+    }); } catch(e) { /* defensivo: nunca romper el flujo */ }
     // Token balance refresh (cobramos 3)
     try { if (typeof fetchBalance === 'function') fetchBalance(); } catch(e) {}
     if (btn) { btn.disabled = false; btn.textContent = prevText; }
@@ -17691,6 +17952,14 @@ function endTourIntro() {
       tr_eyebrow:               'Plan de entrenamiento',
       tr_title:                 'Tu plan está listo',
       tr_new_consult:           'Nueva consulta',
+      tr_save_plan:             'Guardar plan',
+      tr_saved_toast:           'Plan de entrenamiento guardado',
+      tr_err_no_plan:           'No hay plan que guardar.',
+      pending_training_title:   'Tienes un plan de entrenamiento sin guardar.',
+      pending_training_sub:     'Lo recuperamos en este dispositivo, sin volver a cobrar.',
+      pending_training_view:    'Ver',
+      pending_training_discard: 'Descartar',
+      pending_training_discard_confirm: '¿Descartar el plan de entrenamiento sin guardar? No podrás recuperarlo después.',
       tl_eyebrow:               'Plan de entrenamiento',
       tl_title:                 'Generando tu plan…',
       tl_msg:                   'Aplicando análisis funcional ABA y consultando referencias técnicas. Esto puede tardar 30–60 segundos. <strong>No cierres la app.</strong>',
@@ -18611,6 +18880,14 @@ function endTourIntro() {
       tr_eyebrow:               'Training plan',
       tr_title:                 'Your plan is ready',
       tr_new_consult:           'New consultation',
+      tr_save_plan:             'Save plan',
+      tr_saved_toast:           'Training plan saved',
+      tr_err_no_plan:           'No plan to save.',
+      pending_training_title:   'You have an unsaved training plan.',
+      pending_training_sub:     'We recover it on this device, without charging again.',
+      pending_training_view:    'View',
+      pending_training_discard: 'Discard',
+      pending_training_discard_confirm: 'Discard the unsaved training plan? You won\'t be able to recover it later.',
       tl_eyebrow:               'Training plan',
       tl_title:                 'Generating your plan…',
       tl_msg:                   'Applying ABA functional analysis and consulting technical references. This can take 30–60 seconds. <strong>Don\'t close the app.</strong>',

@@ -91,6 +91,15 @@ class AnamnesisInput(BaseModel):
     # Pre-existing extra context field used by frontend
     prior_event: Optional[str] = Field(None, description="Major event/change before the problem started.")
 
+    # Adoption context (frontend feedback #1): time the dog has lived with the current tutor,
+    # distinct from age. An adopted 5-year-old may show the problem since arrival (months),
+    # not for years — critical for accurate ABC history. Empty/null = not adopted / not provided.
+    adopted_time_with_tutor: Optional[str] = Field(
+        None,
+        description="If adopted: how long the dog has lived with the current tutor (free text). Empty = not adopted / not provided.",
+        max_length=200,
+    )
+
     # UI language — controls the language of the AI analysis output
     lang: Optional[str] = Field("es", description="Response language: 'es' (Spanish) or 'en' (English)")
 

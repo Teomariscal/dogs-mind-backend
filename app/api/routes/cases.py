@@ -715,6 +715,20 @@ def export_case_pdf(
     )
 
 
+@router.get("/{case_id}/full/pdf")
+def export_case_pdf_full(
+    case_id: str,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """
+    Alias de /export.pdf con el patrón de ruta {endpoint}/pdf que usa el helper
+    del frontend (_downloadAccessiblePdf). #4 feedback tester: PDF completo =
+    análisis funcional ABC + plan de intervención ÍNTEGRO (no la versión sencilla).
+    """
+    return export_case_pdf(case_id, db=db, user=user)
+
+
 @router.get("/{case_id}/plan-simple/pdf")
 def export_plan_simple_pdf(
     case_id: str,

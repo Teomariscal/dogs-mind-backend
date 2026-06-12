@@ -197,6 +197,17 @@ def build_anamnesis_block(anamnesis: dict) -> str:
     lines.append(f"Previous attempts: {_str_label(a.get('previous_attempts'))}")
     lines.append(f"Owner's theory: {_str_label(a.get('owner_theory'))}")
     lines.append(f"Major event/change before problem started: {_str_label(a.get('prior_event'))}")
+    # #1 (feedback tester): solo se añade cuando el tutor aporta el dato (perro adoptado).
+    # NO mutar el prompt de los casos no adoptados (~95%): se omite por completo si está vacío.
+    _adopted = a.get("adopted_time_with_tutor")
+    if isinstance(_adopted, str):
+        _adopted = _adopted.strip()
+    if _adopted:
+        lines.append(
+            f"Adopted — time living with current tutor: {_adopted}. "
+            "(Interpret the problem's duration/history relative to THIS time with the "
+            "tutor, not the dog's total age.)"
+        )
 
     lines.append("</anamnesis>")
     return "\n".join(lines)

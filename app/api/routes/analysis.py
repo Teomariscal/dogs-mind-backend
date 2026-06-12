@@ -159,6 +159,7 @@ async def create_analysis_with_video(
     background_tasks: BackgroundTasks,
     anamnesis_json: str = Form(..., description="Full AnamnesisInput serialised as JSON"),
     video: UploadFile = File(..., description="Video of the dog's behavior (MP4, MOV, AVI…)"),
+    video_caption: Optional[str] = Form(None, description="Optional owner description of what the video shows (feedback #2)"),
     authorization: Optional[str] = Header(None),
     db: Session = Depends(get_db),
 ):
@@ -253,7 +254,14 @@ async def create_analysis_with_video(
                 "Frame extraction failed, falling back to text-only: %s", e
             )
 
-        return run_clinical_analysis(anamnesis, video_frames=frames or None)
+        # video_caption es input del usuario: se recorta a 300 chars (evita abuso de
+        # tokens y limita superficie de prompt-injection; el prompt ya lo trata como
+        # contexto no fiable que NO anula la evidencia visual).
+        return run_clinical_analysis(
+            anamnesis,
+            video_frames=frames or None,
+            video_caption=((video_caption or "").strip()[:300]) or None,
+        )
 
     except HTTPException:
         raise

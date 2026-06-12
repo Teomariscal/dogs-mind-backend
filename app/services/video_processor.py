@@ -38,6 +38,15 @@ def _extract_with_cv2(video_path: str, max_frames: int, max_duration_sec: float 
     if not cap.isOpened():
         raise RuntimeError(f"OpenCV could not open video: {video_path}")
 
+    # #8 (feedback tester): honor the video's rotation metadata so extracted frames
+    # are NOT sideways/upside-down. A phone video recorded rotated previously made the
+    # model misread the scene. CAP_PROP_ORIENTATION_AUTO auto-applies the display-matrix
+    # rotation (OpenCV ≥4.5). Wrapped defensively in case the build lacks the flag.
+    try:
+        cap.set(cv2.CAP_PROP_ORIENTATION_AUTO, 1)
+    except Exception:
+        pass
+
     total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     if total <= 0:
         raise RuntimeError("Could not determine frame count")

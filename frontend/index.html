@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <meta name="description" content="Dogs’ Mind — Análisis de conducta canina con IA. Consulta con Teo Mariscal y los Dogs Aigents para entender y mejorar el comportamiento de tu perro.">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+<!-- Forzar esquema claro: evita que el modo oscuro de iOS invierta inputs (texto blanco invisible). App es light-themed. -->
+<meta name="color-scheme" content="light">
 <title>The Dogs’ Mind · AI for Canine Behavior</title>
 <!-- PWA manifest -->
 <link rel="manifest" href="/manifest.json">
@@ -38,6 +40,7 @@
 </script>
 <style>
 :root {
+  color-scheme: light; /* iOS dark mode NO debe invertir inputs (texto blanco invisible) */
   --cream:   #f0ece3;
   --cream2:  #e8e2d6;
   --cream3:  #ddd5c4;
@@ -5225,7 +5228,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
   color: var(--ps-text); margin: 0; letter-spacing: -0.01em;
 }
 @media (min-width: 380px) {
-  #s-pro-signup .ps-title { font-size: 26px; },
+  #s-pro-signup .ps-title { font-size: 26px; }
   #s-pro-login .ps-title { font-size: 26px; }
 }
 #s-pro-signup .ps-intro,
@@ -8357,7 +8360,9 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
   <!-- ══ S-LOADING-ANALYSIS: pantalla de espera (análisis y plan) ══ -->
   <div id="s-loading-analysis" class="screen" style="overflow:hidden;">
     <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 22px;text-align:center;gap:22px;">
-      <img src="cecilia-maximus-shihtzu.webp" alt="Cecilia con Maximus y su Shih Tzu" style="height:46vh;max-height:380px;width:auto;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(0,0,0,0.18));">
+<!-- #3 (feedback tester): spinner claro y arriba para que NO parezca colgada -->
+      <div class="la-spinner" aria-hidden="true" style="width:44px;height:44px;border:3px solid rgba(243,241,234,0.25);border-top-color:#f3f1ea;border-radius:50%;animation:laSpin 0.85s linear infinite;flex-shrink:0;"></div>
+      <img src="cecilia-maximus-shihtzu.webp" alt="Cecilia con Maximus y su Shih Tzu" style="height:38vh;max-height:340px;width:auto;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(0,0,0,0.18));">
       <div style="max-width:340px;">
         <div id="loading-title" style="font-family:var(--ff-serif);font-size:22px;font-weight:700;color:var(--dark);letter-spacing:-0.3px;margin-bottom:14px;line-height:1.25;" data-i18n="loading_title">Analizando con IA…</div>
         <div style="font-size:14px;line-height:1.6;color:var(--text2);" data-i18n="loading_msg">Estás utilizando una herramienta de análisis de conducta animal muy potente y va a tomar algo de tiempo. Relax que esto puede tardar unos minutos, <strong>no cierres la app</strong>.</div>
@@ -8372,6 +8377,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
   </div>
   <style>
     @keyframes dotPulse { 0%,80%,100%{opacity:0.25;transform:scale(0.85);} 40%{opacity:1;transform:scale(1.15);} }
+    @keyframes laSpin { to { transform: rotate(360deg); } }
   </style>
 
   <div id="s-abc" class="screen" style="background:linear-gradient(180deg, #4a6741 0%, #5a7a51 25%, var(--cream2) 60%, var(--cream) 100%);">
@@ -8651,7 +8657,9 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
 
     <!-- Footer actions -->
     <div class="pp-actions" id="pp-actions" style="display:none;">
-      <button class="cm-btn-primary cm-btn-block" onclick="ppDownloadPdf()" data-i18n="pp_btn_pdf">Descargar PDF</button>
+      <!-- #4/#9 (feedback tester): esta pantalla es la versión ACCESIBLE → el plan sencillo es el botón PRIMARIO; el PDF completo (análisis ABC + plan íntegro) queda como secundario opcional. -->
+      <button class="cm-btn-primary cm-btn-block" onclick="ppDownloadPdf()" data-i18n="pp_btn_pdf">Descargar PDF (plan sencillo)</button>
+      <button class="cm-btn-secondary cm-btn-block" onclick="ppDownloadFullPdf()" data-i18n="pp_btn_pdf_full">Descargar PDF completo (análisis + plan)</button>
       <button class="cm-btn-secondary cm-btn-block" onclick="ppPrint()" data-i18n="pp_btn_print">Imprimir</button>
       <button class="cm-btn-secondary cm-btn-block" onclick="ppShare()" data-i18n="pp_btn_share">Compartir</button>
       <button class="cm-btn-secondary cm-btn-block" onclick="ppRegenerate()" data-i18n="pp_btn_regen">Regenerar (−0,1 tok.)</button>
@@ -9300,6 +9308,8 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
       </div>
 
       <div class="tc-cost-notice" data-i18n="tc_cost_notice">Este análisis consume 3 tokens.</div>
+      <!-- D-002 / 5.1.2(i): consent IA per-acción, visible en el punto de envío. -->
+      <p id="tc-ai-consent" style="font-family:'Jost',sans-serif;font-size:11px;line-height:1.5;color:rgba(255,255,255,0.55);text-align:center;max-width:300px;margin:8px auto 0;" data-i18n="consent_ai_inline">Al continuar, el texto sobre tu perro se enviará a <strong>Anthropic (EE. UU.)</strong> para generar el análisis.</p>
       <p id="tc-error" class="tc-error" style="display:none;"></p>
       <button id="tc-submit" type="submit" class="tc-submit-btn" data-i18n="tc_submit">Crear plan</button>
     </form>
@@ -9443,6 +9453,12 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;"><span data-i18n="anam_lbl_breed">Tipolog&iacute;a racial</span><span class="req-star" aria-hidden="true">*</span></div>
           <input id="inp-breed" type="text" data-i18n-placeholder="ph_breed" placeholder="Raza o raza a la que se parece m&aacute;s..." aria-required="true" data-required="true" onblur="_anamRequiredCheck(this)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
           <div class="req-error" aria-live="polite"></div>
+        </div>
+
+        <!-- #1 (feedback tester): perro adoptado — tiempo con el tutor, distinto de la edad -->
+        <div style="margin-bottom:12px;">
+          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_adopted">Si es adoptado, &iquest;cu&aacute;nto tiempo lleva contigo? (opcional)</div>
+          <input id="inp-adopted-time" type="text" data-i18n-placeholder="ph_adopted" placeholder="Ej: 6 meses, 2 a&ntilde;os... (d&eacute;jalo vac&iacute;o si no es adoptado)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
         </div>
 
         <div style="margin-bottom:12px;">
@@ -9665,6 +9681,8 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
               <div id="video-file-info" style="font-size:11px; color:var(--grey); flex:1; text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0;"></div>
               <button type="button" onclick="event.stopPropagation(); removeVideo();" style="font-size:11px; padding:8px 14px; border-radius:8px; border:1px solid rgba(220,80,80,0.3); background:#fff5f5; color:#c03030; cursor:pointer; font-family:inherit; font-weight:600; min-height:44px; flex-shrink:0;" data-i18n="anam_video_remove">Quitar vídeo</button>
             </div>
+            <!-- #2 (feedback tester): describir el vídeo para contextualizar a la IA -->
+            <textarea id="inp-video-caption" rows="2" data-i18n-placeholder="ph_video_caption" placeholder="Describe brevemente qué se ve en el vídeo (opcional)" onclick="event.stopPropagation();" style="width:100%; margin-top:10px; padding:10px 12px; border:1.5px solid rgba(0,0,0,0.12); border-radius:10px; font-size:16px; font-family:inherit; background:#fff; color:var(--dark); box-sizing:border-box; outline:none; resize:vertical;"></textarea>
           </div>
         </div>
       </div>
@@ -9679,6 +9697,8 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
       <!-- Cost notice (#10): el usuario ve coste ANTES de comprometer el click.
            Texto cambia a "4 tokens" cuando hay vídeo adjunto (ver setVideoAttachedUI). -->
       <div id="analyze-cost-notice" style="font-size:11px;color:var(--grey);text-align:center;margin-top:14px;margin-bottom:2px;" data-i18n="analyze_cost_notice">Este análisis consume 3 tokens</div>
+      <!-- D-002 / 5.1.2(i): consent IA per-acción, visible en el punto de envío. -->
+      <p id="analyze-ai-consent" style="font-size:11px;color:var(--grey);text-align:center;line-height:1.5;margin-top:10px;margin-bottom:2px;" data-i18n="consent_ai_inline">Al continuar, el texto sobre tu perro se enviará a <strong>Anthropic (EE. UU.)</strong> para generar el análisis.</p>
       <button id="btn-analyze" onclick="analyzeWithAI()" style="background:var(--green2);color:#fff;border:none;border-radius:100px;padding:14px 24px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;margin-top:8px;" data-i18n="analyze_btn">Analizar con IA →</button>
 
     </div>
@@ -10824,6 +10844,9 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
 // Autocontenido, fallback silencioso si visualViewport no existe.
 (function() {
   if (typeof window === 'undefined' || !window.visualViewport) return;
+  // En iOS nativo (Capacitor) el teclado lo gestiona resize:'native' del webview;
+  // este padding JS duplicaría la compensación → desactivarlo solo en iOS nativo.
+  try { if (window.Capacitor && window.Capacitor.getPlatform && window.Capacitor.getPlatform() === 'ios') return; } catch(e) {}
   var vv = window.visualViewport;
   function updateKbdHeight() {
     try {
@@ -11717,6 +11740,19 @@ async function ppDownloadPdf() {
   });
 }
 window.ppDownloadPdf = ppDownloadPdf;
+
+// #4 (feedback tester): PDF COMPLETO = análisis ABC + plan de intervención íntegro
+// (endpoint /cases/{id}/full/pdf → build_case_pdf). Reusa el mismo caseId del caso.
+async function ppDownloadFullPdf() {
+  var caseId = window._planSimpleState && window._planSimpleState.caseId;
+  if (!caseId) { showToast(_i18nText('pdf_err_404', 'No hay contenido para exportar.')); return; }
+  await _downloadAccessiblePdf({
+    caseId: caseId,
+    endpoint: 'full',
+    fallbackFilename: 'informe_completo.pdf',
+  });
+}
+window.ppDownloadFullPdf = ppDownloadFullPdf;
 
 // ── ABC explicado / Cecilia te explica — flujo real (Haiku 4.5, 0,1 tok) ────
 // Backend: POST /cases/{case_id}/abc-explained  (mismo contrato que plan-simple)
@@ -14275,6 +14311,9 @@ function getVal(id, fallback) {
     URL.revokeObjectURL(videoEl.src);
     videoEl.src = '';
     document.getElementById('inp-video').value = '';
+    // #2 fix: limpiar la descripción del vídeo para que no persista al quitar/cambiar vídeo
+    var _capEl = document.getElementById('inp-video-caption');
+    if (_capEl) _capEl.value = '';
     document.getElementById('video-drop-label').style.display   = 'block';
     document.getElementById('video-preview-wrap').style.display = 'none';
     document.getElementById('video-drop-zone').style.borderColor = 'rgba(0,0,0,0.15)';
@@ -15623,6 +15662,7 @@ async function analyzeWithAI() {
         previous_attempts:      history,
         owner_theory:           ownerTheory,
         prior_event:            eventoPrevio,
+        adopted_time_with_tutor: getVal('inp-adopted-time', ''),
         lang:                   (window.getCurrentLang ? window.getCurrentLang() : 'es')
     };
     window._lastAnamnesisData = anamnesisPayload;
@@ -15636,6 +15676,7 @@ async function analyzeWithAI() {
       var fd = new FormData();
       fd.append('anamnesis_json', JSON.stringify(anamnesisPayload));
       fd.append('video', videoFile, videoFile.name);
+      fd.append('video_caption', getVal('inp-video-caption', ''));
       var jwt = getJWT();
       res = await fetch(API_BASE + '/analysis/video', {
         method: 'POST',
@@ -17552,6 +17593,7 @@ function endTourIntro() {
       anam_lbl_name:           'Nombre',
       anam_lbl_age:            'Edad',
       anam_lbl_breed:          'Tipología racial',
+      anam_lbl_adopted:        'Si es adoptado, ¿cuánto tiempo lleva contigo? (opcional)',
       anam_lbl_sex:            'Sexo',
       anam_btn_male:           'Macho',
       anam_btn_female:         'Hembra',
@@ -18119,6 +18161,8 @@ function endTourIntro() {
       ph_dog_name:      'Nombre del perro',
       ph_dog_age:       'Ej: 3 años',
       ph_breed:         'Raza o raza a la que se parece más...',
+      ph_adopted:       'Ej: 6 meses, 2 años... (déjalo vacío si no es adoptado)',
+      ph_video_caption: 'Describe brevemente qué se ve en el vídeo (opcional)',
       ph_dolencia:      '¿Cuál dolencia? (ej: displasia, epilepsia...)',
       ph_weaning:       'Ej: 2 meses, 8 semanas...',
       ph_convive:       '¿Cuántos y de qué raza? (ej: 2 labradores)',
@@ -18271,7 +18315,8 @@ function endTourIntro() {
       pa_btn_activating_promo: 'Activando tu cuenta Profesional…',
       pa_success_promo_done:   '¡Bienvenido a Profesional! Tu cuenta está lista.',
       pa_cancelled:            'Activación cancelada.',
-      pp_btn_pdf:           'Descargar PDF',
+      pp_btn_pdf:           'Descargar PDF (plan sencillo)',
+      pp_btn_pdf_full:      'Descargar PDF completo (análisis + plan)',
       pp_btn_print:         'Imprimir',
       pp_btn_share:         'Compartir',
       pp_btn_regen:         'Regenerar (−0,1 tok.)',
@@ -18400,6 +18445,7 @@ function endTourIntro() {
       form_terms_pre:        'Al registrarte aceptas nuestra ',
       form_terms_link:       'Política de Privacidad',
       form_consent_html:     'He leído y acepto la <a onclick="event.stopPropagation();goTo(\'s-privacy\')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Política de Privacidad</a> y los <a onclick="event.stopPropagation();goTo(\'s-terms\')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Términos de Servicio</a>. Consiento el tratamiento de mis datos personales (email, teléfono) y entiendo que el texto que escriba sobre mi perro (anamnesis, conversaciones) se enviará a <strong>Anthropic (Claude AI, USA)</strong> para generar los análisis. Sin este consentimiento la app no puede generar análisis.',
+      consent_ai_inline:     'Al continuar, el texto sobre tu perro se enviará a <strong>Anthropic (EE. UU.)</strong> para generar el análisis.',
       form_err_required:     'Por favor introduce tu email y una contraseña.',
       form_err_password_short:'La contraseña debe tener al menos 6 caracteres.',
       form_err_terms:        'Para crear tu cuenta debes aceptar la Política de Privacidad y los Términos de Servicio.',
@@ -18483,6 +18529,7 @@ function endTourIntro() {
       anam_lbl_name:           'Name',
       anam_lbl_age:            'Age',
       anam_lbl_breed:          'Breed',
+      anam_lbl_adopted:        'If adopted, how long has the dog been with you? (optional)',
       anam_lbl_sex:            'Sex',
       anam_btn_male:           'Male',
       anam_btn_female:         'Female',
@@ -19048,6 +19095,8 @@ function endTourIntro() {
       ph_dog_name:      'Dog name',
       ph_dog_age:       'E.g.: 3 years',
       ph_breed:         'Breed or closest breed...',
+      ph_adopted:       'E.g. 6 months, 2 years... (leave blank if not adopted)',
+      ph_video_caption: 'Briefly describe what the video shows (optional)',
       ph_dolencia:      'Which condition? (e.g. dysplasia, epilepsy...)',
       ph_weaning:       'E.g.: 2 months, 8 weeks...',
       ph_convive:       'How many and which breeds? (e.g. 2 labradors)',
@@ -19200,7 +19249,8 @@ function endTourIntro() {
       pa_btn_activating_promo: 'Activating your Professional account…',
       pa_success_promo_done:   'Welcome to Professional! Your account is ready.',
       pa_cancelled:            'Activation cancelled.',
-      pp_btn_pdf:           'Download PDF',
+      pp_btn_pdf:           'Download PDF (simple plan)',
+      pp_btn_pdf_full:      'Download full PDF (analysis + plan)',
       pp_btn_print:         'Print',
       pp_btn_share:         'Share',
       pp_btn_regen:         'Regenerate (−0.1 tok.)',
@@ -19329,6 +19379,7 @@ function endTourIntro() {
       form_terms_pre:        'By registering you accept our ',
       form_terms_link:       'Privacy Policy',
       form_consent_html:     'I have read and accept the <a onclick="event.stopPropagation();goTo(\'s-privacy\')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Privacy Policy</a> and the <a onclick="event.stopPropagation();goTo(\'s-terms\')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Terms of Service</a>. I consent to the processing of my personal data (email, phone) and understand that the text I write about my dog (anamnesis, conversations) will be sent to <strong>Anthropic (Claude AI, USA)</strong> to generate the analyses. Without this consent the app cannot generate analyses.',
+      consent_ai_inline:     'By continuing, the text about your dog will be sent to <strong>Anthropic (USA)</strong> to generate the analysis.',
       form_err_required:     'Please enter your email and a password.',
       form_err_password_short:'Password must be at least 6 characters.',
       form_err_terms:        'To create your account you must accept the Privacy Policy and Terms of Service.',

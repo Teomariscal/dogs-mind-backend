@@ -2,6 +2,7 @@ from typing import Optional
 from uuid import UUID
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Header, Depends, Query
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
 
 from app.models.avatar import AvatarChatRequest, AvatarChatResponse
 from app.services.avatar_ai import chat
@@ -103,3 +104,39 @@ def avatar_chat(
             notes=f"avatar={request.avatar_id} | {str(e)[:150]}",
         )
         raise_http_for_anthropic(e)
+
+
+class AvatarReportRequest(BaseModel):
+    content: str = ""
+    avatar_id: Optional[str] = None
+    lang: Optional[str] = None
+
+
+@router.post("/report")
+def avatar_report(
+    request: AvatarReportRequest,
+    background_tasks: BackgroundTasks,
+    authorization: Optional[str] = Header(None),
+    db: Session = Depends(get_db),
+):
+    """
+    Reporte de usuario de una respuesta de IA inapropiada (moderación de contenido
+    generado — Apple App Review 1.2 / 4.7 para IA generativa). NO cobra tokens.
+    Registra el reporte vía usage_tracker (endpoint='/avatar/report', success='reported')
+    para que el equipo lo revise. Fail-soft: nunca rompe la UX del chat (siempre 200).
+    """
+    user_id = _extract_user_id_av(authorization)
+    snippet = (request.content or "")[:1000]
+    try:
+        background_tasks.add_task(
+            log_usage,
+            user_id=user_id,
+            endpoint="/avatar/report",
+            model=get_settings().avatar_model,
+            tokens_charged=0.0,
+            success="reported",
+            notes=f"avatar={request.avatar_id} | REPORTE: {snippet}",
+        )
+    except Exception:
+        pass
+    return {"status": "ok"}

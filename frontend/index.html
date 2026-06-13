@@ -10350,7 +10350,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
           <li data-i18n="pro_pro_feat_1">Hasta 20 perros activos en tu cuenta</li>
           <li data-i18n="pro_pro_feat_2">Informes descargables co-marcados con tu logo</li>
           <li data-i18n="pro_pro_feat_3">Registro completo de casos y seguimientos</li>
-          <li data-i18n="pro_pro_feat_4">10 tokens de cortesía al activar la membresía</li>
+          <li data-i18n="pro_pro_feat_4">10 tokens incluidos para empezar</li>
         </ul>
         <div class="pro-card-price-row">
           <span class="pro-card-price" data-i18n="pro_pro_price">20&nbsp;€/año</span>
@@ -10376,7 +10376,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
           <li data-i18n="pro_cert_feat_4">10 horas anuales de formación continua online</li>
           <li data-i18n="pro_cert_feat_5">Soporte preferente vía email con la oficina TDM</li>
           <li data-i18n="pro_cert_feat_6">Hasta 40 perros activos en tu cuenta</li>
-          <li data-i18n="pro_cert_feat_7">20 tokens de cortesía al activar la membresía</li>
+          <li data-i18n="pro_cert_feat_7">20 tokens incluidos para empezar</li>
           <li data-i18n="pro_cert_feat_8">Sujeto a aprobación: curso + examen oficial</li>
         </ul>
         <button class="pro-card-cta" disabled data-i18n="pro_cta_soon">Próximamente</button>
@@ -10573,12 +10573,12 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
         <label class="ps-bundle">
           <input type="checkbox" id="ps-bundle" onchange="psUpdateTotal()">
           <span class="ps-bundle-content">
-            <span class="ps-bundle-title" data-i18n="ps_bundle_title">Añadir 60 tokens de cortesía</span>
+            <span class="ps-bundle-title" data-i18n="ps_bundle_title">Añadir 60 tokens</span>
             <span class="ps-bundle-sub" data-i18n="ps_bundle_sub">Pack promocional 37,80 € (en vez de 42 €).</span>
           </span>
           <span class="ps-bundle-price" id="ps-bundle-price">+37,80 €</span>
         </label>
-        <p class="ps-courtesy" data-i18n="ps_courtesy">Incluye 10 tokens de cortesía al activar la membresía.</p>
+        <p class="ps-courtesy" data-i18n="ps_courtesy">Incluye 10 tokens para empezar.</p>
       </section>
 
       <p id="ps-error" class="ps-error" role="alert" style="display:none;"></p>
@@ -10616,7 +10616,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
         <div class="pa-summary-row">
           <div class="pa-summary-label">
             <strong data-i18n="pa_membership">Membresía Profesional · 1 año</strong>
-            <span class="pa-summary-hint" data-i18n="pa_membership_hint">Acceso a todas las funciones Profesional + 10 tokens de cortesía.</span>
+            <span class="pa-summary-hint" data-i18n="pa_membership_hint">Acceso a todas las funciones Profesional + 10 tokens para empezar.</span>
           </div>
           <div class="pa-summary-amount">20,00&nbsp;€</div>
         </div>
@@ -10645,7 +10645,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
         <span class="pa-total-amount" id="pa-total">20,00&nbsp;€</span>
       </div>
 
-      <p class="pa-disclaimer" data-i18n="pa_disclaimer">Pago único, no se renueva automáticamente. La activación se aplica en cuanto Stripe confirme el pago. Tu cuenta pasará a Profesional y se acreditarán los tokens cortesía.</p>
+      <p class="pa-disclaimer" data-i18n="pa_disclaimer">Pago único, no se renueva automáticamente. La activación se aplica en cuanto Stripe confirme el pago. Tu cuenta pasará a Profesional y se acreditarán los tokens incluidos.</p>
       <!-- Disclosure suscripción auto-renovable (Apple 3.1.2) — solo iOS, lo revela dmApplyIosNativeUI() -->
       <p id="pa-ios-terms" style="display:none;font-size:11px;line-height:1.5;color:var(--text2);text-align:center;margin-top:8px;">
         <a onclick="event.stopPropagation();goTo('s-terms')" style="color:var(--green);text-decoration:underline;cursor:pointer;" data-i18n="rc_terms_link">Términos de servicio</a> · <a onclick="event.stopPropagation();goTo('s-privacy')" style="color:var(--green);text-decoration:underline;cursor:pointer;" data-i18n="rc_privacy_link">Política de privacidad</a>
@@ -11036,14 +11036,18 @@ window.validateInviteCode = validateInviteCode;
     if (!inv || !btn) return;
     var hasCode = !!inv.value.trim();
     var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+    var base = document.getElementById('ps-plan-base-price');
+    var iosPs = (typeof dmIsIosNative === 'function' && dmIsIosNative());
     if (hasCode) {
-      // Teo 2026-05-16: texto corto "OK" sustituye al anterior "Activar gratis
-      // (cortesía)" que generaba dudas en invitados (el botón azul seguía con
-      // "Pagar 20€" tras setLang re-render porque el listener no se reaplicaba).
-      // Ahora el applyLang llama _syncProBtn al final → texto se mantiene.
-      btn.textContent = 'OK';
+      // Con código válido la activación es gratuita (cortesía).
+      btn.textContent = (lang === 'en') ? 'Activate free' : 'Activar gratis';
       if (secure) secure.textContent = (lang === 'en') ? 'Courtesy activation — no payment required.' : 'Activación cortesía — sin pago.';
       if (total) total.textContent = (lang === 'en') ? 'Free' : 'Gratis';
+    } else if (iosPs) {
+      // iOS: suscripción IAP 19,99 €/año (sin Stripe, sin bundle).
+      btn.textContent = (lang === 'en') ? 'Subscribe · €19.99/yr' : 'Suscribirse · 19,99 €/año';
+      if (total) total.textContent = '19,99 €';
+      if (base) base.textContent = '19,99 €';
     } else {
       btn.textContent = (lang === 'en') ? 'Pay €20.00' : 'Pagar 20,00 €';
       if (secure) secure.textContent = (lang === 'en') ? 'Secure payment via Stripe.' : 'Pago seguro vía Stripe.';
@@ -12687,6 +12691,18 @@ function psUpdateTotal() {
     if (btnElP) btnElP.textContent = _i18nText('pa_btn_activate_promo', 'Activar GRATIS');
     return;
   }
+  // Si hay código de invitación, el precio/botón los gestiona syncProBtn (cortesía gratis).
+  var _invPs = document.getElementById('ps-invite');
+  if (_invPs && _invPs.value.trim()) { if (typeof window._syncProBtn === 'function') window._syncProBtn(); return; }
+  var _totalElIos = document.getElementById('ps-total-amount');
+  var _btnElIos = document.getElementById('ps-pay-btn');
+  var _lgIos = (typeof window.getCurrentLang === 'function') ? window.getCurrentLang() : 'es';
+  // iOS: bundle oculto + precio IAP 19,99 €/año (no Stripe).
+  if (typeof dmIsIosNative === 'function' && dmIsIosNative()) {
+    if (_totalElIos) _totalElIos.textContent = '19,99 €';
+    if (_btnElIos) _btnElIos.textContent = (_lgIos === 'en') ? 'Subscribe · €19.99/yr' : 'Suscribirse · 19,99 €/año';
+    return;
+  }
   var bundle = document.getElementById('ps-bundle');
   var withBundle = !!(bundle && bundle.checked);
   var total = PS_PRICE_BASE + (withBundle ? PS_PRICE_BUNDLE : 0);
@@ -12751,13 +12767,15 @@ function _psApplyPromoUI(active) {
     // Total + CTA
     psUpdateTotal();
   } else {
-    // Restaurar UI normal (idempotencia)
-    if (empresaSec)   empresaSec.style.display   = '';
-    if (logoSec)      logoSec.style.display      = '';
-    if (bundleEl)     bundleEl.style.display     = '';
+    // Restaurar UI normal (idempotencia). En iOS: empresa/logo/bundle quedan
+    // ocultos (flujo Stripe/datos de facturación no aplican a IAP) y precio 19,99 €/año.
+    var _iosSignup = (typeof dmIsIosNative === 'function' && dmIsIosNative());
+    if (empresaSec)   empresaSec.style.display   = _iosSignup ? 'none' : '';
+    if (logoSec)      logoSec.style.display      = _iosSignup ? 'none' : '';
+    if (bundleEl)     bundleEl.style.display     = _iosSignup ? 'none' : '';
     if (courtesyEl)   courtesyEl.style.display   = '';
-    if (planPriceEl)  planPriceEl.textContent    = '20,00 €';
-    if (secureEl)     secureEl.textContent       = _i18nText('ps_secure', 'Pago seguro vía Stripe.');
+    if (planPriceEl)  planPriceEl.textContent    = _iosSignup ? '19,99 €' : '20,00 €';
+    if (secureEl && !_iosSignup) secureEl.textContent = _i18nText('ps_secure', 'Pago seguro vía Stripe.');
     if (inviteWrap)   inviteWrap.style.display   = '';
     psUpdateTotal();
   }
@@ -12804,7 +12822,10 @@ function _psValidate(hasSession) {
   // exigen empresa+logo en el flujo Stripe estándar.
   var hasInvite = !!_v('ps-invite');
   var isPromo = !!window._proPromoActive;
-  if (!hasInvite && !isPromo) {
+  // En iOS la compra Pro va por IAP (sin datos de empresa/facturación, que están
+  // ocultos) → NO exigir esos campos; si no, bloquearía la compra iOS.
+  var _iosVal = (typeof dmIsIosNative === 'function' && dmIsIosNative());
+  if (!hasInvite && !isPromo && !_iosVal) {
     if (!_v('ps-company-name')) errors.push(_i18nText('ps_err_company_name', 'Indica el nombre de la empresa.'));
     if (!_v('ps-legal-rep')) errors.push(_i18nText('ps_err_legal_rep', 'Indica el nombre del representante legal.'));
     var billing = _v('ps-billing-email');
@@ -13066,6 +13087,11 @@ function paUpdateTotal() {
     totalEl.textContent = _i18nText('pa_promo_total', 'GRATIS');
     return;
   }
+  // iOS: bundle oculto + precio IAP 19,99 €/año (no Stripe).
+  if (typeof dmIsIosNative === 'function' && dmIsIosNative()) {
+    totalEl.textContent = '19,99 €';
+    return;
+  }
   var withBundle = !!(cb && cb.checked);
   // 20,00 € + 37,80 € (si bundle) — formato europeo
   totalEl.textContent = withBundle ? '57,80 €' : '20,00 €';
@@ -13123,17 +13149,22 @@ function _paApplyPromoUI(active) {
     if (btn) btn.textContent = _i18nText('pa_btn_activate_promo', 'Activar GRATIS');
   } else {
     // Restaurar UI normal (por si se llamó previamente con active=true)
-    if (bundleCard) bundleCard.style.display = '';
-    if (bundleLabel) bundleLabel.style.display = '';
+    var _iosPa = (typeof dmIsIosNative === 'function' && dmIsIosNative());
+    // iOS: el bundle (pago sin producto IAP equivalente) NO se muestra; en web sí.
+    if (bundleCard) bundleCard.style.display = _iosPa ? 'none' : '';
+    if (bundleLabel) bundleLabel.style.display = _iosPa ? 'none' : '';
     if (summaryAmount) summaryAmount.textContent = '20,00 €';
     if (membershipHint && membershipHint.getAttribute('data-i18n') === 'pa_membership_hint') {
       // Restaurar texto i18n correcto
-      membershipHint.textContent = _i18nText('pa_membership_hint', 'Acceso a todas las funciones Profesional + 10 tokens de cortesía.');
+      membershipHint.textContent = _i18nText('pa_membership_hint', 'Acceso a todas las funciones Profesional + 10 tokens para empezar.');
     }
     if (disclaimer) disclaimer.textContent = (typeof dmIsIosNative === 'function' && dmIsIosNative())
       ? _i18nText('pa_disclaimer_ios', 'Profesional es una suscripción anual de 20 €/año que se renueva automáticamente salvo cancelación en Ajustes › Apple ID › Suscripciones.')
       : _i18nText('pa_disclaimer', 'Pago único, no se renueva automáticamente.');
-    if (btn) btn.textContent = _i18nText('pa_btn_checkout', 'Continuar al pago');
+    if (btn) btn.textContent = _iosPa
+      ? ((window.getCurrentLang && window.getCurrentLang() === 'en') ? 'Subscribe · €19.99/yr' : 'Suscribirse · 19,99 €/año')
+      : _i18nText('pa_btn_checkout', 'Continuar al pago');
+    if (_iosPa && summaryAmount) summaryAmount.textContent = '19,99 €';
     if (typeof paUpdateTotal === 'function') paUpdateTotal();
   }
 }
@@ -14184,6 +14215,19 @@ function dmApplyIosNativeUI() {
     if (paD && typeof _i18nText === 'function') {
       paD.textContent = _i18nText('pa_disclaimer_ios', 'Profesional es una suscripción anual de 20 €/año que se renueva automáticamente salvo cancelación en Ajustes › Apple ID › Suscripciones.');
     }
+    // App Store (≤15%): ocultar en iOS todo lo que es solo del flujo Stripe y NO
+    // aplica a IAP — bundle de 60 tokens (sin producto IAP a ese precio), datos de
+    // empresa/facturación y logo "tras el pago". El co-branding se completa luego en
+    // el área Pro. Evita banderas 3.1.1 / 2.1. En web/Android no cambia nada.
+    var _hideIos = function(sel){ var el = document.querySelector(sel); if (el) el.style.display = 'none'; };
+    _hideIos('#s-pro-signup .ps-bundle');
+    _hideIos('#s-pro-signup .ps-logo-section');
+    var _coT = document.querySelector('#s-pro-signup [data-i18n="ps_company_title"]');
+    if (_coT && _coT.closest('section')) _coT.closest('section').style.display = 'none';
+    // Re-aplicar precios/textos iOS (19,99 €/año) en ambas pantallas Pro.
+    if (typeof window._syncProBtn === 'function') window._syncProBtn();
+    if (typeof paUpdateTotal === 'function') paUpdateTotal();
+    var _saPa = document.querySelector('#s-pro-activate .pa-summary-amount'); if (_saPa) _saPa.textContent = '19,99 €';
   } catch (e) {}
   dmRcInit();
 }
@@ -18066,7 +18110,7 @@ function endTourIntro() {
       pro_pro_feat_1:         'Hasta 20 perros activos en tu cuenta',
       pro_pro_feat_2:         'Informes descargables co-marcados con tu logo',
       pro_pro_feat_3:         'Registro completo de casos y seguimientos',
-      pro_pro_feat_4:         '10 tokens de cortesía al activar la membresía',
+      pro_pro_feat_4:         '10 tokens incluidos para empezar',
       pro_tag_certified:      'Certified · International Hub',
       pro_cert_title:         'Certified Professional<br>by The Dogs’ Mind International',
       pro_cert_pitch:         'El siguiente paso: acreditación internacional, presencia en el hub mundial y derivación de clientes desde nuestra red. Para quienes definen el estándar del sector.',
@@ -18076,7 +18120,7 @@ function endTourIntro() {
       pro_cert_feat_4:        '10 horas anuales de formación continua online',
       pro_cert_feat_5:        'Soporte preferente vía email con la oficina TDM',
       pro_cert_feat_6:        'Hasta 40 perros activos en tu cuenta',
-      pro_cert_feat_7:        '20 tokens de cortesía al activar la membresía',
+      pro_cert_feat_7:        '20 tokens incluidos para empezar',
       pro_cert_feat_8:        'Sujeto a aprobación: curso + examen oficial',
       pro_tag_corporate:      'Corporativo · Custom',
       pro_corp_title:         'Usuario Corporativo',
@@ -18446,9 +18490,9 @@ function endTourIntro() {
       ps_logo_locked:          'Disponible tras el pago. Podrás subirlo (máx. 2 MB) desde tu perfil cuando se confirme la membresía.',
       ps_plan_title:           'Tu membresía',
       ps_plan_name:            'Membresía Profesional · 1 año',
-      ps_bundle_title:         'Añadir 60 tokens de cortesía',
+      ps_bundle_title:         'Añadir 60 tokens',
       ps_bundle_sub:           'Pack promocional 37,80 € (en vez de 42 €).',
-      ps_courtesy:             'Incluye 10 tokens de cortesía al activar la membresía.',
+      ps_courtesy:             'Incluye 10 tokens para empezar.',
       ps_total:                'Total',
       ps_pay:                  'Pagar 20,00 €',
       ps_secure:               'Pago seguro vía Stripe.',
@@ -18492,13 +18536,13 @@ function endTourIntro() {
       pa_eyebrow:              'Activación',
       pa_title:                'Membresía Profesional',
       pa_membership:           'Membresía Profesional · 1 año',
-      pa_membership_hint:      'Acceso a todas las funciones Profesional + 10 tokens de cortesía.',
+      pa_membership_hint:      'Acceso a todas las funciones Profesional + 10 tokens para empezar.',
       pa_addon_section:        'Añadir al activar (oferta única)',
       pa_bundle_title:         'Pack Profesional · 60 tokens',
       pa_bundle_tag:           '−10 % solo al activar la membresía',
       pa_bundle_hint:          '60 tokens adicionales con descuento exclusivo. Una sola vez.',
       pa_total:                'Total',
-      pa_disclaimer:           'Pago único, no se renueva automáticamente. La activación se aplica en cuanto Stripe confirme el pago. Tu cuenta pasará a Profesional y se acreditarán los tokens cortesía.',
+      pa_disclaimer:           'Pago único, no se renueva automáticamente. La activación se aplica en cuanto Stripe confirme el pago. Tu cuenta pasará a Profesional y se acreditarán los tokens incluidos.',
       pa_btn_checkout:         'Continuar al pago',
       pa_btn_redirecting:      'Conectando con Stripe…',
       pa_btn_cancel:           'Cancelar',
@@ -19019,7 +19063,7 @@ function endTourIntro() {
       pro_pro_feat_1:         'Up to 20 active dogs in your account',
       pro_pro_feat_2:         'Downloadable reports co-branded with your logo',
       pro_pro_feat_3:         'Full case and follow-up records',
-      pro_pro_feat_4:         '10 courtesy tokens on membership activation',
+      pro_pro_feat_4:         '10 tokens to get started',
       pro_tag_certified:      'Certified · International Hub',
       pro_cert_title:         'Certified Professional<br>by The Dogs’ Mind International',
       pro_cert_pitch:         'The next step: international accreditation, presence in the global hub and client referrals from our network. For those who set the standard in the field.',
@@ -19029,7 +19073,7 @@ function endTourIntro() {
       pro_cert_feat_4:        '10 hours per year of online continuing education',
       pro_cert_feat_5:        'Priority email support with the TDM office',
       pro_cert_feat_6:        'Up to 40 active dogs in your account',
-      pro_cert_feat_7:        '20 courtesy tokens on membership activation',
+      pro_cert_feat_7:        '20 tokens to get started',
       pro_cert_feat_8:        'Subject to approval: official course + exam',
       pro_tag_corporate:      'Corporate · Custom',
       pro_corp_title:         'Corporate User',
@@ -19397,9 +19441,9 @@ function endTourIntro() {
       ps_logo_locked:          'Available after payment. You will be able to upload it (max 2 MB) from your profile once the membership is confirmed.',
       ps_plan_title:           'Your membership',
       ps_plan_name:            'Professional Membership · 1 year',
-      ps_bundle_title:         'Add 60 courtesy tokens',
+      ps_bundle_title:         'Add 60 tokens',
       ps_bundle_sub:           'Promo pack €37.80 (instead of €42).',
-      ps_courtesy:             'Includes 10 courtesy tokens when the membership is activated.',
+      ps_courtesy:             'Includes 10 tokens to get started.',
       ps_total:                'Total',
       ps_pay:                  'Pay €20.00',
       ps_secure:               'Secure payment via Stripe.',
@@ -19443,13 +19487,13 @@ function endTourIntro() {
       pa_eyebrow:              'Activation',
       pa_title:                'Professional Membership',
       pa_membership:           'Professional Membership · 1 year',
-      pa_membership_hint:      'Access to all Professional features + 10 courtesy tokens.',
+      pa_membership_hint:      'Access to all Professional features + 10 tokens to get started.',
       pa_addon_section:        'Add at activation (one-time offer)',
       pa_bundle_title:         'Professional Pack · 60 tokens',
       pa_bundle_tag:           '−10% only when activating membership',
       pa_bundle_hint:          '60 extra tokens with exclusive discount. One time only.',
       pa_total:                'Total',
-      pa_disclaimer:           'One-time payment, does not auto-renew. Activation applies as soon as Stripe confirms the payment. Your account will become Professional and courtesy tokens will be credited.',
+      pa_disclaimer:           'One-time payment, does not auto-renew. Activation applies as soon as Stripe confirms the payment. Your account will become Professional and the included tokens will be credited.',
       pa_btn_checkout:         'Continue to payment',
       pa_btn_redirecting:      'Connecting to Stripe…',
       pa_btn_cancel:           'Cancel',

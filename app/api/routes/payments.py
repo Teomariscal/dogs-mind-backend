@@ -1,7 +1,9 @@
 import os
+import uuid
 import stripe
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from pydantic import BaseModel
 
 from app.database import get_db
@@ -64,6 +66,25 @@ PRO_INVITE_CODE = os.environ.get("PRO_INVITE_CODE", "").strip()
 # lo sustituye. Los embajadores siguen entrando con código + reciben sus
 # PRO_MEMBERSHIP_TOKENS. La promo abierta es para captación durante el lanzamiento.
 PRO_PROMO_FREE = os.environ.get("PRO_PROMO_FREE", "").strip().lower() in ("1", "true", "yes", "on")
+
+# ── RevenueCat IAP (iOS) — paralelo a Stripe (guideline 3.1.1) ────────────────
+# Las compras dentro del binario iOS van por In-App Purchase vía RevenueCat. Este
+# bloque NO toca el flujo Stripe (web): es additive y aislado. RevenueCat envía un
+# POST a /webhooks/revenuecat por cada evento. Verificación = header Authorization
+# con secreto compartido configurado en el dashboard de RevenueCat (Project >
+# Integrations > Webhooks) y en Railway (REVENUECAT_WEBHOOK_AUTH). El app_user_id
+# del evento == User.id (el frontend llama Purchases.logIn(str(user.id))).
+# Idempotencia: reutilizamos Payment.stripe_session_id guardando "rc_<event_id>"
+# (columna unique) → cero migración de DB.
+REVENUECAT_WEBHOOK_AUTH = os.environ.get("REVENUECAT_WEBHOOK_AUTH", "").strip()
+
+# store identifier (product_id que envía RevenueCat) → tokens a acreditar
+RC_TOKEN_PRODUCTS = {
+    "net.thedogsmind.tokens.5":  5,
+    "net.thedogsmind.tokens.20": 20,
+    "net.thedogsmind.tokens.60": 60,
+}
+RC_PRO_PRODUCT = "net.thedogsmind.pro.yearly"
 
 
 class CheckoutRequest(BaseModel):
@@ -468,6 +489,115 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
             print(f"[Stripe] +{tokens} tokens → {user.email} (total: {user.tokens})")
 
     return {"status": "ok"}
+
+
+# ── Webhook de RevenueCat (iOS IAP, automático) ───────────────────────────────
+@router.post("/webhooks/revenuecat")
+async def revenuecat_webhook(request: Request, db: Session = Depends(get_db)):
+    """
+    Webhook de RevenueCat para las compras In-App de iOS. Espejo del de Stripe:
+    acredita tokens (packs consumibles) o activa Profesional (suscripción Pro)
+    al confirmarse la compra. NO toca nada del flujo Stripe.
+
+    Verificación: header Authorization == REVENUECAT_WEBHOOK_AUTH (secreto
+    compartido configurado en RevenueCat dashboard + Railway). Fail-closed.
+
+    Idempotencia: Payment.stripe_session_id = "rc_<event_id>" (unique). El crédito
+    de tokens y la fila Payment van en la MISMA transacción → si hay carrera, el
+    unique constraint revienta el insert y se hace rollback (cero doble crédito).
+
+    Decisiones v1 (mirror Stripe, mínimo riesgo) — FLAGGED para el founder:
+      - Packs de tokens: NON_RENEWING_PURCHASE → acredita tokens del producto.
+      - Pro: INITIAL_PURCHASE/RENEWAL → account_type='professional'. Tokens
+        cortesía (10) SOLO en INITIAL_PURCHASE (no en renovaciones), igual que Stripe.
+      - EXPIRATION/CANCELLATION: v1 NO revoca Pro (parity con el Pro permanente de
+        Stripe; evita revocar acceso por error). Se puede endurecer post-launch.
+    """
+    # 1. Verificación (fail-closed)
+    if not REVENUECAT_WEBHOOK_AUTH:
+        raise HTTPException(status_code=503, detail="REVENUECAT_WEBHOOK_AUTH no configurado en el servidor")
+    if request.headers.get("authorization", "") != REVENUECAT_WEBHOOK_AUTH:
+        raise HTTPException(status_code=401, detail="Webhook auth inválida")
+
+    try:
+        body = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Body JSON inválido")
+    event = body.get("event", {}) or {}
+    etype = event.get("type", "")
+    event_id = event.get("id", "")
+    app_user_id = event.get("app_user_id", "")
+    product_id = (event.get("product_id", "") or "").split(":")[0]  # normaliza base-plan suffix
+
+    # Solo eventos de compra que acreditan algo. El resto (TEST, CANCELLATION,
+    # EXPIRATION, BILLING_ISSUE, etc.) se ignoran con 200 para que RC no reintente.
+    if etype not in ("NON_RENEWING_PURCHASE", "INITIAL_PURCHASE", "RENEWAL"):
+        return {"status": "ignored", "type": etype}
+    if not event_id or not app_user_id:
+        return {"status": "ignored"}
+
+    # Validar formato UUID antes de tocar la DB (evita 500 con app_user_id basura)
+    try:
+        uuid.UUID(str(app_user_id))
+    except (ValueError, TypeError, AttributeError):
+        print(f"[RevenueCat] app_user_id no es UUID válido: {app_user_id!r}")
+        return {"status": "invalid app_user_id"}
+
+    # 2. Idempotencia
+    rc_key = f"rc_{event_id}"
+    if db.query(Payment).filter(Payment.stripe_session_id == rc_key).first():
+        return {"status": "already processed"}
+
+    # with_for_update: bloquea la fila del usuario hasta el commit → serializa
+    # créditos concurrentes del MISMO usuario (evita lost-update en compras casi
+    # simultáneas). No-op en SQLite (dev); efectivo en PostgreSQL (prod).
+    user = db.query(User).filter(User.id == app_user_id).with_for_update().first()
+    if not user:
+        print(f"[RevenueCat] user no encontrado app_user_id={app_user_id} type={etype}")
+        return {"status": "user not found"}
+
+    credited = 0
+    amount_cents = 0
+    if product_id in RC_TOKEN_PRODUCTS:
+        credited = RC_TOKEN_PRODUCTS[product_id]
+        amount_cents = PACKS.get(credited, {}).get("amount_cents", 0)
+        user.tokens = float(user.tokens) + credited
+        print(f"[RevenueCat] +{credited} tokens → {user.email} ({product_id})")
+    elif product_id == RC_PRO_PRODUCT:
+        user.account_type = "professional"
+        amount_cents = 2000
+        if etype == "INITIAL_PURCHASE":
+            credited = PRO_MEMBERSHIP_TOKENS
+            user.tokens = float(user.tokens) + credited
+        print(f"[RevenueCat-PRO] {user.email} Pro {etype} · +{credited} tokens · saldo={user.tokens}")
+    else:
+        print(f"[RevenueCat] producto desconocido product_id={product_id} type={etype}")
+        return {"status": "unknown product"}
+
+    # 3. Crédito + fila Payment en la misma transacción (idempotencia atómica)
+    try:
+        db.add(Payment(
+            user_id=user.id,
+            stripe_session_id=rc_key,
+            tokens=int(credited),
+            amount_cents=int(amount_cents),
+            status="paid",
+        ))
+        db.commit()
+    except IntegrityError:
+        # rc_key duplicado (carrera/retry del mismo evento) → ya procesado. El
+        # rollback revierte también el crédito de tokens → cero doble cobro.
+        db.rollback()
+        print(f"[RevenueCat] evento duplicado (carrera/retry) event={event_id}")
+        return {"status": "already processed"}
+    except Exception as e:
+        # Error inesperado (p.ej. DB transitoria) → 500 para que RevenueCat
+        # REINTENTE el webhook (no perder el evento devolviendo 200 erróneo).
+        db.rollback()
+        print(f"[RevenueCat] ERROR inesperado event={event_id}: {e}")
+        raise HTTPException(status_code=500, detail="error procesando webhook RevenueCat")
+
+    return {"status": "ok", "credited": credited}
 
 
 # ── Saldo actual (el frontend lo consulta al volver de Stripe) ────────────────

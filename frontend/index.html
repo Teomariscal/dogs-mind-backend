@@ -10495,15 +10495,17 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
           <span class="ps-check-text" data-i18n="ps_tos_text">Acepto los <a href="#" onclick="event.preventDefault(); goTo('s-terms');" data-i18n="ps_tos_link_terms">Términos</a> y la <a href="#" onclick="event.preventDefault(); goTo('s-privacy');" data-i18n="ps_tos_link_privacy">Política de Privacidad</a>.</span>
         </label>
 
-        <!-- Código invitación Pro (opcional). Si coincide con PRO_INVITE_CODE
-             backend → cuenta Profesional cortesía gratis + 10 tokens, salta
-             Stripe y datos de empresa (se completan luego desde área Pro). -->
-        <div class="ps-field">
-          <label for="ps-invite" data-i18n="ps_invite_label">Código de invitación Profesional <span style="color:var(--ps-text3,#777);font-size:11px;font-weight:400;">(opcional)</span></label>
-          <input type="text" id="ps-invite" autocomplete="off" placeholder="Si tienes un código, introdúcelo aquí" data-i18n-placeholder="ps_invite_ph">
-          <p class="ps-field-hint" data-i18n="ps_invite_hint">Con código válido la activación es gratuita y sin datos de empresa.</p>
-        </div>
       </section>
+
+      <!-- Código invitación Pro (opcional) — FUERA de la sección "cuenta" para que
+           sea visible también con sesión iniciada (invitados ya registrados). Si
+           coincide con PRO_INVITE_CODE backend → Profesional cortesía + 10 tokens,
+           salta Stripe/empresa (se completan luego desde área Pro). -->
+      <div class="ps-field" id="ps-invite-field" style="margin-bottom:14px;">
+        <label for="ps-invite" data-i18n="ps_invite_label">Código de invitación Profesional <span style="color:var(--ps-text3,#777);font-size:11px;font-weight:400;">(opcional)</span></label>
+        <input type="text" id="ps-invite" autocomplete="off" placeholder="Si tienes un código, introdúcelo aquí" data-i18n-placeholder="ps_invite_ph">
+        <p class="ps-field-hint" data-i18n="ps_invite_hint">Con código válido la activación es gratuita y sin datos de empresa.</p>
+      </div>
 
       <!-- ── Sección 2: Datos de tu empresa ── -->
       <section class="ps-section">

@@ -10596,7 +10596,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
       <p class="ps-secure" data-i18n="ps_secure">Pago seguro vía Stripe.</p>
       <!-- Disclosure suscripción auto-renovable (Apple 3.1.2) — solo iOS, lo revela dmApplyIosNativeUI() -->
       <p id="ps-ios-terms" style="display:none;font-size:11px;line-height:1.5;color:var(--text2);text-align:center;margin-top:8px;">
-        <span data-i18n="rc_sub_terms">Suscripción anual de 20 €/año; se renueva automáticamente salvo que la canceles en Ajustes › Apple ID › Suscripciones al menos 24 h antes de la renovación.</span><br>
+        <span data-i18n="rc_sub_terms">Suscripción anual de 19,99 €/año; se renueva automáticamente salvo que la canceles en Ajustes › Apple ID › Suscripciones al menos 24 h antes de la renovación.</span><br>
         <a onclick="event.stopPropagation();goTo('s-terms')" style="color:var(--green);text-decoration:underline;cursor:pointer;" data-i18n="rc_terms_link">Términos de servicio</a> · <a onclick="event.stopPropagation();goTo('s-privacy')" style="color:var(--green);text-decoration:underline;cursor:pointer;" data-i18n="rc_privacy_link">Política de privacidad</a>
       </p>
     </div>
@@ -13161,7 +13161,7 @@ function _paApplyPromoUI(active) {
       membershipHint.textContent = _i18nText('pa_membership_hint', 'Acceso a todas las funciones Profesional + 10 tokens para empezar.');
     }
     if (disclaimer) disclaimer.textContent = (typeof dmIsIosNative === 'function' && dmIsIosNative())
-      ? _i18nText('pa_disclaimer_ios', 'Profesional es una suscripción anual de 20 €/año que se renueva automáticamente salvo cancelación en Ajustes › Apple ID › Suscripciones.')
+      ? _i18nText('pa_disclaimer_ios', 'Profesional es una suscripción anual de 19,99 €/año que se renueva automáticamente salvo cancelación en Ajustes › Apple ID › Suscripciones.')
       : _i18nText('pa_disclaimer', 'Pago único, no se renueva automáticamente.');
     if (btn) btn.textContent = _iosPa
       ? ((window.getCurrentLang && window.getCurrentLang() === 'en') ? 'Subscribe · €19.99/yr' : 'Suscribirse · 19,99 €/año')
@@ -14215,7 +14215,7 @@ function dmApplyIosNativeUI() {
     // El disclaimer Pro de iOS dice "auto-renovable", no "pago único" (que es Stripe/web).
     var paD = document.querySelector('#s-pro-activate [data-i18n="pa_disclaimer"]');
     if (paD && typeof _i18nText === 'function') {
-      paD.textContent = _i18nText('pa_disclaimer_ios', 'Profesional es una suscripción anual de 20 €/año que se renueva automáticamente salvo cancelación en Ajustes › Apple ID › Suscripciones.');
+      paD.textContent = _i18nText('pa_disclaimer_ios', 'Profesional es una suscripción anual de 19,99 €/año que se renueva automáticamente salvo cancelación en Ajustes › Apple ID › Suscripciones.');
     }
     // App Store (≤15%): ocultar en iOS todo lo que es solo del flujo Stripe y NO
     // aplica a IAP — bundle de 60 tokens (sin producto IAP a ese precio), datos de
@@ -14230,6 +14230,13 @@ function dmApplyIosNativeUI() {
     if (typeof window._syncProBtn === 'function') window._syncProBtn();
     if (typeof paUpdateTotal === 'function') paUpdateTotal();
     var _saPa = document.querySelector('#s-pro-activate .pa-summary-amount'); if (_saPa) _saPa.textContent = '19,99 €';
+    // Tarjeta de plan ("Elige tu nivel"): en iOS el precio IAP es 19,99 €/año
+    // auto-renovable (en web es 20 € pago único por Stripe). Rewrite solo-iOS.
+    var _lgPro = (window.getCurrentLang && window.getCurrentLang() === 'en') ? 'en' : 'es';
+    var _ppPrice = document.querySelector('[data-i18n="pro_pro_price"]');
+    if (_ppPrice) _ppPrice.textContent = (_lgPro === 'en') ? '€19.99/year' : '19,99 €/año';
+    var _ppSub = document.querySelector('[data-i18n="pro_pro_price_sub"]');
+    if (_ppSub) _ppSub.textContent = (_lgPro === 'en') ? 'Auto-renewable' : 'Renovación automática';
   } catch (e) {}
   dmRcInit();
 }
@@ -18739,10 +18746,10 @@ function endTourIntro() {
       rc_restoring:         'Restaurando compras…',
       rc_restored:          'Compras restauradas.',
       rc_restore_err:       'No hay compras que restaurar o hubo un error.',
-      rc_sub_terms:         'Suscripción anual de 20 €/año; se renueva automáticamente salvo que la canceles en Ajustes › Apple ID › Suscripciones al menos 24 h antes de la renovación.',
+      rc_sub_terms:         'Suscripción anual de 19,99 €/año; se renueva automáticamente salvo que la canceles en Ajustes › Apple ID › Suscripciones al menos 24 h antes de la renovación.',
       rc_terms_link:        'Términos de servicio',
       rc_privacy_link:      'Política de privacidad',
-      pa_disclaimer_ios:    'Profesional es una suscripción anual de 20 €/año que se renueva automáticamente salvo que la canceles en Ajustes › Apple ID › Suscripciones al menos 24 h antes de la fecha de renovación.',
+      pa_disclaimer_ios:    'Profesional es una suscripción anual de 19,99 €/año que se renueva automáticamente salvo que la canceles en Ajustes › Apple ID › Suscripciones al menos 24 h antes de la fecha de renovación.',
       // ABC
       abc_a_title:  'A — ANTECEDENTE',
       abc_a_vars:   'Variables disposicionales',
@@ -19690,10 +19697,10 @@ function endTourIntro() {
       rc_restoring:         'Restoring purchases…',
       rc_restored:          'Purchases restored.',
       rc_restore_err:       'No purchases to restore, or an error occurred.',
-      rc_sub_terms:         'Annual subscription of €20/year; auto-renews unless cancelled in Settings › Apple ID › Subscriptions at least 24h before the renewal date.',
+      rc_sub_terms:         'Annual subscription of €19.99/year; auto-renews unless cancelled in Settings › Apple ID › Subscriptions at least 24h before the renewal date.',
       rc_terms_link:        'Terms of Service',
       rc_privacy_link:      'Privacy Policy',
-      pa_disclaimer_ios:    'Professional is an annual subscription of €20/year that auto-renews unless you cancel it in Settings › Apple ID › Subscriptions at least 24h before the renewal date.',
+      pa_disclaimer_ios:    'Professional is an annual subscription of €19.99/year that auto-renews unless you cancel it in Settings › Apple ID › Subscriptions at least 24h before the renewal date.',
       // ABC
       abc_a_title:  'A — ANTECEDENT',
       abc_a_vars:   'Setting events',
@@ -19775,6 +19782,9 @@ function endTourIntro() {
     //   Sin esta llamada, cambiar idioma o re-renderizar i18n vuelve el botón
     //   a "Pagar 20,00 €" aunque el usuario tenga código de cortesía.
     try { if (typeof window._syncProBtn === 'function') window._syncProBtn(); } catch(e) {}
+    // iOS: re-aplica precios/textos nativos (19,99 €, tarjeta de plan, disclosures)
+    // tras el re-render i18n, para que el cambio de idioma no revierta a precios web.
+    try { if (typeof window.dmApplyIosNativeUI === 'function') window.dmApplyIosNativeUI(); } catch(e) {}
   }
 
   window.setLang = function(lang) { applyLang(lang); };

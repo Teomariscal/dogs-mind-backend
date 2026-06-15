@@ -9388,7 +9388,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
          botón "Guardar plan" que migra a backend con case_type='training' y
          aparece en s-records. -->
     <div class="tr-actions" style="display:flex;flex-direction:column;gap:10px;">
-      <button class="tc-submit-btn" onclick="acceptTrainingPlan()" data-i18n="tr_save_plan">Guardar plan</button>
+      <button id="tr-save-btn" class="tc-submit-btn" onclick="acceptTrainingPlan()" data-i18n="tr_save_plan">Guardar plan</button>
       <button class="tc-submit-btn" onclick="goToConsultType()" data-i18n="tr_new_consult"
               style="background:transparent;color:var(--cyan, #5ec8e6);border:1.5px solid rgba(94,200,230,0.5);">Nueva consulta</button>
     </div>
@@ -14052,6 +14052,8 @@ function _pendingTrainingView() {
     var tr = document.getElementById('tr-content');
     if (tr) tr.innerHTML = window._mdToHtml(p.planMarkdown);
   } catch(e) {}
+  // Plan pendiente sin guardar → "Guardar plan" debe verse.
+  var _sbp = document.getElementById('tr-save-btn'); if (_sbp) _sbp.style.display = '';
   goTo('s-training-result');
 }
 
@@ -14797,6 +14799,29 @@ function getVal(id, fallback) {
     var r = filtered[idx];
     if (!r) return;
 
+    // CASO DE ADIESTRAMIENTO: no tiene ABC; su contenido es el plan de entrenamiento
+    // (r.plan). Rehidratar s-training-result en vez del ABC clínico vacío.
+    if (r.case_type === 'training') {
+      window._lastTrainingPlan    = r.plan || '';
+      window._lastTrainingDogName = r.dog_name || '';
+      window._lastTrainingData    = {
+        dog_name: r.dog_name || '', breed: r.breed || '',
+        age: r.dog_age || '', dog_age: r.dog_age || '',
+        goal: r.problem || '',
+        lang: r.lang || (window.getCurrentLang ? window.getCurrentLang() : 'es'),
+      };
+      window._loadedFromArchive = true;
+      try {
+        var trEl = document.getElementById('tr-content');
+        if (trEl && typeof window._mdToHtml === 'function') trEl.innerHTML = window._mdToHtml(r.plan || '');
+      } catch (e) {}
+      // Ya está guardado (viene de records) → ocultar "Guardar plan" (evita duplicado).
+      var _saveBtn = document.getElementById('tr-save-btn');
+      if (_saveBtn) _saveBtn.style.display = 'none';
+      goTo('s-training-result');
+      return;
+    }
+
     // Cargar el caso en los globals para que las pantallas existentes lo lean
     window._lastAnalysisText      = r.analysis || '';
     window._lastInterventionPlan  = r.plan     || '';
@@ -14920,7 +14945,7 @@ function getVal(id, fallback) {
           '<div style="display:flex;align-items:center;gap:8px;">' +
             '<div style="font-size:10px;color:var(--grey);">' + (r.date || '') + '</div>' +
             '<div style="display:flex;gap:4px;flex-wrap:wrap;">' +
-              '<button onclick="event.stopPropagation();openSeguimientoFromRecord(' + i + ')" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid rgba(74,103,65,0.3);background:rgba(74,103,65,0.08);cursor:pointer;color:var(--green2);font-weight:600;">' + _i18nText('rec_btn_seguimiento','+ Seguimiento') + '</button>' +
+              (r.case_type !== 'training' ? '<button onclick="event.stopPropagation();openSeguimientoFromRecord(' + i + ')" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid rgba(74,103,65,0.3);background:rgba(74,103,65,0.08);cursor:pointer;color:var(--green2);font-weight:600;">' + _i18nText('rec_btn_seguimiento','+ Seguimiento') + '</button>' : '') +
               '<button onclick="event.stopPropagation();changeRecordStatus(' + i + ')" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid rgba(0,0,0,0.12);background:#fafafa;cursor:pointer;color:var(--grey);">' + _i18nText('rec_btn_estado','Estado') + '</button>' +
               '<button onclick="event.stopPropagation();deleteRecord(' + i + ')" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid rgba(220,80,80,0.2);background:#fff5f5;cursor:pointer;color:#c03030;" title="Eliminar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>' +
             '</div>' +
@@ -14933,7 +14958,7 @@ function getVal(id, fallback) {
       // daily-followup hasta que se migren). El plan local del record se
       // cachea en window._dfPlanCache para que openDailyFollowup pueda
       // pasarlo a /init si el backend no tiene CaseEntry intervention.
-      if (r.backend_case_id) {
+      if (r.backend_case_id && r.case_type !== 'training') {
         var bcid = String(r.backend_case_id).replace(/'/g, "\\'");
         try { window._dfPlanCache = window._dfPlanCache || {}; window._dfPlanCache[r.backend_case_id] = r.plan || ''; } catch(e){}
         html += '<button type="button" class="rec-df-cta" onclick="event.stopPropagation();_dfOpenFromBtn(\'' + bcid + '\')" style="border-top-left-radius:0;border-top-right-radius:0;border-top:none;">' +
@@ -17189,6 +17214,9 @@ window.submitTrainingConsult = async function() {
     // Renderizar markdown en s-training-result
     var tr = document.getElementById('tr-content');
     if (tr) tr.innerHTML = window._mdToHtml(md);
+    // Plan recién generado (sin guardar) → asegurar que "Guardar plan" se ve
+    // (pudo quedar oculto tras ver un caso archivado vía openRecord).
+    var _sb = document.getElementById('tr-save-btn'); if (_sb) _sb.style.display = '';
     // ── Autosave del plan (v195 2026-06-04, paralelo a Part B del ABC) ──────
     // Guardamos el plan EN CUANTO llega del backend, antes incluso de pintar la
     // siguiente pantalla. Si el usuario cierra la app o navega, podrá recuperar

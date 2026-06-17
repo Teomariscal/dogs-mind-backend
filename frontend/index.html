@@ -7965,12 +7965,10 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
         <span class="insp-tag">Profesional</span>
       </div>
 
-      <!-- Badge "Usuario Profesional" — solo visible si account_type='professional'.
-           Display lo controla renderHomeProBadge() leyendo window._myAccount. -->
-      <div id="home-pro-badge" class="home-pro-badge" style="display:none;" aria-live="polite">
-        <span class="home-pro-badge-eyebrow" data-i18n="home_pro_badge_eyebrow">Membresía activa</span>
-        <span class="home-pro-badge-text" data-i18n="home_pro_badge">Usuario Profesional</span>
-      </div>
+      <!-- Bloque "Membresía activa · Usuario Profesional" eliminado 2026-06-17:
+           quedaba cortado abajo (había que forzar scroll y al soltar se cortaba).
+           El estado Pro ya se ve en la card "Inspiración Profesional".
+           renderHomeProBadge() es null-safe (if(!el) return) → no rompe nada. -->
     </div>
   </div>
 

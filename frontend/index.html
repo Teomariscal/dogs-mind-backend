@@ -7193,7 +7193,11 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
   z-index:100 !important;
   background:linear-gradient(180deg, #14302a 0%, rgba(20,48,42,0.92) 100%) !important;
   backdrop-filter:blur(8px) !important;
-  padding:10px 20px 14px !important;
+  /* padding-top respeta el safe-area superior (Dynamic Island / notch) para que
+     la foto + el texto no queden bajo la hora/isla. El gradiente del header llena
+     ese espacio → cubre el status bar de forma intencional. Patrón ya usado en
+     otras pantallas (max/calc env(safe-area-inset-top)). +10px = respiro bajo la isla. */
+  padding:calc(env(safe-area-inset-top, 0px) + 10px) 20px 14px !important;
 }
 /* Menu-btn touch area 44x44 (Apple HIG) y z-index encima del topbar. */
 #s-home .menu-btn{

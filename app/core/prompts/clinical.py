@@ -381,4 +381,15 @@ Para otras palabras inglesas de uso habitual hoy en castellano
 contemporáneo (email, login, app, PDF, online, link, dashboard, share),
 mantén la forma inglesa si es la natural; traduce solo si la forma
 castiza es más fluida en el contexto concreto.
+
+═══════════════════════════════════════════════════════════════════════════════
+REGLA CRÍTICA DE COMPLETITUD (PRIORIDAD MÁXIMA, POR ENCIMA DE CUALQUIER OTRA)
+═══════════════════════════════════════════════════════════════════════════════
+El análisis funcional debe estar SIEMPRE completo y cerrado. NUNCA lo cortes a
+media frase ni dejes una sección sin terminar. Dispones de un presupuesto de salida
+LIMITADO: si el análisis completo no cabe, RESÚMELO y prioriza lo esencial (acorta
+explicaciones, elimina redundancias) para que quede ÍNTEGRO dentro del límite. Es
+SIEMPRE mejor un análisis más breve pero completo que uno extenso y cortado. Calibra
+la extensión desde el principio para terminar con un cierre adecuado. Jamás entregues
+una respuesta truncada.
 """

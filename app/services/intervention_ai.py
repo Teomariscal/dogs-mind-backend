@@ -86,18 +86,29 @@ FUNCTIONAL BEHAVIORAL ANALYSIS
 Follow the output format defined in your instructions exactly. Produce the full intervention plan now.
 """
 
-    response = client.messages.create(
-        model=settings.clinical_model,
-        max_tokens=3000,
-        system=[
-            {
-                "type": "text",
-                "text": INTERVENTION_SYSTEM_PROMPT,
-                "cache_control": {"type": "ephemeral"},
-            }
-        ],
-        messages=[{"role": "user", "content": user_message}],
-    )
+    def _call(extra: str = ""):
+        return client.messages.create(
+            model=settings.clinical_model,
+            max_tokens=8000,  # subido de 3000: planes largos (p.ej. Bardo) se cortaban. Sonnet 4.6 admite salida grande; el coste extra solo aplica si el plan lo usa.
+            system=[
+                {
+                    "type": "text",
+                    "text": INTERVENTION_SYSTEM_PROMPT,
+                    "cache_control": {"type": "ephemeral"},
+                }
+            ],
+            messages=[{"role": "user", "content": user_message + extra}],
+        )
+
+    response = _call()
+    # REGLA DURA: el plan NUNCA debe quedar cortado. Si aun con la holgura tocó el
+    # tope de tokens, regeneramos UNA vez pidiendo una versión completa más concisa.
+    if getattr(response, "stop_reason", None) == "max_tokens":
+        response = _call(
+            "\n\nIMPORTANTE: tu respuesta anterior era demasiado larga y se cortó. "
+            "Reescribe el plan COMPLETO pero MÁS CONCISO: resume y prioriza lo esencial "
+            "para que quepa entero y termine con un cierre adecuado. NUNCA lo cortes."
+        )
 
     plan_text = ""
     for block in response.content:

@@ -154,18 +154,35 @@ analysis. Follow the output format defined in your instructions exactly.
     content = _build_user_message_content(user_text, video_frames, video_caption)
 
     # ── 2. Call Claude Sonnet 4.6 with prompt caching ───────────────────────
-    response = client.messages.create(
-        model=settings.clinical_model,
-        max_tokens=4096,
-        system=[
-            {
-                "type": "text",
-                "text": CLINICAL_SYSTEM_PROMPT,
-                "cache_control": {"type": "ephemeral"},
-            }
-        ],
-        messages=[{"role": "user", "content": content}],
-    )
+    def _call(extra: str = ""):
+        msg_content = content
+        if extra:
+            if isinstance(content, list):
+                msg_content = content + [{"type": "text", "text": extra}]
+            else:
+                msg_content = content + extra
+        return client.messages.create(
+            model=settings.clinical_model,
+            max_tokens=6000,  # subido de 4096: el análisis funcional NUNCA debe cortarse (regla dura).
+            system=[
+                {
+                    "type": "text",
+                    "text": CLINICAL_SYSTEM_PROMPT,
+                    "cache_control": {"type": "ephemeral"},
+                }
+            ],
+            messages=[{"role": "user", "content": msg_content}],
+        )
+
+    response = _call()
+    # REGLA DURA: el análisis NUNCA debe quedar cortado. Si tocó el tope de tokens,
+    # regeneramos UNA vez pidiendo una versión completa más concisa.
+    if getattr(response, "stop_reason", None) == "max_tokens":
+        response = _call(
+            "\n\nIMPORTANTE: tu respuesta anterior era demasiado larga y se cortó. "
+            "Reescribe el análisis funcional COMPLETO pero MÁS CONCISO: resume y prioriza "
+            "lo esencial para que quepa entero y termine con un cierre adecuado. NUNCA lo cortes."
+        )
 
     # ── 3. Parse response ────────────────────────────────────────────────────
     analysis_text = ""

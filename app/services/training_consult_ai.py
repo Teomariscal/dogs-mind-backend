@@ -22,7 +22,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from app.config import get_settings
-from app.core.anthropic_client import get_anthropic_client
+from app.core.anthropic_client import get_anthropic_client, create_message_resilient
 from app.core.prompts.training_consult import (
     TRAINING_CONSULT_PROMPT_ES,
     TRAINING_CONSULT_PROMPT_EN,
@@ -266,8 +266,9 @@ def generate_training_consult(
     settings = get_settings()
     client = get_anthropic_client()
 
-    response = client.messages.create(
+    response = create_message_resilient(
         model=settings.clinical_model,  # Sonnet 4.6
+        fallback_model=settings.clinical_fallback_model,  # sube a Opus si Sonnet está 529 (temperature se quita en el helper)
         max_tokens=MAX_OUTPUT_TOKENS,
         temperature=TEMPERATURE,
         system=[

@@ -11,7 +11,7 @@ The minimum cacheable prefix for claude-sonnet-4-6 is 2 048 tokens.
 """
 
 from app.config import get_settings
-from app.core.anthropic_client import get_anthropic_client
+from app.core.anthropic_client import get_anthropic_client, create_message_resilient
 from app.core.prompts.intervention import INTERVENTION_SYSTEM_PROMPT
 from app.models.intervention import InterventionRequest, InterventionResponse
 
@@ -87,8 +87,9 @@ Follow the output format defined in your instructions exactly. Produce the full 
 """
 
     def _call(extra: str = ""):
-        return client.messages.create(
+        return create_message_resilient(
             model=settings.clinical_model,
+            fallback_model=settings.clinical_fallback_model,  # sube a Opus si Sonnet está 529
             max_tokens=8000,  # subido de 3000: planes largos (p.ej. Bardo) se cortaban. Sonnet 4.6 admite salida grande; el coste extra solo aplica si el plan lo usa.
             system=[
                 {

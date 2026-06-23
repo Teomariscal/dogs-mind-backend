@@ -17,7 +17,7 @@ import anthropic
 from typing import Optional
 
 from app.config import get_settings
-from app.core.anthropic_client import get_anthropic_client
+from app.core.anthropic_client import get_anthropic_client, create_message_resilient
 from app.core.prompts.clinical import CLINICAL_SYSTEM_PROMPT
 from app.models.anamnesis import AnamnesisInput, AnalysisResponse, RetrievedChunk
 from app.services.rag import retrieve, build_rag_context_block, build_anamnesis_block
@@ -161,8 +161,9 @@ analysis. Follow the output format defined in your instructions exactly.
                 msg_content = content + [{"type": "text", "text": extra}]
             else:
                 msg_content = content + extra
-        return client.messages.create(
+        return create_message_resilient(
             model=settings.clinical_model,
+            fallback_model=settings.clinical_fallback_model,  # sube a Opus si Sonnet está 529
             max_tokens=6000,  # subido de 4096: el análisis funcional NUNCA debe cortarse (regla dura).
             system=[
                 {

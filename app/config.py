@@ -29,6 +29,9 @@ class Settings(BaseSettings):
 
     # Models
     clinical_model: str = "claude-sonnet-4-6"
+    # Fallback si el modelo clínico (Sonnet) está sobrecargado (529): sube a Opus
+    # 4.8 (capacidad aparte + más capaz). Solo se usa en ese caso excepcional.
+    clinical_fallback_model: str = "claude-opus-4-8"
     avatar_model: str = "claude-haiku-4-5"
     embedding_model: str = "voyage-3-large"
 

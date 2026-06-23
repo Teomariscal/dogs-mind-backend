@@ -13,10 +13,11 @@ The minimum cacheable prefix for claude-sonnet-4-6 is 2 048 tokens.
 from app.config import get_settings
 from app.core.anthropic_client import get_anthropic_client, create_message_resilient
 from app.core.prompts.intervention import INTERVENTION_SYSTEM_PROMPT
+from app.core.prompts.petowner_intervention import PETOWNER_INTERVENTION_SYSTEM_PROMPT
 from app.models.intervention import InterventionRequest, InterventionResponse
 
 
-def run_intervention_plan(request: InterventionRequest) -> InterventionResponse:
+def run_intervention_plan(request: InterventionRequest, account_type=None) -> InterventionResponse:
     """
     Generate a LIMA-based behavioral intervention plan.
 
@@ -25,6 +26,11 @@ def run_intervention_plan(request: InterventionRequest) -> InterventionResponse:
     """
     settings = get_settings()
     client = get_anthropic_client()
+
+    # SALVAGUARDA: SOLO 'particular' → versión Pet Owner accesible. Cualquier otro
+    # valor (professional, corporativo, None, vacío) → versión profesional completa.
+    is_petowner = (account_type or "").strip().lower() == "particular"
+    sys_prompt = PETOWNER_INTERVENTION_SYSTEM_PROMPT if is_petowner else INTERVENTION_SYSTEM_PROMPT
 
     a = request.anamnesis
 
@@ -94,7 +100,7 @@ Follow the output format defined in your instructions exactly. Produce the full 
             system=[
                 {
                     "type": "text",
-                    "text": INTERVENTION_SYSTEM_PROMPT,
+                    "text": sys_prompt,
                     "cache_control": {"type": "ephemeral"},
                 }
             ],
@@ -115,6 +121,17 @@ Follow the output format defined in your instructions exactly. Produce the full 
     for block in response.content:
         if block.type == "text":
             plan_text += block.text
+
+    # Legend Pet Owner (CTA a Profesional) — determinista, solo versión accesible.
+    if is_petowner and plan_text.strip():
+        _legend = (
+            "\n\n———\nVersión Pet Owner · Para un plan más detallado y profundo, "
+            "activa la versión Profesional."
+            if lang != "en" else
+            "\n\n———\nPet Owner version · For a more detailed, in-depth plan, "
+            "activate the Professional version."
+        )
+        plan_text = plan_text.rstrip() + _legend
 
     cache_hit = (response.usage.cache_read_input_tokens or 0) > 0
 

@@ -111,8 +111,14 @@ def create_analysis(
             endpoint="/analysis",
             input_text=safety_text,
         )
+    # account_type → versión: 'particular' = Pet Owner accesible; resto/None = completa (salvaguarda).
+    _acct = None
     try:
-        result = run_clinical_analysis(anamnesis)
+        _acct = getattr(get_user_from_authorization(authorization, db), "account_type", None)
+    except Exception:
+        _acct = None
+    try:
+        result = run_clinical_analysis(anamnesis, account_type=_acct)
         # Cost tracking — fire-and-forget tras la response
         background_tasks.add_task(
             log_usage,
@@ -257,10 +263,16 @@ async def create_analysis_with_video(
         # video_caption es input del usuario: se recorta a 300 chars (evita abuso de
         # tokens y limita superficie de prompt-injection; el prompt ya lo trata como
         # contexto no fiable que NO anula la evidencia visual).
+        _acct_v = None
+        try:
+            _acct_v = getattr(get_user_from_authorization(authorization, db), "account_type", None)
+        except Exception:
+            _acct_v = None
         return run_clinical_analysis(
             anamnesis,
             video_frames=frames or None,
             video_caption=((video_caption or "").strip()[:300]) or None,
+            account_type=_acct_v,
         )
 
     except HTTPException:

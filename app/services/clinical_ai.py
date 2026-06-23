@@ -19,6 +19,7 @@ from typing import Optional
 from app.config import get_settings
 from app.core.anthropic_client import get_anthropic_client, create_message_resilient
 from app.core.prompts.clinical import CLINICAL_SYSTEM_PROMPT
+from app.core.prompts.petowner_clinical import PETOWNER_CLINICAL_SYSTEM_PROMPT
 from app.models.anamnesis import AnamnesisInput, AnalysisResponse, RetrievedChunk
 from app.services.rag import retrieve, build_rag_context_block, build_anamnesis_block
 
@@ -99,6 +100,7 @@ def run_clinical_analysis(
     anamnesis: AnamnesisInput,
     video_frames: Optional[list] = None,
     video_caption: Optional[str] = None,
+    account_type: Optional[str] = None,
 ) -> AnalysisResponse:
     """
     Full pipeline:
@@ -112,6 +114,12 @@ def run_clinical_analysis(
     """
     settings = get_settings()
     client = get_anthropic_client()
+
+    # SALVAGUARDA: SOLO 'particular' → versión Pet Owner accesible. Cualquier otro
+    # valor (professional, corporativo, None, vacío) → versión profesional completa
+    # (el sistema cae SIEMPRE hacia la versión más completa ante la duda).
+    is_petowner = (account_type or "").strip().lower() == "particular"
+    sys_prompt = PETOWNER_CLINICAL_SYSTEM_PROMPT if is_petowner else CLINICAL_SYSTEM_PROMPT
 
     # ── 1. RAG retrieval ────────────────────────────────────────────────────
     query = _build_query_from_anamnesis(anamnesis)
@@ -168,7 +176,7 @@ analysis. Follow the output format defined in your instructions exactly.
             system=[
                 {
                     "type": "text",
-                    "text": CLINICAL_SYSTEM_PROMPT,
+                    "text": sys_prompt,
                     "cache_control": {"type": "ephemeral"},
                 }
             ],
@@ -190,6 +198,17 @@ analysis. Follow the output format defined in your instructions exactly.
     for block in response.content:
         if block.type == "text":
             analysis_text += block.text
+
+    # Legend Pet Owner (CTA a Profesional) — determinista, en código, solo accesible.
+    if is_petowner and analysis_text.strip():
+        _legend = (
+            "\n\n———\nVersión Pet Owner · Para un análisis clínico más profundo, "
+            "activa la versión Profesional."
+            if lang != "en" else
+            "\n\n———\nPet Owner version · For a deeper clinical analysis, "
+            "activate the Professional version."
+        )
+        analysis_text = analysis_text.rstrip() + _legend
 
     cache_hit = (response.usage.cache_read_input_tokens or 0) > 0
 

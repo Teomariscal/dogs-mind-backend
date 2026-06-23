@@ -27,8 +27,14 @@ def create_intervention(
     Si se pasa case_id como query, persiste el plan como entry tipo
     'intervention' en el caso (no rompe la respuesta si la persistencia falla).
     """
+    # account_type → versión: 'particular' = Pet Owner accesible; resto/None = completa (salvaguarda).
+    _acct = None
     try:
-        result = run_intervention_plan(request)
+        _acct = getattr(get_user_from_authorization(authorization, db), "account_type", None)
+    except Exception:
+        _acct = None
+    try:
+        result = run_intervention_plan(request, account_type=_acct)
         # Persistencia opcional al caso
         if case_id:
             user = get_user_from_authorization(authorization, db)

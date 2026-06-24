@@ -46,6 +46,11 @@ class Settings(BaseSettings):
     # App
     app_env: str = "development"
 
+    # Versión italiana — guiño zooantropológico (SIUA/Marchesini).
+    # SOLO se activa con esta env a true Y lang=='it' Y cuenta professional.
+    # Arranca APAGADO: mientras esté en false el comportamiento es idéntico al actual.
+    it_zoo_veneer_enabled: bool = False
+
 
 @lru_cache
 def get_settings() -> Settings:

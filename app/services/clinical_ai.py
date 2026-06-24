@@ -22,6 +22,7 @@ from app.core.prompts.clinical import CLINICAL_SYSTEM_PROMPT
 from app.core.prompts.petowner_clinical import PETOWNER_CLINICAL_SYSTEM_PROMPT
 from app.models.anamnesis import AnamnesisInput, AnalysisResponse, RetrievedChunk
 from app.services.rag import retrieve, build_rag_context_block, build_anamnesis_block
+from app.services.italian_veneer import maybe_apply_italian_veneer
 
 
 def _build_query_from_anamnesis(anamnesis: AnamnesisInput) -> str:
@@ -143,6 +144,12 @@ def run_clinical_analysis(
             "Every heading, bullet point, label and sentence must be in English. "
             "Do NOT use Spanish at any point in the output.\n"
         )
+    elif lang == "it":
+        lang_instruction = (
+            "\nISTRUZIONE DI LINGUA: scrivi l'intera analisi in ITALIANO. "
+            "Ogni intestazione, punto elenco, etichetta e frase deve essere in italiano. "
+            "Non usare lo spagnolo in nessun punto dell'output.\n"
+        )
     else:
         lang_instruction = (
             "\nINSTRUCCIÓN DE IDIOMA: Escribe el análisis completo en ESPAÑOL. "
@@ -209,6 +216,13 @@ analysis. Follow the output format defined in your instructions exactly.
             "activate the Professional version."
         )
         analysis_text = analysis_text.rstrip() + _legend
+
+    # Versión italiana: SEGUNDA PASADA (guiño zooantropológico) SOLO si flag+it+professional.
+    # Aditiva; si no aplica devuelve el ABA puro de arriba idéntico. El motor (pasada 1)
+    # se generó SIN zooantropología → el guiño no puede haber corrompido la ciencia.
+    analysis_text = maybe_apply_italian_veneer(
+        analysis_text, lang=lang, account_type=account_type, kind="analysis"
+    )
 
     cache_hit = (response.usage.cache_read_input_tokens or 0) > 0
 

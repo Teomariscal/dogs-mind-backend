@@ -15,6 +15,7 @@ from app.core.anthropic_client import get_anthropic_client, create_message_resil
 from app.core.prompts.intervention import INTERVENTION_SYSTEM_PROMPT
 from app.core.prompts.petowner_intervention import PETOWNER_INTERVENTION_SYSTEM_PROMPT
 from app.models.intervention import InterventionRequest, InterventionResponse
+from app.services.italian_veneer import maybe_apply_italian_veneer
 
 
 def run_intervention_plan(request: InterventionRequest, account_type=None) -> InterventionResponse:
@@ -70,6 +71,13 @@ def run_intervention_plan(request: InterventionRequest, account_type=None) -> In
             "examples and clinical commentary must be in English. Even though "
             "the system prompt is in English, the model has a tendency to reply "
             "in Spanish — explicitly use English throughout.\n"
+        )
+    elif lang == "it":
+        lang_instruction = (
+            "\nCRITICAL LANGUAGE INSTRUCTION: Write the ENTIRE intervention plan "
+            "in ITALIAN. All section headers, phases, exercises, instructions, "
+            "examples and clinical commentary must be in Italian. The model tends "
+            "to reply in Spanish — explicitly use Italian throughout.\n"
         )
     else:
         lang_instruction = (
@@ -132,6 +140,12 @@ Follow the output format defined in your instructions exactly. Produce the full 
             "activate the Professional version."
         )
         plan_text = plan_text.rstrip() + _legend
+
+    # Versión italiana: SEGUNDA PASADA (guiño zooantropológico) SOLO si flag+it+professional.
+    # Aditiva; si no aplica devuelve el plan ABA/LIMA puro idéntico.
+    plan_text = maybe_apply_italian_veneer(
+        plan_text, lang=lang, account_type=account_type, kind="intervention"
+    )
 
     cache_hit = (response.usage.cache_read_input_tokens or 0) > 0
 

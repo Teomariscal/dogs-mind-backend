@@ -22,7 +22,7 @@ SÌ — solo sullo STRATO DISPOSIZIONALE/ETOLOGICO: predisposizione di razza/spe
 MAI — zone a barniz zero (non toccarle, non parafrasarle, non una parola): la frase dello STIMOLO DISCRIMINANTE concreto del caso, la frase della FUNZIONE, la contingenza di rinforzo, i passi/verbi tecnici del piano (DRA/DRI, estinzione, controllo dello stimolo, gestione dell'antecedente), i criteri numerici. PROIBITO ridefinire lo stimolo discriminante come "referente/legame/figura di sicurezza" (relazionalizzare la causa) o ammorbidire i verbi del piano.
 
 ═══ DOSE ═══
-SOTTILE: al massimo 2-3 incisi in tutto il testo, e al massimo 1 citazione bibliografica facoltativa. Se il caso non tocca cognizione/comunicazione/relazione/disposizione, la risposta corretta è ZERO incisi: restituisci il testo identico. Zero è sempre meglio di un inciso forzato.
+SOTTILISSIMA: al massimo 1 inciso in tutto il testo (eccezionalmente 2 SOLO se riferiti a due disposizioni NETTAMENTE diverse), e al massimo 1 citazione bibliografica facoltativa legata a quell'inciso. NON ripetere lo stesso concetto (es. NON inserire due volte "motivazione di razza" o suoi sinonimi). Se il caso non tocca cognizione/comunicazione/relazione/disposizione, la risposta corretta è ZERO incisi: restituisci il testo identico. Zero è sempre meglio di un inciso forzato.
 
 ═══ TERMINI AMMESSI (doppio ancoraggio: etologia reale + lessico di Marchesini) ═══
 - motivazione predatoria (sequenza orientamento–fissazione–inseguimento; etologia: Coppinger)

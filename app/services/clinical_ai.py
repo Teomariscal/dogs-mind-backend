@@ -147,8 +147,10 @@ def run_clinical_analysis(
     elif lang == "it":
         lang_instruction = (
             "\nISTRUZIONE DI LINGUA: scrivi l'intera analisi in ITALIANO. "
-            "Ogni intestazione, punto elenco, etichetta e frase deve essere in italiano. "
-            "Non usare lo spagnolo in nessun punto dell'output.\n"
+            "Ogni intestazione, banner, etichetta, punto elenco e frase deve essere in "
+            "italiano, INCLUSI i titoli racchiusi tra linee decorative "
+            "(es. 'SÍNTESIS ABC' → 'SINTESI ABC', 'SÍNTESIS' → 'SINTESI'). "
+            "Non lasciare NESSUNA parola in spagnolo in nessun punto dell'output.\n"
         )
     else:
         lang_instruction = (

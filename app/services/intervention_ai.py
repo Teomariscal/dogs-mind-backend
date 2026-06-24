@@ -75,9 +75,10 @@ def run_intervention_plan(request: InterventionRequest, account_type=None) -> In
     elif lang == "it":
         lang_instruction = (
             "\nCRITICAL LANGUAGE INSTRUCTION: Write the ENTIRE intervention plan "
-            "in ITALIAN. All section headers, phases, exercises, instructions, "
-            "examples and clinical commentary must be in Italian. The model tends "
-            "to reply in Spanish — explicitly use Italian throughout.\n"
+            "in ITALIAN. All section headers, banners (including titles between "
+            "decorative lines, e.g. 'SÍNTESIS'→'SINTESI'), phases, exercises, "
+            "instructions, examples and clinical commentary must be in Italian. The "
+            "model tends to reply in Spanish — explicitly use Italian throughout.\n"
         )
     else:
         lang_instruction = (

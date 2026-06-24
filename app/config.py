@@ -1,5 +1,5 @@
 from functools import lru_cache
-from pydantic import field_validator
+from pydantic import field_validator, Field, AliasChoices
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -47,9 +47,13 @@ class Settings(BaseSettings):
     app_env: str = "development"
 
     # Versión italiana — guiño zooantropológico (SIUA/Marchesini).
-    # SOLO se activa con esta env a true Y lang=='it' Y cuenta professional.
+    # SOLO se activa con la env `IT_ZOO_VENEER=true` Y lang=='it' Y cuenta professional.
     # Arranca APAGADO: mientras esté en false el comportamiento es idéntico al actual.
-    it_zoo_veneer_enabled: bool = False
+    # (Acepta también IT_ZOO_VENEER_ENABLED por compatibilidad.)
+    it_zoo_veneer_enabled: bool = Field(
+        default=False,
+        validation_alias=AliasChoices("IT_ZOO_VENEER", "IT_ZOO_VENEER_ENABLED"),
+    )
 
 
 @lru_cache

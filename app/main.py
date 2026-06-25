@@ -392,6 +392,11 @@ def serve_admin():
 <!-- USERS CARD -->
 <div class="card">
   <h2>👥 Gestión de usuarios</h2>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+    <input id="user-search" type="search" oninput="renderUsers()" placeholder="🔎 Buscar por email o rol…"
+      style="flex:1;min-width:220px;padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+    <span id="user-count" style="color:#888;font-size:12px;white-space:nowrap;"></span>
+  </div>
   <div style="overflow-x:auto;">
     <table class="u-table">
       <thead><tr><th>Email</th><th>Rol</th><th>Tokens</th><th>Acciones</th></tr></thead>
@@ -523,10 +528,24 @@ async function adminLogin() {
 function ah() { return { 'Content-Type':'application/json', 'Authorization':'Bearer ' + _jwt }; }
 
 // ── USERS ────────────────────────────────────────────────────────────────────
+var _allUsers = [];
 async function loadUsers() {
   var res = await fetch('/admin/users', { headers: ah() });
   var data = await res.json();
-  var rows = (data.users || []).map(function(u) {
+  _allUsers = data.users || [];
+  renderUsers();
+}
+
+function renderUsers() {
+  var box = document.getElementById('user-search');
+  var q = (box && box.value ? box.value : '').trim().toLowerCase();
+  var list = q
+    ? _allUsers.filter(function(u) {
+        return (u.email || '').toLowerCase().indexOf(q) >= 0 ||
+               (u.role || '').toLowerCase().indexOf(q) >= 0;
+      })
+    : _allUsers;
+  var rows = list.map(function(u) {
     return '<tr>' +
       '<td>' + u.email + '</td>' +
       '<td><span class="role-badge role-' + u.role + '">' + u.role + '</span></td>' +
@@ -541,7 +560,10 @@ async function loadUsers() {
       '</td>' +
     '</tr>';
   }).join('');
-  document.getElementById('users-tbody').innerHTML = rows || '<tr><td colspan="4" style="color:#aaa;">Sin usuarios</td></tr>';
+  var empty = q ? 'Sin resultados para “' + q + '”' : 'Sin usuarios';
+  document.getElementById('users-tbody').innerHTML = rows || '<tr><td colspan="4" style="color:#aaa;">' + empty + '</td></tr>';
+  var cnt = document.getElementById('user-count');
+  if (cnt) cnt.textContent = q ? (list.length + ' de ' + _allUsers.length) : (_allUsers.length + ' usuarios');
 }
 
 async function setRole(email) {

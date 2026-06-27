@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import APIRouter, HTTPException, Header, Depends, Query
+from fastapi import APIRouter, HTTPException, Header, Depends, Query, BackgroundTasks
 from sqlalchemy.orm import Session
 
 from app.models.intervention import InterventionRequest, InterventionResponse
@@ -7,6 +7,7 @@ from app.services.intervention_ai import run_intervention_plan
 from app.database import get_db
 from app.core.case_persistence import persist_to_case_safely, get_user_from_authorization
 from app.core.anthropic_error import raise_http_for_anthropic
+from app.core.usage_tracker import log_usage
 from app.config import get_settings
 
 router = APIRouter(prefix="/intervention", tags=["intervention-plan"])
@@ -15,6 +16,7 @@ router = APIRouter(prefix="/intervention", tags=["intervention-plan"])
 @router.post("", response_model=InterventionResponse)
 def create_intervention(
     request: InterventionRequest,
+    background_tasks: BackgroundTasks,
     case_id: Optional[str] = Query(None, description="Si se pasa, persiste el plan como entry del caso"),
     authorization: Optional[str] = Header(None),
     db: Session = Depends(get_db),
@@ -28,18 +30,32 @@ def create_intervention(
     'intervention' en el caso (no rompe la respuesta si la persistencia falla).
     """
     # account_type → versión: 'particular' = Pet Owner accesible; resto/None = completa (salvaguarda).
-    _acct = None
+    _user = None
     try:
-        _acct = getattr(get_user_from_authorization(authorization, db), "account_type", None)
+        _user = get_user_from_authorization(authorization, db)
     except Exception:
-        _acct = None
+        _user = None
+    _acct = getattr(_user, "account_type", None) if _user else None
+    _user_id = getattr(_user, "id", None) if _user else None
     try:
         result = run_intervention_plan(request, account_type=_acct)
+        # Cost tracking — fire-and-forget tras la response. tokens_charged=0:
+        # hoy la intervención no descuenta saldo (va incluida en el análisis).
+        # Loguear input/output reales hace visible el coste que antes era ciego.
+        background_tasks.add_task(
+            log_usage,
+            user_id=_user_id,
+            endpoint="/intervention",
+            model=get_settings().clinical_model,
+            input_tokens=getattr(result, "input_tokens", None),
+            output_tokens=getattr(result, "output_tokens", None),
+            tokens_charged=0,
+            success="ok",
+        )
         # Persistencia opcional al caso
-        if case_id:
-            user = get_user_from_authorization(authorization, db)
+        if case_id and _user is not None:
             persist_to_case_safely(
-                case_id, user, db,
+                case_id, _user, db,
                 entry_type="intervention",
                 content=getattr(result, "plan", None) or "",
                 meta={"endpoint": "/intervention"},
@@ -50,4 +66,13 @@ def create_intervention(
             )
         return result
     except Exception as e:
+        background_tasks.add_task(
+            log_usage,
+            user_id=_user_id,
+            endpoint="/intervention",
+            model=get_settings().clinical_model,
+            tokens_charged=0,
+            success="error",
+            notes=str(e)[:200],
+        )
         raise_http_for_anthropic(e)

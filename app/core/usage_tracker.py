@@ -1,10 +1,10 @@
 """
 Helper para registrar uso y coste estimado en usage_log.
 
-Precios Anthropic vigentes 2026-04 (en USD/millón tokens):
-- claude-sonnet-4-6: input 3.00 / output 15.00
-- claude-haiku-4-5:  input 0.80 / output 4.00
-- claude-opus:       (no usado actualmente)
+Precios Anthropic vigentes 2026-06 (en USD/millón tokens):
+- claude-sonnet-4-6 / 4-5: input 3.00 / output 15.00
+- claude-haiku-4-5:        input 1.00 / output 5.00
+- claude-opus-4-8 / 4-7:   input 5.00 / output 25.00  (modelo de fallback ante 529)
 
 Voyage AI (embeddings):
 - voyage-3-large: 0.18 USD / millón tokens
@@ -27,8 +27,11 @@ logger = logging.getLogger(__name__)
 # Precios USD por 1M tokens (revisar trimestralmente)
 _PRICES = {
     "claude-sonnet-4-6":  {"in": 3.00,  "out": 15.00},
-    "claude-haiku-4-5":   {"in": 0.80,  "out": 4.00},
-    "voyage-3-large":     {"in": 0.18,  "out": 0.0},   # solo input
+    "claude-sonnet-4-5":  {"in": 3.00,  "out": 15.00},   # usado en /analysis/chat
+    "claude-haiku-4-5":   {"in": 1.00,  "out": 5.00},    # corregido: era 0.80/4.00 (precio Haiku 3.5, infravaloraba ~25%)
+    "claude-opus-4-8":    {"in": 5.00,  "out": 25.00},   # fallback ante 529 de Sonnet
+    "claude-opus-4-7":    {"in": 5.00,  "out": 25.00},
+    "voyage-3-large":     {"in": 0.18,  "out": 0.0},     # solo input
 }
 
 _USD_EUR = float(os.environ.get("EXCHANGE_USD_EUR", "0.92"))

@@ -28,7 +28,7 @@ import logging
 from datetime import datetime, date, timedelta
 from typing import Optional, Literal, Any
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 from pydantic import BaseModel, Field
@@ -39,6 +39,8 @@ from app.models.case import (
     Case, CaseEntry, DailyFollowupEntry,
 )
 from app.api.routes.auth import get_current_user
+from app.config import get_settings
+from app.core.usage_tracker import log_usage
 from app.services.daily_followup_ai import (
     classify_diagnosis, generate_daily_checkin,
     DailyCheckin, ExerciseSpec, TheoryQuestionSpec,
@@ -343,6 +345,7 @@ def init_daily_followup(
 )
 def get_daily_followup_today(
     case_id: str,
+    background_tasks: BackgroundTasks,
     lang: Literal["es", "en"] = "es",
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -423,6 +426,20 @@ def get_daily_followup_today(
     except Exception as e:
         logger.error(f"[daily-followup-today] coach error case={case.id}: {e}")
         raise HTTPException(status_code=502, detail="Error al generar el check-in del día.")
+
+    # Cost tracking — fire-and-forget. tokens_charged=0: hoy el seguimiento
+    # diario no descuenta saldo. Antes el coach Sonnet NO logueaba → su coste
+    # (el mayor a escala porque escala con el engagement) era ciego en usage_log.
+    background_tasks.add_task(
+        log_usage,
+        user_id=user.id,
+        endpoint="/daily-followup/today",
+        model=get_settings().clinical_model,
+        input_tokens=getattr(checkin, "input_tokens", None),
+        output_tokens=getattr(checkin, "output_tokens", None),
+        tokens_charged=0,
+        success="ok",
+    )
 
     # Persistir placeholder (entry con exercises_generated, is_complete=false).
     if not today_entry:

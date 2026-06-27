@@ -268,12 +268,25 @@ async def create_analysis_with_video(
             _acct_v = getattr(get_user_from_authorization(authorization, db), "account_type", None)
         except Exception:
             _acct_v = None
-        return run_clinical_analysis(
+        result = run_clinical_analysis(
             anamnesis,
             video_frames=frames or None,
             video_caption=((video_caption or "").strip()[:300]) or None,
             account_type=_acct_v,
         )
+        # Cost tracking — fire-and-forget tras la response (antes /analysis/video
+        # NO logueaba → coste multimodal era ciego en usage_log).
+        background_tasks.add_task(
+            log_usage,
+            user_id=_extract_user_id(authorization),
+            endpoint="/analysis/video",
+            model=get_settings().clinical_model,
+            input_tokens=getattr(result, "input_tokens", None),
+            output_tokens=getattr(result, "output_tokens", None),
+            tokens_charged=ANALYSIS_VIDEO_TOKEN_COST,
+            success="ok",
+        )
+        return result
 
     except HTTPException:
         raise
@@ -282,6 +295,15 @@ async def create_analysis_with_video(
         # deben triggerar refund).
         if _charged:
             refund_token(authorization, db, amount=ANALYSIS_VIDEO_TOKEN_COST)
+            background_tasks.add_task(
+                log_usage,
+                user_id=_extract_user_id(authorization),
+                endpoint="/analysis/video",
+                model=get_settings().clinical_model,
+                tokens_charged=ANALYSIS_VIDEO_TOKEN_COST,
+                success="error",
+                notes=str(e)[:200],
+            )
         raise_http_for_anthropic(e)
     finally:
         if tmp_path and os.path.exists(tmp_path):

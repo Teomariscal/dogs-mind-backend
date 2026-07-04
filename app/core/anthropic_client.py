@@ -6,10 +6,11 @@ from app.config import get_settings
 @lru_cache
 def get_anthropic_client() -> anthropic.Anthropic:
     settings = get_settings()
-    # max_retries=5 (default del SDK = 2): el SDK reintenta con backoff exponencial
-    # ante 429/5xx/529 (sobrecarga de Anthropic). Aguanta sobrecargas transitorias
-    # de Sonnet sin que el usuario llegue a ver el error.
-    return anthropic.Anthropic(api_key=settings.anthropic_api_key, max_retries=5)
+    # max_retries=2 (bajado de 5): el backoff exponencial de 5 reintentos sumaba
+    # ~15-30 s de espera ante 529, disparando /intervention por encima del timeout
+    # de ~60 s del WebView/Safari móvil → "Load failed". Con 2 reintentos se mantiene
+    # resiliencia ante sobrecargas transitorias sin inflar la latencia hasta el timeout.
+    return anthropic.Anthropic(api_key=settings.anthropic_api_key, max_retries=2)
 
 
 def create_message_resilient(*, model, fallback_model=None, **kwargs):

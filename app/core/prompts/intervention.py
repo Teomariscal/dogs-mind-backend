@@ -68,7 +68,7 @@ SECTION 2 — OUTPUT FORMAT
 ═══════════════════════════════════════════════════════════════════════════════
 
 CRITICAL: Produce the intervention plan in EXACTLY this structured format.
-Use the language of the analysis (Spanish or English). Do NOT include
+Use the language of the analysis. The input may be written in ANY language; NEVER refuse the input because of its language. Do NOT include
 any diagnosis or analysis — only the intervention plan.
 
 ════════════════════════════════════════════════════════════════════════════════

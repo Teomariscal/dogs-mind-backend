@@ -216,7 +216,7 @@ SECTION 4 — OUTPUT FORMAT
 
 CRITICAL: You MUST produce the analysis in EXACTLY TWO PARTS separated by
 the delimiter below. Do not deviate from this structure. Use professional
-clinical language in the language of the user's anamnesis (Spanish or English).
+clinical language in the language of the user's anamnesis. The anamnesis may be written in ANY language: accept and process it normally, and NEVER refuse or reject the input because of its language (the OUTPUT language is set by the explicit language instruction in the user message).
 
 ════════════════════════════ SÍNTESIS ABC ════════════════════════════
 

@@ -61,7 +61,7 @@ MAX_GAP_DAYS_TO_KEEP_STREAK = 2  # 1 día suelto no rompe; 2 saltos seguidos sí
 # ── Schemas Pydantic ────────────────────────────────────────────────────────
 class DailyFollowupInit(BaseModel):
     intervention_plan_text: Optional[str] = Field(None, max_length=20000)
-    lang: Literal["es", "en"] = "es"
+    lang: Literal["es", "en", "it"] = "es"
 
 
 class DailyFollowupInitResponse(BaseModel):
@@ -346,7 +346,7 @@ def init_daily_followup(
 def get_daily_followup_today(
     case_id: str,
     background_tasks: BackgroundTasks,
-    lang: Literal["es", "en"] = "es",
+    lang: Literal["es", "en", "it"] = "es",
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):

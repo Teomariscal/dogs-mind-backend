@@ -72,7 +72,7 @@ class TrainingConsultInput(BaseModel):
     goal: str = Field(..., min_length=4, max_length=1000, description="Habilidad o ejercicio específico que se quiere mejorar")
     context: Literal["pista", "interior", "calle"]
     uses_clicker: bool = Field(..., description="¿Usa clicker habitualmente?")
-    lang: Literal["es", "en"] = "es"
+    lang: Literal["es", "en", "it"] = "es"
 
     @field_validator("reinforcers")
     @classmethod

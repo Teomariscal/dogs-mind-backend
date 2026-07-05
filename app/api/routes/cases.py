@@ -96,7 +96,7 @@ class CaseCreate(BaseModel):
     # Idioma fijo del caso (Opción C). Si no se envía, queda NULL y los endpoints
     # caen al fallback de query-param `?lang=` (compat). Frontend debería enviar
     # window.getCurrentLang() al crear el caso.
-    lang: Optional[Literal["es", "en"]] = Field(None, description="'es' | 'en'. Si NULL, fallback al ?lang= en endpoints.")
+    lang: Optional[Literal["es", "en", "it"]] = Field(None, description="'es' | 'en'. Si NULL, fallback al ?lang= en endpoints.")
 
     @field_validator("title", "motivo_consulta", "client_dog_name", "client_dog_breed", "client_dog_age")
     @classmethod
@@ -117,7 +117,7 @@ class CaseUpdate(BaseModel):
     client_dog_age: Optional[str] = Field(None, max_length=80)
     # Permite cambio explícito de lang (uso raro: corregir un caso mal etiquetado).
     # Si NULL en patch, NO modifica el valor actual (model_dump exclude_unset).
-    lang: Optional[Literal["es", "en"]] = None
+    lang: Optional[Literal["es", "en", "it"]] = None
 
     @field_validator("title", "motivo_consulta", "client_dog_name", "client_dog_breed", "client_dog_age")
     @classmethod
@@ -231,7 +231,7 @@ class LegacyRecord(BaseModel):
     # Opción C — idioma con el que se creó el record en el cliente.
     # NULL si el record fue creado antes de esta feature → case.lang queda NULL,
     # endpoints caen al fallback ?lang= (cero regresión).
-    lang: Optional[Literal["es", "en"]] = Field(None, description="'es' | 'en' si se conoce; NULL para records legacy.")
+    lang: Optional[Literal["es", "en", "it"]] = Field(None, description="'es' | 'en' si se conoce; NULL para records legacy.")
     # Distinción de flujo: 'behavior' (ABC clínico, default) | 'training' (consulta
     # de Entrenamiento Específico). Optional; NULL/missing → default Case.case_type
     # ('behavior') y comportamiento idéntico al previo (cero regresión).

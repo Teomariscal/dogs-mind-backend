@@ -44,7 +44,7 @@ def _today_utc_str() -> str:
 
 @router.get("/today", response_model=DailyTipResponse)
 def get_daily_tip(
-    lang: Literal["es", "en"] = Query("es"),
+    lang: Literal["es", "en", "it"] = Query("es"),
     db: Session = Depends(get_db),
 ):
     """

@@ -21,6 +21,12 @@ class Settings(BaseSettings):
     qdrant_url: str = "http://localhost:6333"
     qdrant_api_key: str = ""
     qdrant_collection: str = "dogs_mind_knowledge"
+    # RAG B — corpus cognitivista italiano (casos reales + bibliografía cognitiva).
+    # Collection FÍSICAMENTE SEPARADA de dogs_mind_knowledge: es corpus de EXPRESIÓN
+    # (estilo/terminología para la 2ª pasada), NO fuente diagnóstica. Solo se consulta
+    # en la vía cognitivista italiana (lang=='it' + stance=='cognitive'). NUNCA
+    # ingestar material cognitivista en dogs_mind_knowledge (contaminaría es/en/it).
+    qdrant_collection_cognitive: str = "dogs_mind_cognitive_it"
 
     @field_validator("qdrant_url", "anthropic_api_key", "voyage_api_key", "qdrant_api_key", mode="before")
     @classmethod

@@ -13,18 +13,18 @@ def get_qdrant_client() -> QdrantClient:
     return QdrantClient(**kwargs)
 
 
-def ensure_collection() -> None:
+def _ensure_named_collection(collection_name: str) -> None:
     """
-    Create the knowledge collection and filename keyword index if needed.
+    Create a collection (and its filename keyword index) if needed.
     Safe to call multiple times — fully idempotent.
     """
     settings = get_settings()
     client = get_qdrant_client()
 
     existing = {c.name for c in client.get_collections().collections}
-    if settings.qdrant_collection not in existing:
+    if collection_name not in existing:
         client.create_collection(
-            collection_name=settings.qdrant_collection,
+            collection_name=collection_name,
             vectors_config=VectorParams(
                 size=settings.embedding_dim,
                 distance=Distance.COSINE,
@@ -35,9 +35,20 @@ def ensure_collection() -> None:
     # Qdrant ignores the call if the index already exists.
     try:
         client.create_payload_index(
-            collection_name=settings.qdrant_collection,
+            collection_name=collection_name,
             field_name="filename",
             field_schema=PayloadSchemaType.KEYWORD,
         )
     except Exception:
         pass  # index already exists — safe to ignore
+
+
+def ensure_collection() -> None:
+    """RAG A (dogs_mind_knowledge): create collection + index if needed."""
+    _ensure_named_collection(get_settings().qdrant_collection)
+
+
+def ensure_cognitive_collection() -> None:
+    """RAG B (corpus cognitivista IT): create collection + index if needed.
+    Collection separada — ver nota en config.py: NUNCA mezclar con la RAG A."""
+    _ensure_named_collection(get_settings().qdrant_collection_cognitive)

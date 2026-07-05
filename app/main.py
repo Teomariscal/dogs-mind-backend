@@ -319,12 +319,12 @@ def serve_admin():
   h1 { font-size: 22px; margin: 0 0 6px; }
   h2 { font-size: 16px; margin: 0 0 16px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
   p { color: #888; font-size: 14px; margin: 0 0 24px; }
-  #drop-zone { border: 2px dashed #c0b8aa; border-radius: 12px; padding: 40px 20px; text-align: center; cursor: pointer; transition: all .2s; background: #faf8f4; }
-  #drop-zone.hover { border-color: #4a6741; background: #edf2eb; }
-  #drop-zone input { display: none; }
-  #drop-zone .icon { font-size: 40px; margin-bottom: 12px; }
-  #drop-zone .label { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
-  #drop-zone .sub { font-size: 13px; color: #aaa; }
+  #drop-zone, #drop-zone-b { border: 2px dashed #c0b8aa; border-radius: 12px; padding: 40px 20px; text-align: center; cursor: pointer; transition: all .2s; background: #faf8f4; }
+  #drop-zone.hover, #drop-zone-b.hover { border-color: #4a6741; background: #edf2eb; }
+  #drop-zone input, #drop-zone-b input { display: none; }
+  #drop-zone .icon, #drop-zone-b .icon { font-size: 40px; margin-bottom: 12px; }
+  #drop-zone .label, #drop-zone-b .label { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  #drop-zone .sub, #drop-zone-b .sub { font-size: 13px; color: #aaa; }
   #file-info { margin-top: 16px; font-size: 14px; color: #4a6741; font-weight: 600; min-height: 20px; }
   button { margin-top: 20px; width: 100%; padding: 14px; background: #4a6741; color: #fff; border: none; border-radius: 100px; font-size: 15px; font-weight: 600; cursor: pointer; }
   button:disabled { background: #ccc; cursor: not-allowed; }
@@ -386,6 +386,31 @@ def serve_admin():
   <div id="docs-section">
     <h2>📚 Documentos indexados</h2>
     <div id="docs-list"><em style="color:#aaa;font-size:13px;">Cargando...</em></div>
+  </div>
+</div>
+
+<!-- COGNITIVE CORPUS CARD (RAG B) -->
+<div class="card" style="border: 2px solid #5ec8e6;">
+  <h1>Corpus Cognitivo IT · RAG B</h1>
+  <p>Casos cognitivistas + bibliografía cognitiva (solo vía italiana). Collection separada: <strong>dogs_mind_cognitive_it</strong>. La ingesta anonimiza datos de propietarios (GDPR) antes de indexar.</p>
+
+  <div id="drop-zone-b" onclick="document.getElementById('file-input-b').click()"
+       ondragover="event.preventDefault();this.classList.add('hover')"
+       ondragleave="this.classList.remove('hover')"
+       ondrop="handleDropB(event)"
+       style="border-color:#8fd4ec;">
+    <input id="file-input-b" type="file" accept=".pdf" onchange="handleSelectB(this)" style="display:none;">
+    <div class="icon">📄</div>
+    <div class="label">Pulsa o arrastra un PDF aquí (corpus cognitivo)</div>
+    <div class="sub">Máximo 100 MB · se anonimiza antes de indexar</div>
+  </div>
+  <div id="file-info-b" style="margin-top:16px;font-size:14px;color:#2a7a9a;font-weight:600;min-height:20px;"></div>
+  <button id="upload-btn-b" onclick="uploadFileB()" disabled style="background:#2a7a9a;">Subir a la RAG B (cognitiva)</button>
+  <div id="status-b" style="margin-top:20px;font-size:14px;min-height:20px;"></div>
+
+  <div id="docs-section-b" style="margin-top:32px;">
+    <h2>📚 Documentos indexados (RAG B)</h2>
+    <div id="docs-list-b"><em style="color:#aaa;font-size:13px;">Cargando...</em></div>
   </div>
 </div>
 
@@ -491,6 +516,91 @@ async function deleteDoc(filename) {
   loadDocs();
 }
 
+// ── RAG B: corpus cognitivo IT (slot separado, destino fijo dogs_mind_cognitive_it) ──
+var selectedFileB = null;
+
+function handleDropB(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone-b').classList.remove('hover');
+  var f = e.dataTransfer.files[0];
+  if (f && f.type === 'application/pdf') setFileB(f);
+  else alert('Solo se aceptan archivos PDF');
+}
+function handleSelectB(input) {
+  if (input.files[0]) setFileB(input.files[0]);
+}
+function setFileB(f) {
+  selectedFileB = f;
+  document.getElementById('file-info-b').textContent = '📄 ' + f.name + ' (' + (f.size/1024/1024).toFixed(1) + ' MB)';
+  document.getElementById('upload-btn-b').disabled = false;
+}
+
+async function uploadFileB() {
+  if (!selectedFileB) return;
+  var btn = document.getElementById('upload-btn-b');
+  var status = document.getElementById('status-b');
+  btn.disabled = true;
+  btn.textContent = 'Subiendo...';
+  status.textContent = '';
+  var fd = new FormData();
+  fd.append('file', selectedFileB);
+  try {
+    var res = await fetch('/documents/cognitive/upload', { method: 'POST', body: fd });
+    var data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Error al subir');
+    status.innerHTML = '⏳ Anonimizando e indexando <strong>' + data.filename + '</strong>... (la anonimización tarda ~1 min por caso)';
+    btn.textContent = 'Subir a la RAG B (cognitiva)';
+    selectedFileB = null;
+    document.getElementById('file-info-b').textContent = '';
+    pollJobB(data.job_id);
+  } catch(e) {
+    status.textContent = '❌ Error: ' + e.message;
+    btn.disabled = false;
+    btn.textContent = 'Subir a la RAG B (cognitiva)';
+  }
+}
+
+async function pollJobB(jobId) {
+  var status = document.getElementById('status-b');
+  var interval = setInterval(async function() {
+    try {
+      var res = await fetch('/documents/jobs/' + jobId);
+      var data = await res.json();
+      if (data.status === 'done') {
+        clearInterval(interval);
+        status.innerHTML = '✅ <strong>' + data.filename + '</strong> anonimizado e indexado — ' + data.chunks_indexed + ' chunks';
+        loadDocsB();
+      } else if (data.status === 'error') {
+        clearInterval(interval);
+        status.textContent = '❌ Error (nada indexado): ' + data.error;
+      }
+    } catch(e) { clearInterval(interval); }
+  }, 2000);
+}
+
+async function loadDocsB() {
+  var list = document.getElementById('docs-list-b');
+  try {
+    var res = await fetch('/documents/cognitive');
+    var data = await res.json();
+    if (!data.documents || data.documents.length === 0) {
+      list.innerHTML = '<em style="color:#aaa;font-size:13px;">RAG B vacía — aún no hay corpus cognitivo</em>';
+      return;
+    }
+    list.innerHTML = data.documents.map(function(d) {
+      return '<div class="doc-item"><div><div class="name">📄 ' + d.filename + '</div><div class="chunks">' + d.chunk_count + ' chunks</div></div><button onclick="deleteDocB(\\'' + d.filename + '\\')">🗑 Eliminar</button></div>';
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<em style="color:#aaa;font-size:13px;">Error al cargar documentos</em>';
+  }
+}
+
+async function deleteDocB(filename) {
+  if (!confirm('¿Eliminar ' + filename + ' de la RAG B (cognitiva)?')) return;
+  await fetch('/documents/cognitive/' + encodeURIComponent(filename), { method: 'DELETE' });
+  loadDocsB();
+}
+
 // ── ADMIN AUTH ───────────────────────────────────────────────────────────────
 var _jwt = '';
 async function adminLogin() {
@@ -516,6 +626,7 @@ async function adminLogin() {
     document.getElementById('login-section').style.display = 'none';
     document.getElementById('admin-content').style.display = 'block';
     loadDocs();
+    loadDocsB();
     loadUsers();
   } catch(e) {
     err.textContent = 'Error de red: ' + e.message;

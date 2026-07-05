@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File, BackgroundTasks
 from app.models.documents import DocumentUploadResponse, DocumentListResponse, DocumentListItem
 from app.services.document_ingestion import ingest_pdf, list_indexed_documents
+from app.services.cognitive_ingestion import ingest_cognitive_pdf, list_cognitive_documents
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
@@ -79,6 +80,96 @@ def list_documents():
     items = [DocumentListItem(**d) for d in docs]
     total = sum(d.chunk_count for d in items)
     return DocumentListResponse(documents=items, total_chunks=total)
+
+
+# ── RAG B: corpus cognitivista italiano (collection dogs_mind_cognitive_it) ─────
+# Slot SEPARADO del principal: destino cableado en fijo a la collection B para que
+# sea imposible contaminar dogs_mind_knowledge. La ingesta B lleva anonimización
+# GDPR fail-closed (casos reales) + chunking por caso. Ver cognitive_ingestion.py.
+
+def _run_cognitive_ingestion(job_id: str, pdf_bytes: bytes, filename: str) -> None:
+    """Background task: anonimizar + indexar en la RAG B."""
+    try:
+        chunks = ingest_cognitive_pdf(pdf_bytes, filename)
+        _jobs[job_id] = {"status": "done", "filename": filename, "chunks_indexed": chunks}
+    except Exception as e:
+        _jobs[job_id] = {"status": "error", "filename": filename, "error": str(e)}
+
+
+@router.post("/cognitive/upload", status_code=202)
+async def upload_cognitive_document(
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...),
+):
+    """
+    Upload a PDF to the ITALIAN COGNITIVE corpus (RAG B) — anonymized + case-chunked.
+
+    Returns 202 immediately. Poll GET /documents/jobs/{job_id} for status.
+    """
+    if file.content_type not in ALLOWED_CONTENT_TYPES:
+        raise HTTPException(
+            status_code=415,
+            detail=f"Only PDF files are accepted. Got: {file.content_type}",
+        )
+
+    pdf_bytes = await file.read()
+    size_mb = len(pdf_bytes) / (1024 * 1024)
+    if size_mb > MAX_FILE_SIZE_MB:
+        raise HTTPException(
+            status_code=413,
+            detail=f"File exceeds {MAX_FILE_SIZE_MB} MB limit ({size_mb:.1f} MB).",
+        )
+
+    import uuid
+    job_id = str(uuid.uuid4())
+    filename = file.filename or "unknown.pdf"
+    _jobs[job_id] = {"status": "processing", "filename": filename}
+
+    background_tasks.add_task(_run_cognitive_ingestion, job_id, pdf_bytes, filename)
+
+    return {
+        "job_id": job_id,
+        "filename": filename,
+        "status": "processing",
+        "message": f"Anonymizing + indexing '{filename}' into cognitive corpus (RAG B).",
+    }
+
+
+@router.get("/cognitive", response_model=DocumentListResponse)
+def list_cognitive():
+    """List documents indexed in the cognitive corpus (RAG B)."""
+    try:
+        docs = list_cognitive_documents()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    items = [DocumentListItem(**d) for d in docs]
+    total = sum(d.chunk_count for d in items)
+    return DocumentListResponse(documents=items, total_chunks=total)
+
+
+@router.delete("/cognitive/{filename}")
+def delete_cognitive_document(filename: str):
+    """Remove all chunks for a filename from the cognitive corpus (RAG B)."""
+    from app.config import get_settings
+    from app.core.qdrant_client import get_qdrant_client
+    from qdrant_client.models import FilterSelector, Filter, FieldCondition, MatchValue
+
+    settings = get_settings()
+    qdrant = get_qdrant_client()
+    try:
+        qdrant.delete(
+            collection_name=settings.qdrant_collection_cognitive,
+            points_selector=FilterSelector(
+                filter=Filter(
+                    must=[FieldCondition(key="filename", match=MatchValue(value=filename))]
+                )
+            ),
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    return {"message": f"Deleted all chunks for '{filename}' from cognitive corpus."}
 
 
 @router.delete("/{filename}")

@@ -102,7 +102,7 @@ class TrainingSessionRequest(BaseModel):
     @classmethod
     def _valid_lang(cls, v: str) -> str:
         s = (v or "es").strip().lower()
-        return s if s in ("es", "en") else "es"
+        return s if s in ("es", "en", "it") else "es"
 
 
 class TrainingExercise(BaseModel):

@@ -132,6 +132,7 @@ Return ONLY a valid JSON array with EXACTLY 5 objects, no text before or after:
 _LEVEL_LABELS = {
     "es": {"basico": "básico", "medio": "medio", "avanzado": "avanzado"},
     "en": {"basico": "basic", "medio": "intermediate", "avanzado": "advanced"},
+    "it": {"basico": "base", "medio": "medio", "avanzado": "avanzato"},
 }
 
 
@@ -183,6 +184,39 @@ def _build_user_prompt(
                 )
         lines.append("")
         lines.append("Generate the 5 training exercises now as a strict JSON array.")
+    elif lang == "it":
+        lines = [
+            f"OBIETTIVO DI OGGI: {objetivo}",
+            "",
+            "IMPOSTAZIONI:",
+            f"- Livello del cane: {np_}",
+            f"- Livello dei conduttori: {ng_}",
+        ]
+        if tiempo:
+            lines.append(f"- Tempo disponibile: {tiempo} min")
+        if donde:
+            lines.append(f"- Dove: {donde}")
+        lines.append(
+            f"- Risorse disponibili: {', '.join(recursos) if recursos else 'non specificato'}"
+        )
+        lines.append(
+            f"- Rinforzatori più validi per il cane: "
+            f"{', '.join(reforzadores) if reforzadores else 'non specificato'}"
+        )
+        if recursos:
+            if clicker_disponible:
+                lines.append("- Il clicker È disponibile: usalo come marcatore predefinito.")
+            else:
+                lines.append(
+                    "- Il clicker NON è nella lista risorse: adatta il marcatore "
+                    "(marcatore verbale breve), non dare per scontato il clicker."
+                )
+        lines.append("")
+        lines.append(
+            "ISTRUZIONE DI LINGUA: scrivi TUTTA la risposta in ITALIANO — i valori "
+            "'instruccion' ed 'explicacion' di ogni oggetto JSON devono essere in "
+            "italiano. Genera ora i 5 esercizi di addestramento come array JSON rigoroso."
+        )
     else:
         lines = [
             f"OBJETIVO DE HOY: {objetivo}",
@@ -284,10 +318,12 @@ def generate_training_session(
     el caller (router) debe hacer refund + log de error.
     """
     lang = (lang or "es").lower()
-    if lang not in ("es", "en"):
+    if lang not in ("es", "en", "it"):
         lang = "es"
 
-    system = _SYSTEM_ES if lang == "es" else _SYSTEM_EN
+    # it → base ES (mantiene intactas las reglas duras LIMA del system prompt) +
+    # instrucción explícita de salida en italiano dentro del user prompt.
+    system = _SYSTEM_EN if lang == "en" else _SYSTEM_ES
     user_prompt = _build_user_prompt(
         objetivo=objetivo,
         nivel_perro=nivel_perro,

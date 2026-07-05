@@ -200,7 +200,7 @@ def generate_training_consult(
     + log de error.
     """
     lang_norm = (lang or "es").lower()
-    if lang_norm not in ("es", "en"):
+    if lang_norm not in ("es", "en", "it"):
         lang_norm = "es"
 
     system_prompt = (
@@ -243,6 +243,16 @@ def generate_training_consult(
             "Use the retrieved knowledge above (cited [1], [2], …) to anchor "
             "the analysis and plan. Follow the response structure defined in "
             "your system prompt exactly. Strict technical tone."
+        )
+    elif lang_norm == "it":
+        lang_instruction = (
+            "ISTRUZIONE DI LINGUA: scrivi TUTTA la risposta in ITALIANO. "
+            "Titoli, elenchi e testo solo in italiano."
+        )
+        closing = (
+            "Usa la letteratura recuperata sopra (citata [1], [2], …) per "
+            "ancorare l'analisi e il piano. Segui esattamente la struttura "
+            "definita nel tuo system prompt. Tono tecnico rigoroso."
         )
     else:
         lang_instruction = (

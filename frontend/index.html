@@ -8510,7 +8510,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
       </div>
 
       <div class="abc-btns">
-        <button class="btn-orange" onclick="generateInterventionPlan()" data-i18n="abc_btn_plan">Ver Plan de Intervención</button>
+        <button class="btn-orange" onclick="generateInterventionPlan()"><span data-i18n="abc_btn_plan">Ver Plan de Intervención</span> <span style="font-size:12px;opacity:0.85;">(−0,2 tok.)</span></button>
         <button id="btn-full-analysis" onclick="goTo('s-full-analysis')" style="width:100%;padding:15px;border:none;border-radius:100px;background:#4a6741;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.02em;" data-i18n="abc_btn_full">Análisis completo &#8594;</button>
         <button class="btn-outline" onclick="goToConsultType()" data-i18n="abc_btn_new">Nuevo análisis</button>
       </div>
@@ -8540,7 +8540,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
 
     <!-- CTA igual que en ABC -->
     <div style="padding:0 16px 12px;">
-      <button class="btn-orange" onclick="generateInterventionPlan()" style="width:100%;padding:15px;border:none;border-radius:100px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;" data-i18n="abc_btn_plan">Ver Plan de Intervención</button>
+      <button class="btn-orange" onclick="generateInterventionPlan()" style="width:100%;padding:15px;border:none;border-radius:100px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;"><span data-i18n="abc_btn_plan">Ver Plan de Intervención</span> <span style="font-size:12px;opacity:0.85;">(−0,2 tok.)</span></button>
     </div>
     <!-- PDF completo profesional (requiere plan generado; si no existe, toast "No hay contenido para exportar") -->
     <div style="padding:0 16px 12px;">
@@ -16025,6 +16025,8 @@ function getVal(id, fallback) {
         headers: _ivHdrs,
         body: JSON.stringify(payload)
       });
+      if (res.status === 401) { showToast(_i18nText('session_expired', 'Sesión caducada.')); goToLogin('s-abc'); return; }
+      if (res.status === 402) { showToast(_fmtInsufTokens(0.2)); goTo('s-tokens'); return; }
       if (!res.ok) {
         var err = await res.json().catch(function(){ return {detail: res.statusText}; });
         var errMsg = err.detail;

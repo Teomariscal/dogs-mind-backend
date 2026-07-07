@@ -7,10 +7,17 @@ from app.services.intervention_ai import run_intervention_plan
 from app.database import get_db
 from app.core.case_persistence import persist_to_case_safely, get_user_from_authorization
 from app.core.anthropic_error import raise_http_for_anthropic
+from app.core.token_utils import deduct_token, refund_token
 from app.core.usage_tracker import log_usage
 from app.config import get_settings
 
 router = APIRouter(prefix="/intervention", tags=["intervention-plan"])
+
+# Coste por generación de plan (founder 2026-07-08: "ponle 0,20"; regla dura
+# "ninguna acción de IA cobra 0"). require_auth=False en el deduct: los
+# clientes iOS antiguos (build ≤20) no envían Authorization en esta llamada y
+# siguen funcionando sin cobro hasta actualizar a 1.0.2 — no se les rompe.
+INTERVENTION_TOKEN_COST = 0.20
 
 
 @router.post("", response_model=InterventionResponse)
@@ -37,11 +44,14 @@ def create_intervention(
         _user = None
     _acct = getattr(_user, "account_type", None) if _user else None
     _user_id = getattr(_user, "id", None) if _user else None
+
+    # Cobro ANTES de la IA (patrón /analysis), con refund si la IA falla.
+    # Anónimos (iOS ≤ build 20 sin JWT aquí) pasan sin cobro; admins exentos.
+    deduct_token(authorization, db, amount=INTERVENTION_TOKEN_COST, require_auth=False)
+    _charged = INTERVENTION_TOKEN_COST if (authorization and authorization.startswith("Bearer ")) else 0
+
     try:
         result = run_intervention_plan(request, account_type=_acct)
-        # Cost tracking — fire-and-forget tras la response. tokens_charged=0:
-        # hoy la intervención no descuenta saldo (va incluida en el análisis).
-        # Loguear input/output reales hace visible el coste que antes era ciego.
         background_tasks.add_task(
             log_usage,
             user_id=_user_id,
@@ -49,7 +59,7 @@ def create_intervention(
             model=get_settings().clinical_model,
             input_tokens=getattr(result, "input_tokens", None),
             output_tokens=getattr(result, "output_tokens", None),
-            tokens_charged=0,
+            tokens_charged=_charged,
             success="ok",
         )
         # Persistencia opcional al caso
@@ -66,6 +76,8 @@ def create_intervention(
             )
         return result
     except Exception as e:
+        # Refund: el usuario no paga por errores de IA/red. No-op para anónimos y admins.
+        refund_token(authorization, db, amount=INTERVENTION_TOKEN_COST)
         background_tasks.add_task(
             log_usage,
             user_id=_user_id,

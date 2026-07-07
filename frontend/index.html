@@ -512,7 +512,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
 #s-seguimiento .sel{
   width:100%;padding:12px 14px;border:1px solid var(--border2);
   border-radius:12px;background:var(--white);font-family:inherit;
-  font-size:14px;color:var(--text);outline:none;
+  font-size:16px;color:var(--text);outline:none; /* 16px: evita auto-zoom iOS */
   -webkit-appearance:none;appearance:none;
 }
 #s-dog-profile .inp:focus,
@@ -1661,7 +1661,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
 .notes-label{font-size:13px;color:var(--text);font-weight:500;margin-bottom:8px;}
 .notes-ta{
   width:100%;background:var(--cream2);border:1px solid var(--border);
-  border-radius:var(--r-sm);padding:12px;font-family:var(--ff-sans);font-size:13px;
+  border-radius:var(--r-sm);padding:12px;font-family:var(--ff-sans);font-size:16px; /* anti-zoom iOS */
   color:var(--text2);resize:none;height:80px;outline:none;
 }
 .notes-ta::placeholder{color:var(--text3);}
@@ -1705,10 +1705,14 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
   border-radius:100px;padding:4px 10px;font-size:12px;color:var(--green3);font-weight:500;
 }
 .back-round{
-  width:32px;height:32px;border-radius:50%;background:var(--cream2);
+  /* 44×44: mínimo HIG de Apple para tap targets (antes 32×32 fallaba el toque). */
+  width:44px;height:44px;border-radius:50%;background:var(--cream2);
   border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
-  font-size:13px;color:var(--text2);cursor:pointer;flex-shrink:0;
+  font-size:15px;color:var(--text2);cursor:pointer;flex-shrink:0;
 }
+
+/* Feedback táctil universal (HIG): toda superficie pulsable responde al pulsar. */
+button:not(:disabled):active{ transform:scale(0.98); }
 
 .msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;}
 .msgs::-webkit-scrollbar{width:0;}
@@ -3764,6 +3768,9 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
   color: rgba(255,250,240,0.95);
 }
 #s-chat .chat-hdr {
+  /* App Store fix: respetar el área segura superior para que el botón atrás y el
+     avatar NO queden ocultos tras la hora/batería/Dynamic Island en iPhone. */
+  padding: calc(env(safe-area-inset-top, 0px) + 12px) 18px 12px !important;
   background: rgba(10,14,8,0.55) !important;
   border-bottom: 1px solid rgba(255,250,240,0.08) !important;
   backdrop-filter: blur(10px);
@@ -3864,6 +3871,9 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
     radial-gradient(ellipse 440px 620px at 100% 38%, rgba(74,103,65,0.12), transparent 70%),
     linear-gradient(180deg, #324028 0%, #283322 55%, #1f2a1c 100%) !important;
   color: rgba(255,250,240,0.95);
+  /* App Store fix: reservar espacio para el nav inferior + área segura para que el
+     CTA "Empezar a chatear" no quede tapado por la barra (mismo patrón que Home/intro). */
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 110px) !important;
 }
 #s-avatars [data-i18n="avatars_title"],
 .av-screen [style*="ff-serif"][style*="22px"] {
@@ -4509,7 +4519,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
   background: rgba(255,250,240,0.96);
   border: 1.5px solid rgba(200,169,110,0.32);
   border-radius: 12px;
-  font-size: 15px;
+  font-size: 16px; /* 16px: evita auto-zoom iOS al enfocar */
   font-family: inherit;
   color: #1a1f17;
   outline: none;
@@ -6050,7 +6060,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
   border: 1px solid rgba(255,255,255,0.18);
   border-radius: 12px;
   font-family: 'Jost', sans-serif;
-  font-size: 15px;
+  font-size: 16px; /* 16px: evita auto-zoom iOS al enfocar */
   color: #fff;
   background: rgba(255,255,255,0.06);
   box-sizing: border-box;
@@ -6553,7 +6563,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
   width:100%; min-height:80px;
   padding:12px 14px; border-radius:14px;
   background:#f5f4ed; border:1.5px solid rgba(0,0,0,0.06);
-  font-family:inherit; font-size:14px; line-height:1.5;
+  font-family:inherit; font-size:16px; line-height:1.5; /* 16px anti-zoom iOS */
   resize:vertical; box-sizing:border-box;
   color:var(--dark);
 }
@@ -6932,12 +6942,12 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
    vibrant. Lo dejamos pero le subimos contraste. El primary verde y el
    outline siguen funcionando bien. */
 #s-abc .btn-orange{
-  background:linear-gradient(135deg, #c8962a 0%, #a87b1f 100%) !important;
-  box-shadow:0 6px 24px rgba(200,150,42,0.32) !important;
+  background:linear-gradient(135deg, #7eb86a 0%, #4a6741 100%) !important;
+  box-shadow:0 6px 24px rgba(126,184,106,0.30) !important;
 }
 #s-abc #btn-full-analysis{
-  background:linear-gradient(135deg, #c8962a 0%, #a87b1f 100%) !important;
-  box-shadow:0 6px 24px rgba(200,150,42,0.32);
+  background:linear-gradient(135deg, #7eb86a 0%, #4a6741 100%) !important;
+  box-shadow:0 6px 24px rgba(126,184,106,0.30);
 }
 #s-abc .btn-outline{
   background:rgba(255,255,255,0.08) !important;
@@ -7099,10 +7109,10 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
   color:var(--grey) !important;
 }
 
-/* CTA inferior amber gradient para coherencia con s-abc */
+/* CTA inferior esmeralda de sistema (antes amber fuera de paleta) — coherente con s-abc */
 #s-full-analysis .btn-orange{
-  background:linear-gradient(135deg, #c8962a 0%, #a87b1f 100%) !important;
-  box-shadow:0 6px 24px rgba(200,150,42,0.32) !important;
+  background:linear-gradient(135deg, #7eb86a 0%, #4a6741 100%) !important;
+  box-shadow:0 6px 24px rgba(126,184,106,0.30) !important;
 }
 
 /* ── E extendido: rediseño vibrant de #s-anamnesis (formulario nueva consulta) */
@@ -7594,6 +7604,30 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
 </head>
 <body>
 
+<!-- ══ INTRO DE BIENVENIDA (aditivo; se quita solo al terminar/saltar/fallar y deja ver el splash) ══ -->
+<div id="intro-overlay" style="position:fixed;inset:0;z-index:99999;background:#000;display:flex;align-items:center;justify-content:center;transition:opacity .55s ease;">
+  <video id="intro-video" src="intro-splash.mp4" muted autoplay playsinline preload="auto" style="width:100%;height:100%;object-fit:cover;"></video>
+</div>
+<script>
+(function(){
+  var ov = document.getElementById('intro-overlay');
+  var vid = ov ? ov.querySelector('#intro-video') : null;
+  function kill(){ try { if (ov && ov.parentNode) ov.parentNode.removeChild(ov); } catch(e){} }
+  try {
+    if (!ov || !vid) { kill(); return; }
+    var isNative = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+    if (!isNative && sessionStorage.getItem('dm_intro_seen')) { kill(); return; }  // web: 1x/sesion · iOS: cada arranque
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { kill(); return; }
+    var done = false;
+    function finish(){ if (done) return; done = true; if (!isNative) { try{ sessionStorage.setItem('dm_intro_seen','1'); }catch(e){} } ov.style.opacity='0'; setTimeout(kill, 600); }
+    vid.addEventListener('ended', finish);
+    vid.addEventListener('error', finish);   // si el vídeo falla → directo al splash
+    ov.addEventListener('click', finish);     // tap para saltar
+    setTimeout(finish, 8000);                 // salvaguarda dura: nunca bloquea
+    var p = vid.play(); if (p && p.catch) p.catch(function(){ finish(); });  // autoplay bloqueado → fallback
+  } catch(e) { kill(); }
+})();
+</script>
 
 <main aria-label="Dogs’ Mind app">
 <div class="phone">
@@ -7618,6 +7652,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
     <div class="splash-lang">
       <button id="lang-es" onclick="setLang('es')" title="Español">ES</button>
       <button id="lang-en" onclick="setLang('en')" title="English">EN</button>
+      <button id="lang-it" onclick="setLang('it')" title="Italiano">IT</button>
     </div>
     <div class="splash-content">
       <p class="splash-eyebrow">The Dogs’ Mind</p>
@@ -7662,7 +7697,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
             <span class="ti-logo-rule"></span>
           </div>
           <p class="ti-letter-line" data-i18n="ti_letter_1">The Dogs’ Mind es producto de más de <em>25 años de experiencia</em> en el campo de la modificación de conducta en más de 15 países donde yo y el resto del equipo que ha construido esta magnífica herramienta han desarrollado su actividad profesional.</p>
-          <p class="ti-letter-line" data-i18n="ti_letter_2">Por menos de un <em>1%</em> de lo que vale una consulta tienes a tu alcance el mejor equipo de profesionales del mundo para analizar y dar soluciones al problema de comportamiento de tu perro.</p>
+          <p class="ti-letter-line" data-i18n="ti_letter_2">Un equipo de especialistas en conducta canina analiza y da soluciones al problema de comportamiento de tu perro.</p>
           <p class="ti-letter-line" data-i18n="ti_letter_3">Te invito a que conozcas The Dogs’ Mind.</p>
           <div class="ti-signature">
             <img class="ti-sig-photo" src="teo-nav.webp" alt="Teo Mariscal">
@@ -7799,9 +7834,8 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
         <img class="ti-bg" src="tour-img-00.webp" alt="" style="object-position:center 30%;opacity:0.40;">
         <div class="ti-bg-fade"></div>
         <div class="ti-content ti-content-cta">
-          <div class="ti-badge" data-i18n="ti_s4_badge">3 TOKENS GRATIS AL REGISTRARTE</div>
+          <div class="ti-badge" data-i18n="ti_s4_badge">5 TOKENS GRATIS AL REGISTRARTE</div>
           <h1 class="ti-cta-title" data-i18n="ti_s4_title">Tu perro merece<br>la mejor ayuda</h1>
-          <p class="ti-cta-sub" data-i18n="ti_s4_sub">Por menos de un <em>1%</em> del coste de una consulta presencial tienes acceso al mejor equipo del mundo.</p>
           <ul class="ti-cta-stats">
             <li><span class="ti-cta-stat-num">25+</span><span class="ti-cta-stat-lbl" data-i18n="ti_s4_stat1">Años exp.</span></li>
             <li><span class="ti-cta-stat-num">15+</span><span class="ti-cta-stat-lbl" data-i18n="ti_s4_stat2">Países</span></li>
@@ -8477,7 +8511,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
 
       <div class="abc-btns">
         <button class="btn-orange" onclick="generateInterventionPlan()" data-i18n="abc_btn_plan">Ver Plan de Intervención</button>
-        <button id="btn-full-analysis" onclick="goTo('s-full-analysis')" style="width:100%;padding:15px;border:none;border-radius:100px;background:#c8962a;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.02em;" data-i18n="abc_btn_full">Análisis completo &#8594;</button>
+        <button id="btn-full-analysis" onclick="goTo('s-full-analysis')" style="width:100%;padding:15px;border:none;border-radius:100px;background:#4a6741;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.02em;" data-i18n="abc_btn_full">Análisis completo &#8594;</button>
         <button class="btn-outline" onclick="goToConsultType()" data-i18n="abc_btn_new">Nuevo análisis</button>
       </div>
 
@@ -8507,6 +8541,10 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
     <!-- CTA igual que en ABC -->
     <div style="padding:0 16px 12px;">
       <button class="btn-orange" onclick="generateInterventionPlan()" style="width:100%;padding:15px;border:none;border-radius:100px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;" data-i18n="abc_btn_plan">Ver Plan de Intervención</button>
+    </div>
+    <!-- PDF completo profesional (requiere plan generado; si no existe, toast "No hay contenido para exportar") -->
+    <div style="padding:0 16px 12px;">
+      <button class="cm-btn-secondary cm-btn-cyan-outline cm-btn-block" style="padding:15px;font-size:15px;" onclick="tdmDownloadFullPdf()" data-i18n="pp_btn_pdf_full">Descargar PDF completo (análisis + plan)</button>
     </div>
 
     <!-- Disclaimer App Store / GDPR (no sustituye veterinario) -->
@@ -8564,6 +8602,8 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
       <button onclick="acceptIntervention()" style="width:100%;padding:16px;border:none;border-radius:100px;background:#4a6741;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.02em;box-shadow:0 4px 16px rgba(74,103,65,0.25);" data-i18n="tracking_accept">Aceptar intervención</button>
       <button onclick="openRefineChat()" style="width:100%;padding:16px;border:none;border-radius:100px;background:#2a4a8a;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.02em;box-shadow:0 4px 16px rgba(42,74,138,0.25);"><span data-i18n="tracking_refine">Afinar plan con IA</span> <span style="font-size:12px;opacity:0.8;">(−0.25 tok.)</span></button>
       <button onclick="goToConsultType()" style="width:100%;padding:16px;border:2px solid #4a6741;border-radius:100px;background:transparent;color:#4a6741;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.02em;" data-i18n="tracking_second">Pedir segunda opinión</button>
+      <!-- PDF completo profesional (análisis + plan, logos TDM + empresa) — descarga directa sin pasar por Plan Sencillo -->
+      <button class="cm-btn-secondary cm-btn-cyan-outline cm-btn-block" style="padding:16px;font-size:15px;" onclick="tdmDownloadFullPdf()" data-i18n="pp_btn_pdf_full">Descargar PDF completo (análisis + plan)</button>
       <!-- Plan sencillo / Pet Owners — outline cyan (tech accent del área pro) -->
       <button class="cm-btn-secondary cm-btn-cyan-outline cm-btn-block" style="padding:16px;font-size:15px;" onclick="onPlanSimple()" data-i18n="tracking_simple_plan">Plan sencillo · Pet Owners</button>
 
@@ -8845,6 +8885,9 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
       <div class="back-round" onclick="chatBack()">←</div>
     </div>
 
+    <!-- App Store 4.7: aviso discreto de IA (transparencia chatbot generativo). Cero emojis. -->
+    <div class="chat-ai-note" data-i18n="chat_ai_note" style="font-size:11px;line-height:1.4;text-align:center;padding:5px 16px;color:rgba(255,250,240,0.55);background:rgba(10,14,8,0.30);flex-shrink:0;">Avatar de IA · no es una persona real</div>
+
     <div class="msgs" id="msgs">
       <div class="msg niaz">
         <div class="msg-av" style="background:none;padding:0;overflow:hidden"><img loading="lazy" id="intro-av-img" src="assets/images/img-17.webp" style="width:100%;height:100%;object-fit:cover;object-position:top;border-radius:50%"></div>
@@ -8897,7 +8940,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
 
       <ul class="aig-list-plain">
         <li><img class="aig-bullet-avatar" src="aig-cecilia-pixar.webp" alt=""><div data-i18n="aig_bullet_cecilia"><strong>Cecilia</strong> es la perfecta profesora para aprender o entender conceptos de psicología del aprendizaje y también sabe de muchos animales diferentes.</div></li>
-        <li><img class="aig-bullet-avatar" src="aig-niaz-pixar.webp" alt=""><div data-i18n="aig_bullet_niaz"><strong>Niaz</strong> <em>Money is not a problem.</em> Es tu mejor asesora en experiencias de lujo para perros. Llega tarde siempre y su TDAH le juega alguna mala pasada, pero si consigues que se centre sacas platino de sus conversaciones.</div></li>
+        <li><img class="aig-bullet-avatar" src="aig-niaz-pixar.webp" alt=""><div data-i18n="aig_bullet_niaz"><strong>Niaz</strong> <em>Money is not a problem.</em> Es tu mejor asesora en experiencias de lujo para perros. Llega tarde siempre y su despiste le juega alguna mala pasada, pero si consigues que se centre sacas platino de sus conversaciones.</div></li>
         <li><img class="aig-bullet-avatar" src="aig-mario-pixar.webp" alt=""><div data-i18n="aig_bullet_mario"><strong>Mario</strong> te va a decir dónde conseguir los mejores chollos o cómo salir de fiesta con tu perro e incluso cómo ligar con perro.</div></li>
         <li><img class="aig-bullet-avatar" src="aig-ale-pixar.webp" alt=""><div data-i18n="aig_bullet_ale"><strong>Ale</strong> te va a llevar a muchos viajes, alojamientos donde admiten perros, rutas por el campo y también cómo entrenar muchos trucos.</div></li>
         <li><img class="aig-bullet-avatar" src="aig-borja-pixar.webp" alt=""><div data-i18n="aig_bullet_borja"><strong>Borja</strong> es el pijo Cayetano español por excelencia.</div></li>
@@ -8918,7 +8961,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
   </div><!-- /s-aigents-intro -->
 
   <div id="s-avatars" class="screen av-screen">
-    <div style="padding:14px 20px 0;display:flex;align-items:center;gap:12px;flex-shrink:0;">
+    <div style="padding:calc(env(safe-area-inset-top, 0px) + 14px) 20px 0;display:flex;align-items:center;gap:12px;flex-shrink:0;">
       <div class="back-round" onclick="goTo('s-home')">←</div>
       <div>
         <div style="font-family:var(--ff-serif);font-size:22px;font-weight:600;color:var(--text)" data-i18n="avatars_title">Tus Aigents</div>
@@ -8942,7 +8985,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
         <div class="av-info">
           <div class="av-name">Niaz</div>
           <div class="av-role" style="color:#b8922a" data-i18n="av_role_niaz">Lujo &amp; Lifestyle canino</div>
-          <div class="av-desc" data-i18n="av_desc_niaz">Peluquería · Hoteles · Productos premium · Restaurantes · Viajes. Niaz tiene déficit de atención, es probable que a veces parezca que no te escucha, pero solo se está reseteando.</div>
+          <div class="av-desc" data-i18n="av_desc_niaz">Peluquería · Hoteles · Productos premium · Restaurantes · Viajes. Niaz es muy despistada; a veces parece que no te escucha, pero solo se está reseteando.</div>
         </div>
         <div class="av-check" id="avck-niaz">✓</div>
       </div>
@@ -9182,7 +9225,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
 
         <!-- Consentimiento explícito (App Store + GDPR) -->
         <label for="reg-accept" style="display:flex;align-items:flex-start;gap:10px;margin-top:8px;cursor:pointer;font-size:12px;color:var(--text2);line-height:1.55;">
-          <input type="checkbox" id="reg-accept" required style="width:18px;height:18px;flex-shrink:0;margin-top:2px;cursor:pointer;accent-color:var(--green);">
+          <input type="checkbox" id="reg-accept" required style="width:22px;height:22px;flex-shrink:0;margin-top:2px;cursor:pointer;accent-color:var(--green);">
           <span data-i18n="form_consent_html">
             He leído y acepto la <a onclick="event.stopPropagation();goTo('s-privacy')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Política de Privacidad</a> y los <a onclick="event.stopPropagation();goTo('s-terms')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Términos de Servicio</a>. Consiento el tratamiento de mis datos personales (email, teléfono) y entiendo que el texto que escriba sobre mi perro (anamnesis, conversaciones) se enviará a <strong>Anthropic (Claude AI, USA)</strong> para generar los análisis. Sin este consentimiento la app no puede generar análisis.
           </span>
@@ -9218,7 +9261,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
         <h3 class="ct-card-title" data-i18n="ct_a_title">Problema de conducta</h3>
         <p class="ct-card-pitch" data-i18n="ct_a_pitch">Análisis funcional ABC + plan de intervención LIMA para resolver un problema de conducta (ansiedad, reactividad, miedos, agresividad…).</p>
       </button>
-      <button class="ct-card ct-card--pro" type="button" onclick="goTo('s-anamnesis-training')">
+      <button class="ct-card ct-card--pro" type="button" onclick="goToTrainingConsult()">
         <span class="ct-card-arrow" aria-hidden="true">&#8594;</span>
         <span class="ct-card-tag" data-i18n="ct_b_tag">Pro · Entrenamiento</span>
         <h3 class="ct-card-title" data-i18n="ct_b_title">Entrenamiento específico</h3>
@@ -9616,10 +9659,10 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_freq">&iquest;Con qu&eacute; frecuencia ocurre?</div>
           <div style="display:flex;flex-wrap:wrap;gap:8px;" id="frecuencia-group">
-            <button onclick="anam_select(this)" style="padding:7px 14px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;" data-i18n="anam_freq_daily">A diario</button>
-            <button onclick="anam_select(this)" style="padding:7px 14px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;" data-i18n="anam_freq_weekly">Varias veces a la semana</button>
-            <button onclick="anam_select(this)" style="padding:7px 14px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;" data-i18n="anam_freq_occasion">Ocasionalmente</button>
-            <button onclick="anam_select(this)" style="padding:7px 14px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;" data-i18n="anam_freq_rare">Raramente</button>
+            <button onclick="anam_select(this)" data-freq="high" style="padding:7px 14px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;" data-i18n="anam_freq_daily">A diario</button>
+            <button onclick="anam_select(this)" data-freq="medium" style="padding:7px 14px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;" data-i18n="anam_freq_weekly">Varias veces a la semana</button>
+            <button onclick="anam_select(this)" data-freq="low" style="padding:7px 14px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;" data-i18n="anam_freq_occasion">Ocasionalmente</button>
+            <button onclick="anam_select(this)" data-freq="none" style="padding:7px 14px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;" data-i18n="anam_freq_rare">Raramente</button>
           </div>
         </div>
 
@@ -9999,7 +10042,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
   <div id="s-refine" class="screen" style="background:#f0f4ff;flex-direction:column;">
 
     <!-- Header -->
-    <div style="display:flex;align-items:center;gap:12px;padding:18px 16px 14px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;background:#fff;position:sticky;top:0;z-index:10;">
+    <div style="display:flex;align-items:center;gap:12px;padding:calc(env(safe-area-inset-top, 0px) + 18px) 16px 14px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;background:#fff;position:sticky;top:0;z-index:10;">
       <button onclick="goTo('s-tracking')" style="width:44px;height:44px;border-radius:50%;background:#f0f4ff;border:1.5px solid rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0;">&#8592;</button>
       <div style="flex:1;">
         <div style="font-size:16px;font-weight:700;color:#1a1a2e;letter-spacing:-0.3px;" data-i18n="refine_title">IA Analítica</div>
@@ -10030,10 +10073,10 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
     </div>
 
     <!-- Input area -->
-    <div style="padding:12px 16px 24px;background:#fff;border-top:1px solid rgba(0,0,0,0.08);flex-shrink:0;">
+    <div style="padding:12px 16px calc(env(safe-area-inset-bottom, 0px) + 24px);background:#fff;border-top:1px solid rgba(0,0,0,0.08);flex-shrink:0;">
       <div style="display:flex;gap:10px;align-items:flex-end;">
         <textarea id="refine-input" placeholder="Ej: Los perros no pueden separarse porque conviven en casa…" rows="2"
-          style="flex:1;border:1.5px solid #d0d8ee;border-radius:14px;padding:12px 14px;font-family:inherit;font-size:14px;resize:none;outline:none;background:#f8f9ff;color:#1a1a2e;line-height:1.5;"
+          style="flex:1;border:1.5px solid #d0d8ee;border-radius:14px;padding:12px 14px;font-family:inherit;font-size:16px;resize:none;outline:none;background:#f8f9ff;color:#1a1a2e;line-height:1.5;"
           onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendRefineMessage();}"></textarea>
         <button onclick="sendRefineMessage()" id="refine-send-btn"
           style="width:44px;height:44px;border-radius:50%;background:#2a4a8a;border:none;color:#fff;font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(42,74,138,0.3);">&#8593;</button>
@@ -10778,7 +10821,8 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
 
       <div class="tr-res-actions">
         <button type="button" class="tr-btn-ghost" onclick="trShowForm()">Regenerar</button><!-- TODO i18n -->
-        <button type="button" class="tr-btn-solid">Guardar sesión</button><!-- TODO i18n -->
+        <!-- "Guardar sesión" eliminado en v1: era botón sin handler (control muerto, riesgo 2.1).
+             Reintroducir con handler real (guardar la sesión) en v1.1 al reactivar el módulo. -->
       </div>
     </div><!-- /tr-result -->
   </div><!-- /s-training -->
@@ -10955,6 +10999,64 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
     setTimeout(fill, 3500);
   } catch(e) {}
 })();
+
+// ── CAMPUS PREFILL — ?ej=<texto> → prerellena la HABILIDAD/EJERCICIO en Entrenamiento Específico ──
+// El campus construye el enlace "Abrir The Dogs' Mind" con el texto del ejercicio dentro de la URL
+// (encodeURIComponent). Cada prompt distinto = su propio enlace con su propio texto.
+// Aditivo y degradante: sin ?ej= NO cambia NADA. De un solo uso: se limpia tras aplicarlo.
+(function() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var ej = (params.get('ej') || '').trim();
+    if (ej) { try { localStorage.setItem('dm_pending_ej', ej); } catch(e){} }
+    var texto = '';
+    try { texto = (localStorage.getItem('dm_pending_ej') || '').trim(); } catch(e){}
+    if (!texto) return;
+    window._trainingPrefillFromCampus = { campo7: texto };
+    var scr = document.getElementById('s-anamnesis-training');
+    if (scr && scr.classList.contains('active')) applyTrainingCampusPrefill();
+  } catch(e) {}
+})();
+
+// Si el texto recibido es una FICHA completa (9 campos), extrae solo el campo 7
+// (Habilidad o ejercicio). Si ya viene solo el ejercicio, lo devuelve tal cual.
+function _extractEjercicioFromFicha(txt) {
+  if (!txt) return '';
+  var m = txt.match(/Habilidad o ejercicio que quieres mejorar[^\n]*\n+([\s\S]*?)(?:\n+\s*[*#>\s]*8[.\)]|\n+\s*[*#>\s]*Contexto principal|$)/i);
+  if (m && m[1] && m[1].trim()) return m[1].trim();
+  return txt.trim();
+}
+
+function applyTrainingCampusPrefill() {
+  try {
+    var texto = '';
+    try { texto = (localStorage.getItem('dm_pending_ej') || '').trim(); } catch(e){}
+    if (!texto && window._trainingPrefillFromCampus) texto = (window._trainingPrefillFromCampus.campo7 || '').trim();
+    if (!texto) return;
+    texto = _extractEjercicioFromFicha(texto);
+    var goal = document.getElementById('tc-goal');
+    if (goal && !goal.value) goal.value = texto;
+    window._trainingPrefillFromCampus = null;
+    try { localStorage.removeItem('dm_pending_ej'); } catch(e){}
+  } catch(e) {}
+}
+
+// Boot deep-link: la app muestra el splash por defecto y NO auto-avanza a home.
+// Si el alumno YA está logueado y trae un ejercicio del campus (?ej=), lo llevamos
+// DIRECTO a la ficha al cargar. Si no está logueado, ve el splash → login → y al
+// llegar a home se redirige igualmente (vía el hook de goTo). Solo actúa con ?ej= pendiente.
+function _campusBootRoute() {
+  try {
+    var pej=''; try { pej=(localStorage.getItem('dm_pending_ej')||'').trim(); } catch(e){}
+    var jwt=false; try { jwt=!!localStorage.getItem('dm_jwt'); } catch(e){}
+    if (pej && jwt && typeof goTo === 'function') goTo('s-anamnesis-training');
+  } catch(e) {}
+}
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  setTimeout(_campusBootRoute, 250);
+} else {
+  window.addEventListener('load', function(){ setTimeout(_campusBootRoute, 250); });
+}
 
 // ── INVITE CODE — PRE-VALIDATION ON BLUR ──────────────────────────────────
 // Pega contra POST /auth/validate-invite (read-only, no crea cuenta) y pinta
@@ -11153,6 +11255,16 @@ function stepperDown(id) {
 
 // ── NAV ────────────────────────────────────────
 function goTo(id) {
+  // Deep-link del campus: si hay un ejercicio pendiente (?ej=) y sesión iniciada,
+  // la 1ª vez que iríamos a Home redirigimos a la ficha de Entrenamiento Específico.
+  // Se limpia al aplicarse (un solo uso) → no afecta a la navegación normal.
+  try {
+    if (id === 's-home') {
+      var _pej = ''; try { _pej = (localStorage.getItem('dm_pending_ej') || '').trim(); } catch(e){}
+      var _jwt = false; try { _jwt = !!localStorage.getItem('dm_jwt'); } catch(e){}
+      if (_pej && _jwt) id = 's-anamnesis-training';
+    }
+  } catch(e) {}
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if (id === 's-records') { renderRecords(); syncBackendCases(); if (typeof reconcileOrphanCases === 'function') reconcileOrphanCases(); }
@@ -11172,6 +11284,7 @@ function goTo(id) {
     } catch(e) {}
     window._anamnesisPrefillFromDog = null;
   }
+  if (id === 's-anamnesis-training' && typeof applyTrainingCampusPrefill === 'function') applyTrainingCampusPrefill();
   if (id === 's-tokens') updateTokensScreen();
   if (id === 's-home') { fetchBalance(); loadDailyTip(); if (typeof maybeShowPendingAnalysisCard === 'function') maybeShowPendingAnalysisCard(); if (typeof maybeShowPendingTrainingCard === 'function') maybeShowPendingTrainingCard(); }
   if (id === 's-training') {
@@ -11215,7 +11328,9 @@ function goTo(id) {
   if (activeNav) { var el = document.getElementById(activeNav); if (el) el.classList.add('on'); }
   // Padding so content doesn't hide under the nav bar
   document.querySelectorAll('.screen').forEach(function(s){
-    s.style.paddingBottom = navHidden ? '' : '65px';
+    // 72px + safe-area: el nav inferior mide ~90-96px en iPhone con home
+    // indicator; con 65px fijos la última fila de contenido quedaba tapada.
+    s.style.paddingBottom = navHidden ? '' : 'calc(72px + env(safe-area-inset-bottom, 0px))';
   });
 }
 
@@ -11347,7 +11462,7 @@ function registerUser() {
 const AVATARS = {
   niaz: {
     name: 'Niaz',
-    role: 'TDAH · Yoga · Energía infinita',
+    role: 'Despistada · Yoga · Energía infinita',
     img: 'assets/images/img-17.webp',
     color: '#c85070',
     intro: '¡Ah! Perdona, venía de una clase... o de dos, ya no sé. Soy Niaz. ¿En qué te puedo ayudar?'
@@ -11638,7 +11753,7 @@ async function _planSimpleFlow(rec, opts) {
       var detail = '';
       try { var ed = await res.json(); detail = ed.detail || ''; } catch(e) {}
       if (res.status === 401) { showToast(_i18nText('session_expired', 'Sesión caducada.')); goTo('s-splash'); return; }
-      if (res.status === 402) { showToast(_i18nText('pp_err_no_balance', 'Saldo insuficiente. Recarga 0,1 tokens.')); goTo('s-tracking'); return; }
+      if (res.status === 402) { showToast(_fmtInsufTokens(0.1)); goTo('s-tokens'); return; }
       if (res.status === 404) { showToast(detail || _i18nText('pp_err_no_plan', 'Genera primero un plan de intervención.')); goTo('s-tracking'); return; }
       if (res.status === 429) { showToast(detail || _i18nText('pp_err_rate', 'Has alcanzado el máximo por hora.')); goTo('s-tracking'); return; }
       throw new Error('HTTP ' + res.status + ' ' + detail);
@@ -11774,6 +11889,75 @@ async function ppDownloadFullPdf() {
 }
 window.ppDownloadFullPdf = ppDownloadFullPdf;
 
+// Descarga directa del PDF completo (análisis ABC + plan, logos TDM + empresa)
+// desde las pantallas profesionales (s-full-analysis y s-tracking), sin pasar
+// por Plan Sencillo. Resuelve el record activo y hace lazy migration si el
+// caso aún no tiene backend_case_id (mismo patrón que _planSimpleFlow).
+async function tdmDownloadFullPdf() {
+  if (!getJWT()) {
+    showToast(_i18nText('seg_login_required', 'Inicia sesión.'));
+    goTo('s-splash');
+    return;
+  }
+  var rec = _resolveActiveRecord('plan');
+  if (!rec) {
+    // El PDF completo exige análisis + plan; sin plan no hay nada que exportar.
+    showToast(_i18nText('pdf_err_404', 'No hay contenido para exportar.'));
+    return;
+  }
+  var caseId = rec.backend_case_id || window._inflightBackendCaseId || null;
+  if (!caseId) {
+    showToast(_i18nText('seg_migrating', 'Sincronizando caso…'));
+    try {
+      var mres = await fetch(API_BASE + '/cases/migrate', {
+        method: 'POST', headers: authHeaders(), body: JSON.stringify({
+          records: [{
+            id: rec.id || Date.now(),
+            date: rec.date || null,
+            dog_name: rec.dog_name || null,
+            breed: rec.breed || null,
+            dog_age: rec.dog_age || null,
+            problem: rec.problem || null,
+            analysis: rec.analysis || null,
+            plan: rec.plan || null,
+            status: rec.status || 'active',
+            lang: rec.lang || (window.getCurrentLang ? window.getCurrentLang() : null)
+          }]
+        })
+      });
+      if (!mres.ok) {
+        if (mres.status === 401) { showToast(_i18nText('session_expired', 'Sesión caducada.')); goTo('s-splash'); return; }
+        throw new Error('HTTP ' + mres.status);
+      }
+      var mdata = await mres.json();
+      var mresult = (mdata.results && mdata.results[0]) || null;
+      if (!mresult || !mresult.case_id) {
+        showToast(_i18nText('pp_err_sync', 'No se pudo sincronizar el caso.'));
+        return;
+      }
+      caseId = mresult.case_id;
+      var recs = getRecords();
+      var idx = recs.indexOf(rec);
+      if (idx >= 0) {
+        recs[idx].backend_case_id = caseId;
+        if (typeof setRecords === 'function') setRecords(recs);
+      } else if (rec._virtual) {
+        window._inflightBackendCaseId = caseId;
+      }
+    } catch (e) {
+      showToast(_i18nText('pp_err_sync', 'No se pudo sincronizar el caso.'));
+      console.error('full-pdf migrate:', e);
+      return;
+    }
+  }
+  await _downloadAccessiblePdf({
+    caseId: caseId,
+    endpoint: 'full',
+    fallbackFilename: 'informe_completo.pdf',
+  });
+}
+window.tdmDownloadFullPdf = tdmDownloadFullPdf;
+
 // ── ABC explicado / Cecilia te explica — flujo real (Haiku 4.5, 0,1 tok) ────
 // Backend: POST /cases/{case_id}/abc-explained  (mismo contrato que plan-simple)
 //   - Si existe CaseEntry.type='abc_explained' cached → devuelve sin cobro
@@ -11887,7 +12071,7 @@ async function _abcExplainedFlow(rec, opts) {
       var detail = '';
       try { var ed = await res.json(); detail = ed.detail || ''; } catch(e) {}
       if (res.status === 401) { showToast(_i18nText('session_expired', 'Sesión caducada.')); goTo('s-splash'); return; }
-      if (res.status === 402) { showToast(_i18nText('at_err_no_balance', 'Saldo insuficiente. Recarga 0,1 tokens.')); goTo('s-abc'); return; }
+      if (res.status === 402) { showToast(_fmtInsufTokens(0.1)); goTo('s-tokens'); return; }
       if (res.status === 404) { showToast(detail || _i18nText('at_err_no_abc', 'Genera primero el análisis funcional ABC.')); goTo('s-abc'); return; }
       if (res.status === 429) { showToast(detail || _i18nText('at_err_rate', 'Has alcanzado el máximo por hora.')); goTo('s-abc'); return; }
       throw new Error('HTTP ' + res.status + ' ' + detail);
@@ -14228,6 +14412,13 @@ function dmApplyIosNativeUI() {
     var _hideIos = function(sel){ var el = document.querySelector(sel); if (el) el.style.display = 'none'; };
     _hideIos('#s-pro-signup .ps-bundle');
     _hideIos('#s-pro-signup .ps-logo-section');
+    // s-pro-activate (pantalla legacy aún en el binario): su bundle de 60 tokens
+    // no existe como producto IAP — paGoToCheckout lo ignoraría y cobraría solo
+    // la suscripción mostrando un total mayor. Ocultarlo evita el descuadre.
+    _hideIos('#s-pro-activate .pa-bundle-card');
+    _hideIos('#s-pro-activate .pa-section-label');
+    // Beta italiana: solo web por ahora (decisión founder: italiano fuera de iOS).
+    _hideIos('#lang-it');
     var _coT = document.querySelector('#s-pro-signup [data-i18n="ps_company_title"]');
     if (_coT && _coT.closest('section')) _coT.closest('section').style.display = 'none';
     // Re-aplicar precios/textos iOS (19,99 €/año) en ambas pantallas Pro.
@@ -14241,6 +14432,14 @@ function dmApplyIosNativeUI() {
     if (_ppPrice) _ppPrice.textContent = (_lgPro === 'en') ? '€19.99/year' : '19,99 €/año';
     var _ppSub = document.querySelector('[data-i18n="pro_pro_price_sub"]');
     if (_ppSub) _ppSub.textContent = (_lgPro === 'en') ? 'Auto-renewable' : 'Renovación automática';
+    // App Store (3.1.1): el CTA de activación Pro en iOS NUNCA debe leerse como
+    // "Continuar al pago" (sabor Stripe). Lo fijamos YA de forma determinista al
+    // texto IAP, sin depender del fetch async de promo (evita el parpadeo inicial).
+    // El onclick ya enruta a IAP (guard en paGoToCheckout). Cero Stripe visible.
+    var _paCta = document.getElementById('pa-checkout-btn');
+    if (_paCta && !window._proPromoActive) {
+      _paCta.textContent = (_lgPro === 'en') ? 'Subscribe · €19.99/yr' : 'Suscribirse · 19,99 €/año';
+    }
   } catch (e) {}
   dmRcInit();
 }
@@ -15744,9 +15943,14 @@ function getVal(id, fallback) {
         anamnesis: window._lastAnamnesisData || {},
         analysis_text: window._lastAnalysisText
       };
+      // Con Authorization: el backend resuelve account_type (modo Pet Owner
+      // accesible para particulares) y loguea el user_id en usage_log.
+      var _ivJwt = getJWT();
+      var _ivHdrs = {'Content-Type': 'application/json'};
+      if (_ivJwt) _ivHdrs['Authorization'] = 'Bearer ' + _ivJwt;
       var res = await fetch(API_BASE + '/intervention', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: _ivHdrs,
         body: JSON.stringify(payload)
       });
       if (!res.ok) {
@@ -15793,11 +15997,23 @@ function getVal(id, fallback) {
       goTo('s-tracking');
     } catch(e) {
       if (loading) loading.style.display = 'none';
+      // Sin e.message crudo ("Load failed") y con reintento directo: el
+      // análisis sigue en memoria, regenerar el plan no re-cobra el análisis.
+      var _ivLang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+      var _ivMsg = (_ivLang === 'en')
+        ? 'The plan could not be generated. Your analysis is safe.'
+        : (_ivLang === 'it')
+        ? 'Impossibile generare il piano. La tua analisi è al sicuro.'
+        : 'No se pudo generar el plan. Tu análisis está a salvo.';
+      var _ivBtn = (_ivLang === 'en') ? 'Retry' : (_ivLang === 'it') ? 'Riprova' : 'Reintentar';
       if (body) {
-        body.innerHTML = '<div style="color:#c0392b;padding:24px;background:#fdf0f0;border-radius:12px;font-size:14px;line-height:1.6;"><strong>Error generando el plan:</strong><br>' + e.message + '</div>';
+        body.innerHTML =
+          '<div style="color:#c0392b;padding:24px;background:#fdf0f0;border-radius:12px;font-size:14px;line-height:1.6;"><strong>' + _ivMsg + '</strong></div>' +
+          '<button onclick="generateInterventionPlan()" style="width:100%;margin-top:14px;padding:15px;border:none;border-radius:100px;background:#4a6741;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">' + _ivBtn + '</button>';
         body.style.display = 'block';
       }
       goTo('s-tracking');
+      console.warn('intervention error:', e && e.message ? e.message : e);
     }
   }
 
@@ -15807,6 +16023,24 @@ async function analyzeWithAI() {
   window._loadedFromArchive = false;
 
   var btn = document.getElementById('btn-analyze');
+
+  // Gate anti-cobro-en-vacío: los 5 campos obligatorios deben tener contenido
+  // ANTES de cobrar (los defaults de getVal pasan la validación del backend).
+  // Marca todos los inválidos y lleva al usuario al primero.
+  var _reqIds = ['inp-dog-name', 'inp-dog-age', 'inp-breed', 'inp-problem', 'inp-since'];
+  var _firstBad = null;
+  for (var _ri = 0; _ri < _reqIds.length; _ri++) {
+    var _re = document.getElementById(_reqIds[_ri]);
+    if (!_re) continue;
+    try { _anamRequiredCheck(_re); } catch(_) {}
+    if (!(_re.value || '').trim() && !_firstBad) _firstBad = _re;
+  }
+  if (_firstBad) {
+    var _rl = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+    showToast(_i18nText('anam_required_err', _rl === 'en' ? 'This field is required' : 'Este campo es obligatorio'));
+    try { _firstBad.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(_) {}
+    return;
+  }
 
   // Collect text fields
   var dogName     = getVal('inp-dog-name', 'Sin nombre');
@@ -15887,11 +16121,18 @@ async function analyzeWithAI() {
       return b.style.color === '#fff';
     });
     if (selectedFreq) {
-      var ft = selectedFreq.textContent;
-      if      (ft.includes('diario'))  frequency = 'high';
-      else if (ft.includes('semana'))  frequency = 'medium';
-      else if (ft.includes('casion'))  frequency = 'low';
-      else if (ft.includes('rara'))    frequency = 'none';
+      // data-freq: independiente del idioma de la UI (en EN/IT el texto visible
+      // no matchea las palabras españolas y se enviaba 'medium' silenciosamente).
+      var _fv = selectedFreq.getAttribute('data-freq');
+      if (_fv) {
+        frequency = _fv;
+      } else {
+        var ft = selectedFreq.textContent;
+        if      (ft.includes('diario'))  frequency = 'high';
+        else if (ft.includes('semana'))  frequency = 'medium';
+        else if (ft.includes('casion'))  frequency = 'low';
+        else if (ft.includes('rara'))    frequency = 'none';
+      }
     }
   }
 
@@ -16017,14 +16258,17 @@ async function analyzeWithAI() {
     fetchBalance(); // refresh token count after deduction
 
   } catch (e) {
-    // Error de red o IA. El backend hace refund automático de los tokens
-    // (token_utils.refund_token) — el usuario NO pierde saldo.
-    // UX: mensaje claro sin stack trace + volver a anamnesis para reintentar.
+    // Error de red o corte del fetch. OJO: si el corte fue por timeout del
+    // WebView (~60s) el backend puede haber COMPLETADO y cobrado igualmente —
+    // no afirmamos nada sobre tokens y refrescamos el saldo real.
     var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
     var msg = (lang === 'en')
-      ? 'Connection error. Your tokens were not charged. Try again.'
-      : 'Error de conexión. No se han descontado tokens. Inténtalo de nuevo.';
+      ? 'Connection error. The analysis may still have completed — check your balance before retrying.'
+      : (lang === 'it')
+      ? 'Errore di connessione. L\'analisi potrebbe comunque essere stata completata — controlla il tuo saldo prima di riprovare.'
+      : 'Error de conexión. El análisis puede haberse completado igualmente — comprueba tu saldo antes de reintentar.';
     try { showToast(msg); } catch(_) { alert(msg); }
+    try { fetchBalance(); } catch(_) {}
     goTo('s-anamnesis');
     console.warn('analyzeWithAI error:', e && e.message ? e.message : e);
   } finally {
@@ -16553,9 +16797,50 @@ function renderHomeInspBtn() {
   if (!el) return;
   var acc = window._myAccount || null;
   var isPro = !!(acc && acc.account_type === 'professional');
-  el.style.display = isPro ? 'flex' : 'none';
+  // v1 App Store: "Inspiración Profesional / Adiestramiento Avanzado" (s-training) es el
+  // módulo BETA sin traducir (proyecto antiguo no consolidado). Ocultamos su entrada para no
+  // exponer contenido incompleto al revisor (la cuenta demo es profesional). El flujo real
+  // "Entrenamiento Específico" (/training-analysis) entra por otra vía y NO se ve afectado.
+  // Reactivar con `isPro` en v1.1 cuando esté i18n.
+  // Gate por plataforma: en iOS nativo sigue OCULTA para todos (modo
+  // revisión-Apple: módulo beta sin i18n; reactivar allí es decisión founder).
+  // En web se mantiene el comportamiento vivo: visible solo para pros.
+  var _inNative = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+  el.style.display = (!_inNative && isPro) ? 'flex' : 'none';
 }
 window.renderHomeInspBtn = renderHomeInspBtn;
+
+// Gate del módulo Pro "Entrenamiento Específico": si sabemos con certeza que
+// la cuenta NO es profesional, en vez de dejarle rellenar 9 campos para
+// estrellarse con un 403, lo llevamos al flujo de activación Pro (upsell en
+// el momento de máxima intención). Si la cuenta aún no cargó (race al
+// arranque), dejamos pasar — el 403 del backend sigue guardando la puerta.
+function goToTrainingConsult() {
+  var acc = window._myAccount || null;
+  if (acc && acc.account_type && acc.account_type !== 'professional') {
+    if (typeof onActivateProClick === 'function') { onActivateProClick(); return; }
+    goTo('s-pro-signup');
+    return;
+  }
+  goTo('s-anamnesis-training');
+}
+window.goToTrainingConsult = goToTrainingConsult;
+
+// Arranque con sesión: el cliente recurrente entra directo a su home en vez
+// del splash de marketing. El deep-link del campus (?ej=) tiene prioridad.
+function _dmBootHome() {
+  try {
+    if (window._dmBootHomeDone) return;
+    window._dmBootHomeDone = true;
+    var _bJwt = false; try { _bJwt = !!localStorage.getItem('dm_jwt'); } catch(e) {}
+    if (!_bJwt) return;
+    var _bCur = document.querySelector('.screen.active');
+    if (_bCur && _bCur.id && _bCur.id !== 's-splash') return; // ya navegó (deep-link u otro boot)
+    var _bPej = ''; try { _bPej = (localStorage.getItem('dm_pending_ej') || '').trim(); } catch(e) {}
+    goTo(_bPej ? 's-anamnesis-training' : 's-home');
+  } catch(e) {}
+}
+window._dmBootHome = _dmBootHome;
 
 // ── #s-training: motor IA (Etapa 2) ────────────────────────────────────────
 // Lee el objetivo + ajustes del form #s-training y llama al endpoint real
@@ -16653,7 +16938,8 @@ async function trGenerate() {
       if (res.status === 401) {
         if (typeof showToast === 'function') showToast(_i18nText('session_expired', lang === 'en' ? 'Session expired.' : 'Sesión caducada.'));
       } else if (res.status === 402) {
-        if (typeof showToast === 'function') showToast(lang === 'en' ? 'Not enough tokens. Top up to continue.' : 'Sin tokens. Recarga para continuar.');
+        if (typeof showToast === 'function') showToast(_fmtInsufTokens(0.25));
+        goTo('s-tokens');
       } else if (res.status === 403) {
         if (typeof showToast === 'function') showToast(detail || (lang === 'en' ? 'Professionals only.' : 'Solo profesionales.'));
       } else {
@@ -17188,6 +17474,14 @@ window.submitTrainingConsult = async function() {
       goTo('s-splash');
       return;
     }
+    if (res.status === 402) {
+      // Saldo insuficiente → mensaje con coste exacto + directo a recargar.
+      // El formulario queda intacto en s-anamnesis-training para retomar.
+      if (btn) { btn.disabled = false; btn.textContent = prevText; }
+      showToast(_fmtInsufTokens(3));
+      goTo('s-tokens');
+      return;
+    }
     if (res.status === 403) {
       var d403 = {};
       try { d403 = await res.json(); } catch(e){}
@@ -17677,7 +17971,7 @@ async function submitSeguimiento() {
     if (!res.ok) {
       var detail = '';
       try { detail = (await res.json()).detail || ''; } catch(e) {}
-      if (res.status === 402) return _setSegMsg(_i18nText('seg_insufficient_tokens', 'Saldo insuficiente. Recarga 1,5 tokens.'), true);
+      if (res.status === 402) { showToast(_fmtInsufTokens(1.5)); goTo('s-tokens'); return; }
       if (res.status === 422) return _setSegMsg(detail || _i18nText('seg_validation_failed', 'Datos no válidos.'), true);
       if (res.status === 429) return _setSegMsg(detail || _i18nText('seg_quota_full', 'Has alcanzado el máximo de entries en este caso.'), true);
       if (res.status === 401) { showToast(_i18nText('session_expired', 'Sesión caducada.')); goTo('s-splash'); return; }
@@ -17752,6 +18046,7 @@ document.addEventListener('DOMContentLoaded', function() {
   setTimeout(loadMyDogs, 50);
   setTimeout(loadAccountInfo, 60);
   setTimeout(_checkProPaymentReturn, 80);
+  setTimeout(_dmBootHome, 200);
   _installDogProfileGuardian();
   _installSeguimientoGuardian();
 });
@@ -17760,6 +18055,7 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
   setTimeout(loadMyDogs, 50);
   setTimeout(loadAccountInfo, 60);
   setTimeout(_checkProPaymentReturn, 80);
+  setTimeout(_dmBootHome, 200);
   _installDogProfileGuardian();
   _installSeguimientoGuardian();
 }
@@ -18012,8 +18308,9 @@ function endTourIntro() {
       chat_reported:           'Reportado ✓',
       chat_report_thanks:      'Gracias. Revisaremos esta respuesta.',
       chat_status_default:     'Educadora personal · Online',
+      chat_ai_note:            'Avatar de IA · no es una persona real',
       chat_intro_default:      '¡Hola! Soy Niaz. He leído el análisis de tu perro y ya tengo MIL ideas. Mi cerebro va a mil por hora — prepárate, porque no voy a darte respuestas aburridas. ¿Por dónde quieres empezar?',
-      chat_role_niaz:          'TDAH · Yoga · Energía infinita',
+      chat_role_niaz:          'Despistada · Yoga · Energía infinita',
       chat_intro_niaz:         '¡Ah! Perdona, venía de una clase... o de dos, ya no sé. Soy Niaz. ¿En qué te puedo ayudar?',
       chat_role_leo:           'Hippie de Ibiza · Tranquilo',
       chat_intro_leo:          'Hola... Soy Leo. Tómate tu tiempo. ¿En qué puedo ayudarte?',
@@ -18030,7 +18327,7 @@ function endTourIntro() {
       // Tour intro
       ti_skip:                 'Saltar',
       ti_letter_1:             'The Dogs’ Mind es producto de más de <em>25 años de experiencia</em> en el campo de la modificación de conducta en más de 15 países donde yo y el resto del equipo que ha construido esta magnífica herramienta han desarrollado su actividad profesional.',
-      ti_letter_2:             'Por menos de un <em>1%</em> de lo que vale una consulta tienes a tu alcance el mejor equipo de profesionales del mundo para analizar y dar soluciones al problema de comportamiento de tu perro.',
+      ti_letter_2:             'Un equipo de especialistas en conducta canina analiza y da soluciones al problema de comportamiento de tu perro.',
       ti_letter_3:             'Te invito a que conozcas The Dogs’ Mind.',
       ti_sig_date:             'Abril 2026',
       ti_p_anam:               'Anamnesis',
@@ -18068,9 +18365,9 @@ function endTourIntro() {
       ti_s3_chip1:             'Sin suscripción',
       ti_s3_chip2:             'Multi-perro',
       ti_s3_chip3:             'Historial completo',
-      ti_s4_badge:             '3 TOKENS GRATIS AL REGISTRARTE',
+      ti_s4_badge:             '5 TOKENS GRATIS AL REGISTRARTE',
       ti_s4_title:             'Tu perro merece<br>la mejor ayuda',
-      ti_s4_sub:               'Por menos de un <em>1%</em> del coste de una consulta presencial tienes acceso al mejor equipo del mundo.',
+      ti_s4_sub:               '',
       ti_s4_stat1:             'Años exp.',
       ti_s4_stat2:             'Países',
       ti_s4_stat3:             'Aigents',
@@ -18084,7 +18381,7 @@ function endTourIntro() {
       aig_lede:               'Te acompañarán y ayudarán a solucionar muchas dudas del día a día con tu perro.',
       aig_intro:              'Cada uno tiene una personalidad y una especialidad. <em>Pregúntales lo que quieras sobre perros</em> y el día a día con ellos. Para problemas de conducta, usa el análisis de la app.',
       aig_bullet_cecilia:     '<strong>Cecilia</strong> es médico veterinario y etóloga, chilena pelolais que monta y compite con su caballo Maximus. La profesora perfecta para entender la psicología del aprendizaje en perros, caballos y mamíferos marinos.',
-      aig_bullet_niaz:        '<strong>Niaz</strong> <em>Money is not a problem.</em> Es tu mejor asesora en experiencias de lujo para perros. Llega tarde siempre y su TDAH le juega alguna mala pasada, pero si consigues que se centre sacas platino de sus conversaciones.',
+      aig_bullet_niaz:        '<strong>Niaz</strong> <em>Money is not a problem.</em> Es tu mejor asesora en experiencias de lujo para perros. Llega tarde siempre y su despiste le juega alguna mala pasada, pero si consigues que se centre sacas platino de sus conversaciones.',
       aig_bullet_mario:       '<strong>Mario</strong> te va a decir dónde conseguir los mejores chollos o cómo salir de fiesta con tu perro e incluso cómo ligar con perro.',
       aig_bullet_ale:         '<strong>Ale</strong> te va a llevar a muchos viajes, alojamientos donde admiten perros, rutas por el campo y también cómo entrenar muchos trucos.',
       aig_bullet_borja:       '<strong>Borja</strong> es el pijo Cayetano español por excelencia.',
@@ -18307,7 +18604,7 @@ function endTourIntro() {
       avatars_title: 'Tus Aigents',
       avatars_sub:   'Para consultas importantes usa el análisis del home. Aquí resuelve dudas rápidas sobre tu perro, lugares, lifestyle y alimentación. Apenas consumen tokens.',
       av_role_niaz:  'Lujo & Lifestyle canino',
-      av_desc_niaz:  'Peluquería · Hoteles · Productos premium · Restaurantes · Viajes. Niaz tiene déficit de atención, es probable que a veces parezca que no te escucha, pero solo se está reseteando.',
+      av_desc_niaz:  'Peluquería · Hoteles · Productos premium · Restaurantes · Viajes. Niaz es muy despistada; a veces parece que no te escucha, pero solo se está reseteando.',
       // Tracking
       tracking_title:  'Plan de Intervención',
       tracking_accept: 'Aceptar intervención',
@@ -18966,8 +19263,9 @@ function endTourIntro() {
       chat_reported:           'Reported ✓',
       chat_report_thanks:      'Thanks. We will review this response.',
       chat_status_default:     'Personal trainer · Online',
+      chat_ai_note:            'AI avatar · not a real person',
       chat_intro_default:      'Hi! I\'m Niaz. I\'ve read your dog\'s analysis and I already have THOUSANDS of ideas. My brain runs at a thousand miles an hour — get ready, because I\'m not going to give you boring answers. Where do you want to start?',
-      chat_role_niaz:          'ADHD · Yoga · Infinite energy',
+      chat_role_niaz:          'Scatterbrained · Yoga · Infinite energy',
       chat_intro_niaz:         'Oh! Sorry, I just came from a class... or two, I don\'t know anymore. I\'m Niaz. How can I help?',
       chat_role_leo:           'Ibiza Hippie · Calm',
       chat_intro_leo:          'Hi... I\'m Leo. Take your time. How can I help you?',
@@ -18984,7 +19282,7 @@ function endTourIntro() {
       // Tour intro
       ti_skip:                 'Skip',
       ti_letter_1:             'The Dogs’ Mind is the product of more than <em>25 years of experience</em> in behavior modification across over 15 countries where I and the rest of the team that built this magnificent tool have practiced.',
-      ti_letter_2:             'For less than <em>1%</em> of the cost of a consultation, you have access to the best team of professionals in the world to analyze and find solutions to your dog\'s behavior problem.',
+      ti_letter_2:             'A team of canine-behavior specialists analyzes and finds solutions to your dog\'s behavior problem.',
       ti_letter_3:             'I invite you to discover The Dogs’ Mind.',
       ti_sig_date:             'April 2026',
       ti_p_anam:               'Anamnesis',
@@ -19022,9 +19320,9 @@ function endTourIntro() {
       ti_s3_chip1:             'No subscription',
       ti_s3_chip2:             'Multi-dog',
       ti_s3_chip3:             'Full history',
-      ti_s4_badge:             '3 FREE TOKENS WHEN YOU SIGN UP',
+      ti_s4_badge:             '5 FREE TOKENS WHEN YOU SIGN UP',
       ti_s4_title:             'Your dog deserves<br>the best help',
-      ti_s4_sub:               'For less than <em>1%</em> of the cost of an in-person consultation, you have access to the best team in the world.',
+      ti_s4_sub:               '',
       ti_s4_stat1:             'Years exp.',
       ti_s4_stat2:             'Countries',
       ti_s4_stat3:             'Aigents',
@@ -19038,7 +19336,7 @@ function endTourIntro() {
       aig_lede:               'They will accompany you and help you resolve many everyday questions about your dog.',
       aig_intro:              'Each one has a personality and a specialty. <em>Ask them anything about dogs</em> and daily life with them. For behavioral problems, use the in-app analysis.',
       aig_bullet_cecilia:     '<strong>Cecilia</strong> is a veterinarian and ethologist, a Chilean pelolais who rides and competes with her horse Maximus. The perfect teacher to understand learning psychology in dogs, horses and marine mammals.',
-      aig_bullet_niaz:        '<strong>Niaz</strong> <em>Money is not a problem.</em> She is your best advisor for luxury dog experiences. She is always late and her ADHD plays tricks on her, but if you get her to focus you get platinum out of her conversations.',
+      aig_bullet_niaz:        '<strong>Niaz</strong> <em>Money is not a problem.</em> She is your best advisor for luxury dog experiences. She is always late and her absent-mindedness plays tricks on her, but if you get her to focus you get platinum out of her conversations.',
       aig_bullet_mario:       '<strong>Mario</strong> will tell you where to get the best deals or how to go partying with your dog and even how to flirt with one.',
       aig_bullet_ale:         '<strong>Ale</strong> will take you on many trips, dog-friendly accommodations, country routes, and also how to train many tricks.',
       aig_bullet_borja:       '<strong>Borja</strong> is the quintessential Spanish posh "Cayetano".',
@@ -19259,7 +19557,7 @@ function endTourIntro() {
       avatars_title: 'Your Aigents',
       avatars_sub:   'For important queries use the home screen analysis. Here quickly resolve questions about your dog, places, lifestyle and nutrition. They barely use tokens.',
       av_role_niaz:  'Canine Luxury & Lifestyle',
-      av_desc_niaz:  'Grooming · Hotels · Premium products · Restaurants · Travel. Niaz has an attention deficit; she may sometimes seem like she is not listening, but she is just resetting.',
+      av_desc_niaz:  'Grooming · Hotels · Premium products · Restaurants · Travel. Niaz is very absent-minded; she may sometimes seem like she is not listening, but she is just resetting.',
       // Tracking
       tracking_title:  'Intervention Plan',
       tracking_accept: 'Accept intervention',
@@ -19764,7 +20062,962 @@ function endTourIntro() {
       pending_analysis_view:            'View',
       pending_analysis_discard:         'Discard',
       pending_analysis_discard_confirm: 'Discard the unfinished analysis? You won\'t be able to recover it later.',
-    }
+    },
+    it: {
+          // Anamnesi
+          anam_basedon:            'Analisi basata su',
+          anam_basedon_3:          'Casi Teo Mariscal',
+          anam_video_label:        'Consulto in video',
+          anam_video_warn_t:       "L'analisi video usa più tokens",
+          anam_video_warn_b:       "L'analisi tramite video richiede di elaborare molti più dati del testo. Ogni minuto di video consuma circa <strong>10 tokens</strong>. Valuta se ti conviene a seconda del caso.",
+          anam_video_add:          "Aggiungere video all'anamnesi",
+          anam_sec_dog:            'Il cane',
+          anam_sec_family:         'Ambiente familiare',
+          anam_sec_problem:        'Il comportamento problema',
+          anam_lbl_name:           'Nome',
+          anam_lbl_age:            'Età',
+          anam_lbl_breed:          'Tipologia razziale',
+          anam_lbl_adopted:        "Se è adottato, da quanto tempo è con te? (opzionale)",
+          anam_lbl_sex:            'Sesso',
+          anam_btn_male:           'Maschio',
+          anam_btn_female:         'Femmina',
+          anam_lbl_chronic:        'Ha qualche patologia cronica?',
+          anam_lbl_living:         'Vive dentro o fuori casa?',
+          anam_lbl_environment:    'In quale ambiente vive?',
+          anam_lbl_walks:          'Quante passeggiate al giorno?',
+          anam_walks_3plus:        '3 o più',
+          anam_sec_history:        'Storia e rinforzi',
+          anam_lbl_other_problems: 'Quali altri problemi di comportamento hai avuto con lui?',
+          ph_other_problems:       "Descrivi il problema o scrivi 'nessuno'",
+          anam_lbl_training:       'Ha frequentato qualche scuola di educazione cinofila?',
+          ph_training_result:      "Descrivi il risultato (es: è migliorato ma è ricaduto, nessun cambiamento, è migliorato notevolmente...)",
+          anam_lbl_reward:         'Qual è secondo te il suo premio preferito?',
+          anam_reward_food:        'Cibo',
+          anam_reward_ball:        'Pallina',
+          anam_reward_petting:     'Coccole',
+          anam_reward_none:        'Niente lo motiva',
+          anam_lbl_weaning:        'A quanti mesi ha lasciato la cucciolata?',
+          anam_lbl_members:        'Membri della famiglia',
+          anam_lbl_kids:           'Ci sono bambini?',
+          anam_lbl_otherdogs:      'Convive con altri cani?',
+          anam_lbl_describe:       'Descrivi il comportamento problema',
+          anam_lbl_since:          'Da quando accade?',
+          anam_lbl_where:          'Dove accade?',
+          anam_lbl_who:            "Chi è presente?",
+          anam_lbl_freq:           'Con quale frequenza accade?',
+          anam_lbl_aggr:           'Comporta aggressività?',
+          anam_lbl_history:        'Cosa hai provato finora? (opzionale)',
+          anam_lbl_theory:         'Quale pensi che sia la causa? (opzionale)',
+          anam_lbl_attach_video:   'Allegare video del comportamento (opzionale)',
+          anam_lbl_prior_event:    "Prima che iniziasse il problema, ricordi qualche cambiamento o evento importante da segnalare?",
+          anam_freq_daily:         'Ogni giorno',
+          anam_freq_weekly:        'Più volte a settimana',
+          anam_freq_occasion:      'Occasionalmente',
+          anam_freq_rare:          'Raramente',
+          anam_drop_text:          'Tocca o trascina un video qui',
+          anam_drop_formats:       'MP4, MOV, AVI · Max 20s (analizziamo i primi 10) · +1 token',
+          anam_video_remove:       'Rimuovere video',
+          anam_modal_title:        'Tokens insufficienti',
+          anam_modal_text:         'Ti servono almeno <strong>4 tokens</strong> per analizzare con video (3 analisi + 1 video). Attualmente hai <strong id="modal-token-count">0</strong> tokens.',
+          anam_modal_btn_recharge: 'Ricaricare tokens',
+          anam_modal_btn_skip:     'Continuare senza video',
+          // Informativa sulla Privacy
+          pp_title:                'Informativa sulla Privacy',
+          pp_subtitle:             'Dogs’ Mind · Ultimo aggiornamento: aprile 2026',
+          pp_intro:                "Questa informativa spiega quali dati raccogliamo, come li usiamo e come li proteggiamo quando usi Dogs’ Mind.",
+          pp_h1:                   '1. Chi è il titolare',
+          pp_p1:                   'The Dogs’ Mind è un servizio gestito da <strong>Teodoro Mariscal Diaz</strong>, specialista in comportamento canino con oltre 25 anni di esperienza, con domicilio in Perales 15, 28609 Villamantilla, Spagna. Per questioni di privacy e dati personali scrivici a <a href="mailto:privacy@thedogsmind.net" style="color:var(--green);">privacy@thedogsmind.net</a>. Supporto generale: <a href="mailto:info@thedogsmind.net" style="color:var(--green);">info@thedogsmind.net</a>.',
+          pp_h2:                   '2. Quali dati raccogliamo',
+          pp_l2_1:                 "<strong style=\"color:var(--text);\">Account:</strong> email, password (crittografata con bcrypt) e, facoltativamente, numero di telefono. Non vediamo mai la tua password in chiaro.",
+          pp_l2_2:                 '<strong style="color:var(--text);">Dati del tuo cane:</strong> nome, razza, età, storia comportamentale che inserisci nei moduli.',
+          pp_l2_3:                 '<strong style="color:var(--text);">Conversazioni:</strong> i messaggi che invii agli Aigents e le analisi generate.',
+          pp_l2_4:                 "<strong style=\"color:var(--text);\">Utilizzo:</strong> pagine visitate e azioni all'interno dell'app (tramite Plausible Analytics, senza cookie).",
+          pp_l2_5:                 "<strong style=\"color:var(--text);\">Errori tecnici:</strong> log automatici se qualcosa non funziona nell'app, senza dati personali.",
+          pp_h3:                   '3. Per cosa usiamo i tuoi dati',
+          pp_l3_1:                 "Generare analisi comportamentali e piani d'intervento tramite IA.",
+          pp_l3_2:                 'Gestire il tuo account e i tuoi tokens.',
+          pp_l3_3:                 "Migliorare la qualità del servizio (analisi d'uso aggregato, senza identificarti).",
+          pp_l3_4:                 'Inviarti comunicazioni relative al tuo account se necessario.',
+          pp_h4:                   '4. Terze parti coinvolte',
+          pp_l4_1:                 "<strong style=\"color:var(--text);\">Anthropic</strong> (USA) — IA clinica (Claude Sonnet) e avatar (Claude Haiku). Riceve il testo dell'anamnesi e le conversazioni per generare le risposte. <a href=\"https://www.anthropic.com/privacy\" target=\"_blank\" style=\"color:var(--green);\">La loro informativa →</a>",
+          pp_l4_2:                 '<strong style="color:var(--text);">Voyage AI</strong> (USA) — embedding vettoriali per il RAG. NON riceve i tuoi dati; elabora solo il corpus clinico interno. <a href="https://www.voyageai.com/privacy" target="_blank" style="color:var(--green);">La loro informativa →</a>',
+          pp_l4_3:                 '<strong style="color:var(--text);">Qdrant Cloud</strong> (UE) — archiviazione vettoriale del corpus clinico. NON conserva dati degli utenti.',
+          pp_l4_4:                 '<strong style="color:var(--text);">Railway</strong> (UE) — hosting del backend e database PostgreSQL dove risiedono il tuo account e i registri di pagamento. <a href="https://railway.com/legal/privacy" target="_blank" style="color:var(--green);">La loro informativa →</a>',
+          pp_l4_5:                 '<strong style="color:var(--text);">Netlify</strong> (USA, CDN globale) — hosting del frontend. Serve file statici; non elabora i tuoi dati personali.',
+          pp_l4_6:                 '<strong style="color:var(--text);">Resend</strong> (USA) — email transazionali (recupero della password). Riceve la tua email e il contenuto del messaggio. <a href="https://resend.com/legal/privacy-policy" target="_blank" style="color:var(--green);">La loro informativa →</a>',
+          pp_l4_7:                 '<strong style="color:var(--text);">Plausible Analytics</strong> (UE) — analisi web senza cookie e senza dati personali. <a href="https://plausible.io/privacy" target="_blank" style="color:var(--green);">La loro informativa →</a>',
+          pp_l4_8:                 '<strong style="color:var(--text);">Stripe</strong> (USA/UE) — pagamenti sul web. I dati della tua carta NON passano dai nostri server; li gestisce Stripe direttamente. <a href="https://stripe.com/privacy" target="_blank" style="color:var(--green);">La loro informativa →</a>',
+          pp_l4_9:                 "<strong style=\"color:var(--text);\">Apple</strong> (USA/UE) — In-App Purchase su iOS quando applicabile. I pagamenti sull'App Store li gestisce Apple. <a href=\"https://www.apple.com/legal/privacy/it/\" target=\"_blank\" style=\"color:var(--green);\">La loro informativa →</a>",
+          pp_l4_10:                "<strong style=\"color:var(--text);\">RevenueCat</strong> (USA) — gestione degli acquisti in-app e degli abbonamenti su iOS; convalida le ricevute d'acquisto di Apple. <a href=\"https://www.revenuecat.com/privacy\" target=\"_blank\" style=\"color:var(--green);\">La loro informativa →</a>",
+          pp_h5:                   '5. Per quanto tempo conserviamo i tuoi dati',
+          pp_p5:                   "Conserviamo i tuoi dati personali (email, telefono, password) finché il tuo account è attivo. Puoi eliminare il tuo account direttamente nell'app da <em>I miei Tokens → Elimina il mio account</em>, oppure esportare tutti i tuoi dati in JSON da <em>I miei Tokens → Scarica i miei dati</em>. Dopo l'eliminazione dell'account, i registri di pagamento vengono conservati in forma anonima per 4 anni per obbligo fiscale spagnolo (Legge 58/2003 Generale Tributaria).",
+          pp_h_lawful:             '4b. Base giuridica del trattamento (GDPR)',
+          pp_p_lawful:             "Trattiamo i tuoi dati personali sulla base di (a) <strong>il tuo consenso</strong> al momento della registrazione e dell'accettazione di questa informativa, (b) <strong>l'esecuzione del contratto</strong> di servizio (gestione dell'account, consegna di analisi e piani), e (c) <strong>l'interesse legittimo</strong> a migliorare la qualità del servizio, prevenire frodi e mantenere la sicurezza. Puoi revocare il tuo consenso in qualsiasi momento eliminando il tuo account.",
+          pp_h6:                   '6. I tuoi diritti (GDPR)',
+          pp_p6_lead:              "Se risiedi nell'UE hai diritto a:",
+          pp_l6_1:                 'Accedere ai tuoi dati.',
+          pp_l6_2:                 'Rettificarli se sono errati.',
+          pp_l6_3:                 'Richiederne la cancellazione.',
+          pp_l6_4:                 'Opporti al loro trattamento.',
+          pp_l6_5:                 'Presentare un reclamo presso l’autorità di protezione dei dati del tuo Paese.',
+          pp_p6_end:               'Per esercitare uno qualsiasi di questi diritti scrivici a <a href="mailto:info@thedogsmind.net" style="color:var(--green);">info@thedogsmind.net</a>.',
+          pp_h_ccpa:               '6b. Residenti in California (CCPA/CPRA)',
+          pp_p_ccpa:               'Se risiedi in California (USA) hai diritti aggiuntivi: (a) sapere quali informazioni personali raccogliamo su di te e con chi le condividiamo, (b) eliminare le tue informazioni personali, (c) correggere informazioni inesatte, (d) limitare l’uso di informazioni sensibili, e (e) non essere discriminato per aver esercitato questi diritti. <strong>NON vendiamo né condividiamo le tue informazioni personali a fini pubblicitari.</strong> Per esercitare questi diritti contatta <a href="mailto:privacy@thedogsmind.net" style="color:var(--green);">privacy@thedogsmind.net</a>.',
+          pp_h7:                   '7. Sicurezza',
+          pp_p7:                   'Tutte le connessioni sono cifrate con HTTPS. Le password vengono archiviate con hash bcrypt. Non vendiamo né condividiamo mai i tuoi dati con terze parti a fini commerciali.',
+          pp_h8:                   '8. Modifiche a questa informativa',
+          pp_p8:                   "Se apportiamo modifiche rilevanti te lo comunicheremo all'interno dell'app. La data dell'ultimo aggiornamento appare sempre nell'intestazione di questa pagina.",
+          pp_box_title:            'Hai qualche dubbio?',
+          pp_box_text:             'Scrivici a <a href="mailto:info@thedogsmind.net" style="color:var(--green);font-weight:600;">info@thedogsmind.net</a> — rispondiamo in meno di 48 ore.',
+          // CV / Profilo
+          cv_back:                 'Indietro',
+          cv_eyebrow:              'Dogs’ Mind · Founder',
+          cv_title:                'Animal Behaviorist · Fondatore della Fondazione Bocalán dal 2002',
+          cv_stat_years:           'Anni esp.',
+          cv_stat_countries:       'Paesi',
+          cv_stat_speaker:         'Relatore Intl.',
+          cv_stat_foundation:      'Fondazione',
+          cv_about_eyebrow:        'Su Teo',
+          cv_about_p1:             "Figura di riferimento mondiale nell'etologia canina e nella modificazione del comportamento. Con oltre 25 anni di esperienza, ha sviluppato metodologie uniche basate su <em>scienza, rispetto e connessione emotiva</em>.",
+          cv_about_p2:             'Fondatore della Fondazione Bocalán dal 2002, con presenza in oltre 14 Paesi. Consulente di unità di polizia ed esercito in molti Paesi, docente universitario e autore di riferimento nel settore.',
+          cv_spec_eyebrow:         'Specialità',
+          cv_spec_1:               'Comportamento Animale',
+          cv_spec_2:               'Modificazione del Comportamento',
+          cv_spec_3:               'Unità Cinofile Polizia ed Esercito',
+          cv_spec_4:               'Cani di Assistenza',
+          cv_spec_5:               'Terapia Assistita con Animali',
+          cv_spec_6:               'Educazione Assistita con Animali',
+          cv_spec_7:               'Formazione di Professionisti',
+          cv_spec_8:               'Allevatore dal 1994',
+          cv_spec_9:               'Formazione Universitaria',
+          cv_spec_10:              'Sport Cinofilo',
+          cv_spec_11:              'Coach Entrepreneurs',
+          cv_acc_eyebrow:          'Accreditamenti',
+          cv_acc_1:                'Istruttore Formatore della <strong>Real Sociedad Canina de España</strong>',
+          cv_acc_2:                "Istruttore di K9 Patrol Dogs — <strong>Harris County Sheriff's Academy</strong>, Texas",
+          cv_acc_3:                'Istruttore di <strong>Unità di Cani di Assistenza</strong> dal 2002',
+          cv_acc_4:                '<strong>International Mondioring</strong> Decoy Level III',
+          cv_career_eyebrow:       'Percorso',
+          cv_tl1_t:                'Fond. Bocalán',
+          cv_tl1_m:                'Fondatore e Direttore · 2002 – Attuale · Spagna',
+          cv_tl2_t:                'Docenza Universitaria',
+          cv_tl2_m:                'UAM Madrid · U. Mayor Cile · U. Cile · USFQ Ecuador',
+          cv_tl3_t:                'Consulente K9 Internazionale',
+          cv_tl3_m:                'Polizia Nazionale Spagna · Colombia · Carabineros Cile · Harris County TX',
+          cv_tl4_t:                'Bocalán Japan',
+          cv_tl4_m:                'Osaka, Giappone · +9 anni di attività',
+          cv_tl5_t:                'Consiglio ADI Europe & AAI International',
+          cv_tl5_m:                'Membro del consiglio direttivo · 2009 – 2019',
+          cv_cta:                  'Consulta Teo',
+          // Chat
+          chat_now:                'Ora',
+          chat_report:             'Segnalare',
+          chat_report_confirm:     'Segnalare questa risposta come inappropriata? La esamineremo.',
+          chat_reported:           'Segnalato ✓',
+          chat_report_thanks:      'Grazie. Esamineremo questa risposta.',
+          chat_status_default:     'Educatrice personale · Online',
+          chat_ai_note:            'Avatar di IA · non è una persona reale',
+          chat_intro_default:      "Ciao! Sono Niaz. Ho letto l'analisi del tuo cane e ho già MILLE idee. Il mio cervello va a mille all'ora — preparati, perché non ti darò risposte noiose. Da dove vuoi cominciare?",
+          chat_role_niaz:          'Distratta · Yoga · Energia infinita',
+          chat_intro_niaz:         "Ah! Scusa, venivo da una lezione... o da due, non so più. Sono Niaz. Come posso aiutarti?",
+          chat_role_leo:           'Hippie di Ibiza · Tranquillo',
+          chat_intro_leo:          'Ciao... Sono Leo. Prenditi il tuo tempo. Come posso aiutarti?',
+          chat_role_katja:         'Olandese · Diretta e precisa',
+          chat_intro_katja:        'Ciao. Sono Katja. Dimmi cosa ti serve, senza tralasciare nulla.',
+          chat_role_ale:           'Veterinaria · Hippie autentica',
+          chat_intro_ale:          'Ciao, sono Ale. Dimmi, come posso aiutarti?',
+          chat_role_borja:         'Snob madrileno · Il fascinoso',
+          chat_intro_borja:        'Ciao, sono Borja. Allora, dimmi. Come posso aiutarti?',
+          chat_role_mario:         'Il più giovane · Con swag',
+          chat_intro_mario:        'Come va. Sono Mario. Dimmi, in cosa ti posso dare una mano?',
+          chat_role_cecilia:       'Etologa, Veterinaria, Addestratrice di cavalli e cani, la migliore insegnante di apprendimento animale. Cilena e profondamente «Pelolais»',
+          chat_intro_cecilia:      "Ciao, cara. Sono Cecilia, medico veterinario ed etologa. Raccontami cosa succede con il tuo cane e vediamo insieme cosa dice la teoria dell'apprendimento.",
+          // Intro tour
+          ti_skip:                 'Salta',
+          ti_letter_1:             "The Dogs’ Mind è il frutto di oltre <em>25 anni di esperienza</em> nel campo della modificazione del comportamento in più di 15 Paesi dove io e il resto del team che ha costruito questo magnifico strumento abbiamo svolto la nostra attività professionale.",
+          ti_letter_2:             'Un team di specialisti in comportamento canino analizza e offre soluzioni al problema comportamentale del tuo cane.',
+          ti_letter_3:             'Ti invito a conoscere The Dogs’ Mind.',
+          ti_sig_date:             'Aprile 2026',
+          ti_p_anam:               'Anamnesi',
+          ti_p_anam_sub:           'Modulo clinico',
+          ti_p_ai:                 'Analisi IA',
+          ti_p_ai_sub:             'Ipotesi funzionale',
+          ti_p_lima:               'Piano LIMA',
+          ti_p_lima_sub:           'Per fasi',
+          ti_q_eyebrow:            'Ipotesi funzionale',
+          ti_q_text:               'Comportamento mantenuto da rinforzo negativo — eliminazione dello stimolo avversivo come conseguenza.',
+          ti_s1_eyebrow:           '01 — Clinica comportamentale',
+          ti_s1_title:             'Analisi clinica e piano di trattamento',
+          ti_s1_body:              "Descrivi il caso, ottieni un'analisi funzionale ABC rigorosa e un piano d'intervento per fasi basato sul protocollo <em>LIMA</em> — la stessa metodologia che Teo usa nel consulto in presenza.",
+          ti_s1_chip1:             'Applied Animal Behaviour',
+          ti_s1_chip2:             'Protocollo LIMA',
+          ti_s1_chip3:             '3 tokens / analisi',
+          ti_s2_chat:              'Hotel pet-friendly a Barcellona? Ho 5 opzioni incredibili per te.',
+          ti_s2_eyebrow:           '02 — Dogs Aigents',
+          ti_s2_title:             'Quell’amico che se ne intende di cani',
+          ti_s2_body:              "Non sono per l'analisi clinica — sono per le domande di tutti i giorni. Scegli quello più adatto a te: ognuno ha la propria personalità e specialità. Come avere un esperto sempre disponibile che per giunta ti sta simpatico.",
+          ti_s2_chip1:             'Dubbi rapidi',
+          ti_s2_chip2:             'Usano pochissimi tokens',
+          ti_s2_chip3:             '7 personalità',
+          ti_f1_title:             'Monitoraggio',
+          ti_f1_sub:               'Registra l’evoluzione del comportamento nel tempo',
+          ti_f2_title:             'Storia clinica',
+          ti_f2_sub:               'Tutte le tue analisi e i tuoi piani salvati',
+          ti_f3_title:             'Più cani',
+          ti_f3_sub:               'Gestisci i casi di tutta la tua famiglia',
+          ti_f4_title:             'Tokens',
+          ti_f4_sub:               'Ricarica solo ciò che ti serve. Senza abbonamento.',
+          ti_s3_eyebrow:           '03 — La tua storia, i tuoi cani',
+          ti_s3_title:             'Tutto sotto controllo, senza complicazioni',
+          ti_s3_body:              'Registri clinici, monitoraggio dei progressi, gestione di più cani e tokens a richiesta. <em>Senza quote mensili</em> — paghi esattamente ciò che usi.',
+          ti_s3_chip1:             'Senza abbonamento',
+          ti_s3_chip2:             'Multi-cane',
+          ti_s3_chip3:             'Storia completa',
+          ti_s4_badge:             '5 TOKENS GRATIS ALLA REGISTRAZIONE',
+          ti_s4_title:             'Il tuo cane merita<br>il miglior aiuto',
+          ti_s4_sub:               '',
+          ti_s4_stat1:             'Anni esp.',
+          ti_s4_stat2:             'Paesi',
+          ti_s4_stat3:             'Aigents',
+          ti_s4_btn_create:        'Crea un account gratis → 5 tokens',
+          ti_s4_btn_login:         'Ho già un account',
+          ti_s4_btn_skip:          'Vedi l’app →',
+          // Intro Aigents
+          aig_back:               'Indietro',
+          aig_eyebrow:            'Dogs’ Mind · AI Specialists',
+          aig_title:              'Gli <span class="aig-peek-anchor">Aigents<span class="aig-peek" aria-hidden="true"></span></span>',
+          aig_lede:               'Ti accompagneranno e ti aiuteranno a risolvere molti dubbi quotidiani con il tuo cane.',
+          aig_intro:              "Ognuno ha una personalità e una specialità. <em>Chiedi loro tutto ciò che vuoi sui cani</em> e sulla vita di tutti i giorni con loro. Per i problemi di comportamento, usa l'analisi dell'app.",
+          aig_bullet_cecilia:     "<strong>Cecilia</strong> è medico veterinario ed etologa, cilena pelolais che monta e gareggia con il suo cavallo Maximus. L'insegnante perfetta per capire la psicologia dell'apprendimento in cani, cavalli e mammiferi marini.",
+          aig_bullet_niaz:        "<strong>Niaz</strong> <em>Money is not a problem.</em> È la tua migliore consulente per esperienze di lusso per cani. Arriva sempre in ritardo e la sua distrazione le gioca qualche brutto scherzo, ma se riesci a farla concentrare ricavi platino dalle sue conversazioni.",
+          aig_bullet_mario:       '<strong>Mario</strong> ti dirà dove trovare le migliori occasioni o come uscire a far festa con il tuo cane e perfino come rimorchiare con il cane.',
+          aig_bullet_ale:         '<strong>Ale</strong> ti porterà in tanti viaggi, alloggi che accettano cani, percorsi in campagna e anche come insegnare molti trucchi.',
+          aig_bullet_borja:       '<strong>Borja</strong> è lo snob spagnolo per eccellenza.',
+          aig_bullet_leo:         '<strong>Leo</strong> è un ex dirigente riciclato nel Boho e nella spiritualità.',
+          aig_bullet_iris:        '<strong>Iris</strong> è il tuo perfetto supporto emotivo. Ti aiuta a far sì che tu e il tuo cane vi sosteniate a vicenda nei momenti difficili. Vive in Olanda ma è spagnola e ha un Beagle.',
+          aig_closing:            'Entra in ciascuno di loro e scopri tutto ciò che possono offrirti i tuoi nuovi <em>Ai-Amici</em>.',
+          aig_cta:                'Scegli il tuo avatar',
+          // Monitoraggio quotidiano (s-daily-followup) — commit B
+          df_title:               'Monitoraggio quotidiano',
+          df_day_label:           'Giorno',
+          df_loading:             'Generazione del check-in del giorno con il tuo coach…',
+          df_error_title:         'Impossibile caricare',
+          df_retry:               'Riprovare',
+          df_theory_tag:          'Domanda del giorno',
+          df_reveal:              'Mostra la risposta corretta',
+          df_reveal_done:         'Risposta rivelata',
+          df_save_day:            'Salva il giorno',
+          df_save_in_progress:    'Salvataggio…',
+          df_save_error:          'Impossibile salvare. Riprova.',
+          df_completed:           'Hai già completato il monitoraggio di oggi',
+          df_exercise:            'Esercizio',
+          df_wellness:            'Wellness',
+          df_silver_earned:       'Hai ottenuto il badge Tutor Responsabile!',
+          df_gold_earned:         'Hai ottenuto il badge Tutor Eccellente! +2 tokens',
+          df_textarea_ph:         "Una frase su com'è andata…",
+          df_records_btn_title:   'Monitoraggio quotidiano',
+          df_records_btn_sub:     'Porta a termine ogni giorno i compiti consigliati per sfruttarlo al massimo.',
+          df_invite_title:        'Ciao, come va la giornata?',
+          df_invite_sub_template: 'Come va con {dog} oggi? Facciamo insieme il monitoraggio del giorno.',
+          df_invite_cta_now:      'Fai ora',
+          df_invite_cta_later:    'Più tardi',
+          df_recovery_msg_short:  'Compila il monitoraggio per due giorni di fila e recupererai il tuo Tutor Responsabile.',
+          df_recovery_msg_streak1:'Sei a un giorno. Compilane uno in più e recuperi il tuo Tutor Responsabile.',
+          // Splash
+          splash_title:           'AI for<br>Canine Behavior',
+          splash_sub:             'Analisi funzionale esperta per capire<br>e migliorare il comportamento del tuo cane',
+          get_started:            'Log In',
+          log_in:                 'Accedi',
+          take_tour:              'Vedi il tour',
+          splash_pro_area:        'Area Professionale',
+          splash_dock_start_eyebrow: 'Inizia',
+          splash_dock_pro_eyebrow:   'Pro',
+          splash_dock_tour:          'Tour',
+          // Selezione tipo di account (s-account-type)
+          account_type_eyebrow:   'Profilo Utente',
+          at_headline:            'Qual è il tuo profilo?',
+          at_tagline:             'Scegli il tipo di account più adatto a te. Potrai cambiarlo in seguito.',
+          at_tag_particular:      'Pet Owner',
+          at_particular_title:    'Privato',
+          at_particular_pitch:    "Per proprietari di cani. Analisi funzionale e piano d'intervento per i tuoi cani.",
+          at_tag_professional:    'International Hub',
+          at_professional_title:  'Professionale',
+          at_professional_pitch:  'Per professionisti del comportamento canino. I tuoi casi con il logo della tua azienda nei report.',
+          // Area Professionale (s-pro-area)
+          pro_hero_eyebrow:       'The Dogs’ Mind International Hub',
+          pro_hero_headline:      'Welcome all’area professionale',
+          pro_hero_tagline:       'Un’infrastruttura tecnologica per professionisti del comportamento canino. Immagine professionale e rigore scientifico per i tuoi clienti.',
+          pro_section_eyebrow:    'Tipi di membership',
+          pro_section_title:      'Scegli il tuo livello',
+          pro_tag_pro:            'Professionale',
+          pro_pro_title:          'Membership Professionale',
+          pro_pro_pitch:          'I tuoi report con il logo della tua azienda accanto a quello di The Dogs’ Mind. Immagine internazionale per i tuoi clienti fin dal primo caso.',
+          pro_pro_feat_1:         'Fino a 20 cani attivi nel tuo account',
+          pro_pro_feat_2:         'Report scaricabili co-brandizzati con il tuo logo',
+          pro_pro_feat_3:         'Registro completo di casi e monitoraggi',
+          pro_pro_feat_4:         '10 tokens inclusi per iniziare',
+          pro_tag_certified:      'Certified · International Hub',
+          pro_cert_title:         'Certified Professional<br>by The Dogs’ Mind International',
+          pro_cert_pitch:         'Il passo successivo: accreditamento internazionale, presenza nell’hub mondiale e segnalazione di clienti dalla nostra rete. Per chi definisce lo standard del settore.',
+          pro_cert_feat_1:        'Badge "Certified by The Dogs’ Mind International" nei report e nel profilo',
+          pro_cert_feat_2:        'Inserimento nell’elenco internazionale di professionisti accreditati',
+          pro_cert_feat_3:        'Segnalazione di clienti dalla rete TDM',
+          pro_cert_feat_4:        '10 ore annuali di formazione continua online',
+          pro_cert_feat_5:        "Supporto prioritario via email con l'ufficio TDM",
+          pro_cert_feat_6:        'Fino a 40 cani attivi nel tuo account',
+          pro_cert_feat_7:        '20 tokens inclusi per iniziare',
+          pro_cert_feat_8:        'Soggetto ad approvazione: corso + esame ufficiale',
+          pro_tag_corporate:      'Corporate · Custom',
+          pro_corp_title:         'Utente Corporate',
+          pro_corp_pitch:         'Per enti con grande volume di cani (più di 100 cani attivi): Forze e Corpi di Sicurezza dello Stato, Scuole di Cani Guida, grandi associazioni di tutela.',
+          pro_corp_feat_1:        'IA totalmente personalizzata e adattata alle vostre esigenze specifiche',
+          pro_corp_feat_2:        'Branding aziendale in tutti i report e le comunicazioni',
+          pro_corp_feat_3:        'Programma di formazione continua per il tuo team',
+          pro_corp_feat_4:        'Assistenza tecnica e clinica 24/7',
+          pro_corp_feat_5:        'Pricing custom in base a volume ed esigenze',
+          pro_corp_cta:           'Scrivici per un incontro',
+          pro_cta_soon:           'Prossimamente',
+          // Home
+          hero_title:             'Avvia una nuova analisi comportamentale',
+          begin_consultation:     'Inizia il consulto',
+          my_dogs:                'I miei cani',
+          behavioral_records:     'Registri di comportamento',
+          behavioral_records_sub: 'Vedi casi e report precedenti',
+          aigent_sub:             'Il tuo Aigent personale',
+          new_analysis:           'Nuova Analisi',
+          continue_case:          'Continua caso',
+          tip_of_day:             'Consiglio del giorno: Il rinforzo positivo costante è la chiave per il cambiamento comportamentale a lungo termine. Rinforza subito le azioni desiderate.',
+          recharge_tokens:        'Comprare tokens',
+          new_consultation:       'Nuovo Consulto',
+          // Nav
+          nav_home:    'Home',
+          nav_trainer: 'Aigents',
+          nav_progress:'Progressi',
+          nav_teo:     'Teo',
+          nav_register:'Registrazione',
+          // Login
+          login_welcome_tokens:  '5 tokens di benvenuto',
+          login_welcome_sub:     'Gratis alla registrazione. Senza carta di credito.',
+          home_demo_badge:       'Esempio',
+          analyze_cost_notice:   'Questa analisi consuma 3 tokens',
+          analyze_cost_notice_video: 'Questa analisi con video consuma 4 tokens',
+          country_placeholder:   'Seleziona il tuo Paese...',
+          country_es:            'Spagna',
+          country_mx:            'Messico',
+          country_ar:            'Argentina',
+          country_co:            'Colombia',
+          country_cl:            'Cile',
+          country_pe:            'Perù',
+          country_us:            'Stati Uniti',
+          country_gb:            'Regno Unito',
+          country_jp:            'Giappone',
+          country_ae:            'Emirati Arabi Uniti',
+          country_other:         'Altro',
+          anam_required_err:     'Questo campo è obbligatorio',
+          login_register_btn:    'Crea il mio account →',
+          login_already:         'Hai già un account? ',
+          login_sign_in_link:    'Accedi',
+          login_sign_in_title:   'Accedi',
+          login_enter_btn:       'Entra →',
+          login_back_create:     '← Crea un nuovo account',
+          // Registri
+          records_title:    'Registri di comportamento',
+          records_sub:      'Casi archiviati · Teo Mariscal',
+          filter_all:       'Tutti',
+          filter_active:    'In monitoraggio',
+          filter_resolved:  'Risolti',
+          filter_closed:    'Chiusi',
+          // Card dei registri (rendering JS dinamico)
+          rec_status_active:    'In monitoraggio',
+          rec_status_resolved:  'Risolto',
+          rec_status_closed:    'Chiuso',
+          rec_tag_abc:          'ABC Analisi',
+          rec_tag_plan_lima:    'Piano LIMA',
+          rec_btn_seguimiento:  '+ Monitoraggio',
+          rec_btn_estado:       'Stato',
+          rec_btn_new_consult:  '+ Nuovo Consulto',
+          // ── Selettore "Nuovo consulto" (Fase 2 Addestramento Specifico) ──
+          ct_eyebrow:               'Nuovo consulto',
+          ct_headline:              'Di cosa hai bisogno oggi?',
+          ct_tagline:               'Due percorsi diversi a seconda del caso. Scegli quello più adatto.',
+          ct_a_tag:                 'Etologia clinica',
+          ct_a_title:               'Problema di comportamento',
+          ct_a_pitch:               "Analisi funzionale ABC + piano d'intervento LIMA per risolvere un problema di comportamento (ansia, reattività, paure, aggressività…).",
+          ct_b_tag:                 'Pro · Addestramento',
+          ct_b_title:               'Addestramento specifico',
+          ct_b_pitch:               'Analisi + piano operante per fasi per insegnare UN esercizio o una abilità concreta (recall, leave-it, contatto visivo…). Protocollo LIMA rigoroso, senza metodi avversivi.',
+          // ── Modulo Addestramento Specifico (9 campi) ──
+          tc_eyebrow:               'Addestramento specifico',
+          tc_title:                 "Raccontaci dell'esercizio",
+          tc_lima_callout:          'Progettiamo un piano per UN esercizio specifico, non un curriculum di addestramento. Quanto più concretizzi l’abilità o l’esercizio che vuoi migliorare, migliore sarà il piano che riceverai. Protocollo LIMA rigoroso: solo rinforzo positivo e metodi rispettosi. Senza coercizione, senza avversivi, senza punizione fisica.',
+          tc_field_name:            'Nome del cane',
+          tc_field_breed:           'Tipologia razziale',
+          tc_breed_ph:              'Border Collie, Malinois, meticcio, podenco…',
+          tc_field_age:             'Età',
+          tc_age_ph:                '2 anni, 6 mesi…',
+          tc_field_dog_level:       'Livello di addestramento del cane',
+          tc_field_handler_level:   'Livello del conduttore',
+          tc_lvl_basic:             'Base',
+          tc_lvl_medium:            'Medio',
+          tc_lvl_advanced:          'Avanzato',
+          tc_field_reinforcers:     'Rinforzatori preferiti',
+          tc_reinforcers_hint:      'Seleziona fino a 3 che motivino di più il tuo cane. "Niente lo motiva" è esclusivo.',
+          tc_reinf_ball:            'Pallina',
+          tc_reinf_tug:             'Mordicchio',
+          tc_reinf_food:            'Cibo',
+          tc_reinf_pet:             'Coccole',
+          tc_reinf_none:            'Niente lo motiva',
+          tc_field_goal:            'Abilità o esercizio che vuoi migliorare',
+          tc_goal_ph:               'Es: contatto visivo prolungato con distrattori; venire al primo richiamo al parco; non tirare il guinzaglio incrociando i pedoni…',
+          tc_field_context:         'Contesto principale',
+          tc_ctx_field:             'Campo',
+          tc_ctx_indoor:            'Interno',
+          tc_ctx_street:            'Strada',
+          tc_field_clicker:         'Usi abitualmente il clicker?',
+          tc_yes:                   'Sì',
+          tc_no:                    'No',
+          tc_cost_notice:           'Questa analisi consuma 3 tokens.',
+          tc_submit:                'Crea piano',
+          tc_submitting:            'Generazione del piano…',
+          tc_err_name:              'Manca il nome del cane.',
+          tc_err_breed:             'Manca la tipologia razziale.',
+          tc_err_age:               'Manca l’età.',
+          tc_err_dog_level:         'Scegli il livello del cane.',
+          tc_err_handler_level:     'Scegli il livello del conduttore.',
+          tc_err_reinforcers:       'Seleziona almeno un rinforzatore (o "Niente lo motiva").',
+          tc_err_too_many_reinforcers: 'Massimo 3 rinforzatori.',
+          tc_err_exclusive:         '"Niente lo motiva" non può essere selezionato insieme ad altri rinforzatori.',
+          tc_err_goal:              'Raccontaci cosa vuoi insegnare (frase concreta).',
+          tc_err_context:           'Scegli il contesto principale.',
+          tc_err_clicker:           'Usi abitualmente il clicker? Seleziona sì o no.',
+          tc_err_pro_only:          'Questo modulo è disponibile solo per gli account Professionali. Prossimamente aperto a tutti.',
+          tc_err_network:           'Impossibile connettersi. Controlla la rete e riprova.',
+          tr_eyebrow:               'Piano di addestramento',
+          tr_title:                 'Il tuo piano è pronto',
+          tr_new_consult:           'Nuovo consulto',
+          tr_save_plan:             'Salva piano',
+          tr_saved_toast:           'Piano di addestramento salvato',
+          tr_err_no_plan:           'Non c’è alcun piano da salvare.',
+          rec_tag_training:         'Addestramento',
+          pending_training_title:   'Hai un piano di addestramento non salvato.',
+          pending_training_sub:     'Lo recuperiamo su questo dispositivo, senza addebitare di nuovo.',
+          pending_training_view:    'Vedi',
+          pending_training_discard: 'Scarta',
+          pending_training_discard_confirm: 'Scartare il piano di addestramento non salvato? Non potrai recuperarlo in seguito.',
+          tl_eyebrow:               'Piano di addestramento',
+          tl_title:                 'Generazione del tuo piano…',
+          tl_msg:                   'Applicazione dell’analisi funzionale ABA e consultazione di riferimenti tecnici. Può richiedere 30–60 secondi. <strong>Non chiudere l’app.</strong>',
+          tl_disclaimer:            'The Dogs’ Mind ti offre un’analisi tramite IA e può commettere errori. Non sostituisce il tuo etologo veterinario.',
+          // Avatar
+          avatars_title: 'I tuoi Aigents',
+          avatars_sub:   'Per i consulti importanti usa l’analisi della home. Qui risolvi dubbi rapidi sul tuo cane, luoghi, lifestyle e alimentazione. Consumano pochissimi tokens.',
+          av_role_niaz:  'Lusso & Lifestyle canino',
+          av_desc_niaz:  'Toelettatura · Hotel · Prodotti premium · Ristoranti · Viaggi. Niaz è molto distratta; a volte sembra che non ti ascolti, ma si sta solo resettando.',
+          // Tracking
+          tracking_title:  "Piano d'Intervento",
+          tracking_accept: 'Accettare l’intervento',
+          tracking_refine: 'Affinare il piano con IA',
+          tracking_second: 'Chiedere un secondo parere',
+          // Anamnesi
+          anamnesis_title: 'Nuovo Consulto',
+          anamnesis_sub:   'Anamnesi comportamentale · Teo Mariscal',
+          analyze_btn:     'Analizza con IA →',
+          // Tokens
+          tokens_title:    'I miei Tokens',
+          tokens_sub:      'Saldo disponibile · Dogs’ Mind',
+          tokens_recharge: 'Ricaricare tokens',
+          // Extra home
+          home_aigents_title: 'The Dogs Aigents',
+          home_teo_title:     'Analysis by Teo Mariscal',
+          home_teo_sub:       'Revisione esperta e analisi funzionale',
+          // Extra avatar
+          av_role_leo:   'Benessere spirituale &amp; Doga',
+          av_desc_leo:   'Meditazione · Feng shui · Connessione emotiva · Frasi da calendario. Leo era un dirigente che si è riciclato attraverso molto Boho e un po’ di Tulum.',
+          av_role_katja: 'Consulente razionale · Expat',
+          av_desc_katja: 'Dieta basata su evidenze · Città con cane · Pratiche internazionali. Katja è olandese e razionale, non aspettarti che addolcisca la risposta, né parla tanto per parlare.',
+          av_role_mario: 'Vita urbana con cane',
+          av_desc_mario: 'Parchi · Eventi · Sport · Occasioni · Tutto ciò che è figo. Mario è il tuo amico cool.',
+          av_role_ale:   'Vet · Addestratrice · Natura',
+          av_desc_ale:   'Trucchi · Arricchimento · Percorsi in campagna · Medicina naturale. Ale si gode davvero i cani e la natura. È capace di mangiare pane sopra un pickup sotto la pioggia su una strada di montagna e divertirsi.',
+          av_role_borja: 'Cultura canina classica',
+          av_desc_borja: 'Razze · Storia · Cani da campagna · Consigli di sempre. Uno snob di sempre.',
+          av_role_iris:  'Supporto emotivo · Umanista',
+          av_desc_iris:  'Il tuo perfetto supporto emotivo. Ti aiuta a far sì che tu e il tuo cane vi sosteniate a vicenda nelle situazioni difficili. Prepara anche dei cocktail incredibili che in qualche caso aiutano se non esageri. Vive in Olanda ma è spagnola.',
+          av_role_cecilia: 'Etologa, Veterinaria, Addestratrice di cavalli e cani, la migliore insegnante di apprendimento animale. Cilena e profondamente «Pelolais»',
+          av_desc_cecilia: 'Sa molto di apprendimento, è un po’ snob e piuttosto selettiva, ma questo non le impedisce di avere un cuore enorme, specialmente per il suo cavallo ;) se ti distrai finisce per parlare di lui.',
+          // ── Profilo Cane (scheda del cane) ─────────────────────────────────
+          dog_profile_title_create:    'Nuovo cane',
+          dog_profile_subtitle_create: 'Aggiungi i dati di base del tuo cane.',
+          dog_profile_title_edit:      'Scheda del cane',
+          dog_profile_subtitle_edit:   'Modifica i dati o la foto.',
+          dog_profile_load_error:      'Non siamo riusciti a caricare questo cane.',
+          back_to_home:                'Torna alla home',
+          loading_dots:                'Caricamento…',
+          dog_photo_change:            'Cambia foto',
+          dog_photo_remove:            'Rimuovi foto',
+          dog_photo_hint:              'Foto profilo opzionale. Viene compressa automaticamente.',
+          dog_field_name:              'Nome',
+          dog_field_name_ph:           'Es: Buddy',
+          dog_field_breed:             'Razza',
+          dog_field_breed_ph:          'Es: Border Collie',
+          dog_field_birth_year:        'Anno di nascita',
+          dog_field_weight:            'Peso approx. (kg)',
+          dog_field_sex:               'Sesso',
+          dog_field_neutered:          'Sterilizzato',
+          dog_sex_male:                'Maschio',
+          dog_sex_female:              'Femmina',
+          dog_save_btn_create:         'Crea cane',
+          dog_save_btn_edit:           'Salva modifiche',
+          dog_delete_btn:              'Elimina cane',
+          dog_new_consult_btn:         '+ Nuovo consulto',
+          dog_new_consult_btn_for:     '+ Nuovo consulto per {name}',
+          dog_login_required:          'Accedi per creare un cane.',
+          dog_login_required_view:     'Accedi per vedere la scheda.',
+          dog_quota_full_short:        'Massimo 2 cani attivi.',
+          dog_quota_full:              'Hai raggiunto il massimo di cani attivi.',
+          dog_validation_name:         'Inserisci un nome.',
+          dog_validation_breed:        'Indica la razza.',
+          dog_validation_birth_year:   'Anno di nascita non valido.',
+          dog_validation_sex:          'Sesso non valido.',
+          dog_validation_weight:       'Peso fuori intervallo.',
+          dog_validation_failed:       'Dati non validi.',
+          dog_created_ok:              'Cane creato ✓',
+          dog_saved_ok:                'Modifiche salvate ✓',
+          dog_save_error:              'Errore nel salvataggio. Riprova.',
+          dog_delete_confirm:          'Eliminare questo cane? Questa azione non può essere annullata.',
+          dog_deleted_ok:              'Cane eliminato',
+          dog_delete_error:            'Impossibile eliminare.',
+          dog_photo_type_error:        'Solo JPG, PNG o WebP.',
+          dog_photo_too_big:           'La foto è troppo grande, provane un’altra.',
+          dog_photo_process_error:     'Non siamo riusciti a elaborare la foto.',
+          session_expired:             'Sessione scaduta.',
+          // ── Monitoraggio (modello) ──────────────────────────────────────
+          seg_title:                   'Consulto di monitoraggio',
+          seg_subtitle:                'Racconta a Teo come va il tuo cane.',
+          seg_intro:                   "Non c'è un piano magico, i progressi si basano sulla costanza e sulla fiducia nel modello. Seguire il caso, supervisionare i progressi e a volte riconoscere che si sono commessi errori e correggerli fa parte del processo. Ora dimmi:",
+          seg_field_dias:              'Giorni di trattamento',
+          seg_field_sesiones:          'N° di sessioni',
+          seg_field_evolucion:         'Vedi evoluzione?',
+          seg_radio_yes:               'Sì',
+          seg_radio_no:                'No',
+          seg_field_criterio:          'Quale criterio usi per misurarla?',
+          seg_field_criterio_ph:       'Es: distanza, frequenza, durata',
+          seg_field_descripcion:       'Descrivi l’evoluzione',
+          seg_field_descripcion_ph:    'Raccontami quali cambiamenti hai notato…',
+          seg_field_dificultades:      'C’è qualcosa che ti rende difficile applicare le proposte?',
+          seg_field_dificultades_ph:   'Se qualcosa non si adatta alla tua quotidianità, dillo qui.',
+          seg_field_motivo:            'Riassumi il motivo di questo consulto (1 frase)',
+          seg_field_motivo_ph:         'Es: non reagisce più per strada ma continua in casa',
+          seg_field_extra:             'Informazioni extra (max 4 frasi)',
+          seg_field_extra_ph:          'Qualsiasi dato rilevante per l’analisi.',
+          seg_submit_btn:              'Invia monitoraggio (1,5 tokens)',
+          seg_cost_hint:               'Costo: 1,5 tokens · Teo elaborerà il tuo report con la tua storia.',
+          seg_processing:              'Elaborazione con Teo…',
+          seg_response_label:          'Risposta di Teo',
+          seg_thanks:                  'Grazie per aver dato fiducia a The Dogs’ Mind.',
+          seg_btn_new_consult:         '+ Nuovo Consulto',
+          seg_btn_chat_aigent:         'Chatta con il tuo Aigent preferito',
+          seg_login_required:          'Accedi.',
+          seg_no_case:                 'Manca l’identificatore del caso.',
+          seg_validation_dias:         'Giorni di trattamento non validi.',
+          seg_validation_sesiones:     'Numero di sessioni non valido.',
+          seg_validation_evolucion:    'Indica se vedi evoluzione.',
+          seg_validation_failed:       'Dati non validi.',
+          seg_insufficient_tokens:     'Saldo insufficiente. Ricarica 1,5 tokens.',
+          seg_quota_full:              'Hai raggiunto il massimo di entries in questo caso.',
+          seg_case_not_found:          'Caso non trovato.',
+          seg_sent_ok:                 'Monitoraggio inviato ✓',
+          seg_send_error:              'Errore nell’invio. Riprova.',
+          seg_migrating:               'Sincronizzazione del caso…',
+          seg_migration_failed:        'Impossibile sincronizzare il caso.',
+          seg_already_migrated:        'Il caso era già sincronizzato. Ricarica la lista.',
+          // Schermata di caricamento + CTA helper Cecilia
+          loading_title:    'Analisi con IA…',
+          loading_msg:      'Stai utilizzando uno strumento di analisi del comportamento animale molto potente e ci vorrà un po’ di tempo. Rilassati, questo può richiedere alcuni minuti, <strong>non chiudere l’app</strong>.',
+          loading_disclaimer: 'The Dogs’ Mind ti offre un’analisi tramite IA e può commettere errori. Non sostituisce il tuo etologo veterinario.',
+          // Analisi multimodale con video — beta privata
+          video_badge:    'BETA PRIVATA',
+          video_teaser_t: 'Analisi multimodale con video',
+          video_teaser_b: 'BETA PRIVATA · Solo professionisti accreditati',
+          // Anamnesi — pulsanti riutilizzabili e placeholder (i18n completo)
+          btn_no:           'No',
+          btn_yes:          'Sì',
+          anam_btn_indoor:  'Dentro',
+          anam_btn_outdoor: 'Fuori',
+          anam_btn_both:    'Entrambi',
+          anam_btn_country: 'Campagna',
+          anam_btn_suburb:  'Periferia',
+          anam_btn_city:    'Città',
+          ph_dog_name:      'Nome del cane',
+          ph_dog_age:       'Es: 3 anni',
+          ph_breed:         'Razza o razza a cui assomiglia di più...',
+          ph_adopted:       'Es: 6 mesi, 2 anni... (lascia vuoto se non è adottato)',
+          ph_video_caption: 'Descrivi brevemente cosa si vede nel video (opzionale)',
+          ph_dolencia:      'Quale patologia? (es: displasia, epilessia...)',
+          ph_weaning:       'Es: 2 mesi, 8 settimane...',
+          ph_convive:       'Quanti e di quale razza? (es: 2 labrador)',
+          ph_problem:       'Descrivi in dettaglio il comportamento che preoccupa...',
+          ph_since:         'Es: 6 mesi fa, da cucciolo...',
+          ph_where:         'Es: a casa, per strada, al parco...',
+          ph_who:           'Es: tutta la famiglia, solo io, estranei...',
+          ph_agresion_dist: 'Distanza a cui inizia l’aggressività (cm)',
+          ph_history:       'Es: punizione, ignorare, andare dal veterinario...',
+          ph_theory:        'La tua ipotesi sul perché si verifica questo comportamento...',
+          ph_evento_previo: 'Rispondi brevemente (trasloco, arrivo di un bebè, lutto, viaggio, cambio di orario, ecc.)',
+          // Il mio account e privacy (GDPR/CCPA + Apple)
+          account_section:        'Il mio account e privacy',
+          account_email_label:    'Email dell’account',
+          account_support_title:   'Contattare il supporto',
+          account_support_desc:    'Scrivici se hai dubbi o problemi con l’app',
+                account_change_pw_title: 'Cambiare password',
+          account_change_pw_desc:  'Aggiorna la tua password con una nuova',
+          cp_modal_title:          'Cambiare password',
+          cp_modal_body:           'Per sicurezza, dobbiamo verificare la tua password attuale prima di impostarne una nuova.',
+          cp_modal_current_label:  'Password attuale',
+          cp_modal_new_label:      'Nuova password (minimo 6 caratteri)',
+          cp_modal_confirm_label:  'Ripeti la nuova password',
+          cp_modal_cancel:         'Annulla',
+          cp_modal_confirm:        'Cambia',
+                account_export_title:   'Scarica i miei dati',
+          account_export_desc:    'Esporta tutte le tue informazioni personali in formato JSON',
+          account_delete_title:   'Elimina il mio account',
+          account_delete_desc:    'Cancella il tuo account e tutti i tuoi dati personali. Non può essere annullato.',
+          account_legal_note:     'Usando The Dogs’ Mind accetti la nostra <a href="#" onclick="goTo(\'s-privacy\');return false;" style="color:var(--green);text-decoration:underline;">Informativa sulla Privacy</a> e i <a href="#" onclick="goTo(\'s-terms\');return false;" style="color:var(--green);text-decoration:underline;">Termini di Servizio</a>.',
+          del_modal_title:        'Elimina il tuo account',
+          del_modal_body:         'La tua email, password e telefono saranno eliminati definitivamente. I registri di pagamento vengono conservati in forma anonima per 4 anni per obbligo fiscale (Spagna). <strong>Questa azione non può essere annullata.</strong>',
+          del_modal_pw_label:     'Conferma la tua password attuale',
+          del_modal_confirm_label:'Scrivi ELIMINA per confermare',
+          del_modal_cancel:       'Annulla',
+          del_modal_confirm:      'Elimina',
+          ask_cecilia_text: 'Il linguaggio è troppo tecnico? Se hai bisogno di aiuto, chiedi a Cecilia.',
+          ask_cecilia_btn:  'Chat con Cecilia',
+          // Blocco informativo + pulsanti in s-abc (versione accessibile)
+          abc_intro_text:   'Quello che ricevi è un documento altamente tecnico di carattere professionale. Se vuoi una versione più semplice premi <strong>"Spiega"</strong> oppure chiedi all’Aigent <strong>Cecilia</strong>.',
+          abc_btn_what:     'Di cosa si tratta?',
+          abc_btn_explain:  'Spiega',
+          tracking_simple_plan: 'Piano semplice · Pet Owners',
+          soon_available:   'Prossimamente disponibile',
+          // Piano Semplice / Pet Owners (s-plan-simple)
+          pp_eyebrow:           'Versione accessibile · Pet Owners',
+          pp_title:             'Piano semplice',
+          pp_meta_dog_default:  'Il tuo cane',
+          pp_loading:           'Generazione del tuo piano in linguaggio semplice…',
+          pp_disclaimer:        'Questa versione semplice è un riassunto accessibile del piano tecnico. Non sostituisce il consulto in presenza con etologo o veterinario quando il caso lo richiede.',
+          // Login nell’area professionale
+          pro_login_link:          'Accedi',
+          pro_logout_link:         'Esci',
+          pro_mid_auth_label:      'Sei registrato?',
+          pro_mid_auth_btn:        'Log in',
+          pro_mid_auth_hint:       'Non sei registrato? Scegli il tuo piano',
+
+          // ── S-PRO-SIGNUP ──
+          ps_eyebrow:              'Membership Professionale',
+          ps_title:                'Il tuo marchio accanto al nostro',
+          ps_intro:                'Attiva il tuo account professionale, carica il logo della tua azienda e condividi report co-brandizzati con i tuoi clienti fin dal primo caso.',
+          ps_account_title:        'Dati del tuo account',
+          ps_email:                'Email',
+          ps_password:             'Password',
+          ps_password_hint:        'Minimo 8 caratteri.',
+          ps_tos_text:             'Accetto i Termini e l’Informativa sulla Privacy.',
+          ps_tos_link_terms:       'Termini',
+          ps_tos_link_privacy:     'Informativa sulla Privacy',
+          ps_company_title:        'Dati della tua azienda',
+          ps_company_name:         'Nome dell’azienda',
+          ps_legal_rep:            'Nome del rappresentante legale',
+          ps_cif:                  'CIF / NIF / Tax ID',
+          ps_cif_hint:             'Opzionale. Necessario solo per la fatturazione.',
+          ps_billing_email:        'Email di fatturazione',
+          ps_city:                 'Città',
+          ps_country:              'Paese',
+          ps_cases:                'Numero approssimativo di casi all’anno',
+          ps_collab:               'Voglio collaborare con The Dogs’ Mind International (studi, formazioni, segnalazioni).',
+          ps_logo_title:           'Logo della tua azienda',
+          ps_logo_locked:          'Disponibile dopo il pagamento. Potrai caricarlo (max. 2 MB) dal tuo profilo quando la membership sarà confermata.',
+          ps_plan_title:           'La tua membership',
+          ps_plan_name:            'Membership Professionale · 1 anno',
+          ps_bundle_title:         'Aggiungi 60 tokens',
+          ps_bundle_sub:           'Pack promozionale 37,80 € (invece di 42 €).',
+          ps_courtesy:             'Include 10 tokens per iniziare.',
+          ps_total:                'Totale',
+          ps_pay:                  'Paga 20,00 €',
+          ps_secure:               'Pagamento sicuro tramite Stripe.',
+          ps_err_email:            'Inserisci un’email valida.',
+          ps_err_password:         'La password deve avere almeno 8 caratteri.',
+          ps_err_tos:              'Devi accettare i Termini e l’Informativa sulla Privacy.',
+          ps_err_company_name:     'Indica il nome dell’azienda.',
+          ps_err_legal_rep:        'Indica il nome del rappresentante legale.',
+          ps_err_billing_email:    'Inserisci un’email di fatturazione valida.',
+          ps_err_city:             'Indica la città.',
+          ps_err_country:          'Indica il Paese.',
+          ps_err_email_exists:     'Questa email è già registrata. Accedi e torna ad Attivare Professionale.',
+          ps_err_register:         'Impossibile creare l’account.',
+          ps_err_company:          'Impossibile salvare i dati dell’azienda.',
+          ps_err_checkout:         'Impossibile avviare il pagamento.',
+          ps_err_unexpected:       'Errore imprevisto. Riprova.',
+
+          // ── S-PRO-LOGIN ──
+          pl_eyebrow:              'Area Professionale',
+          pl_title:                'Accedi',
+          pl_intro:                'Accedi al tuo account professionale con email e password.',
+          pl_email:                'Email',
+          pl_password:             'Password',
+          pl_forgot:               'Hai dimenticato la password?',
+          pl_submit:               'Accedi',
+          pl_noaccount:            'Non hai un account? Scegli il tuo piano',
+          pl_err_password_empty:   'Inserisci la tua password.',
+          pl_err_invalid:          'Email o password errati.',
+          pl_err_generic:          'Impossibile accedere.',
+          pl_forgot_need_email:    'Inserisci prima la tua email e premi di nuovo "Hai dimenticato la password?".',
+          pl_forgot_sent:          'Se l’email esiste, ti abbiamo inviato un link per reimpostare la password.',
+          pro_auth_eyebrow:        'Sei già utente?',
+          pro_auth_title:          'Accedi o crea il tuo account',
+          pro_auth_sub:            'Accedi alla tua area professionale con email e password.',
+          pro_auth_btn:            'Accedi / Crea account',
+          // Card Pro prezzo + attivare
+          pro_pro_price:           '20 €/anno',
+          pro_pro_price_sub:       'Pagamento unico annuale',
+          pro_cta_activate:        'Attivare Professionale',
+          // s-pro-activate (pre-checkout Stripe)
+          pa_eyebrow:              'Attivazione',
+          pa_title:                'Membership Professionale',
+          pa_membership:           'Membership Professionale · 1 anno',
+          pa_membership_hint:      'Accesso a tutte le funzioni Professionali + 10 tokens per iniziare.',
+          pa_addon_section:        'Aggiungi all’attivazione (offerta unica)',
+          pa_bundle_title:         'Pack Professionale · 60 tokens',
+          pa_bundle_tag:           '−10 % solo all’attivazione della membership',
+          pa_bundle_hint:          '60 tokens aggiuntivi con sconto esclusivo. Una sola volta.',
+          pa_total:                'Totale',
+          pa_disclaimer:           'Pagamento unico, non si rinnova automaticamente. L’attivazione si applica non appena Stripe conferma il pagamento. Il tuo account passerà a Professionale e verranno accreditati i tokens inclusi.',
+          pa_btn_checkout:         'Continua al pagamento',
+          pa_btn_redirecting:      'Connessione con Stripe…',
+          pa_btn_cancel:           'Annulla',
+          pa_err_already_pro:      'Il tuo account è già Professionale.',
+          pa_err_checkout:         'Impossibile creare la sessione di pagamento.',
+          pa_err_promo_off:        'La promo non è più disponibile. Riprova dal flusso di pagamento.',
+          pa_success_processing:   'Conferma del tuo pagamento…',
+          pa_success_done:         'Benvenuto in Professionale! Tokens accreditati.',
+          pa_success_pending:      'Il tuo pagamento è in elaborazione. Ricarica tra qualche secondo.',
+          // Promo Professionale GRATIS (toggle con PRO_PROMO_FREE nel backend)
+          pa_promo_badge:          'PROMO LANCIO',
+          pa_promo_total:          'GRATIS',
+          pa_promo_disclaimer:     'Attivazione immediata, senza pagamento. Durante il periodo promozionale puoi attivare il tuo account Professionale senza costi. Membership permanente. Mantieni i tokens che hai già; quando li spendi, puoi ricaricare come qualsiasi altro utente.',
+          pa_btn_activate_promo:   'Attivare GRATIS',
+          pa_btn_activating_promo: 'Attivazione del tuo account Professionale…',
+          pa_success_promo_done:   'Benvenuto in Professionale! Il tuo account è pronto.',
+          pa_cancelled:            'Attivazione annullata.',
+          pp_btn_pdf:           'Scarica PDF (piano semplice)',
+          pp_btn_pdf_full:      'Scarica PDF completo (analisi + piano)',
+          pp_btn_print:         'Stampa',
+          pp_btn_share:         'Condividi',
+          pp_btn_regen:         'Rigenera (−0,1 tok.)',
+          pp_btn_back_to_plan:  '← Torna al piano',
+          pp_err_no_plan:       'Genera prima un piano d’intervento.',
+          pp_err_no_balance:    'Saldo insufficiente. Ricarica almeno 0,1 tokens.',
+          pp_err_rate:          'Hai raggiunto il massimo di generazioni all’ora. Aspetta un momento.',
+          pp_err_sync:          'Impossibile sincronizzare il caso.',
+          pp_err_failed:        'Impossibile generare il piano semplice.',
+          pp_share_title:       'Piano semplice · The Dogs’ Mind',
+          pp_share_copied:      'Copiato negli appunti',
+          pp_share_failed:      'Impossibile condividere.',
+          pp_regen_confirm:     'Rigenerare il piano semplice? Verranno addebitati 0,1 tokens in più.',
+          pdf_downloading:      'Generazione del PDF…',
+          pdf_err_404:          'Non c’è contenuto da esportare.',
+          pdf_err_failed:       'Impossibile scaricare il PDF.',
+          // ABC spiegato / Cecilia ti spiega (s-abc-translated)
+          at_eyebrow:           'Cecilia ti spiega · Pet Owners',
+          at_title:             'La tua analisi spiegata',
+          at_loading:           'Cecilia sta preparando la tua spiegazione…',
+          at_disclaimer:        'Questa versione accessibile riassume l’analisi funzionale ABC in linguaggio quotidiano. Non sostituisce il consulto in presenza con etologo o veterinario quando il caso lo richiede.',
+          at_btn_pdf:           'Scarica PDF',
+          at_btn_print:         'Stampa',
+          at_btn_share:         'Condividi',
+          at_btn_regen:         'Rigenera (−0,1 tok.)',
+          at_btn_back_to_analysis: '← Torna all’analisi',
+          at_err_no_abc:        'Genera prima l’analisi funzionale ABC.',
+          at_err_no_balance:    'Saldo insufficiente. Ricarica almeno 0,1 tokens.',
+          at_err_rate:          'Hai raggiunto il massimo di generazioni all’ora. Aspetta un momento.',
+          at_err_sync:          'Impossibile sincronizzare il caso.',
+          at_err_failed:        'Impossibile generare la spiegazione.',
+          at_err_not_found:     'Caso non trovato.',
+          at_share_title:       'La tua analisi spiegata · The Dogs’ Mind',
+          at_regen_confirm:     'Rigenerare la spiegazione? Verranno addebitati 0,1 tokens in più.',
+          // Slot Entità (home — solo professionisti)
+          home_entity_empty:    'La mia azienda',
+          home_entity_aria:     'Dati dell’azienda',
+          home_pro_badge_eyebrow: 'Membership attiva',
+          home_pro_badge:        'Utente Professionale',
+          menu_logout:           'Esci',
+          menu_logout_confirm:   'Sei sicuro di voler uscire?',
+          menu_logout_done:      'Sessione chiusa.',
+          // s-pro-company (dati azienda + logo)
+          pc_eyebrow:                 'Solo professionisti',
+          pc_title:                   'Dati dell’azienda',
+          pc_logo_section:            'Logo nei report',
+          pc_logo_btn:                'Carica / cambia logo',
+          pc_logo_remove:             'Rimuovi logo',
+          pc_logo_remove_confirm:     'Rimuovere il logo aziendale? I tuoi PDF futuri usciranno senza.',
+          pc_logo_hint:               'PNG, JPG o WebP · max. 10 MB. L’app lo ottimizza automaticamente per i tuoi PDF.',
+          pc_logo_compressing:        'Ottimizzazione dell’immagine…',
+          pc_logo_uploading:          'Caricamento del logo…',
+          pc_logo_uploaded:           'Logo salvato ✓',
+          pc_logo_removed:            'Logo eliminato.',
+          pc_form_section:            'Informazioni dell’entità',
+          pc_field_name:              'Nome dell’azienda',
+          pc_field_web:               'Web',
+          pc_field_cif:               'CIF / Tax ID',
+          pc_field_cif_hint:          'Solo se vuoi la fattura mensile.',
+          pc_field_clients:           'N° di clienti all’anno',
+          pc_field_clients_hint:      'Stima. Aiuta il team a capire il tuo volume.',
+          pc_field_city:              'Città',
+          pc_field_country:           'Paese',
+          pc_field_billing_email:     'Email di fatturazione',
+          pc_field_billing_email_hint:'Dove riceverai la fattura mensile se hai richiesto il CIF.',
+          pc_field_collaborate:       'Ti piacerebbe collaborare con The Dogs’ Mind?',
+          pc_field_collaborate_hint:  'Casi formativi, validazione clinica, contenuti.',
+          pc_disclaimer:              'Il logo apparirà solo se il tuo account è professionale e hai caricato un file valido. Senza logo, il PDF mostra solo The Dogs’ Mind.',
+          pc_btn_save:                'Salva modifiche',
+          pc_btn_save_continue:       'Salva e continua al pagamento',
+          pc_btn_saving:              'Salvataggio…',
+          pc_btn_back:                'Torna alla home',
+          pc_btn_cancel_activation:   'Annulla attivazione',
+          pc_from_activate_title:     'Prima del pagamento',
+          pc_from_activate_hint:      'Compila il nome della tua azienda e il sito web. Questi dati identificano il tuo account come professionale. Dopo ti portiamo al pagamento.',
+          pc_saved_ok:                'Dati salvati ✓',
+          pc_err_name:                'Il nome dell’azienda è obbligatorio.',
+          pc_err_web:                 'Il sito web è obbligatorio. Includi https://',
+          pc_err_clients:             'Il n° di clienti deve essere un numero valido.',
+          pc_err_email:               'Email di fatturazione in formato non valido.',
+          pc_err_save:                'Errore nel salvataggio dei dati.',
+          pc_err_not_pro:             'Questa sezione è solo per account professionali.',
+          pc_err_logo_size:           'Il file è troppo grande (max 10 MB).',
+          pc_err_logo_format:         'Formato non supportato. Usa PNG, JPG o WebP.',
+          pc_err_logo_upload:         'Impossibile caricare il logo.',
+          pc_err_logo_remove:         'Impossibile rimuovere il logo.',
+          pc_err_logo_read:           'Impossibile leggere il file.',
+          // ABC spiegato (s-abc-explained)
+          ae_eyebrow:           'Analisi funzionale ABC',
+          ae_title:             'Di cosa si tratta?',
+          ae_btn_back:          'Torna all’analisi',
+          ae_content: '<p>Un’analisi funzionale del comportamento, basata sul modello ABC, è un modo per capire perché un comportamento si verifica e cosa lo mantiene nel tempo. La sigla ABC fa riferimento a tre elementi chiave: gli <strong>antecedenti (A)</strong>, cioè tutto ciò che accade prima del comportamento; il <strong>comportamento in sé (B)</strong>, ciò che l’individuo fa in modo osservabile; e le <strong>conseguenze (C)</strong>, ciò che accade subito dopo e che può rinforzare o mantenere quel comportamento.</p><p>Questo tipo di analisi non si concentra unicamente sul descrivere ciò che fa il cane o la persona, ma sul comprendere la <em>funzione</em> che quel comportamento svolge. Cioè, cosa ottiene o cosa evita l’individuo comportandosi in quel modo. Per esempio, un comportamento può servire a ridurre l’ansia, attirare l’attenzione, ottenere qualcosa di desiderato o evitare una situazione spiacevole.</p><p>È importante avere chiaro che l’analisi funzionale <strong>non è un piano d’intervento</strong>. Non indica direttamente cosa fare per correggere il problema. Quello è il passo successivo quando premi <em>“Vedi piano d’intervento”</em>. È, in realtà, lo strumento che utilizziamo per valutare e capire il comportamento da un punto di vista funzionale. Ci permette di identificare le variabili che lo scatenano e lo mantengono.</p><p>A partire da quell’analisi si può progettare un piano di lavoro adeguato. Senza una buona comprensione preliminare del problema, qualsiasi intervento rischia di essere superficiale o poco efficace. Per questo, l’analisi funzionale è la base su cui si costruisce qualsiasi strategia seria di modificazione del comportamento.</p>',
+          cecilia_intro_analysis: 'Ho rivisto l’analisi del caso, cara. Quale termine o concetto ti confonde? Te lo traduco nel linguaggio di sempre.',
+          cecilia_intro_plan:     'Ho rivisto il piano d’intervento, cara. Quale parte vuoi che ti chiarisca? Senza tecnicismi, te lo prometto.',
+          cecilia_chip_analysis:  'Analisi del caso condivisa con Cecilia',
+          cecilia_chip_plan:      'Piano d’intervento condiviso con Cecilia',
+          // Modulo di registrazione
+          login_section_title:   'Accedi',
+          form_or:               'o',
+          form_new_user:         'Nuovo Utente',
+          splash_home:           'Home',
+          forgot_password_link:  'Hai dimenticato la password?',
+          form_welcome_intro:    'Benvenuto in <strong style="color:var(--text)">The Dogs’ Mind</strong>. Puoi scegliere due modelli di abbonamento: <strong style="color:var(--green)">Privato</strong> (fino a 2 cani) o <strong style="color:var(--green)">Professionale</strong> (fino a 20 cani).<br><br>Ti invitiamo a scoprire gratuitamente il funzionamento di questa app, che crescerà e migliorerà insieme a te. Hai <strong style="color:var(--text)">5 tokens in regalo</strong>. Una volta esauriti dovrai ricaricare i tuoi tokens.',
+          form_user_type:        'Tipo di utente',
+          form_full_name:        'Nome e cognome',
+          form_full_name_ph:     'Il tuo nome completo...',
+          form_dog1_header:      'Cane 1',
+          form_dog2_header:      'Cane 2 <span style="font-size:10px;font-weight:400;color:var(--text3)">(opzionale)</span>',
+          form_dog_name:         'Nome del cane',
+          form_dog_breed:        'Razza / Meticcio',
+          form_dog1_name_ph:     'Es: Buddy, Luna...',
+          form_dog1_breed_ph:    'Es: Border Collie, Meticcio...',
+          form_dog2_name_ph:     'Es: Max, Laika...',
+          form_dog2_breed_ph:    'Es: Springer Spaniel, Meticcio...',
+          form_country:          'Paese di residenza',
+          form_email:            'Email',
+          form_email_ph:         'tua@email.com',
+          form_phone:            'Telefono',
+          form_phone_ph:         '+34 600 000 000',
+          form_password:         'Password',
+          form_password_ph:      'Minimo 6 caratteri',
+          form_password_login_ph:'Password',
+          form_invite_label:     'Codice di invito <span style="color:var(--grey);font-size:10px;text-transform:none;">(opzionale)</span>',
+          form_invite_ph:        'Se hai un codice, inseriscilo qui',
+          form_submit:           'Crea il mio account →',
+          form_terms_pre:        'Registrandoti accetti la nostra ',
+          form_terms_link:       'Informativa sulla Privacy',
+          form_consent_html:     'Ho letto e accetto l’<a onclick="event.stopPropagation();goTo(\'s-privacy\')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Informativa sulla Privacy</a> e i <a onclick="event.stopPropagation();goTo(\'s-terms\')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Termini di Servizio</a>. Acconsento al trattamento dei miei dati personali (email, telefono) e comprendo che il testo che scrivo sul mio cane (anamnesi, conversazioni) verrà inviato ad <strong>Anthropic (Claude AI, USA)</strong> per generare le analisi. Senza questo consenso l’app non può generare analisi.',
+          consent_ai_inline:     'Continuando, il testo sul tuo cane verrà inviato ad <strong>Anthropic (USA)</strong> per generare l’analisi.',
+          form_err_required:     'Inserisci la tua email e una password.',
+          form_err_password_short:'La password deve avere almeno 6 caratteri.',
+          form_err_terms:        'Per creare il tuo account devi accettare l’Informativa sulla Privacy e i Termini di Servizio.',
+          form_consent:          'Creando il mio account accetto l’<a onclick="goTo(\'s-privacy\')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Informativa sulla Privacy</a> e i <a onclick="goTo(\'s-terms\')" style="color:var(--green);cursor:pointer;text-decoration:underline;">Termini di Servizio</a>, e acconsento al trattamento dei miei dati personali (email, telefono) per le finalità descritte nell’Informativa sulla Privacy.',
+          // Termini di Servizio (s-terms) — IT
+          tos_title:     'Termini di Servizio',
+          tos_subtitle:  'The Dogs’ Mind · Ultimo aggiornamento: aprile 2026',
+          tos_intro:     'Usando The Dogs’ Mind accetti questi termini. Leggili con attenzione prima di creare il tuo account.',
+          tos_h1:        '1. Chi eroga il servizio',
+          tos_p1:        'The Dogs’ Mind è un servizio creato da <strong>Teodoro Mariscal Diaz</strong> (Spagna). Per contatti, scrivi a <a href="mailto:info@thedogsmind.net" style="color:var(--green);">info@thedogsmind.net</a>.',
+          tos_h2:        '2. Natura del servizio',
+          tos_p2:        'The Dogs’ Mind offre analisi comportamentali e piani d’intervento generati da intelligenza artificiale. <strong>Il contenuto è orientativo, può contenere errori e NON sostituisce la diagnosi né il trattamento di un etologo veterinario abilitato.</strong> In casi di aggressività, comportamenti autolesionistici o emergenze mediche, rivolgiti immediatamente a un professionista qualificato.',
+          tos_h3:        '3. Account e idoneità',
+          tos_p3:        'Devi avere almeno 18 anni per creare un account. Sei responsabile della veridicità dei dati che inserisci e del mantenere sicura la tua password. Un account = una persona fisica.',
+          tos_h4:        '4. Tokens e pagamenti',
+          tos_p4:        'L’accesso ad analisi e piani consuma tokens. I tokens si acquistano in pack e non scadono. I pagamenti vengono elaborati tramite Stripe (web) o Apple In-App Purchase (iOS). I tokens non sono rimborsabili salvo errore tecnico a noi imputabile o obbligo legale applicabile. Le ricariche sono definitive dopo la conferma.',
+          tos_h5:        '5. Uso accettabile',
+          tos_p5:        'Non puoi usare il servizio per fini illegali, dannosi o che violino i diritti di terzi. Non puoi inoltre tentare di estrarre i modelli, fare reverse engineering, né rivendere il servizio senza autorizzazione scritta.',
+          tos_h6:        '6. Cancellazione dell’account',
+          tos_p6:        'Puoi eliminare il tuo account in qualsiasi momento dalla schermata "I miei Tokens → Elimina il mio account". I tuoi dati personali vengono cancellati immediatamente. I registri di pagamento vengono conservati in forma anonima per 4 anni per obbligo fiscale (Spagna).',
+          tos_h7:        '7. Limitazione di responsabilità',
+          tos_p7:        'Il servizio è offerto "così com’è". The Dogs’ Mind non garantisce risultati specifici sul comportamento del tuo cane e non è responsabile dei danni derivanti dall’uso delle analisi o dei piani generati. Ciò non esclude gli obblighi legali minimi che non possono essere limitati.',
+          tos_h8:        '8. Modifiche ai termini',
+          tos_p8:        'Possiamo aggiornare questi termini. Ti avviseremo via email o all’interno dell’app in caso di modifiche sostanziali. L’uso continuato dopo la notifica implica accettazione.',
+          tos_h9:        '9. Legge applicabile e foro competente',
+          tos_p9:        'Questi termini sono regolati dalla legge spagnola. Qualsiasi controversia sarà sottoposta ai tribunali di Madrid (Spagna), salvo che la legislazione di tutela del consumatore del tuo Paese stabilisca un foro diverso.',
+          tos_box_label: 'Contatto',
+          tos_box_text:  'Dubbi su questi termini? Scrivici a <a href="mailto:info@thedogsmind.net" style="color:var(--green);font-weight:600;">info@thedogsmind.net</a>.',
+          form_already_account:  'Hai già un account? ',
+          form_sign_in:          'Accedi',
+          // Extra tokens
+          tokens_note:           'Ogni analisi completa consuma circa <strong style="color:var(--dark);">3 tokens</strong>.<br>I tokens non scadono.',
+          tokens_pack5_desc:     'Risolvi il tuo problema iniziale',
+          tokens_popular:        'SCELTA PREFERITA',
+          tokens_pack20_desc:    'Il più richiesto',
+          tokens_pack60_desc:    'Per educatori, etologi e veterinari in attività',
+          tokens_secure_payment: 'Pagamento sicuro con carta',
+          rc_restore_btn:       'Ripristina acquisti',
+          rc_login_first:       'Accedi per acquistare.',
+          rc_processing:        'Elaborazione dell’acquisto…',
+          rc_purchase_ok:       'Acquisto effettuato. Accreditamento dei tuoi tokens…',
+          rc_purchase_err:      'Impossibile completare l’acquisto. Riprova.',
+          rc_pro_ok:            'Professionale attivato. Completamento…',
+          rc_restoring:         'Ripristino degli acquisti…',
+          rc_restored:          'Acquisti ripristinati.',
+          rc_restore_err:       'Non ci sono acquisti da ripristinare o si è verificato un errore.',
+          rc_sub_terms:         'Abbonamento annuale di 19,99 €/anno; si rinnova automaticamente salvo che lo annulli in Impostazioni › Apple ID › Abbonamenti almeno 24 h prima del rinnovo.',
+          rc_terms_link:        'Termini di servizio',
+          rc_privacy_link:      'Informativa sulla privacy',
+          pa_disclaimer_ios:    'Professionale è un abbonamento annuale di 19,99 €/anno che si rinnova automaticamente salvo che lo annulli in Impostazioni › Apple ID › Abbonamenti almeno 24 h prima della data di rinnovo.',
+          // ABC
+          abc_a_title:  'A — ANTECEDENTE',
+          abc_a_vars:   'Variabili disposizionali',
+          abc_a_ec:     'Stimoli condizionati (EC)',
+          abc_a_ed:     'ED — Stimolo discriminativo',
+          abc_b_title:  'B — COMPORTAMENTO',
+          abc_c_title:  'C — CONSEGUENZA RINFORZANTE',
+          abc_btn_plan: 'Vedi Piano d’Intervento',
+          abc_btn_full: 'Analisi completa &#8594;',
+          abc_btn_new:  'Nuova analisi',
+          abc_btn_teo:  'Revisione personale di Teo Mariscal',
+          // Analisi completa
+          full_title: 'Analisi funzionale completa',
+          full_empty: 'Esegui un’analisi per vedere qui il report completo.',
+          // Refine
+          refine_title: 'IA Analitica',
+          refine_sub:   'by Teo Mariscal · Affinamento del piano',
+          // Disclaimer generale nelle schermate di analisi (App Store + GDPR + medical-adjacent)
+          analysis_footer_disclaimer: 'Analisi generata da IA basata sulle informazioni che hai fornito. Può contenere errori. Non sostituisce il consulto in presenza con etologo o veterinario abilitato.',
+          // Bozza anamnesi (Part A): riprendere la bozza senza inviare
+          anam_resume_title:           'Hai un consulto non terminato.',
+          anam_resume_sub:             'Abbiamo salvato ciò che hai scritto su questo dispositivo.',
+          anam_resume_continue:        'Continua',
+          anam_resume_discard:         'Scarta',
+          anam_resume_discard_confirm: 'Scartare il consulto non terminato?',
+          // Analisi in sospeso (Part B): analisi già pagata, non accettata
+          pending_analysis_title:           'Hai un’analisi non terminata.',
+          pending_analysis_sub:             'La recuperiamo su questo dispositivo, senza addebitare di nuovo.',
+          pending_analysis_view:            'Vedi',
+          pending_analysis_discard:         'Scarta',
+          pending_analysis_discard_confirm: 'Scartare l’analisi non terminata? Non potrai recuperarla in seguito.',
+        },
   };
 
   var _currentLang = localStorage.getItem('dm_lang') || 'es';
@@ -19789,23 +21042,27 @@ function endTourIntro() {
     var ta = document.getElementById('chat-ta');
     if (ta) {
       var av = document.getElementById('chat-hdr-name');
-      var avName = av ? av.textContent.trim() : (lang === 'en' ? 'your avatar' : 'tu avatar');
-      ta.placeholder = lang === 'en' ? 'Write to ' + avName + '…' : 'Escríbele a ' + avName + '…';
+      var avName = av ? av.textContent.trim() : (lang === 'it' ? 'il tuo avatar' : (lang === 'en' ? 'your avatar' : 'tu avatar'));
+      ta.placeholder = lang === 'it' ? 'Scrivi a ' + avName + '…' : (lang === 'en' ? 'Write to ' + avName + '…' : 'Escríbele a ' + avName + '…');
     }
 
     // Refine input placeholder
     var ri = document.getElementById('refine-input');
     if (ri) {
-      ri.placeholder = lang === 'en'
+      ri.placeholder = lang === 'it'
+        ? 'Es.: I cani non si possono separare perché vivono insieme…'
+        : (lang === 'en'
         ? 'E.g.: The dogs cannot be separated because they live together…'
-        : 'Ej: Los perros no pueden separarse porque conviven en casa…';
+        : 'Ej: Los perros no pueden separarse porque conviven en casa…');
     }
 
     // Highlight active flag buttons
     var esBtn = document.getElementById('lang-es');
     var enBtn = document.getElementById('lang-en');
+    var itBtn = document.getElementById('lang-it');
     if (esBtn) esBtn.style.borderColor = lang === 'es' ? 'var(--green)' : 'transparent';
     if (enBtn) enBtn.style.borderColor = lang === 'en' ? 'var(--green)' : 'transparent';
+    if (itBtn) itBtn.style.borderColor = lang === 'it' ? 'var(--green)' : 'transparent';
 
     document.documentElement.lang = lang;
 
@@ -20137,6 +21394,28 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
       df_recovery_msg_streak1:"You've checked in one day. One more and your Responsible Caretaker is back.",
       df_error_noplan:        'To start the daily follow-up you first need to accept an intervention plan in the case analysis.',
     },
+    it: {
+          df_day_label:        'Giorno',
+          df_error_title:      'Impossibile caricare',
+          df_theory_tag:       'Domanda del giorno',
+          df_reveal:           'Mostra la risposta corretta',
+          df_reveal_done:      'Risposta rivelata',
+          df_save_day:         'Salva il giorno',
+          df_save_in_progress: 'Salvataggio…',
+          df_save_error:       "Impossibile salvare. Riprova.",
+          df_exercise:         'Esercizio',
+          df_wellness:         'Wellness',
+          df_silver_earned:    'Hai ottenuto il badge Tutor Responsabile!',
+          df_gold_earned:      'Hai ottenuto il badge Tutor Eccellente! +2 tokens',
+          df_textarea_ph:      "Una frase su com'è andata…",
+          df_invite_title:        'Ciao, come va la giornata?',
+          df_invite_sub_template: 'Come va con {dog} oggi? Facciamo insieme il monitoraggio del giorno.',
+          df_invite_cta_now:      'Fai ora',
+          df_invite_cta_later:    'Più tardi',
+          df_recovery_msg_short:  'Compila il monitoraggio per due giorni di fila e recupererai il tuo Tutor Responsabile.',
+          df_recovery_msg_streak1:'Sei a un giorno. Compilane uno in più e recuperi il tuo Tutor Responsabile.',
+          df_error_noplan:        "Per attivare il monitoraggio quotidiano serve prima accettare un piano d'intervento nell'analisi del caso.",
+        },
   };
   function _t(k, fb){
     try {

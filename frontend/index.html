@@ -15037,10 +15037,19 @@ function getVal(id, fallback) {
     // debe mostrar el plan guardado SIN regenerar (la anamnesis archivada
     // no tiene todos los campos required que pide /intervention).
     window._loadedFromArchive = true;
+    window._lastArchiveCaseId = r.backend_case_id || null;
 
     // Repoblar s-abc con el análisis archivado (función ya existente)
     if (typeof fillABCScreen === 'function' && r.analysis) {
       try { fillABCScreen(r.dog_name || 'Sin nombre', r.analysis, []); } catch(e) {}
+    }
+
+    // Hidratación completa desde backend: los records creados por syncBackendCases
+    // solo traen summaries (summary_abc ~600 chars, summary_plan a veces vacío) →
+    // análisis "cortado" y plan ausente al reabrir. Recuperamos los entries
+    // REALES (abc + intervention) y reemplazamos en cuanto llegan.
+    if (r.backend_case_id && (r._fromBackend || !r.plan || !(r.analysis || '').length || (r.analysis || '').length < 900)) {
+      _hydrateArchivedCase(r.backend_case_id, r.id);
     }
 
     // Navegar al análisis funcional. Desde aquí el usuario tiene los flows
@@ -15049,6 +15058,48 @@ function getVal(id, fallback) {
     goTo('s-abc');
   }
   window.openRecord = openRecord;
+
+  // Recupera del backend los entries completos de un caso archivado y sustituye
+  // los summaries truncados en globals + record local (persistiendo). Idempotente
+  // y silenciosa: si falla la red, la vista local (summary) se mantiene.
+  async function _hydrateArchivedCase(caseId, localId) {
+    try {
+      var jwt = '';
+      try { jwt = localStorage.getItem('dm_jwt') || ''; } catch(e) {}
+      if (!jwt || !caseId) return;
+      var res = await fetch(API_BASE + '/cases/' + encodeURIComponent(caseId) + '/entries', {
+        headers: { 'Authorization': 'Bearer ' + jwt }, cache: 'no-store'
+      });
+      if (!res.ok) return;
+      var entries = await res.json();
+      if (!Array.isArray(entries)) return;
+      var abc = null, plan = null;
+      entries.forEach(function(e) {
+        if (!e || !e.content) return;
+        if (e.type === 'abc' && (!abc || String(e.created_at) > String(abc.created_at))) abc = e;
+        if (e.type === 'intervention' && (!plan || String(e.created_at) > String(plan.created_at))) plan = e;
+      });
+      var recs = getRecords();
+      var rec = null;
+      for (var i = 0; i < recs.length; i++) {
+        if (String(recs[i].backend_case_id) === String(caseId) || (localId != null && String(recs[i].id) === String(localId))) { rec = recs[i]; break; }
+      }
+      var stillViewing = (window._lastArchiveCaseId === caseId);
+      if (abc && abc.content.length > ((rec && rec.analysis) || '').length) {
+        if (rec) rec.analysis = abc.content;
+        if (stillViewing) {
+          window._lastAnalysisText = abc.content;
+          try { fillABCScreen(window._lastDogName || 'Sin nombre', abc.content, []); } catch(e) {}
+        }
+      }
+      if (plan && plan.content && plan.content.length > ((rec && rec.plan) || '').length) {
+        if (rec) rec.plan = plan.content;
+        if (stillViewing) window._lastInterventionPlan = plan.content;
+      }
+      if (rec) setRecords(recs);
+    } catch(e) { /* red caída: la vista local sigue funcionando */ }
+  }
+  window._hydrateArchivedCase = _hydrateArchivedCase;
 
   function filterRecords(f) {
     _recordsFilter = f;
@@ -15922,6 +15973,16 @@ function getVal(id, fallback) {
       renderInterventionPlan(window._lastInterventionPlan, dn);
       return;
     }
+    // Archivado SIN plan local (record sincronizado con solo summaries): antes
+    // de regenerar, intentar recuperar el plan REAL que ya existe en backend.
+    if (window._loadedFromArchive && !window._lastInterventionPlan && window._lastArchiveCaseId) {
+      try { await _hydrateArchivedCase(window._lastArchiveCaseId, null); } catch(e) {}
+      if (window._lastInterventionPlan) {
+        var dnh = (window._lastAnamnesisData && window._lastAnamnesisData.dog_name) || '';
+        renderInterventionPlan(window._lastInterventionPlan, dnh);
+        return;
+      }
+    }
     // Show shared loading screen
     var _loadingTitle = document.getElementById('loading-title');
     if (_loadingTitle) {
@@ -15939,8 +16000,19 @@ function getVal(id, fallback) {
     if (actions) actions.style.display = 'none';
 
     try {
+      // Cinturón anti-422: la anamnesis de un caso archivado solo conserva
+      // nombre/raza/edad/problema. Completamos los campos REQUIRED que falten
+      // (household_members, when_it_happens…) con los mismos defaults neutros
+      // que usa el flujo normal, para que Pydantic nunca rechace la petición.
+      var _ivAnam = Object.assign({}, window._lastAnamnesisData || {});
+      if (!_ivAnam.dog_name) _ivAnam.dog_name = 'Sin nombre';
+      if (!_ivAnam.dog_age) _ivAnam.dog_age = 'Desconocida';
+      if (!_ivAnam.breed) _ivAnam.breed = 'Mestizo';
+      if (!_ivAnam.problem_description) _ivAnam.problem_description = 'No especificado';
+      if (!_ivAnam.when_it_happens) _ivAnam.when_it_happens = 'No especificado';
+      if (!_ivAnam.household_members || _ivAnam.household_members < 1) _ivAnam.household_members = 1;
       var payload = {
-        anamnesis: window._lastAnamnesisData || {},
+        anamnesis: _ivAnam,
         analysis_text: window._lastAnalysisText
       };
       // Con Authorization: el backend resuelve account_type (modo Pet Owner
@@ -16021,6 +16093,7 @@ async function analyzeWithAI() {
   // Análisis nuevo → ya no estamos viendo un archivo. Reseteamos flag para
   // que generateInterventionPlan regenere normalmente con la anamnesis fresca.
   window._loadedFromArchive = false;
+  window._lastArchiveCaseId = null;
 
   var btn = document.getElementById('btn-analyze');
 

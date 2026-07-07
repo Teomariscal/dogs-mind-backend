@@ -27,6 +27,18 @@ class Settings(BaseSettings):
     # en la vía cognitivista italiana (lang=='it' + stance=='cognitive'). NUNCA
     # ingestar material cognitivista en dogs_mind_knowledge (contaminaría es/en/it).
     qdrant_collection_cognitive: str = "dogs_mind_cognitive_it"
+    # EJE de la RAG B: los documentos cuyo filename contenga alguno de estos patrones
+    # (case-insensitive) son la CAPA NÚCLEO (obra "Vivir con el perro" = columna
+    # vertebral); el resto (casos, papers, glosario) es COMPLEMENTO de segunda capa.
+    # La recuperación cognitiva prioriza el núcleo y rellena con complemento.
+    cognitive_core_patterns: list[str] = [
+        "vivir con el perro",
+        "vivere con il cane",
+        "enfoque cognitivo",
+        "approccio cognitivo",
+    ]
+    # Cuántos de los top_k se reservan al núcleo (si hay hits del eje sobre umbral).
+    cognitive_core_quota: int = 4
 
     @field_validator("qdrant_url", "anthropic_api_key", "voyage_api_key", "qdrant_api_key", mode="before")
     @classmethod

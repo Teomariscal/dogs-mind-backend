@@ -52,6 +52,75 @@ def retrieve(query: str, top_k: Optional[int] = None) -> list[RetrievedChunk]:
     return chunks
 
 
+def _is_core_cognitive(filename: str) -> bool:
+    """True si el documento pertenece a la CAPA NÚCLEO (eje) de la RAG B."""
+    settings = get_settings()
+    fn = (filename or "").lower()
+    return any(p.lower() in fn for p in settings.cognitive_core_patterns)
+
+
+def retrieve_cognitive(query: str, top_k: Optional[int] = None) -> list[RetrievedChunk]:
+    """
+    Recuperación de la RAG B (corpus cognitivista IT) con JERARQUÍA DE CAPAS:
+      • EJE (núcleo): la obra "Vivir con el perro" — columna vertebral del estilo.
+      • COMPLEMENTO: casos (Referto*), glosario, papers y demás.
+    Reserva una cuota del top_k al eje (si hay hits sobre umbral) y rellena el
+    resto con el mejor complemento, preservando el orden por score dentro de cada capa.
+    Devuelve lista vacía si la collection está vacía o es inalcanzable.
+    """
+    settings = get_settings()
+    k = top_k or settings.rag_top_k
+    qdrant = get_qdrant_client()
+
+    # Si la RAG B aún no existe (vacía), no romper: sin contexto cognitivo.
+    try:
+        existing = {c.name for c in qdrant.get_collections().collections}
+        if settings.qdrant_collection_cognitive not in existing:
+            return []
+    except Exception:
+        return []
+
+    query_vector = embed_query(query)
+
+    # Pedimos un pool mayor que k para poder separar capas y elegir con criterio.
+    pool = qdrant.search(
+        collection_name=settings.qdrant_collection_cognitive,
+        query_vector=query_vector,
+        limit=max(k * 4, 20),
+        with_payload=True,
+        score_threshold=0.30,
+    )
+
+    def _to_chunk(hit) -> RetrievedChunk:
+        payload = hit.payload or {}
+        return RetrievedChunk(
+            chunk_id=str(hit.id),
+            text=payload.get("text", ""),
+            source=payload.get("filename", "unknown"),
+            page=payload.get("page_start"),
+            score=round(hit.score, 4),
+        )
+
+    core = [_to_chunk(h) for h in pool if _is_core_cognitive((h.payload or {}).get("filename", ""))]
+    complement = [_to_chunk(h) for h in pool if not _is_core_cognitive((h.payload or {}).get("filename", ""))]
+
+    # El eje encabeza, con una cuota reservada; el complemento rellena hasta k.
+    quota = min(settings.cognitive_core_quota, k)
+    selected = core[:quota]
+    for c in complement:
+        if len(selected) >= k:
+            break
+        selected.append(c)
+    # Si sobran huecos y quedan hits del eje, se añaden.
+    if len(selected) < k:
+        for c in core[quota:]:
+            if len(selected) >= k:
+                break
+            selected.append(c)
+
+    return selected[:k]
+
+
 def build_rag_context_block(chunks: list[RetrievedChunk]) -> str:
     """
     Format retrieved chunks as a numbered reference block to inject

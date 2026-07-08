@@ -405,7 +405,11 @@ def serve_admin():
     <div class="sub">Máximo 100 MB · se anonimiza antes de indexar</div>
   </div>
   <div id="file-info-b" style="margin-top:16px;font-size:14px;color:#2a7a9a;font-weight:600;min-height:20px;"></div>
-  <button id="upload-btn-b" onclick="uploadFileB()" disabled style="background:#2a7a9a;">Subir a la RAG B (cognitiva)</button>
+  <div style="margin-top:12px;font-size:14px;">
+    <label style="margin-right:18px;"><input type="radio" name="doctype-b" value="book" checked> Libro / bibliografía <span style="color:#888;">(sin anonimizar)</span></label>
+    <label><input type="radio" name="doctype-b" value="case"> Caso real <span style="color:#888;">(anonimiza datos de cliente)</span></label>
+  </div>
+  <button id="upload-btn-b" onclick="uploadFileB()" disabled style="background:#2a7a9a;margin-top:12px;">Subir a la RAG B (cognitiva)</button>
   <div id="status-b" style="margin-top:20px;font-size:14px;min-height:20px;"></div>
 
   <div id="docs-section-b" style="margin-top:32px;">
@@ -544,6 +548,8 @@ async function uploadFileB() {
   status.textContent = '';
   var fd = new FormData();
   fd.append('file', selectedFileB);
+  var dt = document.querySelector('input[name="doctype-b"]:checked');
+  fd.append('doc_type', dt ? dt.value : 'book');
   try {
     var res = await fetch('/documents/cognitive/upload', { method: 'POST', body: fd });
     var data = await res.json();

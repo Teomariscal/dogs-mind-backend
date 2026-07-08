@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, UploadFile, File, BackgroundTasks
+from fastapi import APIRouter, HTTPException, UploadFile, File, BackgroundTasks, Form
 from app.models.documents import DocumentUploadResponse, DocumentListResponse, DocumentListItem
 from app.services.document_ingestion import ingest_pdf, list_indexed_documents
 from app.services.cognitive_ingestion import ingest_cognitive_pdf, list_cognitive_documents
@@ -87,10 +87,10 @@ def list_documents():
 # sea imposible contaminar dogs_mind_knowledge. La ingesta B lleva anonimización
 # GDPR fail-closed (casos reales) + chunking por caso. Ver cognitive_ingestion.py.
 
-def _run_cognitive_ingestion(job_id: str, pdf_bytes: bytes, filename: str) -> None:
-    """Background task: anonimizar + indexar en la RAG B."""
+def _run_cognitive_ingestion(job_id: str, pdf_bytes: bytes, filename: str, anonymize: bool) -> None:
+    """Background task: (anonimizar si es caso +) indexar en la RAG B."""
     try:
-        chunks = ingest_cognitive_pdf(pdf_bytes, filename)
+        chunks = ingest_cognitive_pdf(pdf_bytes, filename, anonymize=anonymize)
         _jobs[job_id] = {"status": "done", "filename": filename, "chunks_indexed": chunks}
     except Exception as e:
         _jobs[job_id] = {"status": "error", "filename": filename, "error": str(e)}
@@ -100,9 +100,13 @@ def _run_cognitive_ingestion(job_id: str, pdf_bytes: bytes, filename: str) -> No
 async def upload_cognitive_document(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
+    doc_type: str = Form("case"),
 ):
     """
-    Upload a PDF to the ITALIAN COGNITIVE corpus (RAG B) — anonymized + case-chunked.
+    Upload a PDF to the ITALIAN COGNITIVE corpus (RAG B).
+
+    doc_type='case' (default) → anonimiza (datos de cliente) antes de indexar.
+    doc_type='book'           → libro/bibliografía: indexa directo, sin anonimizar.
 
     Returns 202 immediately. Poll GET /documents/jobs/{job_id} for status.
     """
@@ -123,15 +127,17 @@ async def upload_cognitive_document(
     import uuid
     job_id = str(uuid.uuid4())
     filename = file.filename or "unknown.pdf"
+    anonymize = (doc_type or "case").strip().lower() != "book"
     _jobs[job_id] = {"status": "processing", "filename": filename}
 
-    background_tasks.add_task(_run_cognitive_ingestion, job_id, pdf_bytes, filename)
+    background_tasks.add_task(_run_cognitive_ingestion, job_id, pdf_bytes, filename, anonymize)
 
+    action = "Anonymizing + indexing" if anonymize else "Indexing (no anonymization)"
     return {
         "job_id": job_id,
         "filename": filename,
         "status": "processing",
-        "message": f"Anonymizing + indexing '{filename}' into cognitive corpus (RAG B).",
+        "message": f"{action} '{filename}' into cognitive corpus (RAG B).",
     }
 
 

@@ -142,10 +142,16 @@ def anonymize_case_text(text: str) -> str:
 
 # ── Ingesta pública ──────────────────────────────────────────────────────────────
 
-def ingest_cognitive_pdf(pdf_bytes: bytes, filename: str) -> int:
+def ingest_cognitive_pdf(pdf_bytes: bytes, filename: str, anonymize: bool = True) -> int:
     """
     Ingesta un PDF al corpus cognitivista (RAG B). Returns chunks indexados.
-    Reemplaza chunks previos del mismo filename. Fail-closed en anonimización.
+    Reemplaza chunks previos del mismo filename.
+
+    anonymize=True  → CASO real (datos de cliente): pasa por anonimización
+                      fail-closed (si falla, NADA se indexa).
+    anonymize=False → LIBRO / bibliografía (texto publicado, sin PII de cliente):
+                      se indexa directo, sin anonimización (más rápido y no aborta
+                      por los guardas pensados para casos).
     """
     settings = get_settings()
     ensure_cognitive_collection()
@@ -167,10 +173,14 @@ def ingest_cognitive_pdf(pdf_bytes: bytes, filename: str) -> int:
     if not pages:
         return 0
 
-    # ANONIMIZACIÓN antes de trocear: el texto completo del caso pasa por las dos
-    # capas. Si falla → excepción → el job de ingesta termina en error y NADA se indexa.
     full_text = "\n\n".join(p["text"] for p in pages)
-    clean_text = anonymize_case_text(full_text)
+    if anonymize:
+        # CASO: el texto pasa por las dos capas. Si falla → excepción → el job
+        # termina en error y NADA se indexa (fail-closed).
+        clean_text = anonymize_case_text(full_text)
+    else:
+        # LIBRO/bibliografía: sin datos de cliente → se indexa tal cual.
+        clean_text = full_text
 
     # Un PDF = un caso. Chunking sobre el texto ya anonimizado.
     clean_pages = [{"page": 1, "text": clean_text}]
@@ -191,6 +201,7 @@ def ingest_cognitive_pdf(pdf_bytes: bytes, filename: str) -> int:
                 "filename": filename,
                 "case_id": filename,          # 1 PDF = 1 caso
                 "corpus": "cognitive_it",     # marca inequívoca de RAG B
+                "doc_type": "case" if anonymize else "book",
                 "chunk_index": chunk["chunk_index"],
                 "page_start": chunk["page_start"],
                 "page_end": chunk["page_end"],

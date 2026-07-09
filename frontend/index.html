@@ -7559,6 +7559,109 @@ button:not(:disabled):active{ transform:scale(0.98); }
 #s-privacy > *,
 #s-terms > *{ position:relative; z-index:1; }
 
+/* ── Exterminio del Cream (2026-07-09): s-dog-profile, s-seguimiento,
+   s-daily-followup y s-refine a vibrant emerald. Mismo lenguaje que los
+   bloques anteriores: fondo #0e1f1a→#14302a + radiales cyan/verde; las
+   cards blancas existentes se conservan (legibilidad intacta); solo se
+   aclaran los textos que quedaban directamente sobre el fondo. ───────── */
+#s-dog-profile,
+#s-seguimiento{
+  background:linear-gradient(180deg, #3a5a34 0%, #1a3b2e 30%, #14302a 60%, #0e1f1a 100%) !important;
+  position:relative;
+}
+#s-dog-profile::before,
+#s-seguimiento::before{
+  content:''; position:absolute; left:0; right:0; top:0; height:55%;
+  background:
+    radial-gradient(ellipse 600px 300px at 25% -2%, rgba(94,200,230,0.20), transparent 64%),
+    radial-gradient(ellipse 540px 240px at 80% 4%, rgba(74,103,65,0.30), transparent 62%);
+  pointer-events:none; z-index:0;
+}
+#s-dog-profile > *, #s-seguimiento > *{ position:relative; z-index:1; }
+/* Los labels viven DENTRO de cards blancas → mantienen su color oscuro.
+   Solo se aclara lo que cuelga directamente del fondo oscuro. */
+#s-dog-profile #dog-profile-loading{ color:rgba(243,241,234,0.65) !important; }
+
+#s-daily-followup{
+  background:linear-gradient(180deg, #0e1f1a 0%, #14302a 100%) !important;
+  position:relative;
+}
+#s-daily-followup::before{
+  content:''; position:absolute; left:0; right:0; top:0; height:55%;
+  background:
+    radial-gradient(ellipse 600px 300px at 25% -2%, rgba(94,200,230,0.22), transparent 64%),
+    radial-gradient(ellipse 540px 240px at 80% 4%, rgba(74,103,65,0.30), transparent 62%);
+  pointer-events:none; z-index:0;
+}
+#s-daily-followup > *{ position:relative; z-index:1; }
+#s-daily-followup .df-header{
+  background:rgba(14,31,26,0.62) !important;
+  border-bottom:1px solid rgba(94,200,230,0.18) !important;
+}
+#s-daily-followup .df-back{
+  background:rgba(255,255,255,0.10) !important;
+  border-color:rgba(255,255,255,0.18) !important;
+  color:#f3f1ea !important;
+}
+#s-daily-followup .df-title-main{ color:#f3f1ea !important; }
+#s-daily-followup .df-day{ color:rgba(243,241,234,0.60) !important; }
+#s-daily-followup .df-badge-text{ color:#f3f1ea !important; }
+#s-daily-followup .df-badge-ring-bg{ stroke:rgba(255,255,255,0.18) !important; }
+#s-daily-followup .df-state{ color:rgba(243,241,234,0.70) !important; }
+
+/* s-refine: de mini-app azul a vibrant emerald + cyan (función de pago) */
+#s-refine{
+  background:linear-gradient(180deg, #0e1f1a 0%, #14302a 100%) !important;
+  position:relative;
+}
+#s-refine::before{
+  content:''; position:absolute; left:0; right:0; top:0; height:55%;
+  background:
+    radial-gradient(ellipse 600px 300px at 25% -2%, rgba(94,200,230,0.22), transparent 64%),
+    radial-gradient(ellipse 540px 240px at 80% 4%, rgba(74,103,65,0.30), transparent 62%);
+  pointer-events:none; z-index:0;
+}
+#s-refine > *{ position:relative; z-index:1; }
+/* Header: blanco → glass oscuro; título/subtítulo claros */
+#s-refine > div:nth-of-type(1){
+  background:rgba(14,31,26,0.62) !important;
+  backdrop-filter:saturate(140%) blur(14px);
+  -webkit-backdrop-filter:saturate(140%) blur(14px);
+  border-bottom:1px solid rgba(94,200,230,0.18) !important;
+}
+#s-refine [data-i18n="refine_title"]{ color:#f3f1ea !important; }
+#s-refine [data-i18n="refine_sub"]{ color:rgba(243,241,234,0.60) !important; }
+#s-refine > div:nth-of-type(1) > button{
+  background:rgba(255,255,255,0.10) !important;
+  border-color:rgba(255,255,255,0.18) !important;
+  color:#f3f1ea !important;
+}
+/* Pill de tokens: azul → glass cyan */
+#s-refine > div:nth-of-type(1) > div:nth-of-type(2){
+  background:rgba(94,200,230,0.14) !important;
+  border:1px solid rgba(94,200,230,0.28);
+}
+#s-refine > div:nth-of-type(1) > div:nth-of-type(2) span{ color:#c7eafa !important; }
+#s-refine #refine-tok-num{ color:#80d6ee !important; }
+/* Barra de input: blanca → glass oscuro; textarea legible */
+#s-refine > div:nth-of-type(3){
+  background:rgba(14,31,26,0.72) !important;
+  border-top:1px solid rgba(94,200,230,0.18) !important;
+  backdrop-filter:saturate(140%) blur(14px);
+  -webkit-backdrop-filter:saturate(140%) blur(14px);
+}
+#s-refine #refine-input{
+  background:rgba(255,255,255,0.08) !important;
+  border-color:rgba(255,255,255,0.20) !important;
+  color:#f3f1ea !important;
+}
+#s-refine #refine-input::placeholder{ color:rgba(243,241,234,0.45); }
+#s-refine #refine-send-btn{
+  background:linear-gradient(135deg, #7eb86a 0%, #4a6741 100%) !important;
+  box-shadow:0 2px 8px rgba(126,184,106,0.35) !important;
+}
+
+
 /* s-loading-analysis: texto cream sobre vibrant, imagen Cecilia centrada */
 #s-loading-analysis [data-i18n="loading_title"]{ color:#f3f1ea !important; }
 #s-loading-analysis [data-i18n="loading_msg"]{ color:rgba(243,241,234,0.82) !important; }
@@ -15832,7 +15935,7 @@ function getVal(id, fallback) {
     var isAI = role === 'ai' || role === 'assistant';
     div.style.cssText = isAI
       ? 'background:#fff;border-radius:16px 16px 16px 4px;padding:14px 16px;max-width:85%;align-self:flex-start;box-shadow:0 2px 8px rgba(0,0,0,0.06);font-size:14px;line-height:1.6;color:#1a1a2e;white-space:pre-wrap;'
-      : 'background:#2a4a8a;border-radius:16px 16px 4px 16px;padding:14px 16px;max-width:85%;align-self:flex-end;font-size:14px;line-height:1.6;color:#fff;white-space:pre-wrap;';
+      : 'background:#4a6741;border-radius:16px 16px 4px 16px;padding:14px 16px;max-width:85%;align-self:flex-end;font-size:14px;line-height:1.6;color:#fff;white-space:pre-wrap;';
     div.textContent = isAI ? cleanMarkdown(text) : text;
     container.appendChild(div);
     container.scrollTop = container.scrollHeight;

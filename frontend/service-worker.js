@@ -1,3 +1,4 @@
+// v216 (Exterminio del Cream completado: s-dog-profile, s-seguimiento, s-daily-followup y s-refine a vibrant emerald + burbuja usuario refine verde; labels dentro de cards blancas conservan color oscuro. 2026-07-09)
 // v215 (italiano EN iOS: retirado el gate del boton IT en dmApplyIosNativeUI para build 23/v1.0.3 — sin efecto en web, 2026-07-09)
 // v206 (plan de intervención cobra 0,20 tk — founder 2026-07-08; coste visible en botones + rama 402→s-tokens; backend deduct/refund con require_auth=False para no romper iOS ≤ build 20, 2026-07-08)
 // v205 (fix casos archivados: hidratación completa desde /cases/{id}/entries al reabrir — summaries truncados sustituidos por análisis+plan reales; recuperación del plan antes de regenerar; defaults anti-422 household_members/when_it_happens, 2026-07-07)
@@ -22,7 +23,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v215';
+const CACHE_NAME = 'dogs-mind-v216';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

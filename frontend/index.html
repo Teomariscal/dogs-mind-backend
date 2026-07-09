@@ -8524,7 +8524,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
   <div id="s-full-analysis" class="screen" style="overflow-y:auto;">
     <!-- header -->
     <div style="display:flex;align-items:center;gap:12px;padding:18px 16px 14px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;position:sticky;top:0;z-index:10;">
-      <button onclick="goTo('s-abc')" style="width:44px;height:44px;border-radius:50%;background:#fff;border:1.5px solid rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0;">&#8592;</button>
+      <button onclick="goTo(window._tdmStance==='cognitive' ? 's-home' : 's-abc')" style="width:44px;height:44px;border-radius:50%;background:#fff;border:1.5px solid rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0;">&#8592;</button>
       <div style="flex:1;">
         <div id="full-analysis-title" style="font-size:17px;font-weight:700;color:var(--dark);letter-spacing:-0.3px;" data-i18n="full_title">Análisis funcional completo</div>
         <div style="font-size:11px;color:var(--grey);margin-top:1px;">Dogs’ Mind · Teo Mariscal</div>
@@ -16368,7 +16368,11 @@ async function analyzeWithAI() {
       });
     }
     fillABCScreen(dogName, data.analysis, data.sources || []);
-    goTo('s-abc');
+    // Vía cognitivista (italiano): el modelo ABC es andamiaje conductual → se omite
+    // esa pantalla y se va directo al análisis completo (ya reescrito en clave cognitiva).
+    // La versión conductual mantiene la pantalla ABC de siempre.
+    if (window._tdmStance === 'cognitive') { goTo('s-full-analysis'); }
+    else { goTo('s-abc'); }
     fetchBalance(); // refresh token count after deduction
 
   } catch (e) {

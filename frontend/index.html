@@ -8576,14 +8576,14 @@ button:not(:disabled):active{ transform:scale(0.98); }
     <!-- Loading state -->
     <div id="interv-loading" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px;gap:16px;">
       <div style="width:48px;height:48px;border:3px solid rgba(74,103,65,0.15);border-top-color:#4a6741;border-radius:50%;animation:spin 0.9s linear infinite;"></div>
-      <div style="font-size:15px;color:var(--grey);text-align:center;line-height:1.5;">Generando plan de intervención<br><span style="font-size:13px;opacity:0.7;">Basado en el análisis funcional…</span></div>
+      <div data-i18n="interv_loading" style="font-size:15px;color:var(--grey);text-align:center;line-height:1.5;">Generando plan de intervención<br><span style="font-size:13px;opacity:0.7;">Basado en el análisis funcional…</span></div>
     </div>
 
     <!-- Empty state -->
     <div id="interv-empty" style="padding:60px 24px;text-align:center;color:var(--grey);">
-      
-      <div style="font-size:15px;font-weight:600;color:var(--dark);margin-bottom:8px;">Plan no generado aún</div>
-      <div style="font-size:13px;line-height:1.6;">Primero realiza un análisis funcional y luego pulsa <strong>Ver Plan de Intervención</strong>.</div>
+
+      <div data-i18n="interv_empty_title" style="font-size:15px;font-weight:600;color:var(--dark);margin-bottom:8px;">Plan no generado aún</div>
+      <div data-i18n="interv_empty_sub" style="font-size:13px;line-height:1.6;">Primero realiza un análisis funcional y luego pulsa <strong>Ver Plan de Intervención</strong>.</div>
     </div>
 
     <!-- Plan body -->
@@ -16012,7 +16012,9 @@ function getVal(id, fallback) {
     var _loadingTitle = document.getElementById('loading-title');
     if (_loadingTitle) {
       var _lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
-      _loadingTitle.textContent = _lang === 'en' ? 'Generating intervention plan…' : 'Generando plan de intervención…';
+      _loadingTitle.textContent = _lang === 'en' ? 'Generating intervention plan…'
+        : _lang === 'it' ? 'Generazione del piano d’intervento…'
+        : 'Generando plan de intervención…';
     }
     goTo('s-loading-analysis');
     var loading  = document.getElementById('interv-loading');
@@ -19224,6 +19226,9 @@ function endTourIntro() {
       // Full analysis
       full_title: 'Análisis funcional completo',
       full_empty: 'Realiza un análisis para ver el informe completo aquí.',
+      interv_loading: 'Generando plan de intervención<br><span style="font-size:13px;opacity:0.7;">Basado en el análisis funcional…</span>',
+      interv_empty_title: 'Plan no generado aún',
+      interv_empty_sub: 'Primero realiza un análisis funcional y luego pulsa <strong>Ver Plan de Intervención</strong>.',
       // Refine
       refine_title: 'IA Analítica',
       refine_sub:   'by Teo Mariscal · Refinamiento del plan',
@@ -20177,6 +20182,9 @@ function endTourIntro() {
       // Full analysis
       full_title: 'Complete functional analysis',
       full_empty: 'Run an analysis to see the complete report here.',
+      interv_loading: 'Generating intervention plan<br><span style="font-size:13px;opacity:0.7;">Based on the functional analysis…</span>',
+      interv_empty_title: 'Plan not generated yet',
+      interv_empty_sub: 'First run a functional analysis, then tap <strong>View Intervention Plan</strong>.',
       // Refine
       refine_title: 'Analytical AI',
       refine_sub:   'by Teo Mariscal · Plan refinement',
@@ -21132,6 +21140,9 @@ function endTourIntro() {
           // Analisi completa
           full_title: 'Analisi funzionale completa',
           full_empty: 'Esegui un’analisi per vedere qui il report completo.',
+          interv_loading: 'Generazione del piano d’intervento<br><span style="font-size:13px;opacity:0.7;">Basato sull’analisi funzionale…</span>',
+          interv_empty_title: 'Piano non ancora generato',
+          interv_empty_sub: 'Prima esegui un’analisi funzionale, poi premi <strong>Vedi Piano d’Intervento</strong>.',
           // Refine
           refine_title: 'IA Analitica',
           refine_sub:   'by Teo Mariscal · Affinamento del piano',

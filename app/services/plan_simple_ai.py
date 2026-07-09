@@ -47,18 +47,30 @@ def run_plan_simple(*, original_plan_text: str, lang: str = "es") -> PlanSimpleR
     client = get_anthropic_client()
 
     lang_norm = (lang or "es").lower()
-    system_prompt = (
-        PLAN_SIMPLE_SYSTEM_PROMPT_EN if lang_norm == "en" else PLAN_SIMPLE_SYSTEM_PROMPT_ES
-    )
-
-    user_message = (
-        ("Here is the technical intervention plan to reformulate as a step-by-step recipe "
-         "for the dog's owner. Apply your strict rules:\n\n"
-         if lang_norm == "en"
-         else "Aquí tienes el plan de intervención técnico que debes reformular como guía paso-a-paso para el dueño del perro. Aplica tus reglas duras:\n\n"
+    if lang_norm == "en":
+        system_prompt = PLAN_SIMPLE_SYSTEM_PROMPT_EN
+    elif lang_norm == "it":
+        # No hay prompt IT dedicado: base ES + override duro de idioma. La instrucción
+        # final gana sobre el "Idioma: español" del prompt base.
+        system_prompt = (
+            PLAN_SIMPLE_SYSTEM_PROMPT_ES
+            + "\n\n=== OVERRIDE LINGUA (PRIORITÀ MASSIMA) ===\n"
+            "Scrivi ASSOLUTAMENTE TUTTO l'output in ITALIANO (mai in spagnolo): ogni titolo, "
+            "ogni passo, ogni frase ed esempio. Dai del tu al proprietario. Ignora l'istruzione "
+            "precedente 'español de España': la lingua di output è l'ITALIANO."
         )
-        + original_plan_text.strip()
-    )
+    else:
+        system_prompt = PLAN_SIMPLE_SYSTEM_PROMPT_ES
+
+    if lang_norm == "en":
+        _intro = ("Here is the technical intervention plan to reformulate as a step-by-step recipe "
+                  "for the dog's owner. Apply your strict rules:\n\n")
+    elif lang_norm == "it":
+        _intro = ("Ecco il piano d'intervento tecnico da riformulare come guida passo-passo per il "
+                  "proprietario del cane. Applica le tue regole, e scrivi TUTTO in italiano:\n\n")
+    else:
+        _intro = "Aquí tienes el plan de intervención técnico que debes reformular como guía paso-a-paso para el dueño del perro. Aplica tus reglas duras:\n\n"
+    user_message = _intro + original_plan_text.strip()
 
     response = client.messages.create(
         model=settings.avatar_model,  # Haiku 4.5 — mismo que avatares

@@ -49,19 +49,28 @@ def run_abc_explained(*, original_abc_text: str, lang: str = "es") -> AbcExplain
     client = get_anthropic_client()
 
     lang_norm = (lang or "es").lower()
-    system_prompt = (
-        ABC_EXPLAINED_SYSTEM_PROMPT_EN if lang_norm == "en" else ABC_EXPLAINED_SYSTEM_PROMPT_ES
-    )
-
-    user_message = (
-        ("Here is the technical ABC analysis to translate to plain language for the dog's owner. "
-         "Apply your strict rules and the 4-paragraph structure:\n\n"
-         if lang_norm == "en"
-         else "Aquí tienes el análisis ABC técnico que debes traducir a lenguaje sencillo para el dueño del perro. "
-              "Aplica tus reglas duras y la estructura de 4 párrafos:\n\n"
+    if lang_norm == "en":
+        system_prompt = ABC_EXPLAINED_SYSTEM_PROMPT_EN
+    elif lang_norm == "it":
+        system_prompt = (
+            ABC_EXPLAINED_SYSTEM_PROMPT_ES
+            + "\n\n=== OVERRIDE LINGUA (PRIORITÀ MASSIMA) ===\n"
+            "Scrivi ASSOLUTAMENTE TUTTO l'output in ITALIANO (mai in spagnolo). Dai del tu al "
+            "proprietario. Ignora l'istruzione precedente 'español de España': la lingua è l'ITALIANO."
         )
-        + original_abc_text.strip()
-    )
+    else:
+        system_prompt = ABC_EXPLAINED_SYSTEM_PROMPT_ES
+
+    if lang_norm == "en":
+        _intro = ("Here is the technical ABC analysis to translate to plain language for the dog's owner. "
+                  "Apply your strict rules and the 4-paragraph structure:\n\n")
+    elif lang_norm == "it":
+        _intro = ("Ecco l'analisi ABC tecnica da tradurre in linguaggio semplice per il proprietario del "
+                  "cane. Applica le tue regole e la struttura in 4 paragrafi, e scrivi TUTTO in italiano:\n\n")
+    else:
+        _intro = ("Aquí tienes el análisis ABC técnico que debes traducir a lenguaje sencillo para el dueño del perro. "
+                  "Aplica tus reglas duras y la estructura de 4 párrafos:\n\n")
+    user_message = _intro + original_abc_text.strip()
 
     response = client.messages.create(
         model=settings.avatar_model,  # Haiku 4.5 (mismo modelo que Plan Sencillo y Aigents)

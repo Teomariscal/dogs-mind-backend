@@ -89,7 +89,15 @@ def apply_cognitive_reexpression(
         '"""'
     )
 
+    # Política (decisión founder 2026-07-08): la lista negra NO es fatal. Reintentamos
+    # para MINIMIZAR términos ABA colados, pero si tras los intentos alguno sobrevive
+    # (no hay traducción cognitiva para ese término), se DEVUELVE igualmente el texto
+    # con el término dentro — se irán filtrando/ampliando el glosario con el tiempo.
+    # Solo se lanza (→ refund) si NO hay ninguna re-expresión utilizable (fallo real).
+    best_output: Optional[str] = None
+    best_hits: list[str] = []
     last_hits: list[str] = []
+
     for attempt in range(1, MAX_ATTEMPTS + 1):
         user_message = base_user_message
         if last_hits:
@@ -114,15 +122,11 @@ def apply_cognitive_reexpression(
                 ],
                 messages=[{"role": "user", "content": user_message}],
             )
-        except Exception as e:
-            if attempt == MAX_ATTEMPTS:
-                raise CognitiveReexpressionError(f"LLM call failed: {e}") from e
+        except Exception:
             continue
 
+        # Un truncado no es utilizable como salida final, pero no es fatal por sí solo.
         if getattr(response, "stop_reason", None) == "max_tokens":
-            last_hits = []
-            if attempt == MAX_ATTEMPTS:
-                raise CognitiveReexpressionError("Cognitive re-expression truncated.")
             continue
 
         out = ""
@@ -130,18 +134,28 @@ def apply_cognitive_reexpression(
             if block.type == "text":
                 out += block.text
         out = out.strip()
-
         if not out:
-            if attempt == MAX_ATTEMPTS:
-                raise CognitiveReexpressionError("Cognitive re-expression returned empty.")
             continue
 
         hits = find_blacklisted(out)
         if not hits:
-            return out
+            return out  # limpio → mejor caso
+
+        # Guardamos el intento con MENOS términos colados como respaldo.
+        if best_output is None or len(hits) < len(best_hits):
+            best_output, best_hits = out, hits
         last_hits = hits
 
+    if best_output is not None:
+        # Salió con algún término ABA que no tiene traducción todavía: se entrega igual.
+        import logging
+        logging.getLogger("italian_cognitive").warning(
+            "Cognitive output shipped with residual behavioral terms (to filter): %s",
+            ", ".join(best_hits),
+        )
+        return best_output
+
+    # Ninguna re-expresión utilizable (todos los intentos fallaron/truncaron/vacíos).
     raise CognitiveReexpressionError(
-        "Cognitive re-expression still contained forbidden behavioral terms after "
-        f"{MAX_ATTEMPTS} attempts: {', '.join(last_hits)}"
+        f"Cognitive re-expression produced no usable output after {MAX_ATTEMPTS} attempts."
     )

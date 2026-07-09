@@ -76,9 +76,11 @@ class Settings(BaseSettings):
     # Vía COGNITIVISTA italiana (Deploy 2). Motor ABA intacto (pasada 1, invisible) +
     # pasada 2 que reescribe al marco cognitivo con la RAG B, con gate de lista negra.
     # Puertas: flag ON · lang=='it' · cuenta professional · stance=='cognitive'.
-    # Arranca APAGADO: mientras esté en false, comportamiento idéntico al actual.
+    # ACTIVO por defecto (founder 2026-07-08, para testeo de Odette). Solo afecta a la
+    # versión italiana profesional cuando el veterinario pulsa "Analisi Cognitivista";
+    # es/en y la vía conductual NO cambian. Kill-switch: IT_COGNITIVE=false en Railway.
     it_cognitive_enabled: bool = Field(
-        default=False,
+        default=True,
         validation_alias=AliasChoices("IT_COGNITIVE", "IT_COGNITIVE_ENABLED"),
     )
 

@@ -9742,6 +9742,15 @@ button:not(:disabled):active{ transform:scale(0.98); }
       </div>
 
       <!-- submit -->
+      <!-- STANCE (solo versión italiana): el veterinario elige el enfoque del análisis.
+           behavioral = motor ABA · cognitive = lectura cognitivo-zooantropológica. -->
+      <div id="stance-selector" style="display:none;margin-top:18px;">
+        <div style="font-size:12px;color:var(--grey);text-align:center;margin-bottom:8px;">Approccio dell'analisi</div>
+        <div style="display:flex;gap:10px;">
+          <button type="button" id="stance-behavioral" onclick="setStance('behavioral')" style="flex:1;padding:12px;border-radius:14px;border:2px solid var(--green2);background:var(--green2);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Analisi ABA</button>
+          <button type="button" id="stance-cognitive" onclick="setStance('cognitive')" style="flex:1;padding:12px;border-radius:14px;border:2px solid var(--green2);background:transparent;color:var(--green2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Analisi Cognitivista</button>
+        </div>
+      </div>
       <!-- Cost notice (#10): el usuario ve coste ANTES de comprometer el click.
            Texto cambia a "4 tokens" cuando hay vídeo adjunto (ver setVideoAttachedUI). -->
       <div id="analyze-cost-notice" style="font-size:11px;color:var(--grey);text-align:center;margin-top:14px;margin-bottom:2px;" data-i18n="analyze_cost_notice">Este análisis consume 3 tokens</div>
@@ -11269,6 +11278,7 @@ function goTo(id) {
   document.getElementById(id).classList.add('active');
   if (id === 's-records') { renderRecords(); syncBackendCases(); if (typeof reconcileOrphanCases === 'function') reconcileOrphanCases(); }
   if (id === 's-anamnesis' && typeof maybeShowAnamResumeCard === 'function') maybeShowAnamResumeCard();
+  if (id === 's-anamnesis' && typeof refreshStanceSelector === 'function') refreshStanceSelector();
   // Pre-fill desde ficha del perro: solo activo si startConsultFromDog() lo seteó.
   // Aplica únicamente a inputs vacíos para no pisar el borrador (sistema v162).
   if (id === 's-anamnesis' && window._anamnesisPrefillFromDog) {
@@ -16091,6 +16101,33 @@ function getVal(id, fallback) {
     }
   }
 
+// ── STANCE (solo versión italiana) ──────────────────────────────────────────
+// El selector aparece únicamente con lang=='it'. En es/en nunca se muestra y el
+// backend ignora el campo → comportamiento idéntico al actual.
+window._tdmStance = window._tdmStance || 'behavioral';
+function setStance(s) {
+  window._tdmStance = (s === 'cognitive') ? 'cognitive' : 'behavioral';
+  var b = document.getElementById('stance-behavioral');
+  var c = document.getElementById('stance-cognitive');
+  var on  = 'flex:1;padding:12px;border-radius:14px;border:2px solid var(--green2);background:var(--green2);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;';
+  var off = 'flex:1;padding:12px;border-radius:14px;border:2px solid var(--green2);background:transparent;color:var(--green2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;';
+  if (b) b.style.cssText = (window._tdmStance === 'behavioral') ? on : off;
+  if (c) c.style.cssText = (window._tdmStance === 'cognitive')  ? on : off;
+}
+// Muestra u oculta el selector según el idioma actual (llamar al entrar a s-anamnesis y en applyLang).
+function refreshStanceSelector() {
+  var sel = document.getElementById('stance-selector');
+  if (!sel) return;
+  var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+  if (lang === 'it') {
+    sel.style.display = 'block';
+    setStance(window._tdmStance || 'behavioral');
+  } else {
+    sel.style.display = 'none';
+    window._tdmStance = 'behavioral';  // fuera de italiano: siempre conductual
+  }
+}
+
 async function analyzeWithAI() {
   // Análisis nuevo → ya no estamos viendo un archivo. Reseteamos flag para
   // que generateInterventionPlan regenere normalmente con la anamnesis fresca.
@@ -16256,7 +16293,8 @@ async function analyzeWithAI() {
         owner_theory:           ownerTheory,
         prior_event:            eventoPrevio,
         adopted_time_with_tutor: getVal('inp-adopted-time', ''),
-        lang:                   (window.getCurrentLang ? window.getCurrentLang() : 'es')
+        lang:                   (window.getCurrentLang ? window.getCurrentLang() : 'es'),
+        stance:                 (window._tdmStance || 'behavioral')
     };
     window._lastAnamnesisData = anamnesisPayload;
 
@@ -21101,6 +21139,7 @@ function endTourIntro() {
     _currentLang = lang;
     localStorage.setItem('dm_lang', lang);
     var t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
+    if (typeof refreshStanceSelector === 'function') refreshStanceSelector();
 
     document.querySelectorAll('[data-i18n]').forEach(function(el) {
       var key = el.getAttribute('data-i18n');

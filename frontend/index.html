@@ -1149,7 +1149,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
   margin:0;
 }
 #s-plan-simple .pp-body, #s-abc-translated .pp-body{
-  flex:1;overflow-y:auto;
+  flex:1;overflow-y:auto;min-height:0;
   padding:18px 16px 8px;
 }
 #s-plan-simple .pp-loading-text, #s-abc-translated .pp-loading-text{
@@ -8680,7 +8680,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
   </div>
 
   <!-- ══ S-PLAN-SIMPLE: Plan accesible Pet Owners (Haiku 4.5) ══ -->
-  <div id="s-plan-simple" class="screen" style="overflow-y:auto;">
+  <div id="s-plan-simple" class="screen">
     <!-- Header sticky -->
     <div class="pp-header">
       <button onclick="goTo('s-tracking')" class="pp-back" aria-label="Volver">&#8592;</button>
@@ -8743,7 +8743,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
   </div><!-- /s-abc-explained -->
 
   <!-- ══ S-ABC-TRANSLATED: versión accesible del análisis ABC (Cecilia te explica · Haiku 4.5 · 0,1 tok.) ══ -->
-  <div id="s-abc-translated" class="screen" style="overflow-y:auto;">
+  <div id="s-abc-translated" class="screen">
     <!-- Header sticky -->
     <div class="pp-header">
       <button onclick="goTo('s-abc')" class="pp-back" aria-label="Volver">&#8592;</button>

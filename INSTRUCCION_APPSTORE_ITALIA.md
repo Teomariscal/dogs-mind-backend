@@ -10,7 +10,7 @@
 
 ## Alcance por idioma (IMPORTANTE)
 - **Diseño (encabezados premium + guiones markdown fuera):** AGNÓSTICO DE IDIOMA → aplica a **es, en, it** por igual, en análisis Y plan (comparten `markdownToHtml`, líneas ~15962/16067/16638; también afecta respuestas del chat).
-- **Heros:** en **todos los idiomas**. Análisis (`s-full-analysis`) = `full-analysis-hero.jpg` (B&W, nuevo). Plan de intervención (`s-tracking`) = `assets/images/img-16.webp` (ya existía). Ambas pantallas con hero.
+- **Hero (todos los idiomas):** el hero nuevo B&W (`full-analysis-hero.jpg`) va SOLO en el **plan de intervención** (`s-tracking`), alto 210px `object-position:center 42%`. El **análisis** (`s-full-analysis`) NO lleva hero. (Cambio founder 2026-07-09: el hero nuevo solo en el plan.)
 - **Vía cognitivista + selector de postura:** SOLO `lang=='it'` (gate deliberado). es/en no lo ven.
 - **Idioma es→it (plan-simple/spiega, strings de carga/vacío):** afecta a la salida en italiano; es/en intactos.
 

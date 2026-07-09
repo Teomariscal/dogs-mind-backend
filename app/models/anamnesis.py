@@ -102,6 +102,10 @@ class AnamnesisInput(BaseModel):
 
     # UI language — controls the language of the AI analysis output
     lang: Optional[str] = Field("es", description="Response language: 'es' (Spanish) or 'en' (English)")
+    # Postura de análisis. Solo operativa en la versión ITALIANA profesional con el
+    # flag IT_COGNITIVE encendido; en cualquier otro caso se ignora y manda el motor ABA.
+    # 'behavioral' (defecto) = salida ABA. 'cognitive' = pasada 2 cognitivo-zooantropológica.
+    stance: Optional[str] = Field("behavioral", description="Analysis stance: 'behavioral' or 'cognitive'")
 
 
 class RetrievedChunk(BaseModel):

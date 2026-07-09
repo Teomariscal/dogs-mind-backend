@@ -73,6 +73,15 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices("IT_ZOO_VENEER", "IT_ZOO_VENEER_ENABLED"),
     )
 
+    # Vía COGNITIVISTA italiana (Deploy 2). Motor ABA intacto (pasada 1, invisible) +
+    # pasada 2 que reescribe al marco cognitivo con la RAG B, con gate de lista negra.
+    # Puertas: flag ON · lang=='it' · cuenta professional · stance=='cognitive'.
+    # Arranca APAGADO: mientras esté en false, comportamiento idéntico al actual.
+    it_cognitive_enabled: bool = Field(
+        default=False,
+        validation_alias=AliasChoices("IT_COGNITIVE", "IT_COGNITIVE_ENABLED"),
+    )
+
 
 @lru_cache
 def get_settings() -> Settings:

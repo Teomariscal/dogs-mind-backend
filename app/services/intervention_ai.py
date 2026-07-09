@@ -16,6 +16,7 @@ from app.core.prompts.intervention import INTERVENTION_SYSTEM_PROMPT
 from app.core.prompts.petowner_intervention import PETOWNER_INTERVENTION_SYSTEM_PROMPT
 from app.models.intervention import InterventionRequest, InterventionResponse
 from app.services.italian_veneer import maybe_apply_italian_veneer
+from app.services.italian_cognitive import cognitive_path_applies, apply_cognitive_reexpression
 
 
 def run_intervention_plan(request: InterventionRequest, account_type=None) -> InterventionResponse:
@@ -142,11 +143,17 @@ Follow the output format defined in your instructions exactly. Produce the full 
         )
         plan_text = plan_text.rstrip() + _legend
 
-    # Versión italiana: SEGUNDA PASADA (guiño zooantropológico) SOLO si flag+it+professional.
-    # Aditiva; si no aplica devuelve el plan ABA/LIMA puro idéntico.
-    plan_text = maybe_apply_italian_veneer(
-        plan_text, lang=lang, account_type=account_type, kind="intervention"
-    )
+    # ── PASADA 2 (solo italiano) — ver nota en clinical_ai.py ────────────────
+    # El plan de arriba es el ABA/LIMA CONGELADO. Vía cognitivista (botón) → re-expresión
+    # con RAG B + gate de lista negra (si falla, lanza → refund; nunca degrada a ABA).
+    # Vía conductual → guiño zooantropológico aditivo (comportamiento previo).
+    if cognitive_path_applies(lang=lang, account_type=account_type, stance=a.stance):
+        _query = " ".join(p for p in [a.problem_description, a.when_it_happens, a.breed] if p)
+        plan_text = apply_cognitive_reexpression(plan_text, query=_query, kind="intervention")
+    else:
+        plan_text = maybe_apply_italian_veneer(
+            plan_text, lang=lang, account_type=account_type, kind="intervention"
+        )
 
     cache_hit = (response.usage.cache_read_input_tokens or 0) > 0
 

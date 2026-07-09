@@ -23,6 +23,7 @@ from app.core.prompts.petowner_clinical import PETOWNER_CLINICAL_SYSTEM_PROMPT
 from app.models.anamnesis import AnamnesisInput, AnalysisResponse, RetrievedChunk
 from app.services.rag import retrieve, build_rag_context_block, build_anamnesis_block
 from app.services.italian_veneer import maybe_apply_italian_veneer
+from app.services.italian_cognitive import cognitive_path_applies, apply_cognitive_reexpression
 
 
 def _build_query_from_anamnesis(anamnesis: AnamnesisInput) -> str:
@@ -219,12 +220,21 @@ analysis. Follow the output format defined in your instructions exactly.
         )
         analysis_text = analysis_text.rstrip() + _legend
 
-    # Versión italiana: SEGUNDA PASADA (guiño zooantropológico) SOLO si flag+it+professional.
-    # Aditiva; si no aplica devuelve el ABA puro de arriba idéntico. El motor (pasada 1)
-    # se generó SIN zooantropología → el guiño no puede haber corrompido la ciencia.
-    analysis_text = maybe_apply_italian_veneer(
-        analysis_text, lang=lang, account_type=account_type, kind="analysis"
-    )
+    # ── PASADA 2 (solo italiano) ─────────────────────────────────────────────
+    # El texto de arriba es el MOTOR ABA CONGELADO (pasada 1). Dos caminos excluyentes:
+    #  (a) vía COGNITIVISTA (botón del veterinario + flag + it + professional):
+    #      re-expresión integral al marco cognitivo con la RAG B y gate de lista negra.
+    #      Si falla, LANZA → el endpoint hace refund. NUNCA se degrada al texto ABA:
+    #      el veterinario italiano no puede ver léxico conductual ni por accidente.
+    #  (b) vía conductual: guiño zooantropológico aditivo (comportamiento previo).
+    if cognitive_path_applies(lang=lang, account_type=account_type, stance=anamnesis.stance):
+        analysis_text = apply_cognitive_reexpression(
+            analysis_text, query=query, kind="analysis"
+        )
+    else:
+        analysis_text = maybe_apply_italian_veneer(
+            analysis_text, lang=lang, account_type=account_type, kind="analysis"
+        )
 
     cache_hit = (response.usage.cache_read_input_tokens or 0) > 0
 

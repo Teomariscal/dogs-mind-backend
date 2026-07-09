@@ -9468,6 +9468,16 @@ button:not(:disabled):active{ transform:scale(0.98); }
         </div>
       </div>
 
+      <!-- STANCE (solo versión italiana): primera elección — enfoque del análisis.
+           behavioral = motor ABA · cognitive = lectura cognitivo-zooantropológica. -->
+      <div id="stance-selector" style="display:none;margin-bottom:22px;padding-bottom:20px;border-bottom:1px solid rgba(0,0,0,0.08);">
+        <div style="font-size:10px;font-weight:700;color:var(--green2);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;">Approccio dell'analisi</div>
+        <div style="display:flex;gap:10px;">
+          <button type="button" id="stance-behavioral" onclick="setStance('behavioral')" style="flex:1;padding:14px 10px;border-radius:14px;border:2px solid var(--green2);background:var(--green2);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Analisi ABA</button>
+          <button type="button" id="stance-cognitive" onclick="setStance('cognitive')" style="flex:1;padding:14px 10px;border-radius:14px;border:2px solid var(--green2);background:transparent;color:var(--green2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Analisi Cognitivista</button>
+        </div>
+      </div>
+
       <!-- analisis basado en -->
       <div>
         <div style="font-size:10px;font-weight:700;color:var(--grey);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px;" data-i18n="anam_basedon">An&aacute;lisis basado en</div>
@@ -9742,15 +9752,6 @@ button:not(:disabled):active{ transform:scale(0.98); }
       </div>
 
       <!-- submit -->
-      <!-- STANCE (solo versión italiana): el veterinario elige el enfoque del análisis.
-           behavioral = motor ABA · cognitive = lectura cognitivo-zooantropológica. -->
-      <div id="stance-selector" style="display:none;margin-top:18px;">
-        <div style="font-size:12px;color:var(--grey);text-align:center;margin-bottom:8px;">Approccio dell'analisi</div>
-        <div style="display:flex;gap:10px;">
-          <button type="button" id="stance-behavioral" onclick="setStance('behavioral')" style="flex:1;padding:12px;border-radius:14px;border:2px solid var(--green2);background:var(--green2);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Analisi ABA</button>
-          <button type="button" id="stance-cognitive" onclick="setStance('cognitive')" style="flex:1;padding:12px;border-radius:14px;border:2px solid var(--green2);background:transparent;color:var(--green2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Analisi Cognitivista</button>
-        </div>
-      </div>
       <!-- Cost notice (#10): el usuario ve coste ANTES de comprometer el click.
            Texto cambia a "4 tokens" cuando hay vídeo adjunto (ver setVideoAttachedUI). -->
       <div id="analyze-cost-notice" style="font-size:11px;color:var(--grey);text-align:center;margin-top:14px;margin-bottom:2px;" data-i18n="analyze_cost_notice">Este análisis consume 3 tokens</div>

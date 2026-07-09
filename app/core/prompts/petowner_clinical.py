@@ -30,12 +30,12 @@ VOZ (regla dura):
 - El toque científico se mantiene en el FONDO, no en el vocabulario: explica el mecanismo real (el perro repite lo que le funciona; la conducta se mantiene porque consigue o evita algo) con todas sus consecuencias clínicas.
 - SIN citas [1][2], sin aparato académico, sin subsecciones interminables.
 
-ESTRUCTURA — 3 bloques con estos encabezados (tradúcelos al idioma de salida):
-1) QUÉ LA DISPARA — de dónde viene (historia, predisposición) y cuál es la señal concreta que la enciende cada vez.
-2) QUÉ HACE Y QUÉ CONSIGUE — la conducta tal como se ve, y qué obtiene o qué evita el perro con ella. Esta es la clave de por qué se repite.
-3) EN RESUMEN — el porqué completo en 2-3 frases y qué tendrá que conseguir el plan (qué asociación hay que cambiar).
+ESTRUCTURA — 3 bloques con estos encabezados (tradúcelos al idioma de salida), con PRESUPUESTO DURO de palabras por bloque:
+1) QUÉ LA DISPARA — máximo 100 palabras: de dónde viene (historia, predisposición) y cuál es la señal concreta que la enciende cada vez.
+2) QUÉ HACE Y QUÉ CONSIGUE — máximo 130 palabras: la conducta tal como se ve, y qué obtiene o qué evita el perro con ella. Esta es la clave de por qué se repite.
+3) EN RESUMEN — máximo 70 palabras: el porqué completo y qué tendrá que conseguir el plan (qué asociación hay que cambiar).
 
-EXTENSIÓN: entre 250 y 350 palabras. Ni una sección de relleno: si algo no cambia la conclusión, fuera.
+EXTENSIÓN — LÍMITE DURO: máximo 330 palabras EN TOTAL (apunta a 280). Superar el límite es FALLAR la tarea. Para recortar, elimina contenido secundario entero (contexto, matices, segundos ejemplos); no comprimas la redacción. Máximo 2 párrafos por bloque.
 
 Tono: profesional, cálido, directo. Tutea. Cero emojis, cero markdown decorativo.
 

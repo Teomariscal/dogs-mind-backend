@@ -14166,10 +14166,14 @@ function _pendingAnalysisView() {
   window._lastAnamnesisData = p.anamnesis || null;
   window._lastAnalysisText  = p.analysisText || '';
   window._lastDogName       = p.dogName || (p.anamnesis && p.anamnesis.dog_name) || '';
+  window._tdmStance = (p.anamnesis && p.anamnesis.stance) ||
+    (/evocator|motivazional|lettura cognitiv|attività emendativ|profilo rappresentazional/i.test(p.analysisText || '')
+      ? 'cognitive' : 'behavioral');
   try {
     fillABCScreen(window._lastDogName, p.analysisText, p.sources || []);
   } catch(e) { /* si fillABCScreen falla, no perdemos el dato — sigue en localStorage */ }
-  goTo('s-abc');
+  if (window._tdmStance === 'cognitive') { goTo('s-full-analysis'); }
+  else { goTo('s-abc'); }
 }
 
 // "Descartar": confirmación suave y borrar la clave. El usuario asume la pérdida.
@@ -15053,6 +15057,13 @@ function getVal(id, fallback) {
     window._loadedFromArchive = true;
     window._lastArchiveCaseId = r.backend_case_id || null;
 
+    // Postura del caso: si el record la guardó, la usamos; si no (casos antiguos),
+    // la deducimos del texto (marcadores cognitivo-zooantropológicos). Determina si
+    // se muestra la pantalla ABC (conductual) o se va directo al análisis (cognitivo).
+    window._tdmStance = r.stance ||
+      (/evocator|motivazional|lettura cognitiv|attività emendativ|profilo rappresentazional/i.test(r.analysis || '')
+        ? 'cognitive' : 'behavioral');
+
     // Repoblar s-abc con el análisis archivado (función ya existente)
     if (typeof fillABCScreen === 'function' && r.analysis) {
       try { fillABCScreen(r.dog_name || 'Sin nombre', r.analysis, []); } catch(e) {}
@@ -15066,10 +15077,10 @@ function getVal(id, fallback) {
       _hydrateArchivedCase(r.backend_case_id, r.id);
     }
 
-    // Navegar al análisis funcional. Desde aquí el usuario tiene los flows
-    // habituales: "Análisis completo →", "Ver Plan de Intervención",
-    // "Chat con Cecilia" — todos siguen funcionando con el caso cargado.
-    goTo('s-abc');
+    // Navegar al análisis funcional. Cognitivo → directo al análisis completo
+    // (sin pantalla ABC, andamiaje conductual); conductual → pantalla ABC de siempre.
+    if (window._tdmStance === 'cognitive') { goTo('s-full-analysis'); }
+    else { goTo('s-abc'); }
   }
   window.openRecord = openRecord;
 

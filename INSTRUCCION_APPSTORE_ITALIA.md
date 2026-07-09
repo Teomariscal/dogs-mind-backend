@@ -8,6 +8,12 @@
 - **Backend YA desplegado en Railway** (git push): `plan_simple_ai.py` + `abc_explained_ai.py` con rama italiana, vía cognitivista (`IT_COGNITIVE` default ON, gateado a it+professional+stance=cognitive). NO hay que tocar backend.
 - El frontend vivo (web, SW v213) = git `main` HEAD (`e363d9f`). Están commiteados. El working tree debe estar limpio.
 
+## Alcance por idioma (IMPORTANTE)
+- **Diseño (encabezados premium + guiones markdown fuera):** AGNÓSTICO DE IDIOMA → aplica a **es, en, it** por igual, en análisis Y plan (comparten `markdownToHtml`, líneas ~15962/16067/16638; también afecta respuestas del chat).
+- **Heros:** en **todos los idiomas**. Análisis (`s-full-analysis`) = `full-analysis-hero.jpg` (B&W, nuevo). Plan de intervención (`s-tracking`) = `assets/images/img-16.webp` (ya existía). Ambas pantallas con hero.
+- **Vía cognitivista + selector de postura:** SOLO `lang=='it'` (gate deliberado). es/en no lo ven.
+- **Idioma es→it (plan-simple/spiega, strings de carga/vacío):** afecta a la salida en italiano; es/en intactos.
+
 ## Qué cambios entran en el build (todos ya en git main)
 1. **Vía cognitivista italiana**: selector "Analisi ABA / Analisi Cognitivista" al inicio de `s-anamnesis` (solo `lang=='it'`), envía `stance` en `/analysis`, `/analysis/video`, `/intervention`. Cognitivo salta la pantalla ABC → directo a `s-full-analysis`; reabrir caso cognitivo también (deduce postura del texto). Commits `a708f18`, `b6c70bf`, `f1bc801`, `0123493`, `f69af21`.
 2. **Hero visual** `frontend/full-analysis-hero.jpg` (1600×1066) al inicio de todos los análisis completos, alto 210px. Commit `7d4a9a1`. **Verificar que el jpg está trackeado en git** (`git ls-files | grep full-analysis-hero`).

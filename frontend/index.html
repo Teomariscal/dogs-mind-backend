@@ -14432,8 +14432,8 @@ function dmApplyIosNativeUI() {
     // la suscripción mostrando un total mayor. Ocultarlo evita el descuadre.
     _hideIos('#s-pro-activate .pa-bundle-card');
     _hideIos('#s-pro-activate .pa-section-label');
-    // Beta italiana: solo web por ahora (decisión founder: italiano fuera de iOS).
-    _hideIos('#lang-it');
+    // Italiano EN iOS desde 1.0.3 (decisión founder 2026-07-09: subir la versión
+    // italiana al App Store) — gate _hideIos('#lang-it') retirado.
     var _coT = document.querySelector('#s-pro-signup [data-i18n="ps_company_title"]');
     if (_coT && _coT.closest('section')) _coT.closest('section').style.display = 'none';
     // Re-aplicar precios/textos iOS (19,99 €/año) en ambas pantallas Pro.

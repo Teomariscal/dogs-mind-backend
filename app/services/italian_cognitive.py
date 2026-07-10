@@ -18,6 +18,7 @@ DECISIÓN DEL FOUNDER: si la pasada 2 falla, NUNCA se degrada a la salida conduc
 excepción → error + refund del token.
 """
 
+import re as _re
 from typing import Optional
 
 from app.config import get_settings
@@ -27,6 +28,24 @@ from app.services.cognitive_blacklist import find_blacklisted
 from app.services.rag import retrieve_cognitive, build_rag_context_block
 
 MAX_ATTEMPTS = 3
+
+# El informe cognitivista NO debe exponer el aparato de fuentes de la pasada 1:
+# los títulos del corpus conductual ("Informe evaluación … BOCALAN", "Handbook of
+# Applied Dog Behavior"…) identifican el motor ABA ante un veterinario cognitivista
+# igual que un término prohibido (caso real: PDF de Achille 2026-07-09, sección
+# RIFERIMENTI con fuentes de la RAG A). Se elimina la sección de referencias
+# completa y las citas [n] intercaladas, de forma determinista.
+_REFS_HEADER_RX = _re.compile(
+    r"\n[#*\-–—═\s]*\s*(RIFERIMENTI|REFERENZE|BIBLIOGRAFIA|FONTI|REFERENCIAS|REFERENCES)\b[\s\S]*$",
+    _re.IGNORECASE,
+)
+_INLINE_CITES_RX = _re.compile(r"\s*\[\d+(?:\s*,\s*\d+)*\]")
+
+
+def _strip_source_apparatus(text: str) -> str:
+    text = _REFS_HEADER_RX.sub("", text)
+    text = _INLINE_CITES_RX.sub("", text)
+    return text.strip()
 
 
 class CognitiveReexpressionError(Exception):
@@ -137,6 +156,10 @@ def apply_cognitive_reexpression(
         if not out:
             continue
 
+        out = _strip_source_apparatus(out)
+        if not out:
+            continue
+
         hits = find_blacklisted(out)
         if not hits:
             return out  # limpio → mejor caso
@@ -153,7 +176,7 @@ def apply_cognitive_reexpression(
             "Cognitive output shipped with residual behavioral terms (to filter): %s",
             ", ".join(best_hits),
         )
-        return best_output
+        return _strip_source_apparatus(best_output)
 
     # Ninguna re-expresión utilizable (todos los intentos fallaron/truncaron/vacíos).
     raise CognitiveReexpressionError(

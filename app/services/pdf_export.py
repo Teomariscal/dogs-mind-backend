@@ -71,6 +71,60 @@ DISCLAIMER_TEXT = (
     "conductas autolesivas u otros riesgos clínicos serios)."
 )
 
+# ── i18n del chrome del PDF (fix 2026-07-09: informe italiano salía con
+# disclaimer/página/títulos en español — la "extraña mezcla" del caso Achille).
+# El idioma sale de case.lang; fallback es (comportamiento previo intacto).
+_PDF_I18N = {
+    "es": {
+        "disclaimer": DISCLAIMER_TEXT,
+        "page": "Página",
+        "abc_title": "Análisis funcional ABC",
+        "plan_title": "Plan de intervención",
+        "doc_title": "Informe",
+    },
+    "en": {
+        "disclaimer": (
+            "This report was generated with AI assistance within The Dogs Mind "
+            "app. It does not replace an in-person consultation with a qualified "
+            "veterinary or behavior professional when the case requires it "
+            "(aggression, biting, self-injurious behavior or other serious "
+            "clinical risks)."
+        ),
+        "page": "Page",
+        "abc_title": "Functional analysis (ABC)",
+        "plan_title": "Intervention plan",
+        "doc_title": "Report",
+    },
+    "it": {
+        "disclaimer": (
+            "Questo report è stato generato con l'assistenza dell'IA all'interno "
+            "dell'app The Dogs Mind. Non sostituisce la consulenza in presenza di "
+            "un medico veterinario qualificato quando il caso lo richieda "
+            "(aggressione, morsi, condotte autolesive o altri rischi clinici seri)."
+        ),
+        "page": "Pagina",
+        "abc_title": "Analisi funzionale ABC",
+        "plan_title": "Piano d'intervento",
+        "doc_title": "Report",
+    },
+}
+
+# Vía cognitivista italiana: el PDF no puede nombrar "ABC" ni marco conductual.
+# Se detecta por el léxico del propio contenido (mismo criterio que el frontend).
+_COGNITIVE_RX = re.compile(
+    r"evocator|lettura cognitiv|profilo rappresentazional|attività emendativ|zooantropolog",
+    re.IGNORECASE,
+)
+
+
+def _pdf_strings(case: Case, abc_md: Optional[str] = None) -> dict:
+    lang = ((getattr(case, "lang", None) or "es")[:2]).lower()
+    s = dict(_PDF_I18N.get(lang, _PDF_I18N["es"]))
+    if lang == "it" and abc_md and _COGNITIVE_RX.search(abc_md):
+        s["abc_title"] = "Report clinico"
+        s["plan_title"] = "Progetto educativo"
+    return s
+
 _LOGO_TDM_PATH = os.path.join(os.path.dirname(__file__), "..", "static", "logo-tdm.png")
 
 
@@ -225,6 +279,8 @@ def _draw_header_footer(
     report_date: str,
     company_name: Optional[str],
     company_logo_image: Optional[Image],
+    disclaimer_text: str = DISCLAIMER_TEXT,
+    page_label: str = "Página",
 ):
     canvas.saveState()
 
@@ -282,7 +338,7 @@ def _draw_header_footer(
     canvas.setFont("Helvetica-Oblique", 7.5)
     # Wrap manual del disclaimer (texto fijo, ancho conocido)
     disclaimer_lines = _wrap_text_for_canvas(
-        canvas, DISCLAIMER_TEXT,
+        canvas, disclaimer_text,
         font="Helvetica-Oblique", size=7.5,
         max_width=page_w - 2 * PAGE_MARGIN,
     )
@@ -294,7 +350,7 @@ def _draw_header_footer(
     canvas.setFont("Helvetica", 8)
     canvas.drawRightString(
         page_w - PAGE_MARGIN, PAGE_MARGIN * 0.6,
-        f"Página {doc.page}",
+        f"{page_label} {doc.page}",
     )
 
     canvas.restoreState()
@@ -375,6 +431,7 @@ def build_case_pdf(case: Case, user: User, db: Session) -> bytes:
     styles      = _build_styles()
     dog_label   = _resolve_dog_label(case, db)
     report_date = datetime.utcnow().strftime("%d/%m/%Y")
+    strings     = _pdf_strings(case, abc_md)
     company_name  = user.company_name if user.account_type == "professional" else None
     company_logo  = (
         _decode_logo_data_url(user.company_logo_base64)
@@ -389,7 +446,7 @@ def build_case_pdf(case: Case, user: User, db: Session) -> bytes:
         leftMargin=PAGE_MARGIN, rightMargin=PAGE_MARGIN,
         topMargin=PAGE_MARGIN + LOGO_SIZE + 0.6 * cm,    # deja sitio a header
         bottomMargin=PAGE_MARGIN + 1.8 * cm,             # deja sitio a footer
-        title=f"Informe — {dog_label} — {report_date}",
+        title=f"{strings['doc_title']} — {dog_label} — {report_date}",
         author="The Dogs Mind",
     )
     frame = Frame(
@@ -404,17 +461,19 @@ def build_case_pdf(case: Case, user: User, db: Session) -> bytes:
             report_date=report_date,
             company_name=company_name,
             company_logo_image=company_logo,
+            disclaimer_text=strings["disclaimer"],
+            page_label=strings["page"],
         )
 
     doc.addPageTemplates([PageTemplate(id="default", frames=[frame], onPage=_on_page)])
 
     story: List = []
-    story.append(Paragraph("Análisis funcional ABC", styles["section_title"]))
+    story.append(Paragraph(strings["abc_title"], styles["section_title"]))
     story.append(HRFlowable(width="100%", thickness=0.5, color=TDM_COLOR_GREEN, spaceAfter=8))
     story.extend(markdown_to_flowables(abc_md, styles))
 
     story.append(PageBreak())
-    story.append(Paragraph("Plan de intervención", styles["section_title"]))
+    story.append(Paragraph(strings["plan_title"], styles["section_title"]))
     story.append(HRFlowable(width="100%", thickness=0.5, color=TDM_COLOR_GREEN, spaceAfter=8))
     story.extend(markdown_to_flowables(plan_md, styles))
 
@@ -458,6 +517,7 @@ def _build_simple_pdf(
     styles      = _build_styles()
     dog_label   = _resolve_dog_label(case, db)
     report_date = datetime.utcnow().strftime("%d/%m/%Y")
+    strings     = _pdf_strings(case, body_md)
     company_name  = user.company_name if user.account_type == "professional" else None
     company_logo  = (
         _decode_logo_data_url(user.company_logo_base64)
@@ -487,6 +547,8 @@ def _build_simple_pdf(
             report_date=report_date,
             company_name=company_name,
             company_logo_image=company_logo,
+            disclaimer_text=strings["disclaimer"],
+            page_label=strings["page"],
         )
 
     doc.addPageTemplates([PageTemplate(id="default", frames=[frame], onPage=_on_page)])

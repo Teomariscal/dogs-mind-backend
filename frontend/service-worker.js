@@ -1,3 +1,4 @@
+// v218 (intro del plan: OCULTA en vía cognitivista — stance='cognitive', ningún idioma; regla founder 2026-07-10: no suscribir el análisis funcional — y localizada es/en/it en vía conductual vía _ivIntroHtml())
 // v217 (títulos informe Opción 1 Editorial: serif caja normal + Title Case anti-gritos + tick cyan corto + h3 teal AA — markdownToHtml, todos los idiomas, análisis y plan. Elegido por founder+skill diseño 2026-07-09)
 // v216 (Exterminio del Cream completado: s-dog-profile, s-seguimiento, s-daily-followup y s-refine a vibrant emerald + burbuja usuario refine verde; labels dentro de cards blancas conservan color oscuro. 2026-07-09)
 // v215 (italiano EN iOS: retirado el gate del boton IT en dmApplyIosNativeUI para build 23/v1.0.3 — sin efecto en web, 2026-07-09)
@@ -24,7 +25,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v217';
+const CACHE_NAME = 'dogs-mind-v218';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

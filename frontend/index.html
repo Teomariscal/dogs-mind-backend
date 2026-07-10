@@ -16051,6 +16051,24 @@ function getVal(id, fallback) {
     }, 300);
   }
 
+  // Recuadro de introducción del plan. REGLA (founder 2026-07-10): en la vía
+  // cognitivista (stance='cognitive') NO se muestra en ningún idioma — el
+  // texto suscribe el análisis funcional y contradice ese enfoque. En la vía
+  // conductual se muestra localizado (es/en/it).
+  function _ivIntroHtml() {
+    if ((window._tdmStance || '') === 'cognitive') return '';
+    var L = (typeof window.getCurrentLang === 'function') ? window.getCurrentLang() : 'es';
+    var txt = (L === 'en')
+      ? 'Below, based on the functional analysis performed by the AI trained by Teo Mariscal and a team of the world\'s leading ethologists taking part in this project, our recommendation is:'
+      : (L === 'it')
+      ? 'Di seguito, sulla base dell\'analisi funzionale realizzata dall\'IA addestrata da Teo Mariscal e da un team dei migliori etologi al mondo che partecipa a questo progetto, la nostra raccomandazione è:'
+      : 'A continuación, y en función del análisis funcional realizado por la IA entrenada por Teo Mariscal y un equipo de los mejores etólogos mundiales que participa de este proyecto, nuestra recomendación es:';
+    return '<div style="font-size:14px;line-height:1.75;color:var(--dark);margin-bottom:20px;padding:18px;border-radius:14px;border:1px solid rgba(0,0,0,0.07);position:relative;overflow:hidden;background:#fff;">' +
+        '<div style="position:absolute;inset:0;background-image:url(assets/images/img-21.webp);background-size:cover;background-position:center 30%;opacity:0.25;border-radius:14px;"></div>' +
+        '<div style="position:relative;z-index:1;">' + txt + '</div>' +
+      '</div>';
+  }
+
   // Helper que renderiza el plan ya generado en s-tracking — reutilizable
   // para casos nuevos (tras llamar API) y para casos archivados (sin API).
   function renderInterventionPlan(planText, dogName) {
@@ -16065,10 +16083,7 @@ function getVal(id, fallback) {
     if (titleEl && dogName) titleEl.textContent = 'Plan · ' + dogName;
 
     var fullHtml =
-      '<div style="font-size:14px;line-height:1.75;color:var(--dark);margin-bottom:20px;padding:18px;border-radius:14px;border:1px solid rgba(0,0,0,0.07);position:relative;overflow:hidden;background:#fff;">' +
-        '<div style="position:absolute;inset:0;background-image:url(assets/images/img-21.webp);background-size:cover;background-position:center 30%;opacity:0.25;border-radius:14px;"></div>' +
-        '<div style="position:relative;z-index:1;">A continuación, y en función del análisis funcional realizado por la IA entrenada por Teo Mariscal y un equipo de los mejores etólogos mundiales que participa de este proyecto, nuestra recomendación es:</div>' +
-      '</div>' +
+      _ivIntroHtml() +
       '<div style="background:#f7f9f5;border-left:4px solid #4a6741;border-radius:0 14px 14px 0;padding:20px 18px;margin-bottom:20px;">' +
         planHtml +
       '</div>' +
@@ -16173,10 +16188,7 @@ function getVal(id, fallback) {
 
       // Build wrapper with intro + plan + footer
       var fullHtml =
-        '<div style="font-size:14px;line-height:1.75;color:var(--dark);margin-bottom:20px;padding:18px;border-radius:14px;border:1px solid rgba(0,0,0,0.07);position:relative;overflow:hidden;background:#fff;">' +
-          '<div style="position:absolute;inset:0;background-image:url(assets/images/img-21.webp);background-size:cover;background-position:center 30%;opacity:0.25;border-radius:14px;"></div>' +
-          '<div style="position:relative;z-index:1;">A continuación, y en función del análisis funcional realizado por la IA entrenada por Teo Mariscal y un equipo de los mejores etólogos mundiales que participa de este proyecto, nuestra recomendación es:</div>' +
-        '</div>' +
+        _ivIntroHtml() +
 
         '<div style="background:#f7f9f5;border-left:4px solid #4a6741;border-radius:0 14px 14px 0;padding:20px 18px;margin-bottom:20px;">' +
           planHtml +

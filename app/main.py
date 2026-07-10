@@ -258,7 +258,8 @@ _ALLOWED_ORIGINS = [
     "https://thedogsmindbeta.netlify.app",   # staging (Netlify URL, legacy)
     "capacitor://localhost",                 # iOS app (Capacitor WebView)
     "ionic://localhost",                     # iOS app (alt scheme legacy)
-    "http://localhost",                      # Android app (Capacitor WebView)
+    "http://localhost",                      # Android app (Capacitor WebView, androidScheme http)
+    "https://localhost",                     # Android app (Capacitor WebView, androidScheme https — default Capacitor 6+)
     "http://localhost:3000",                 # local dev
     "http://localhost:8000",                 # local FastAPI
 ]

@@ -27,6 +27,7 @@ from app.core.prompts.training_consult import (
     TRAINING_CONSULT_PROMPT_ES,
     TRAINING_CONSULT_PROMPT_EN,
 )
+from app.core.prompts.petowner_training_overlay import PETOWNER_TRAINING_VOICE_OVERLAY
 from app.services.rag import retrieve, build_rag_context_block
 from app.models.anamnesis import RetrievedChunk
 
@@ -188,6 +189,7 @@ def generate_training_consult(
     context: str,
     uses_clicker: bool,
     lang: str = "es",
+    audience: str = "professional",
 ) -> TrainingConsultResult:
     """
     Pipeline:
@@ -207,6 +209,11 @@ def generate_training_consult(
         TRAINING_CONSULT_PROMPT_EN if lang_norm == "en"
         else TRAINING_CONSULT_PROMPT_ES
     )
+    # Particular (Pet Owner): misma estructura y rigor, VOZ en llano.
+    # Overlay aditivo — el prompt Pro no se toca (founder 2026-07-11).
+    is_petowner = (audience or "professional").lower() != "professional"
+    if is_petowner:
+        system_prompt = system_prompt + PETOWNER_TRAINING_VOICE_OVERLAY
 
     # ── 1. RAG retrieval ────────────────────────────────────────────────────
     query = _build_rag_query(
@@ -264,6 +271,31 @@ def generate_training_consult(
             "anclar el análisis y el plan. Sigue exactamente la estructura "
             "definida en tu system prompt. Tono técnico estricto."
         )
+
+    # Pet Owner: el cierre no debe pedir "tono técnico estricto" (contradice
+    # el overlay de voz) ni citas visibles.
+    if is_petowner:
+        if lang_norm == "en":
+            closing = (
+                "Use the retrieved knowledge above to anchor the analysis and "
+                "plan (do NOT show [n] citations in the output). Follow the "
+                "response structure defined in your system prompt exactly. "
+                "Plain, clear voice as defined in the PET OWNER voice override."
+            )
+        elif lang_norm == "it":
+            closing = (
+                "Usa la letteratura recuperata sopra per ancorare l'analisi e "
+                "il piano (NON mostrare citazioni [n] nell'output). Segui la "
+                "struttura definita nel tuo system prompt. Voce piana e chiara "
+                "come definito nell'override PET OWNER."
+            )
+        else:
+            closing = (
+                "Usa la literatura recuperada arriba para anclar el análisis y "
+                "el plan (NO muestres citas [n] en el output). Sigue la "
+                "estructura definida en tu system prompt. Voz llana y clara "
+                "según el override PET OWNER."
+            )
 
     user_text = (
         f"{lang_instruction}\n\n"

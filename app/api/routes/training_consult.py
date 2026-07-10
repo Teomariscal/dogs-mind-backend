@@ -47,12 +47,15 @@ _log = logging.getLogger(__name__)
 router = APIRouter(prefix="/training-analysis", tags=["training-consult"])
 
 
-# Coste tokens (igual que /analysis ABC clínico, decisión founder 2026-05-29).
-TRAINING_CONSULT_TOKEN_COST = 3.0
+# Coste tokens. Decisión founder 2026-07-11: 1,5 tokens (la mitad del análisis
+# clínico) porque es UN solo paso — no hay análisis funcional previo, va directo
+# al plan. Gasto real medido: ~0,039 €/consulta (cfo-report) → margen ~97%.
+TRAINING_CONSULT_TOKEN_COST = 1.5
 
-# Audiencia. Fase 2.0 = solo Pro. Para abrir a todos en Fase 2.1, basta cambiar
-# la env var TRAINING_CONSULT_AUDIENCE a "all" en Railway. Cero redeploy.
-TRAINING_CONSULT_AUDIENCE = (os.environ.get("TRAINING_CONSULT_AUDIENCE", "pro_only")).lower().strip()
+# Audiencia. Fase 2.1 (founder 2026-07-11): abierto a TODOS (particular incluido,
+# con prompt en tono llano Pet Owner). La env var TRAINING_CONSULT_AUDIENCE
+# permite volver a "pro_only" en Railway sin redeploy.
+TRAINING_CONSULT_AUDIENCE = (os.environ.get("TRAINING_CONSULT_AUDIENCE", "all")).lower().strip()
 
 
 # ── Schemas Pydantic ──────────────────────────────────────────────────────
@@ -157,6 +160,7 @@ def create_training_consult(
             context=payload.context,
             uses_clicker=payload.uses_clicker,
             lang=payload.lang,
+            audience=(user.account_type or "particular").lower(),
         )
 
         # 3. Cost tracking fire-and-forget.

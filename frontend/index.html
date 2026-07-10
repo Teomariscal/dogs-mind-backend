@@ -9346,9 +9346,9 @@ button:not(:disabled):active{ transform:scale(0.98); }
 
 
   <!-- ══ S-CONSULT-TYPE — Selector A/B Problema de conducta vs Entrenamiento específico ══
-       Solo aparece para usuarios Pro (gate frontend en goToConsultType()).
-       Si el usuario es Particular o no autenticado, "Nueva consulta" va directo
-       a s-anamnesis como hasta ahora. Decisión founder 2026-05-29 Fase 2.0.
+       Fase 2.1 (founder 2026-07-11): visible para TODOS los usuarios logueados.
+       El backend adapta el tono del plan por account_type (llano Pet Owner /
+       técnico Pro). Coste: 1,5 tokens.
   -->
   <div id="s-consult-type" class="screen">
     <button class="ct-back" onclick="goTo(window._consultTypeReturnTo || 's-home')" aria-label="Volver">&#8592;</button>
@@ -9366,7 +9366,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
       </button>
       <button class="ct-card ct-card--pro" type="button" onclick="goToTrainingConsult()">
         <span class="ct-card-arrow" aria-hidden="true">&#8594;</span>
-        <span class="ct-card-tag" data-i18n="ct_b_tag">Pro · Entrenamiento</span>
+        <span class="ct-card-tag" data-i18n="ct_b_tag">Entrenamiento</span>
         <h3 class="ct-card-title" data-i18n="ct_b_title">Entrenamiento específico</h3>
         <p class="ct-card-pitch" data-i18n="ct_b_pitch">Análisis + plan operante por fases para enseñar UN ejercicio o habilidad concreta (recall, leave-it, contacto visual…). Protocolo LIMA estricto, sin métodos aversivos.</p>
       </button>
@@ -9374,9 +9374,9 @@ button:not(:disabled):active{ transform:scale(0.98); }
   </div><!-- /s-consult-type -->
 
   <!-- ══ S-ANAMNESIS-TRAINING — Formulario 9 campos de Entrenamiento Específico ══
-       Submit llama POST /training-analysis (backend Fase 1, commit e72ec07).
-       Cobra 3 tokens (igual que /analysis ABC). Solo Pro mientras
-       TRAINING_CONSULT_AUDIENCE=pro_only (env var Railway).
+       Submit llama POST /training-analysis.
+       Cobra 1,5 tokens (founder 2026-07-11). Abierto a todos (Fase 2.1);
+       tono llano Pet Owner para particulares, técnico para Pro.
   -->
   <div id="s-anamnesis-training" class="screen" style="overflow-y:auto;">
     <header class="tc-header">
@@ -9458,7 +9458,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
         </div>
       </div>
 
-      <div class="tc-cost-notice" data-i18n="tc_cost_notice">Este análisis consume 3 tokens.</div>
+      <div class="tc-cost-notice" data-i18n="tc_cost_notice">Este análisis consume 1,5 tokens.</div>
       <!-- D-002 / 5.1.2(i): consent IA per-acción, visible en el punto de envío. -->
       <p id="tc-ai-consent" style="font-family:'Jost',sans-serif;font-size:11px;line-height:1.5;color:rgba(255,255,255,0.55);text-align:center;max-width:300px;margin:8px auto 0;" data-i18n="consent_ai_inline">Al continuar, el texto sobre tu perro se enviará a <strong>Anthropic (EE. UU.)</strong> para generar el análisis.</p>
       <p id="tc-error" class="tc-error" style="display:none;"></p>
@@ -11867,7 +11867,7 @@ async function _planSimpleFlow(rec, opts) {
       var detail = '';
       try { var ed = await res.json(); detail = ed.detail || ''; } catch(e) {}
       if (res.status === 401) { showToast(_i18nText('session_expired', 'Sesión caducada.')); goTo('s-splash'); return; }
-      if (res.status === 402) { showToast(_fmtInsufTokens(0.1)); goTo('s-tokens'); return; }
+      if (res.status === 402) { showRechargeNotice(0.1); return; }
       if (res.status === 404) { showToast(detail || _i18nText('pp_err_no_plan', 'Genera primero un plan de intervención.')); goTo('s-tracking'); return; }
       if (res.status === 429) { showToast(detail || _i18nText('pp_err_rate', 'Has alcanzado el máximo por hora.')); goTo('s-tracking'); return; }
       throw new Error('HTTP ' + res.status + ' ' + detail);
@@ -12185,7 +12185,7 @@ async function _abcExplainedFlow(rec, opts) {
       var detail = '';
       try { var ed = await res.json(); detail = ed.detail || ''; } catch(e) {}
       if (res.status === 401) { showToast(_i18nText('session_expired', 'Sesión caducada.')); goTo('s-splash'); return; }
-      if (res.status === 402) { showToast(_fmtInsufTokens(0.1)); goTo('s-tokens'); return; }
+      if (res.status === 402) { showRechargeNotice(0.1); return; }
       if (res.status === 404) { showToast(detail || _i18nText('at_err_no_abc', 'Genera primero el análisis funcional ABC.')); goTo('s-abc'); return; }
       if (res.status === 429) { showToast(detail || _i18nText('at_err_rate', 'Has alcanzado el máximo por hora.')); goTo('s-abc'); return; }
       throw new Error('HTTP ' + res.status + ' ' + detail);
@@ -12322,7 +12322,37 @@ async function _downloadAccessiblePdf(opts) {
 
     var blob = await res.blob();
 
-    // 1) Web Share API con archivo: menu nativo iOS/Android.
+    // 0) Apps nativas (Capacitor iOS/Android): los WebView NO soportan
+    //    navigator.share con archivos, ni window.open(blob), ni <a download>
+    //    (fallaban en silencio — bug founder 2026-07-10). Vía nativa:
+    //    escribir el PDF en caché con Filesystem y abrir el menú compartir
+    //    del sistema con Share (Guardar en Archivos, AirDrop, imprimir…).
+    try {
+      if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()
+          && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem && window.Capacitor.Plugins.Share) {
+        var b64 = await new Promise(function(resolve, reject) {
+          var rd = new FileReader();
+          rd.onload = function() { resolve(String(rd.result).split(',')[1] || ''); };
+          rd.onerror = function() { reject(rd.error || new Error('read fail')); };
+          rd.readAsDataURL(blob);
+        });
+        if (b64) {
+          var FS = window.Capacitor.Plugins.Filesystem;
+          var SH = window.Capacitor.Plugins.Share;
+          await FS.writeFile({ path: filename, data: b64, directory: 'CACHE' });
+          var fu = await FS.getUri({ path: filename, directory: 'CACHE' });
+          await SH.share({ title: filename, url: fu.uri });
+          return; // usuario eligió destino (o canceló el sheet nativo)
+        }
+      }
+    } catch (natErr) {
+      // Cancelación del share sheet nativo: silencio. Otros errores: caemos
+      // a las vías web (que en app no harán nada, pero no rompen).
+      if (natErr && /cancel/i.test(String(natErr.message || natErr))) return;
+      console.warn('native pdf share failed, fallback:', natErr);
+    }
+
+    // 1) Web Share API con archivo: menu nativo iOS/Android (navegador).
     //    canShare con files es el check correcto (no todos los navegadores
     //    aceptan files via share aunque tengan navigator.share).
     try {
@@ -13788,8 +13818,7 @@ async function sendMsg() {
     if (r.status === 402) {
       _avatarHistory.pop();
       // /avatar chat cobra 0.10 tokens
-      showToast(_fmtInsufTokens(0.10));
-      goTo('s-tokens');
+      showRechargeNotice(0.10);
       return;
     }
     if (!r.ok) { showToast('Error al conectar. Intenta de nuevo.'); _avatarHistory.pop(); return; }
@@ -15417,9 +15446,49 @@ function getVal(id, fallback) {
     var n = (needed % 1 === 0) ? String(needed) : needed.toFixed(2).replace(/\.?0+$/, '');
     var h = (have % 1 === 0) ? String(have) : have.toFixed(2).replace(/\.?0+$/, '');
     if (lang === 'en') return 'You need ' + n + ' tokens, you have ' + h + '. Recharge to continue.';
+    if (lang === 'it') return 'Ti servono ' + n + ' token, ne hai ' + h + '. Ricarica per continuare.';
     return 'Necesitas ' + n + ' tokens, tienes ' + h + '. Recarga para continuar.';
   }
   window._fmtInsufTokens = _fmtInsufTokens;
+
+  // ── Aviso unificado de tokens insuficientes (founder 2026-07-11) ──────────
+  // Sustituye el patrón toast+goTo: modal premium coherente con la identidad
+  // (backdrop esmeralda profundo, card blanca, CTA gradiente verde) con el
+  // detalle del saldo y botón "Recargar tokens" → s-tokens.
+  function showRechargeNotice(needed) {
+    try {
+      var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+      var t = {
+        es: { title: 'Tokens insuficientes', btn: 'Recargar tokens', later: 'Ahora no' },
+        en: { title: 'Not enough tokens',    btn: 'Recharge tokens', later: 'Not now' },
+        it: { title: 'Token insufficienti',  btn: 'Ricarica token',  later: 'Non ora' }
+      }[lang] || null;
+      if (!t) t = { title: 'Tokens insuficientes', btn: 'Recargar tokens', later: 'Ahora no' };
+      var prev = document.getElementById('dm-recharge-notice');
+      if (prev) prev.remove();
+      var ov = document.createElement('div');
+      ov.id = 'dm-recharge-notice';
+      ov.style.cssText = 'position:absolute;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:28px;background:rgba(10,26,20,0.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);';
+      ov.innerHTML =
+        '<div style="width:100%;max-width:330px;background:#fff;border-radius:22px;padding:26px 22px 20px;box-shadow:0 24px 64px rgba(0,0,0,0.35);text-align:center;">' +
+          '<div style="width:52px;height:52px;margin:0 auto 14px;border-radius:50%;background:linear-gradient(135deg,rgba(94,200,230,0.16),rgba(74,103,65,0.14));display:flex;align-items:center;justify-content:center;">' +
+            '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#4a6741" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4.5"></circle></svg>' +
+          '</div>' +
+          '<div style="font-family:var(--ff-serif, Georgia, serif);font-size:21px;font-weight:600;color:#1f2a1c;letter-spacing:-0.2px;margin-bottom:8px;">' + t.title + '</div>' +
+          '<div style="font-size:14px;line-height:1.6;color:#4b554a;margin-bottom:20px;">' + _fmtInsufTokens(needed) + '</div>' +
+          '<button id="dm-rn-go" style="width:100%;padding:15px;border:none;border-radius:100px;background:linear-gradient(135deg,#7eb86a 0%,#4a6741 100%);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.02em;box-shadow:0 4px 16px rgba(74,103,65,0.30);">' + t.btn + '</button>' +
+          '<button id="dm-rn-later" style="width:100%;margin-top:10px;padding:10px;border:none;background:transparent;color:#6b756a;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">' + t.later + '</button>' +
+        '</div>';
+      var host = document.querySelector('.phone') || document.body;
+      host.appendChild(ov);
+      document.getElementById('dm-rn-go').onclick = function() { ov.remove(); goTo('s-tokens'); };
+      document.getElementById('dm-rn-later').onclick = function() { ov.remove(); };
+    } catch(e) {
+      // Fallback ultra-defensivo: comportamiento anterior (toast + pantalla tokens).
+      try { showToast(_fmtInsufTokens(needed)); goTo('s-tokens'); } catch(_) {}
+    }
+  }
+  window.showRechargeNotice = showRechargeNotice;
 
   function authHeaders() {
     return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getJWT() };
@@ -15888,8 +15957,7 @@ function getVal(id, fallback) {
 
       if (res.status === 402) {
         // /analysis/chat (modificación pequeña del plan) cobra 0.25 tokens
-        showToast(_fmtInsufTokens(0.25));
-        goTo('s-tokens');
+        showRechargeNotice(0.25);
         return;
       }
 
@@ -16168,7 +16236,7 @@ function getVal(id, fallback) {
         body: JSON.stringify(payload)
       });
       if (res.status === 401) { showToast(_i18nText('session_expired', 'Sesión caducada.')); goToLogin('s-abc'); return; }
-      if (res.status === 402) { showToast(_fmtInsufTokens(0.2)); goTo('s-tokens'); return; }
+      if (res.status === 402) { showRechargeNotice(0.2); return; }
       if (!res.ok) {
         var err = await res.json().catch(function(){ return {detail: res.statusText}; });
         var errMsg = err.detail;
@@ -16466,7 +16534,7 @@ async function analyzeWithAI() {
     if (res.status === 402) {
       // /analysis: 3 tokens texto-only, 4 con vídeo adjuntado
       var _cost = window._attachedVideo ? 4 : 3;
-      showToast(_fmtInsufTokens(_cost));
+      showRechargeNotice(_cost);
       goTo('s-tokens');
       btn.textContent = 'Analizar con IA →';
       btn.disabled = false;
@@ -17061,16 +17129,10 @@ function renderHomeInspBtn() {
   if (!el) return;
   var acc = window._myAccount || null;
   var isPro = !!(acc && acc.account_type === 'professional');
-  // v1 App Store: "Inspiración Profesional / Adiestramiento Avanzado" (s-training) es el
-  // módulo BETA sin traducir (proyecto antiguo no consolidado). Ocultamos su entrada para no
-  // exponer contenido incompleto al revisor (la cuenta demo es profesional). El flujo real
-  // "Entrenamiento Específico" (/training-analysis) entra por otra vía y NO se ve afectado.
-  // Reactivar con `isPro` en v1.1 cuando esté i18n.
-  // Gate por plataforma: en iOS nativo sigue OCULTA para todos (modo
-  // revisión-Apple: módulo beta sin i18n; reactivar allí es decisión founder).
-  // En web se mantiene el comportamiento vivo: visible solo para pros.
-  var _inNative = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
-  el.style.display = (!_inNative && isPro) ? 'flex' : 'none';
+  // Founder 2026-07-11: Inspiración Profesional se incorpora a las APPS tal
+  // cual está en la web — visible para profesionales en todas las plataformas.
+  // (El gate de plataforma nativa de la v1 App Store queda retirado.)
+  el.style.display = isPro ? 'flex' : 'none';
 }
 window.renderHomeInspBtn = renderHomeInspBtn;
 
@@ -17080,12 +17142,8 @@ window.renderHomeInspBtn = renderHomeInspBtn;
 // el momento de máxima intención). Si la cuenta aún no cargó (race al
 // arranque), dejamos pasar — el 403 del backend sigue guardando la puerta.
 function goToTrainingConsult() {
-  var acc = window._myAccount || null;
-  if (acc && acc.account_type && acc.account_type !== 'professional') {
-    if (typeof onActivateProClick === 'function') { onActivateProClick(); return; }
-    goTo('s-pro-signup');
-    return;
-  }
+  // Fase 2.1 (founder 2026-07-11): Entrenamiento Específico abierto a TODOS.
+  // El backend adapta el tono (llano Pet Owner / técnico Pro) por account_type.
   goTo('s-anamnesis-training');
 }
 window.goToTrainingConsult = goToTrainingConsult;
@@ -17202,8 +17260,7 @@ async function trGenerate() {
       if (res.status === 401) {
         if (typeof showToast === 'function') showToast(_i18nText('session_expired', lang === 'en' ? 'Session expired.' : 'Sesión caducada.'));
       } else if (res.status === 402) {
-        if (typeof showToast === 'function') showToast(_fmtInsufTokens(0.25));
-        goTo('s-tokens');
+        showRechargeNotice(0.25);
       } else if (res.status === 403) {
         if (typeof showToast === 'function') showToast(detail || (lang === 'en' ? 'Professionals only.' : 'Solo profesionales.'));
       } else {
@@ -17522,13 +17579,9 @@ window.startConsultFromDog = startConsultFromDog;
 // clínica (cero cambio respecto al flujo de hoy). El backend tiene su propio
 // gate (HTTP 403) por si el frontend se cuela.
 window.goToConsultType = async function() {
-  // GATE "NO ES particular" (en lugar de "ES professional"): más robusto
-  // ante (a) race conditions de _myAccount no cargada al click, (b) futuros
-  // account_type distintos de 'professional' (corporativo, admin, internal),
-  // (c) variantes de capitalización del backend, (d) fallos silenciosos
-  // de /me/account. La verificación definitiva la hace el backend al
-  // submit (HTTP 403 con copy claro si no es 'professional'). El frontend
-  // solo evita mostrar el selector a particulares confirmados.
+  // Fase 2.1 (founder 2026-07-11): el Adiestramiento Específico se abre a
+  // TODOS — el selector A/B se muestra también a particulares. El backend
+  // adapta el tono del plan (llano Pet Owner vs técnico Pro) por account_type.
   try {
     // Captura la pantalla activa ANTES de navegar para que el botón "atrás"
     // de s-consult-type vuelva exactamente a donde venía el usuario (s-home,
@@ -17550,17 +17603,6 @@ window.goToConsultType = async function() {
     // Intentar cargar info de cuenta si todavía no está, para no decidir
     // sobre datos vacíos. Si falla, asumimos NO-particular (optimista) y
     // mostramos selector — el backend filtra al submit.
-    if (!window._myAccount && typeof loadAccountInfo === 'function') {
-      try { await loadAccountInfo(); } catch(e) {}
-    }
-    var acc = window._myAccount || {};
-    var at = (acc.account_type || '').toString().toLowerCase().trim();
-    // Solo "particular" CONFIRMADO va directo a anamnesis clínica.
-    // Todo lo demás (incluido string vacío por fallo de red) ve el selector.
-    if (at === 'particular') {
-      goTo('s-anamnesis');
-      return;
-    }
     goTo('s-consult-type');
   } catch(e) {
     // Cualquier excepción inesperada: fallback a anamnesis (comportamiento
@@ -17742,8 +17784,7 @@ window.submitTrainingConsult = async function() {
       // Saldo insuficiente → mensaje con coste exacto + directo a recargar.
       // El formulario queda intacto en s-anamnesis-training para retomar.
       if (btn) { btn.disabled = false; btn.textContent = prevText; }
-      showToast(_fmtInsufTokens(3));
-      goTo('s-tokens');
+      showRechargeNotice(1.5);
       return;
     }
     if (res.status === 403) {
@@ -18235,7 +18276,7 @@ async function submitSeguimiento() {
     if (!res.ok) {
       var detail = '';
       try { detail = (await res.json()).detail || ''; } catch(e) {}
-      if (res.status === 402) { showToast(_fmtInsufTokens(1.5)); goTo('s-tokens'); return; }
+      if (res.status === 402) { showRechargeNotice(1.5); return; }
       if (res.status === 422) return _setSegMsg(detail || _i18nText('seg_validation_failed', 'Datos no válidos.'), true);
       if (res.status === 429) return _setSegMsg(detail || _i18nText('seg_quota_full', 'Has alcanzado el máximo de entries en este caso.'), true);
       if (res.status === 401) { showToast(_i18nText('session_expired', 'Sesión caducada.')); goTo('s-splash'); return; }
@@ -18799,7 +18840,7 @@ function endTourIntro() {
       ct_a_tag:                 'Etología clínica',
       ct_a_title:               'Problema de conducta',
       ct_a_pitch:               'Análisis funcional ABC + plan de intervención LIMA para resolver un problema de conducta (ansiedad, reactividad, miedos, agresividad…).',
-      ct_b_tag:                 'Pro · Entrenamiento',
+      ct_b_tag:                 'Entrenamiento',
       ct_b_title:               'Entrenamiento específico',
       ct_b_pitch:               'Análisis + plan operante por fases para enseñar UN ejercicio o habilidad concreta (recall, leave-it, contacto visual…). Protocolo LIMA estricto, sin métodos aversivos.',
       // ── Formulario Entrenamiento Específico (9 campos) ──
@@ -18832,7 +18873,7 @@ function endTourIntro() {
       tc_field_clicker:         '¿Usas clicker habitualmente?',
       tc_yes:                   'Sí',
       tc_no:                    'No',
-      tc_cost_notice:           'Este análisis consume 3 tokens.',
+      tc_cost_notice:           'Este análisis consume 1,5 tokens.',
       tc_submit:                'Crear plan',
       tc_submitting:            'Generando plan…',
       tc_err_name:              'Falta el nombre del perro.',
@@ -19756,7 +19797,7 @@ function endTourIntro() {
       ct_a_tag:                 'Clinical ethology',
       ct_a_title:               'Behavior problem',
       ct_a_pitch:               'Functional ABC analysis + LIMA intervention plan to resolve a behavior problem (anxiety, reactivity, fears, aggression…).',
-      ct_b_tag:                 'Pro · Training',
+      ct_b_tag:                 'Training',
       ct_b_title:               'Specific training',
       ct_b_pitch:               'Analysis + operant plan by phases to teach ONE specific skill or exercise (recall, leave-it, sustained eye contact…). Strict LIMA protocol, no aversive methods.',
       tc_eyebrow:               'Specific training',
@@ -19788,7 +19829,7 @@ function endTourIntro() {
       tc_field_clicker:         'Do you use a clicker regularly?',
       tc_yes:                   'Yes',
       tc_no:                    'No',
-      tc_cost_notice:           'This analysis costs 3 tokens.',
+      tc_cost_notice:           'This analysis costs 1.5 tokens.',
       tc_submit:                'Create plan',
       tc_submitting:            'Generating plan…',
       tc_err_name:              'Dog name is missing.',
@@ -20713,7 +20754,7 @@ function endTourIntro() {
           ct_a_tag:                 'Etologia clinica',
           ct_a_title:               'Problema di comportamento',
           ct_a_pitch:               "Analisi funzionale ABC + piano d'intervento LIMA per risolvere un problema di comportamento (ansia, reattività, paure, aggressività…).",
-          ct_b_tag:                 'Pro · Addestramento',
+          ct_b_tag:                 'Addestramento',
           ct_b_title:               'Addestramento specifico',
           ct_b_pitch:               'Analisi + piano operante per fasi per insegnare UN esercizio o una abilità concreta (recall, leave-it, contatto visivo…). Protocollo LIMA rigoroso, senza metodi avversivi.',
           // ── Modulo Addestramento Specifico (9 campi) ──
@@ -20746,7 +20787,7 @@ function endTourIntro() {
           tc_field_clicker:         'Usi abitualmente il clicker?',
           tc_yes:                   'Sì',
           tc_no:                    'No',
-          tc_cost_notice:           'Questa analisi consuma 3 tokens.',
+          tc_cost_notice:           'Questa analisi consuma 1,5 token.',
           tc_submit:                'Crea piano',
           tc_submitting:            'Generazione del piano…',
           tc_err_name:              'Manca il nome del cane.',

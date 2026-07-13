@@ -11256,7 +11256,7 @@ window.validateInviteCode = validateInviteCode;
     var hasCode = !!inv.value.trim();
     var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
     var base = document.getElementById('ps-plan-base-price');
-    var iosPs = (typeof dmIsIosNative === 'function' && dmIsIosNative());
+    var iosPs = (typeof dmIsNativeApp === 'function' && dmIsNativeApp());
     if (hasCode) {
       // Con código válido la activación es gratuita (cortesía).
       btn.textContent = (lang === 'en') ? 'Activate free' : 'Activar gratis';
@@ -13029,8 +13029,8 @@ function psUpdateTotal() {
   var _totalElIos = document.getElementById('ps-total-amount');
   var _btnElIos = document.getElementById('ps-pay-btn');
   var _lgIos = (typeof window.getCurrentLang === 'function') ? window.getCurrentLang() : 'es';
-  // iOS: bundle oculto + precio IAP 19,99 €/año (no Stripe).
-  if (typeof dmIsIosNative === 'function' && dmIsIosNative()) {
+  // App nativa (iOS/Android): bundle oculto + precio IAP 19,99 €/año (no Stripe).
+  if (typeof dmIsNativeApp === 'function' && dmIsNativeApp()) {
     if (_totalElIos) _totalElIos.textContent = '19,99 €';
     if (_btnElIos) _btnElIos.textContent = (_lgIos === 'en') ? 'Subscribe · €19.99/yr' : 'Suscribirse · 19,99 €/año';
     return;
@@ -13101,7 +13101,7 @@ function _psApplyPromoUI(active) {
   } else {
     // Restaurar UI normal (idempotencia). En iOS: empresa/logo/bundle quedan
     // ocultos (flujo Stripe/datos de facturación no aplican a IAP) y precio 19,99 €/año.
-    var _iosSignup = (typeof dmIsIosNative === 'function' && dmIsIosNative());
+    var _iosSignup = (typeof dmIsNativeApp === 'function' && dmIsNativeApp());
     if (empresaSec)   empresaSec.style.display   = _iosSignup ? 'none' : '';
     if (logoSec)      logoSec.style.display      = _iosSignup ? 'none' : '';
     if (bundleEl)     bundleEl.style.display     = _iosSignup ? 'none' : '';
@@ -13156,7 +13156,7 @@ function _psValidate(hasSession) {
   var isPromo = !!window._proPromoActive;
   // En iOS la compra Pro va por IAP (sin datos de empresa/facturación, que están
   // ocultos) → NO exigir esos campos; si no, bloquearía la compra iOS.
-  var _iosVal = (typeof dmIsIosNative === 'function' && dmIsIosNative());
+  var _iosVal = (typeof dmIsNativeApp === 'function' && dmIsNativeApp());
   if (!hasInvite && !isPromo && !_iosVal) {
     if (!_v('ps-company-name')) errors.push(_i18nText('ps_err_company_name', 'Indica el nombre de la empresa.'));
     if (!_v('ps-legal-rep')) errors.push(_i18nText('ps_err_legal_rep', 'Indica el nombre del representante legal.'));
@@ -13328,7 +13328,7 @@ async function psSubmit() {
     // D-002: en iOS la membresía Pro va por IAP (Fase 2), nunca por Stripe. Si
     // se llega aquí en iOS (promo OFF, sin código cortesía) → fail-closed: no se
     // crea sesión Stripe. La promo/cortesía se resuelven en ramas anteriores.
-    if (dmIsIosNative()) { _psSetBusy(false); dmRcBuyPro(); return; } // iOS: membresía Pro por IAP (RevenueCat).
+    if (dmIsNativeApp()) { _psSetBusy(false); dmRcBuyPro(); return; } // App nativa: membresía Pro por IAP (RevenueCat).
     // Paso 2 — Guardar datos de empresa (PUT /me/company).
     var companyPayload = _psBuildCompanyPayload();
     var compRes = await fetch(API_BASE + '/me/company', {
@@ -13419,8 +13419,8 @@ function paUpdateTotal() {
     totalEl.textContent = _i18nText('pa_promo_total', 'GRATIS');
     return;
   }
-  // iOS: bundle oculto + precio IAP 19,99 €/año (no Stripe).
-  if (typeof dmIsIosNative === 'function' && dmIsIosNative()) {
+  // App nativa (iOS/Android): bundle oculto + precio IAP 19,99 €/año (no Stripe).
+  if (typeof dmIsNativeApp === 'function' && dmIsNativeApp()) {
     totalEl.textContent = '19,99 €';
     return;
   }
@@ -13481,7 +13481,7 @@ function _paApplyPromoUI(active) {
     if (btn) btn.textContent = _i18nText('pa_btn_activate_promo', 'Activar GRATIS');
   } else {
     // Restaurar UI normal (por si se llamó previamente con active=true)
-    var _iosPa = (typeof dmIsIosNative === 'function' && dmIsIosNative());
+    var _iosPa = (typeof dmIsNativeApp === 'function' && dmIsNativeApp());
     // iOS: el bundle (pago sin producto IAP equivalente) NO se muestra; en web sí.
     if (bundleCard) bundleCard.style.display = _iosPa ? 'none' : '';
     if (bundleLabel) bundleLabel.style.display = _iosPa ? 'none' : '';
@@ -13492,6 +13492,8 @@ function _paApplyPromoUI(active) {
     }
     if (disclaimer) disclaimer.textContent = (typeof dmIsIosNative === 'function' && dmIsIosNative())
       ? _i18nText('pa_disclaimer_ios', 'Profesional es una suscripción anual de 19,99 €/año que se renueva automáticamente salvo cancelación en Ajustes › Apple ID › Suscripciones.')
+      : (typeof dmIsAndroidNative === 'function' && dmIsAndroidNative())
+      ? _i18nText('pa_disclaimer_android', 'Profesional es una suscripción anual de 19,99 €/año que se renueva automáticamente salvo cancelación en Google Play › Pagos y suscripciones.')
       : _i18nText('pa_disclaimer', 'Pago único, no se renueva automáticamente.');
     if (btn) btn.textContent = _iosPa
       ? ((window.getCurrentLang && window.getCurrentLang() === 'en') ? 'Subscribe · €19.99/yr' : 'Suscribirse · 19,99 €/año')
@@ -13518,8 +13520,8 @@ async function paGoToCheckout() {
     return _paActivatePromo();
   }
 
-  // D-002: en iOS la membresía Pro va por IAP (RevenueCat), nunca por Stripe.
-  if (dmIsIosNative()) { dmRcBuyPro(); return; }
+  // D-002: en app nativa (iOS/Android) la membresía Pro va por IAP (RevenueCat), nunca por Stripe.
+  if (dmIsNativeApp()) { dmRcBuyPro(); return; }
 
   var cb = document.getElementById('pa-bundle-cb');
   var withBundle = !!(cb && cb.checked);
@@ -14528,11 +14530,26 @@ function dmIsIosNative() {
 }
 window.dmIsIosNative = dmIsIosNative;
 
+// Android nativo (Capacitor). Google Play exige Play Billing para bienes
+// digitales (paridad con la regla IAP de Apple) → mismo tratamiento que iOS.
+function dmIsAndroidNative() {
+  try {
+    return !!(window.Capacitor && window.Capacitor.getPlatform
+      && window.Capacitor.getPlatform() === 'android');
+  } catch (e) { return false; }
+}
+window.dmIsAndroidNative = dmIsAndroidNative;
+
+// App nativa (iOS o Android): en ambas los bienes digitales van por IAP
+// (RevenueCat) y Stripe queda completamente oculto. Web sigue con Stripe.
+function dmIsNativeApp() { return dmIsIosNative() || dmIsAndroidNative(); }
+window.dmIsNativeApp = dmIsNativeApp;
+
 // Oculta toda la superficie Stripe del binario iOS (botones de compra + copy de
 // pago). No-op en web/Android. Idempotente. La vía de compra iOS (IAP) se cablea
 // en Fase 2 sobre estos mismos puntos.
 function dmApplyIosNativeUI() {
-  if (!dmIsIosNative()) return;
+  if (!dmIsNativeApp()) return;
   try {
     // Tokens: los packs ahora compran por IAP (RevenueCat) → se MUESTRAN (Fase 2).
     // Solo ocultamos el copy de pago con tarjeta (Stripe-específico, no aplica IAP).
@@ -14545,12 +14562,16 @@ function dmApplyIosNativeUI() {
     var rb = document.getElementById('dm-rc-restore');
     if (rb) rb.style.display = '';
     // Disclosure de suscripción auto-renovable (Apple 3.1.2) — solo iOS.
-    var pat = document.getElementById('pa-ios-terms'); if (pat) pat.style.display = '';
-    var pst = document.getElementById('ps-ios-terms'); if (pst) pst.style.display = '';
+    if (dmIsIosNative()) {
+      var pat = document.getElementById('pa-ios-terms'); if (pat) pat.style.display = '';
+      var pst = document.getElementById('ps-ios-terms'); if (pst) pst.style.display = '';
+    }
     // El disclaimer Pro de iOS dice "auto-renovable", no "pago único" (que es Stripe/web).
     var paD = document.querySelector('#s-pro-activate [data-i18n="pa_disclaimer"]');
     if (paD && typeof _i18nText === 'function') {
-      paD.textContent = _i18nText('pa_disclaimer_ios', 'Profesional es una suscripción anual de 19,99 €/año que se renueva automáticamente salvo cancelación en Ajustes › Apple ID › Suscripciones.');
+      paD.textContent = dmIsIosNative()
+        ? _i18nText('pa_disclaimer_ios', 'Profesional es una suscripción anual de 19,99 €/año que se renueva automáticamente salvo cancelación en Ajustes › Apple ID › Suscripciones.')
+        : _i18nText('pa_disclaimer_android', 'Profesional es una suscripción anual de 19,99 €/año que se renueva automáticamente salvo cancelación en Google Play › Pagos y suscripciones.');
     }
     // App Store (≤15%): ocultar en iOS todo lo que es solo del flujo Stripe y NO
     // aplica a IAP — bundle de 60 tokens (sin producto IAP a ese precio), datos de
@@ -14599,7 +14620,9 @@ else { document.addEventListener('DOMContentLoaded', dmApplyIosNativeUI); }
 // web/Android: dmRcPlugin() devuelve null (el plugin nativo no existe) y nada se
 // ejecuta. El webhook del backend (/webhooks/revenuecat) acredita tokens / activa
 // Pro al confirmar la compra; el frontend solo lanza la compra nativa y refresca.
-var DM_RC_PUBLIC_KEY = 'appl_YdjhXMzMdSsoYNsKqHWbyoRPpJd';
+var DM_RC_PUBLIC_KEY = 'appl_YdjhXMzMdSsoYNsKqHWbyoRPpJd';       // iOS (App Store)
+var DM_RC_PUBLIC_KEY_ANDROID = 'goog_PENDIENTE_REVENUECAT';       // Android (Play) — se fija al crear la app Play en RevenueCat
+function dmRcKey() { return dmIsAndroidNative() ? DM_RC_PUBLIC_KEY_ANDROID : DM_RC_PUBLIC_KEY; }
 var _dmRcConfigured = false;
 
 function dmRcPlugin() {
@@ -14621,12 +14644,13 @@ function dmUserIdFromJWT() {
 }
 
 async function dmRcInit() {
-  if (!dmIsIosNative()) return false;
+  if (!dmIsNativeApp()) return false;
   var P = dmRcPlugin(); if (!P) return false;
+  if (dmRcKey().indexOf('PENDIENTE') !== -1) return false; // clave Android aún sin fijar → no configurar
   var uid = dmUserIdFromJWT();
   try {
     if (!_dmRcConfigured) {
-      await P.configure(uid ? { apiKey: DM_RC_PUBLIC_KEY, appUserID: uid } : { apiKey: DM_RC_PUBLIC_KEY });
+      await P.configure(uid ? { apiKey: dmRcKey(), appUserID: uid } : { apiKey: dmRcKey() });
       _dmRcConfigured = true;
     } else if (uid) {
       try { await P.logIn({ appUserID: uid }); } catch (e) {}
@@ -15624,7 +15648,7 @@ function getVal(id, fallback) {
   // ── Pago con Stripe Checkout (automático, <30 seg) ────────────────────────
   function recargar(pack) {
     // D-002: en iOS la compra de tokens va por IAP (RevenueCat), nunca por Stripe.
-    if (dmIsIosNative()) { dmRcBuyTokens(pack); return; }
+    if (dmIsNativeApp()) { dmRcBuyTokens(pack); return; }
     var jwt = getJWT();
     if (!jwt) { alert('Inicia sesión para comprar tokens.'); goToLogin('s-tokens'); return; }
 
@@ -19383,6 +19407,7 @@ function endTourIntro() {
       rc_terms_link:        'Términos de servicio',
       rc_privacy_link:      'Política de privacidad',
       pa_disclaimer_ios:    'Profesional es una suscripción anual de 19,99 €/año que se renueva automáticamente salvo que la canceles en Ajustes › Apple ID › Suscripciones al menos 24 h antes de la fecha de renovación.',
+      pa_disclaimer_android:'Profesional es una suscripción anual de 19,99 €/año que se renueva automáticamente salvo que la canceles en Google Play › Pagos y suscripciones antes de la fecha de renovación.',
       // ABC
       abc_a_title:  'A — ANTECEDENTE',
       abc_a_vars:   'Variables disposicionales',
@@ -20339,6 +20364,7 @@ function endTourIntro() {
       rc_terms_link:        'Terms of Service',
       rc_privacy_link:      'Privacy Policy',
       pa_disclaimer_ios:    'Professional is an annual subscription of €19.99/year that auto-renews unless you cancel it in Settings › Apple ID › Subscriptions at least 24h before the renewal date.',
+      pa_disclaimer_android:'Professional is an annual subscription of €19.99/year that auto-renews unless you cancel it in Google Play › Payments & subscriptions before the renewal date.',
       // ABC
       abc_a_title:  'A — ANTECEDENT',
       abc_a_vars:   'Setting events',
@@ -21297,6 +21323,7 @@ function endTourIntro() {
           rc_terms_link:        'Termini di servizio',
           rc_privacy_link:      'Informativa sulla privacy',
           pa_disclaimer_ios:    'Professionale è un abbonamento annuale di 19,99 €/anno che si rinnova automaticamente salvo che lo annulli in Impostazioni › Apple ID › Abbonamenti almeno 24 h prima della data di rinnovo.',
+          pa_disclaimer_android:'Professionale è un abbonamento annuale di 19,99 €/anno che si rinnova automaticamente salvo che lo annulli in Google Play › Pagamenti e abbonamenti prima della data di rinnovo.',
           // ABC
           abc_a_title:  'A — ANTECEDENTE',
           abc_a_vars:   'Variabili disposizionali',

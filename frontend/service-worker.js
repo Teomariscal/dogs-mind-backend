@@ -1,3 +1,4 @@
+// v222 (fix chat Aigents Android: el final de las respuestas largas [Cecilia en Sonnet] quedaba oculto bajo el borde por scroll síncrono antes del reflow del WebView → _scrollChatBottom() con doble rAF + reintentos. 2026-07-19)
 // v221 (clave pública RevenueCat Android goog_bbJlTNcKhrWtUwWSUrgzUpUZVau fijada — Play Billing operativo en app Android tras subir credencial SA en RevenueCat. 2026-07-18)
 // v220 (Play Billing Android: dmIsNativeApp() — Stripe oculto también en Android nativo; compras Pro+tokens enrutadas a RevenueCat en ambas apps; disclaimers por tienda (pa_disclaimer_android es/en/it); clave RC Android goog_ placeholder hasta crear app Play en RevenueCat. INERTE en web. 2026-07-13)
 // v219 (paquete 1.0.4: PDF nativo en apps via Capacitor Filesystem+Share [los WebView no soportan share/blob/download — fallaba en silencio]; Adiestramiento Específico abierto a particulares a 1,5 tok con tono llano Pet Owner [Pro sigue técnico]; selector consulta para todos; aviso premium unificado "Recargar tokens" en todos los 402 [modal emerald con CTA a s-tokens, es/en/it]; Inspiración Profesional visible en apps para Pro [gate nativo retirado]. 2026-07-11)
@@ -28,7 +29,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v221';
+const CACHE_NAME = 'dogs-mind-v222';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

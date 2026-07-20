@@ -13747,6 +13747,21 @@ function confirmAvatar() {
   goTo('s-chat');
 }
 
+// Scroll al fondo del chat DESPUÉS de que el WebView termine de ajustar el
+// texto. En Android el `scrollTop = scrollHeight` síncrono medía la altura
+// antes del reflow de mensajes largos → el final quedaba bajo el borde y
+// parecía "cortado". Doble rAF + reintento asegura la medida final; el
+// último reintento (250ms) cubre reflows lentos con fuentes/imágenes.
+function _scrollChatBottom() {
+  var c = document.getElementById('msgs');
+  if (!c) return;
+  var go = function(){ c.scrollTop = c.scrollHeight; };
+  go();
+  requestAnimationFrame(function(){ go(); requestAnimationFrame(go); });
+  setTimeout(go, 120);
+  setTimeout(go, 250);
+}
+
 function addMsgWithImg(role, text, imgSrc) {
   const c = document.getElementById('msgs');
   const d = document.createElement('div');
@@ -13759,7 +13774,7 @@ function addMsgWithImg(role, text, imgSrc) {
     d.innerHTML = `<div class="msg-av">&nbsp;</div><div><div class="bbl">${text}</div><div class="msg-t">${t}</div></div>`;
   }
   c.appendChild(d);
-  c.scrollTop = c.scrollHeight;
+  _scrollChatBottom();
   return d;
 }
 
@@ -13846,7 +13861,7 @@ function addTyping() {
   const d = document.createElement('div');
   d.className = 'msg niaz';
   d.innerHTML = `<div class="msg-av" style="background:none;padding:0;overflow:hidden"><img src="${av.img}" style="width:100%;height:100%;object-fit:cover;object-position:top;border-radius:50%"></div><div class="bbl"><div class="typing-bbl"><span></span><span></span><span></span></div></div>`;
-  c.appendChild(d); c.scrollTop = c.scrollHeight;
+  c.appendChild(d); _scrollChatBottom();
   return d;
 }
 
@@ -14544,6 +14559,65 @@ window.dmIsAndroidNative = dmIsAndroidNative;
 // (RevenueCat) y Stripe queda completamente oculto. Web sigue con Stripe.
 function dmIsNativeApp() { return dmIsIosNative() || dmIsAndroidNative(); }
 window.dmIsNativeApp = dmIsNativeApp;
+
+// ════ Configuración remota (banner de avisos + paywall) ═══════════════════════
+// El backend gobierna avisos y paywall vía /app-config (env vars de Railway).
+// Cambiar textos o encender flags NO requiere nuevo build ni deploy frontend.
+// Fail-safe: si el fetch falla, todo queda apagado (comportamiento actual).
+window._dmAppConfig = null;
+
+async function dmFetchAppConfig() {
+  try {
+    var res = await fetch(API_BASE + '/app-config');
+    if (!res.ok) return;
+    window._dmAppConfig = await res.json();
+    dmRenderRemoteBanner();
+  } catch (e) { /* apagado */ }
+}
+
+// Banner de aviso remoto: persistente (reaparece en cada arranque), no
+// bloqueante, descartable durante la sesión. El texto viene del backend
+// (copy del founder); si no hay texto para el idioma actual, cae a ES.
+function dmRenderRemoteBanner() {
+  try {
+    var cfg = window._dmAppConfig && window._dmAppConfig.banner;
+    if (!cfg || !cfg.enabled) return;
+    var lang = (typeof window.getCurrentLang === 'function') ? window.getCurrentLang() : 'es';
+    var text = (cfg.text && (cfg.text[lang] || cfg.text.es)) || '';
+    if (!text) return;
+    if (sessionStorage.getItem('dm_banner_dismissed_' + cfg.id)) return;
+    if (document.getElementById('dm-remote-banner')) return;
+    var warn = cfg.level === 'warning';
+    var host = document.querySelector('.phone') || document.body;
+    var bar = document.createElement('div');
+    bar.id = 'dm-remote-banner';
+    bar.style.cssText = 'position:absolute;top:0;left:0;right:0;z-index:9500;' +
+      'padding:calc(env(safe-area-inset-top, 0px) + 12px) 16px 12px 16px;' +
+      'background:rgba(14,31,26,0.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);' +
+      'border-bottom:2px solid ' + (warn ? '#e0a23c' : '#5ec8e6') + ';' +
+      'color:#fff;font-size:13.5px;line-height:1.5;font-family:inherit;display:flex;gap:12px;align-items:flex-start;';
+    var icon = document.createElement('div');
+    icon.textContent = warn ? '⚠' : 'ℹ';
+    icon.style.cssText = 'flex:none;font-size:16px;color:' + (warn ? '#e0a23c' : '#5ec8e6') + ';line-height:1.4;';
+    var msg = document.createElement('div');
+    msg.textContent = text;
+    msg.style.cssText = 'flex:1;';
+    var close = document.createElement('button');
+    close.setAttribute('aria-label', 'Cerrar aviso');
+    close.textContent = '✕';
+    close.style.cssText = 'flex:none;background:none;border:none;color:rgba(255,255,255,0.7);' +
+      'font-size:15px;padding:2px 4px;cursor:pointer;min-width:32px;min-height:32px;';
+    close.onclick = function () {
+      try { sessionStorage.setItem('dm_banner_dismissed_' + cfg.id, '1'); } catch (e) {}
+      bar.remove();
+    };
+    bar.appendChild(icon); bar.appendChild(msg); bar.appendChild(close);
+    host.appendChild(bar);
+  } catch (e) { /* nunca romper la app por un aviso */ }
+}
+
+if (document.readyState !== 'loading') { dmFetchAppConfig(); }
+else { document.addEventListener('DOMContentLoaded', dmFetchAppConfig); }
 
 // Oculta toda la superficie Stripe del binario iOS (botones de compra + copy de
 // pago). No-op en web/Android. Idempotente. La vía de compra iOS (IAP) se cablea

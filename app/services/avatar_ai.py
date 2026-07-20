@@ -74,8 +74,13 @@ def chat(request: AvatarChatRequest) -> AvatarChatResponse:
     # alto para dar espacio al modelo a resumir 1-3 resultados con detalle.
     use_web_search = request.avatar_id not in _AIGENTS_WITHOUT_WEB_SEARCH
 
+    # Modelo por avatar: Cecilia (ABA pura) va en Sonnet para ser inquebrantable;
+    # el resto en Haiku. Fallback al modelo global si el id no está mapeado.
+    per_id_models = getattr(settings, "avatar_models_per_id", {}) or {}
+    avatar_model = per_id_models.get(request.avatar_id, settings.avatar_model)
+
     create_kwargs = {
-        "model": settings.avatar_model,
+        "model": avatar_model,
         # 350 para Aigents sin web_search (calibración estricta del prompt).
         # 500 para Aigents con web_search (margen para listar resultados
         # concretos con nombre + ciudad/precio sin truncar).

@@ -51,6 +51,11 @@ class Settings(BaseSettings):
     # 4.8 (capacidad aparte + más capaz). Solo se usa en ese caso excepcional.
     clinical_fallback_model: str = "claude-opus-4-8"
     avatar_model: str = "claude-haiku-4-5"
+    # Cecilia es analista ABA pura y radical: sus afirmaciones deben ser
+    # categóricas, correctas e imposibles de tumbar con preguntas capciosas.
+    # Haiku cedía al primer envite → Sonnet solo para ella (regla calidad:
+    # ante un problema, subir modelo, nunca bajar). El resto sigue en Haiku.
+    avatar_models_per_id: dict = {"cecilia": "claude-sonnet-4-6"}
     embedding_model: str = "voyage-3-large"
 
     # RAG

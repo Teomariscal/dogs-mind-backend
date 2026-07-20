@@ -16,6 +16,13 @@ from app.config import get_settings
 router = APIRouter(prefix="/avatar", tags=["avatar"])
 
 
+def _model_for_avatar(avatar_id: Optional[str]) -> str:
+    """Modelo real usado por avatar (Cecilia=Sonnet, resto=Haiku). Para logs de coste."""
+    st = get_settings()
+    per_id = getattr(st, "avatar_models_per_id", {}) or {}
+    return per_id.get(avatar_id, st.avatar_model)
+
+
 def _extract_user_id_av(authorization: Optional[str]) -> Optional[UUID]:
     if not authorization or not authorization.startswith("Bearer "):
         return None
@@ -57,7 +64,7 @@ def avatar_chat(
             log_usage,
             user_id=user_id_for_logs,
             endpoint="/avatar/chat",
-            model=get_settings().avatar_model,
+            model=_model_for_avatar(request.avatar_id),
             input_tokens=getattr(result, "input_tokens", None),
             output_tokens=getattr(result, "output_tokens", None),
             tokens_charged=0.10,
@@ -85,7 +92,7 @@ def avatar_chat(
                 entry_type="chat_aigent",
                 content=getattr(result, "reply", None) or getattr(result, "content", None) or "",
                 meta={**base_meta, "role": "assistant"},
-                ai_model=get_settings().avatar_model,
+                ai_model=_model_for_avatar(request.avatar_id),
                 input_tokens=getattr(result, "input_tokens", None),
                 output_tokens=getattr(result, "output_tokens", None),
                 tokens_charged=0.10,
@@ -98,7 +105,7 @@ def avatar_chat(
             log_usage,
             user_id=user_id_for_logs,
             endpoint="/avatar/chat",
-            model=get_settings().avatar_model,
+            model=_model_for_avatar(request.avatar_id),
             tokens_charged=0.10,
             success="error",
             notes=f"avatar={request.avatar_id} | {str(e)[:150]}",

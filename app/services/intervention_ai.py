@@ -46,6 +46,8 @@ def run_intervention_plan(request: InterventionRequest, account_type=None) -> In
         anamnesis_lines.append("Children present in household.")
     if a.other_dogs:
         anamnesis_lines.append(f"Other dogs: {a.other_dogs_detail or 'yes'}")
+    if a.neutered is not None:
+        anamnesis_lines.append(f"Neutered: {'yes' if a.neutered else 'no'}")
     if a.chronic_disease:
         anamnesis_lines.append(f"Chronic disease: {a.chronic_disease_detail or 'yes'}")
     if a.urban_rural:

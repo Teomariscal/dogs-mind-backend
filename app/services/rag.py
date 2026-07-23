@@ -234,6 +234,7 @@ def build_anamnesis_block(anamnesis: dict) -> str:
         f"Dog: {a.get('dog_name') or _NOT_PROVIDED}, {a.get('breed') or _NOT_PROVIDED}, {a.get('dog_age') or _NOT_PROVIDED}",
         f"Sex: {sex_str}",
         f"Weaning age: {weaning_str}",
+        f"Neutered: {_bool_label(a.get('neutered')) if a.get('neutered') is not None else _NOT_PROVIDED}",
         f"Chronic disease: {'Yes — ' + (a.get('chronic_disease_detail') or _NOT_PROVIDED) if a.get('chronic_disease') else _bool_label(a.get('chronic_disease'))}",
         "",
         "## Living situation",

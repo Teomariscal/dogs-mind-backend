@@ -30,6 +30,7 @@ class AnamnesisInput(BaseModel):
     dog_name: str = Field(..., description="Dog's name")
     dog_age: str = Field(..., description="Age (e.g. '3 years', '8 months')")
     dog_sex: Optional[str] = Field(None, description="Dog sex: 'male' | 'female' | null if not provided")
+    neutered: Optional[bool] = Field(None, description="Neutered/spayed? None if not answered (older clients don't send it)")
     breed: str = Field(..., description="Breed or mix")
     weaning_age_weeks: Optional[int] = Field(None, description="Age at weaning / separation from litter (weeks)")
 

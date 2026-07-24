@@ -9631,6 +9631,14 @@ button:not(:disabled):active{ transform:scale(0.98); }
         </div>
 
         <div style="margin-bottom:12px;">
+          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_neutered">&iquest;Esterilizado?</div>
+          <div style="display:flex;gap:8px;">
+            <button id="esteril-si" onclick="anam_toggle('esteril-si','esteril-no')" data-i18n="btn_yes" type="button" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
+            <button id="esteril-no" onclick="anam_toggle('esteril-no','esteril-si')" data-i18n="btn_no" type="button" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
+          </div>
+        </div>
+
+        <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_chronic">&iquest;Tiene alguna dolencia cr&oacute;nica?</div>
           <div style="display:flex;gap:8px;">
             <button id="dolencia-no" onclick="anam_toggle('dolencia-no','dolencia-si')" data-i18n="btn_no" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
@@ -14063,6 +14071,7 @@ function collectAnamDraft() {
   // Toggles binarios/triples (guardamos qué id está activo, o null)
   d.toggles.sexo      = isActive('sexo-macho') ? 'sexo-macho' : (isActive('sexo-hembra') ? 'sexo-hembra' : null);
   d.toggles.dolencia  = isActive('dolencia-si') ? 'si' : (isActive('dolencia-no') ? 'no' : null);
+  d.toggles.esteril   = isActive('esteril-si') ? 'si' : (isActive('esteril-no') ? 'no' : null);
   d.toggles.vive      = isActive('vive-dentro') ? 'vive-dentro' : (isActive('vive-fuera') ? 'vive-fuera' : (isActive('vive-ambos') ? 'vive-ambos' : null));
   d.toggles.entorno   = isActive('entorno-campo') ? 'entorno-campo' : (isActive('entorno-periferia') ? 'entorno-periferia' : (isActive('entorno-ciudad') ? 'entorno-ciudad' : null));
   d.toggles.ninios    = isActive('ninios-si') ? 'si' : (isActive('ninios-no') ? 'no' : null);
@@ -14144,6 +14153,8 @@ function restoreAnamDraft() {
   if (t.sexo === 'sexo-hembra') anam_toggle('sexo-hembra','sexo-macho');
   if (t.dolencia === 'si') anam_toggle_cond('dolencia-si','dolencia-no','inp-dolencia-wrap');
   if (t.dolencia === 'no') anam_toggle('dolencia-no','dolencia-si');
+  if (t.esteril === 'si') anam_toggle('esteril-si','esteril-no');
+  if (t.esteril === 'no') anam_toggle('esteril-no','esteril-si');
   if (t.vive === 'vive-dentro') anam_toggle3('vive-dentro','vive-fuera','vive-ambos');
   if (t.vive === 'vive-fuera')  anam_toggle3('vive-fuera','vive-dentro','vive-ambos');
   if (t.vive === 'vive-ambos')  anam_toggle3('vive-ambos','vive-dentro','vive-fuera');
@@ -16476,6 +16487,7 @@ async function analyzeWithAI() {
 
   // Toggles
   var chronicDisease  = isActive('dolencia-si');
+  var neuteredAnam    = isActive('esteril-si') ? true : (isActive('esteril-no') ? false : null);
   var childrenPresent = isActive('ninios-si');
   var otherDogs       = isActive('convive-si');
 
@@ -16562,6 +16574,7 @@ async function analyzeWithAI() {
         dog_sex:           dogSex,
         breed:             breed,
         weaning_age_weeks: weaningWeeks,
+        neutered:               neuteredAnam,
         chronic_disease:        chronicDisease,
         chronic_disease_detail: chronicDetail,
         living_environment:     livingEnv,
@@ -18576,6 +18589,7 @@ function endTourIntro() {
       anam_lbl_sex:            'Sexo',
       anam_btn_male:           'Macho',
       anam_btn_female:         'Hembra',
+      anam_lbl_neutered:       '¿Esterilizado?',
       anam_lbl_chronic:        '¿Tiene alguna dolencia crónica?',
       anam_lbl_living:         '¿Vive dentro o fuera de casa?',
       anam_lbl_environment:    '¿Entorno donde vive?',
@@ -19535,6 +19549,7 @@ function endTourIntro() {
       anam_lbl_sex:            'Sex',
       anam_btn_male:           'Male',
       anam_btn_female:         'Female',
+      anam_lbl_neutered:       'Neutered/spayed?',
       anam_lbl_chronic:        'Any chronic condition?',
       anam_lbl_living:         'Lives indoors or outdoors?',
       anam_lbl_environment:    'Type of environment?',
@@ -20492,6 +20507,7 @@ function endTourIntro() {
           anam_lbl_sex:            'Sesso',
           anam_btn_male:           'Maschio',
           anam_btn_female:         'Femmina',
+          anam_lbl_neutered:       'Sterilizzato?',
           anam_lbl_chronic:        'Ha qualche patologia cronica?',
           anam_lbl_living:         'Vive dentro o fuori casa?',
           anam_lbl_environment:    'In quale ambiente vive?',

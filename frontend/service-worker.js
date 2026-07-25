@@ -1,3 +1,4 @@
+// v224 (2 cambios founder 2026-07-24: [1] pantalla de espera con pasos clínicos — sustituye Cecilia+reloj en s-loading-analysis por 5 pasos en vivo, 2 juegos analysis/plan, es/en/it, nombre del perro dinámico, cadencia 12s, último queda "en curso" hasta la respuesta; [2] exterminio cream en s-login/registro — fondo vibrant emerald, tarjetas glass oscuras, inputs/selects glass con focus cyan, acentos oro→cyan/lime. Aprobados en beta visual, van al 1.0.5)
 // v223 (anamnesis: campo ¿Esterilizado? Sí/No tras Sexo — es/en/it, borrador, payload `neutered` opcional retrocompatible; backend lo pasa a prompts de análisis y plan. Founder 2026-07-20, va al 1.0.5)
 // v222 (fix chat Aigents Android: el final de las respuestas largas [Cecilia en Sonnet] quedaba oculto bajo el borde por scroll síncrono antes del reflow del WebView → _scrollChatBottom() con doble rAF + reintentos. 2026-07-19)
 // v221 (clave pública RevenueCat Android goog_bbJlTNcKhrWtUwWSUrgzUpUZVau fijada — Play Billing operativo en app Android tras subir credencial SA en RevenueCat. 2026-07-18)
@@ -30,7 +31,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v223';
+const CACHE_NAME = 'dogs-mind-v224';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

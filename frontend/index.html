@@ -4397,12 +4397,12 @@ button:not(:disabled):active{ transform:scale(0.98); }
 #s-login {
   position: relative;
   background:
-    /* aurora cálida superior (sensación de amanecer/portal) */
-    radial-gradient(ellipse 700px 450px at 50% -10%, rgba(255,210,140,0.16), transparent 60%),
+    /* aurora tech superior (cyan sutil, coherente con área pro y beta 1.0.5) */
+    radial-gradient(ellipse 700px 450px at 50% -10%, rgba(94,200,230,0.10), transparent 60%),
     /* halo verde profundo lateral */
-    radial-gradient(ellipse 400px 600px at 0% 30%, rgba(74,103,65,0.12), transparent 65%),
-    /* base oscura */
-    linear-gradient(180deg, #1a1f17 0%, #0f150d 55%, #0a0e08 100%);
+    radial-gradient(ellipse 400px 600px at 0% 30%, rgba(74,103,65,0.16), transparent 65%),
+    /* base oscura vibrant emerald */
+    linear-gradient(180deg, #0a1a14 0%, #0e1f1a 55%, #14302a 100%);
   padding-bottom: max(48px, env(safe-area-inset-bottom, 48px));
   color: rgba(255,250,240,0.92);
   overflow: hidden;
@@ -4415,10 +4415,10 @@ button:not(:disabled):active{ transform:scale(0.98); }
   inset: 0;
   pointer-events: none;
   background-image:
-    radial-gradient(circle, rgba(255,210,150,0.7) 0%, transparent 70%),
-    radial-gradient(circle, rgba(200,169,110,0.5) 0%, transparent 70%),
-    radial-gradient(circle, rgba(255,235,180,0.6) 0%, transparent 70%),
-    radial-gradient(circle, rgba(180,200,160,0.4) 0%, transparent 70%);
+    radial-gradient(circle, rgba(94,200,230,0.55) 0%, transparent 70%),
+    radial-gradient(circle, rgba(126,184,106,0.45) 0%, transparent 70%),
+    radial-gradient(circle, rgba(94,200,230,0.40) 0%, transparent 70%),
+    radial-gradient(circle, rgba(180,200,160,0.35) 0%, transparent 70%);
   background-size: 3px 3px, 2px 2px, 4px 4px, 2px 2px;
   background-position: 12% 18%, 78% 32%, 30% 60%, 88% 78%;
   background-repeat: no-repeat;
@@ -4434,7 +4434,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
   left: 10%;
   right: 10%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(200,169,110,0.55) 50%, transparent);
+  background: linear-gradient(90deg, transparent, rgba(94,200,230,0.50) 50%, transparent);
   filter: blur(0.5px);
   pointer-events: none;
   animation: login-portal-glow 5s ease-in-out infinite;
@@ -4467,36 +4467,38 @@ button:not(:disabled):active{ transform:scale(0.98); }
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(200,169,110,0.95), rgba(184,146,42,0.85));
-  color: #1a1f17;
+  background: linear-gradient(135deg, #5ec8e6, #4a6741);
+  color: #0a1a14;
   font-family: var(--ff-sans, sans-serif);
   font-size: 14px;
   font-weight: 800;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(184,146,42,0.35);
+  box-shadow: 0 2px 8px rgba(94,200,230,0.30);
 }
 #s-login .login-card-existing {
-  background: rgba(255,250,240,0.96);
-  border: 1.5px solid rgba(200,169,110,0.45);
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(94,200,230,0.30);
   border-radius: 16px;
   padding: 16px 16px 18px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.28);
   margin-top: 12px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 #s-login .login-card-existing .inp {
-  background: #fff;
-  border: 1px solid rgba(0,0,0,0.1);
-  color: #1a1f17;
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(255,255,255,0.25);
+  color: #f3f1ea;
 }
 #s-login .login-card-existing .inp:focus {
-  border-color: rgba(184,146,42,0.7);
-  box-shadow: 0 0 0 3px rgba(184,146,42,0.18);
+  border-color: #5ec8e6;
+  box-shadow: 0 0 0 3px rgba(94,200,230,0.18);
   outline: none;
 }
 
 /* Form labels directly on dark bg — make readable */
 #s-login label {
-  color: rgba(255,235,210,0.82) !important;
+  color: rgba(243,241,234,0.85) !important;
   font-weight: 500;
 }
 /* Privacy + already-account text on dark */
@@ -4516,36 +4518,36 @@ button:not(:disabled):active{ transform:scale(0.98); }
   box-sizing: border-box;
   height: 50px;
   padding: 14px 16px;
-  background: rgba(255,250,240,0.96);
-  border: 1.5px solid rgba(200,169,110,0.32);
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(255,255,255,0.25);
   border-radius: 12px;
   font-size: 16px; /* 16px: evita auto-zoom iOS al enfocar */
   font-family: inherit;
-  color: #1a1f17;
+  color: #f3f1ea;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
   -webkit-appearance: none;
   appearance: none;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.18) inset, 0 2px 6px rgba(0,0,0,0.12);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 #s-login .inp::placeholder {
-  color: rgba(60,50,30,0.42);
+  color: rgba(243,241,234,0.38);
   font-weight: 400;
 }
 #s-login .inp:hover,
 #s-login .sel:hover {
-  border-color: rgba(200,169,110,0.55);
-  background: #fffaf0;
+  border-color: rgba(94,200,230,0.45);
+  background: rgba(255,255,255,0.09);
 }
 #s-login .inp:focus,
 #s-login .sel:focus {
-  border-color: rgba(184,146,42,0.85);
-  box-shadow: 0 0 0 4px rgba(184,146,42,0.18), 0 1px 3px rgba(0,0,0,0.12) inset;
-  background: #fff;
+  border-color: #5ec8e6;
+  box-shadow: 0 0 0 4px rgba(94,200,230,0.16);
+  background: rgba(255,255,255,0.10);
 }
 /* Custom dropdown arrow for selects */
 #s-login .sel {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none'%3E%3Cpath d='M3 5.5L7 9.5L11 5.5' stroke='%23b8922a' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none'%3E%3Cpath d='M3 5.5L7 9.5L11 5.5' stroke='%235ec8e6' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 16px center;
   background-size: 14px;
@@ -4556,18 +4558,34 @@ button:not(:disabled):active{ transform:scale(0.98); }
 #s-login [id="dog2-block"],
 #s-login [id="dog2-block"] ~ *,
 #s-login .login-card-existing ~ * .av-screen {}
-#s-login > div > div > div > div[style*="background:var(--white)"] {
-  background: rgba(255,250,240,0.94) !important;
-  border: 1.5px solid rgba(200,169,110,0.30) !important;
+#s-login div[style*="background:var(--white)"] {
+  background: rgba(255,255,255,0.06) !important;
+  border: 1.5px solid rgba(255,255,255,0.14) !important;
   border-radius: 16px !important;
   padding: 18px !important;
   box-shadow: 0 6px 18px rgba(0,0,0,0.22);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 /* Welcome paragraph card on dark */
 #s-login p[data-i18n="form_welcome_intro"] {
-  color: #2a2a1f !important;
+  color: rgba(243,241,234,0.78) !important;
 }
+#s-login p[data-i18n="form_welcome_intro"] strong[style*="--text"] {
+  color: #f3f1ea !important;
+}
+#s-login p[data-i18n="form_welcome_intro"] strong[style*="--green"] {
+  color: #7eb86a !important;
+}
+/* Cabeceras "Perro 1" / "Perro 2" dentro de tarjetas glass */
+#s-login [data-i18n="form_dog1_header"] { color: #7eb86a !important; }
+#s-login [data-i18n="form_dog2_header"],
+#s-login [data-i18n="form_dog2_header"] span { color: rgba(243,241,234,0.65) !important; }
+/* Enlace "¿Olvidaste tu contraseña?" sobre tarjeta glass */
+#s-login a[data-i18n="forgot_password_link"] { color: #80d6ee !important; }
+/* Separadores cálidos heredados → cyan sutil */
+#s-login div[style*="rgba(255,210,150"] { background: rgba(94,200,230,0.20) !important; }
 
 /* Step number bigger pop on section 2 */
 #s-login .login-section-header {
@@ -4576,12 +4594,12 @@ button:not(:disabled):active{ transform:scale(0.98); }
 
 /* Token gift banner — adapt to dark */
 #s-login div[style*="--green-bg"] {
-  background: linear-gradient(135deg, rgba(74,103,65,0.55), rgba(184,146,42,0.20)) !important;
-  border: 1.5px solid rgba(200,169,110,0.45) !important;
+  background: linear-gradient(135deg, rgba(74,103,65,0.55), rgba(94,200,230,0.14)) !important;
+  border: 1.5px solid rgba(94,200,230,0.40) !important;
   color: rgba(255,250,240,0.95);
 }
 #s-login div[style*="--green-bg"] [data-i18n="login_welcome_tokens"] {
-  color: rgba(255,235,180,0.98) !important;
+  color: #80d6ee !important;
 }
 #s-login div[style*="--green-bg"] [data-i18n="login_welcome_sub"] {
   color: rgba(255,250,240,0.75) !important;
@@ -8501,25 +8519,36 @@ button:not(:disabled):active{ transform:scale(0.98); }
 
   <!-- ══ S-LOADING-ANALYSIS: pantalla de espera (análisis y plan) ══ -->
   <div id="s-loading-analysis" class="screen" style="overflow:hidden;">
-    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 22px;text-align:center;gap:22px;">
+    <div style="flex:1;display:flex;flex-direction:column;padding:56px 26px 26px;max-width:430px;margin:0 auto;width:100%;box-sizing:border-box;overflow-y:auto;">
 <!-- #3 (feedback tester): spinner claro y arriba para que NO parezca colgada -->
-      <div class="la-spinner" aria-hidden="true" style="width:44px;height:44px;border:3px solid rgba(243,241,234,0.25);border-top-color:#f3f1ea;border-radius:50%;animation:laSpin 0.85s linear infinite;flex-shrink:0;"></div>
-      <img src="cecilia-maximus-shihtzu.webp" alt="Cecilia con Maximus y su Shih Tzu" style="height:38vh;max-height:340px;width:auto;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(0,0,0,0.18));">
-      <div style="max-width:340px;">
-        <div id="loading-title" style="font-family:var(--ff-serif);font-size:22px;font-weight:700;color:var(--dark);letter-spacing:-0.3px;margin-bottom:14px;line-height:1.25;" data-i18n="loading_title">Analizando con IA…</div>
-        <div style="font-size:14px;line-height:1.6;color:var(--text2);" data-i18n="loading_msg">Estás utilizando una herramienta de análisis de conducta animal muy potente y va a tomar algo de tiempo. Relax que esto puede tardar unos minutos, <strong>no cierres la app</strong>.</div>
-        <div style="margin-top:18px;display:inline-flex;gap:6px;">
-          <span class="dot-pulse" style="width:8px;height:8px;border-radius:50%;background:#4a6741;animation:dotPulse 1.4s infinite ease-in-out;"></span>
-          <span class="dot-pulse" style="width:8px;height:8px;border-radius:50%;background:#4a6741;animation:dotPulse 1.4s infinite ease-in-out;animation-delay:0.2s;"></span>
-          <span class="dot-pulse" style="width:8px;height:8px;border-radius:50%;background:#4a6741;animation:dotPulse 1.4s infinite ease-in-out;animation-delay:0.4s;"></span>
-        </div>
-        <div style="margin-top:22px;font-size:11px;line-height:1.5;color:var(--text3);opacity:0.75;font-style:italic;max-width:300px;margin-left:auto;margin-right:auto;" data-i18n="loading_disclaimer">The Dogs’ Mind te ofrece un análisis por IA y puede cometer errores. No sustituye a tu etólogo veterinario.</div>
+      <div class="la-spinner" aria-hidden="true" style="width:32px;height:32px;border:3px solid rgba(243,241,234,0.25);border-top-color:#f3f1ea;border-radius:50%;animation:laSpin 0.85s linear infinite;flex-shrink:0;margin:0 auto 12px;"></div>
+      <div id="loading-title" style="font-family:var(--ff-serif);font-size:23px;font-weight:700;color:#f3f1ea;letter-spacing:-0.3px;line-height:1.2;text-align:center;" data-i18n="loading_title">Analizando con IA…</div>
+      <div style="font-size:12.5px;color:rgba(243,241,234,0.7);text-align:center;margin:4px 0 16px;" data-i18n="ls_sub">Esto es exactamente lo que está pasando</div>
+      <!-- Pasos del proceso clínico, rellenados por dmLoadingSteps() al entrar -->
+      <div id="dm-ls-steps"></div>
+      <div style="margin-top:auto;border-top:1px solid rgba(243,241,234,0.15);padding-top:12px;">
+        <div style="font-size:11.5px;color:rgba(243,241,234,0.65);line-height:1.5;font-style:italic;" data-i18n="ls_foot">Cada análisis sigue el mismo proceso clínico, creado por Teo Mariscal y su equipo. Puede tardar unos minutos — <strong>no cierres la app</strong>.</div>
+        <div style="margin-top:8px;font-size:10.5px;line-height:1.45;color:rgba(243,241,234,0.45);" data-i18n="loading_disclaimer">The Dogs’ Mind te ofrece un análisis por IA y puede cometer errores. No sustituye a tu etólogo veterinario.</div>
       </div>
     </div>
   </div>
   <style>
     @keyframes dotPulse { 0%,80%,100%{opacity:0.25;transform:scale(0.85);} 40%{opacity:1;transform:scale(1.15);} }
     @keyframes laSpin { to { transform: rotate(360deg); } }
+    /* Pasos clínicos de la pantalla de espera (texto cream sobre vibrant) */
+    .dm-ls-step{display:flex;gap:12px;align-items:flex-start;padding:8px 0;}
+    .dm-ls-ic{width:24px;height:24px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .3s;}
+    .dm-ls-step.done  .dm-ls-ic{background:rgba(126,184,106,0.2);border:1.5px solid #7eb86a;color:#7eb86a;}
+    .dm-ls-step.doing .dm-ls-ic{background:rgba(94,200,230,0.15);border:1.5px solid #5ec8e6;color:#80d6ee;}
+    .dm-ls-step.todo  .dm-ls-ic{background:rgba(243,241,234,0.05);border:1.5px solid rgba(243,241,234,0.2);color:rgba(243,241,234,0.35);}
+    .dm-ls-step b{font-size:13.5px;display:block;font-weight:600;color:#f3f1ea;transition:color .3s;}
+    .dm-ls-step.todo b{color:rgba(243,241,234,0.45);}
+    .dm-ls-step.doing b{color:#80d6ee;}
+    .dm-ls-step span{font-size:11.5px;color:rgba(243,241,234,0.6);line-height:1.45;display:block;margin-top:2px;}
+    .dm-ls-step span.dm-ls-pulse{display:none;width:34px;height:4px;border-radius:4px;background:linear-gradient(90deg,#5ec8e6,transparent);margin-top:6px;animation:dmLsPl 1.2s infinite;}
+    .dm-ls-step.doing span.dm-ls-pulse{display:inline-block;}
+    .dm-ls-step .dm-ls-dog{display:inline !important;}
+    @keyframes dmLsPl { 50%{opacity:.25;} }
   </style>
 
   <div id="s-abc" class="screen" style="background:linear-gradient(180deg, #0e1f1a 0%, #14302a 100%);">
@@ -11375,6 +11404,45 @@ function stepperDown(id) {
 }
 
 // ── NAV ────────────────────────────────────────
+// ── Pantalla de espera: pasos del proceso clínico ─────────────────────────
+// Sustituye a Cecilia+reloj (decisión founder 2026-07-24): la espera del
+// análisis/plan explica el proceso real. mode: 'analysis' | 'plan'.
+// Cadencia 12s/paso; el último queda "en curso" hasta que llega la respuesta.
+var _dmLsTimer = null;
+function dmLoadingSteps(mode, dogName) {
+  var box = document.getElementById('dm-ls-steps');
+  if (!box) return;
+  if (_dmLsTimer) { clearInterval(_dmLsTimer); _dmLsTimer = null; }
+  var esc = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };
+  var dog = esc((dogName || '').trim() || _i18nText('ls_dog_fb', 'tu perro'));
+  var prefix = mode === 'plan' ? 'ls_p' : 'ls_a';
+  var html = '';
+  for (var i = 1; i <= 5; i++) {
+    var t = _i18nText(prefix + i + '_t', '');
+    var d = _i18nText(prefix + i + '_d', '').replace(/\{dog\}/g, '<span class="dm-ls-dog">' + dog + '</span>');
+    html += '<div class="dm-ls-step todo" id="dm-ls-s' + (i - 1) + '">'
+      + '<div class="dm-ls-ic">&#9675;</div>'
+      + '<div><b>' + t + '</b><span>' + d + '</span><span class="dm-ls-pulse"></span></div></div>';
+  }
+  box.innerHTML = html;
+  var idx = 0;
+  function paint() {
+    for (var j = 0; j < 5; j++) {
+      var n = document.getElementById('dm-ls-s' + j);
+      if (!n) return;
+      n.className = 'dm-ls-step ' + (j < idx ? 'done' : j === idx ? 'doing' : 'todo');
+      n.querySelector('.dm-ls-ic').innerHTML = j < idx ? '&#10003;' : j === idx ? '&#9679;' : '&#9675;';
+    }
+  }
+  paint();
+  _dmLsTimer = setInterval(function () {
+    var scr = document.getElementById('s-loading-analysis');
+    if (!scr || !scr.classList.contains('active')) { clearInterval(_dmLsTimer); _dmLsTimer = null; return; }
+    if (idx < 4) { idx++; paint(); }
+    else { clearInterval(_dmLsTimer); _dmLsTimer = null; }
+  }, 12000);
+}
+
 function goTo(id) {
   // Deep-link del campus: si hay un ejercicio pendiente (?ej=) y sesión iniciada,
   // la 1ª vez que iríamos a Home redirigimos a la ficha de Entrenamiento Específico.
@@ -16308,6 +16376,7 @@ function getVal(id, fallback) {
         : _lang === 'it' ? 'Generazione del piano d’intervento…'
         : 'Generando plan de intervención…';
     }
+    dmLoadingSteps('plan', '');
     goTo('s-loading-analysis');
     var loading  = document.getElementById('interv-loading');
     var empty    = document.getElementById('interv-empty');
@@ -16563,8 +16632,18 @@ async function analyzeWithAI() {
   var _loadingTitle = document.getElementById('loading-title');
   if (_loadingTitle) {
     var _lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
-    _loadingTitle.textContent = _lang === 'en' ? 'Analyzing with AI…' : 'Analizando con IA…';
+    var _dn = (dogName || '').trim();
+    if (_dn) {
+      _loadingTitle.textContent = _lang === 'en' ? 'Analyzing ' + _dn + '…'
+        : _lang === 'it' ? 'Analisi di ' + _dn + '…'
+        : 'Analizando a ' + _dn + '…';
+    } else {
+      _loadingTitle.textContent = _lang === 'en' ? 'Analyzing with AI…'
+        : _lang === 'it' ? 'Analisi con IA…'
+        : 'Analizando con IA…';
+    }
   }
+  dmLoadingSteps('analysis', dogName);
   goTo('s-loading-analysis');
 
   try {
@@ -19144,6 +19223,30 @@ function endTourIntro() {
       loading_title:    'Analizando con IA…',
       loading_msg:      'Estás utilizando una herramienta de análisis de conducta animal muy potente y va a tomar algo de tiempo. Relax que esto puede tardar unos minutos, <strong>no cierres la app</strong>.',
       loading_disclaimer: 'The Dogs’ Mind te ofrece un análisis por IA y puede cometer errores. No sustituye a tu etólogo veterinario.',
+      // Pantalla de espera con pasos clínicos (2026-07-24)
+      ls_sub:    'Esto es exactamente lo que está pasando',
+      ls_foot:   'Cada análisis sigue el mismo proceso clínico, creado por Teo Mariscal y su equipo. Puede tardar unos minutos — <strong>no cierres la app</strong>.',
+      ls_dog_fb: 'tu perro',
+      ls_a1_t: 'Anamnesis revisada',
+      ls_a1_d: 'Historia, entorno, salud y la conducta problema de {dog}.',
+      ls_a2_t: 'Antecedentes identificados',
+      ls_a2_d: 'Qué dispara la conducta y en qué contextos aparece.',
+      ls_a3_t: 'Analizando la función de la conducta',
+      ls_a3_d: 'Qué consigue {dog} con ella — la clave del análisis funcional.',
+      ls_a4_t: 'Contraste con casos y bibliografía',
+      ls_a4_d: 'Casos resueltos y bibliografía científica seleccionada.',
+      ls_a5_t: 'Redacción del informe',
+      ls_a5_d: 'Análisis completo con criterio clínico y métodos respetuosos (LIMA).',
+      ls_p1_t: 'Hipótesis funcional revisada',
+      ls_p1_d: 'El plan parte del análisis del caso, no de recetas genéricas.',
+      ls_p2_t: 'Selección de procedimientos',
+      ls_p2_d: 'Refuerzo positivo y métodos respetuosos (LIMA).',
+      ls_p3_t: 'Estructura por fases',
+      ls_p3_d: 'Objetivos progresivos, de lo fácil a lo difícil.',
+      ls_p4_t: 'Criterios de avance',
+      ls_p4_d: 'Cuándo subir de fase y qué registrar cada día.',
+      ls_p5_t: 'Redacción del plan',
+      ls_p5_d: 'Instrucciones claras para aplicarlo desde hoy.',
       // Análisis multimodal con vídeo — beta privada
       video_badge:    'BETA PRIVADA',
       video_teaser_t: 'Análisis multimodal con vídeo',
@@ -20101,6 +20204,30 @@ function endTourIntro() {
       // Loading screen + Cecilia helper CTA
       loading_title:    'Analyzing with AI…',
       loading_msg:      'You are using a very powerful behavioral analysis tool and it will take some time. Relax — this may take a few minutes, <strong>do not close the app</strong>.',
+      // Loading screen with clinical steps (2026-07-24)
+      ls_sub:    'This is exactly what is happening',
+      ls_foot:   'Every analysis follows the same clinical process, created by Teo Mariscal and his team. It may take a few minutes — <strong>do not close the app</strong>.',
+      ls_dog_fb: 'your dog',
+      ls_a1_t: 'Anamnesis reviewed',
+      ls_a1_d: '{dog}’s history, environment, health and problem behavior.',
+      ls_a2_t: 'Antecedents identified',
+      ls_a2_d: 'What triggers the behavior and in which contexts it appears.',
+      ls_a3_t: 'Analyzing the function of the behavior',
+      ls_a3_d: 'What {dog} gets from it — the key to functional analysis.',
+      ls_a4_t: 'Cross-checking cases and literature',
+      ls_a4_d: 'Solved cases and selected scientific literature.',
+      ls_a5_t: 'Writing the report',
+      ls_a5_d: 'Full analysis with clinical judgment and respectful methods (LIMA).',
+      ls_p1_t: 'Functional hypothesis reviewed',
+      ls_p1_d: 'The plan builds on the case analysis, not generic recipes.',
+      ls_p2_t: 'Selecting procedures',
+      ls_p2_d: 'Positive reinforcement and respectful methods (LIMA).',
+      ls_p3_t: 'Phased structure',
+      ls_p3_d: 'Progressive goals, from easy to hard.',
+      ls_p4_t: 'Progress criteria',
+      ls_p4_d: 'When to move up a phase and what to record each day.',
+      ls_p5_t: 'Writing the plan',
+      ls_p5_d: 'Clear instructions to start today.',
       loading_disclaimer: 'The Dogs’ Mind provides an AI-generated analysis and may contain errors. It does not replace your veterinary ethologist.',
       // Multimodal video analysis — private beta
       video_badge:    'PRIVATE BETA',
@@ -21061,6 +21188,30 @@ function endTourIntro() {
           // Schermata di caricamento + CTA helper Cecilia
           loading_title:    'Analisi con IA…',
           loading_msg:      'Stai utilizzando uno strumento di analisi del comportamento animale molto potente e ci vorrà un po’ di tempo. Rilassati, questo può richiedere alcuni minuti, <strong>non chiudere l’app</strong>.',
+          // Schermata di attesa con passi clinici (2026-07-24)
+          ls_sub:    'Ecco esattamente cosa sta succedendo',
+          ls_foot:   'Ogni analisi segue lo stesso processo clinico, creato da Teo Mariscal e dal suo team. Può richiedere alcuni minuti — <strong>non chiudere l’app</strong>.',
+          ls_dog_fb: 'il tuo cane',
+          ls_a1_t: 'Anamnesi esaminata',
+          ls_a1_d: 'Storia, ambiente, salute e comportamento problema di {dog}.',
+          ls_a2_t: 'Antecedenti identificati',
+          ls_a2_d: 'Cosa scatena il comportamento e in quali contesti compare.',
+          ls_a3_t: 'Analisi della funzione del comportamento',
+          ls_a3_d: 'Cosa ottiene {dog} con esso — la chiave dell’analisi funzionale.',
+          ls_a4_t: 'Confronto con casi e bibliografia',
+          ls_a4_d: 'Casi risolti e bibliografia scientifica selezionata.',
+          ls_a5_t: 'Stesura del report',
+          ls_a5_d: 'Analisi completa con criterio clinico e metodi rispettosi (LIMA).',
+          ls_p1_t: 'Ipotesi funzionale rivista',
+          ls_p1_d: 'Il piano parte dall’analisi del caso, non da ricette generiche.',
+          ls_p2_t: 'Selezione delle procedure',
+          ls_p2_d: 'Rinforzo positivo e metodi rispettosi (LIMA).',
+          ls_p3_t: 'Struttura per fasi',
+          ls_p3_d: 'Obiettivi progressivi, dal facile al difficile.',
+          ls_p4_t: 'Criteri di avanzamento',
+          ls_p4_d: 'Quando salire di fase e cosa registrare ogni giorno.',
+          ls_p5_t: 'Stesura del piano',
+          ls_p5_d: 'Istruzioni chiare per iniziare da oggi.',
           loading_disclaimer: 'The Dogs’ Mind ti offre un’analisi tramite IA e può commettere errori. Non sostituisce il tuo etologo veterinario.',
           // Analisi multimodale con video — beta privata
           video_badge:    'BETA PRIVATA',

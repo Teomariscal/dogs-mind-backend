@@ -11895,7 +11895,13 @@ async function _planSimpleFlow(rec, opts) {
       var mdata = await mres.json();
       var mresult = (mdata.results && mdata.results[0]) || null;
       if (!mresult || !mresult.case_id) {
-        showToast(_i18nText('pp_err_sync', 'No se pudo sincronizar el caso.'));
+        // Cupo de casos lleno → decirlo claro (antes: "No se pudo sincronizar",
+        // que parecía un fallo de red y dejaba el botón "muerto" sin explicación).
+        if (mresult && mresult.status === 'skipped_quota') {
+          showToast(mresult.detail || _i18nText('case_quota_full', 'Has alcanzado tu límite de casos. Borra o cierra uno para guardar este.'));
+        } else {
+          showToast(_i18nText('pp_err_sync', 'No se pudo sincronizar el caso.'));
+        }
         return;
       }
       caseId = mresult.case_id;
@@ -12122,7 +12128,13 @@ async function tdmDownloadFullPdf() {
       var mdata = await mres.json();
       var mresult = (mdata.results && mdata.results[0]) || null;
       if (!mresult || !mresult.case_id) {
-        showToast(_i18nText('pp_err_sync', 'No se pudo sincronizar el caso.'));
+        // Cupo de casos lleno → decirlo claro (antes: "No se pudo sincronizar",
+        // que parecía un fallo de red y dejaba el botón "muerto" sin explicación).
+        if (mresult && mresult.status === 'skipped_quota') {
+          showToast(mresult.detail || _i18nText('case_quota_full', 'Has alcanzado tu límite de casos. Borra o cierra uno para guardar este.'));
+        } else {
+          showToast(_i18nText('pp_err_sync', 'No se pudo sincronizar el caso.'));
+        }
         return;
       }
       caseId = mresult.case_id;
@@ -16188,6 +16200,29 @@ function getVal(id, fallback) {
 
   // ────────────────────────────────────────────────────────────────────────────
   async function acceptIntervention() {
+    // Guard anti doble-toque (bug triplicación 2026-07-28): sin esto, cada
+    // toque hacía unshift de un record nuevo (id=Date.now()) y con el cupo
+    // de casos lleno la migración fallaba en silencio → copias locales.
+    if (window._acceptInFlight) return;
+    window._acceptInFlight = true;
+    try { await _acceptInterventionInner(); }
+    finally { window._acceptInFlight = false; }
+  }
+
+  async function _acceptInterventionInner() {
+    // Dedup: si este mismo plan ya está guardado (mismo texto de plan),
+    // no crear otro record — reusar el existente y navegar a Registros.
+    try {
+      var _dupPlan = window._lastInterventionPlan || '';
+      if (_dupPlan.length > 50) {
+        var _existing = getRecords().find(function(r){ return r && r.plan === _dupPlan; });
+        if (_existing) {
+          goTo('s-records');
+          showToast(_i18nText('case_already_saved', 'Este caso ya estaba guardado.'));
+          return;
+        }
+      }
+    } catch(e) {}
     // Save accepted case to localStorage behavioral records
     var record = {
       id:       Date.now(),
@@ -16259,8 +16294,9 @@ function getVal(id, fallback) {
             } else if (mresult && mresult.status === 'skipped_quota') {
               // Límite de casos del plan alcanzado → aviso claro. El caso queda
               // en local; el usuario debe borrar uno para guardarlo en backend.
-              var _qmsg = mresult.detail || _i18nText('case_quota_full', 'Has alcanzado tu límite de casos. Borra uno para guardar este.');
+              var _qmsg = mresult.detail || _i18nText('case_quota_full', 'Has alcanzado tu límite de casos. Borra o cierra uno para guardar este.');
               try { showToast(_qmsg); } catch(_) {}
+              window._acceptQuotaHit = true;  // suprime el flash de éxito (mensajes contradictorios)
             }
           }
         }
@@ -16286,7 +16322,10 @@ function getVal(id, fallback) {
     }
 
     goTo('s-records');
-    // Brief confirmation flash
+    // Brief confirmation flash — NO si la migración chocó con el cupo (el
+    // toast de cupo ya explica la situación; "registrado correctamente"
+    // a la vez era contradictorio y enmascaraba el problema).
+    if (window._acceptQuotaHit) { window._acceptQuotaHit = false; return; }
     setTimeout(function() {
       var toast = document.createElement('div');
       toast.textContent = 'Caso registrado correctamente';
@@ -19427,6 +19466,8 @@ function endTourIntro() {
       pp_err_no_balance:    'Saldo insuficiente. Recarga al menos 0,1 tokens.',
       pp_err_rate:          'Has alcanzado el máximo de generaciones por hora. Espera un momento.',
       pp_err_sync:          'No se pudo sincronizar el caso.',
+      case_quota_full:      'Has alcanzado tu límite de casos. Borra o cierra uno para guardar este.',
+      case_already_saved:   'Este caso ya estaba guardado.',
       pp_err_failed:        'No se pudo generar el plan sencillo.',
       pp_share_title:       'Plan sencillo · The Dogs’ Mind',
       pp_share_copied:      'Copiado al portapapeles',
@@ -20409,6 +20450,8 @@ function endTourIntro() {
       pp_err_no_balance:    'Insufficient balance. Top up at least 0.1 tokens.',
       pp_err_rate:          'You’ve reached the maximum generations per hour. Wait a moment.',
       pp_err_sync:          'Could not sync the case.',
+      case_quota_full:      'You have reached your case limit. Delete or close one to save this case.',
+      case_already_saved:   'This case was already saved.',
       pp_err_failed:        'Could not generate the simple plan.',
       pp_share_title:       'Simple plan · The Dogs’ Mind',
       pp_share_copied:      'Copied to clipboard',
@@ -21393,6 +21436,8 @@ function endTourIntro() {
           pp_err_no_balance:    'Saldo insufficiente. Ricarica almeno 0,1 tokens.',
           pp_err_rate:          'Hai raggiunto il massimo di generazioni all’ora. Aspetta un momento.',
           pp_err_sync:          'Impossibile sincronizzare il caso.',
+          case_quota_full:      'Hai raggiunto il limite di casi. Elimina o chiudi un caso per salvare questo.',
+          case_already_saved:   'Questo caso era già salvato.',
           pp_err_failed:        'Impossibile generare il piano semplice.',
           pp_share_title:       'Piano semplice · The Dogs’ Mind',
           pp_share_copied:      'Copiato negli appunti',

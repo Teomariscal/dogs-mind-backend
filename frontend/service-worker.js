@@ -1,3 +1,4 @@
+// v225 (BUG triplicación caso + botón plan sencillo "muerto" con cupo de casos lleno — founder 2026-07-28: (1) acceptIntervention: guard anti doble-toque + dedup por texto de plan (no más copias locales) + sin flash "registrado correctamente" cuando la migración choca con el cupo; (2) plan sencillo/ABC explicado: si migrate devuelve skipped_quota, toast claro de cupo (case_quota_full es/en/it) en vez del genérico "No se pudo sincronizar". Causa raíz: cuenta pro del founder en el tope de 20 casos.)
 // v224 (2 cambios founder 2026-07-24: [1] pantalla de espera con pasos clínicos — sustituye Cecilia+reloj en s-loading-analysis por 5 pasos en vivo, 2 juegos analysis/plan, es/en/it, nombre del perro dinámico, cadencia 12s, último queda "en curso" hasta la respuesta; [2] exterminio cream en s-login/registro — fondo vibrant emerald, tarjetas glass oscuras, inputs/selects glass con focus cyan, acentos oro→cyan/lime. Aprobados en beta visual, van al 1.0.5)
 // v223 (anamnesis: campo ¿Esterilizado? Sí/No tras Sexo — es/en/it, borrador, payload `neutered` opcional retrocompatible; backend lo pasa a prompts de análisis y plan. Founder 2026-07-20, va al 1.0.5)
 // v222 (fix chat Aigents Android: el final de las respuestas largas [Cecilia en Sonnet] quedaba oculto bajo el borde por scroll síncrono antes del reflow del WebView → _scrollChatBottom() con doble rAF + reintentos. 2026-07-19)
@@ -31,7 +32,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v224';
+const CACHE_NAME = 'dogs-mind-v225';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

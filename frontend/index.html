@@ -12533,7 +12533,7 @@ async function _pcOnEnter() {
   }
 
   var acc = window._myAccount || null;
-  var isProfessional = acc && acc.account_type === 'professional';
+  var isProfessional = dmIsProAccount(acc);
   var fromActivate   = !!window._pcReturnToActivate;
 
   // Estado del banner "vienes desde activar profesional" + ajustes UI
@@ -13004,7 +13004,7 @@ async function onActivateProClick() {
       try { await loadAccountInfo(); } catch(e) {}
     }
     var acc = window._myAccount || null;
-    if (acc && acc.account_type === 'professional') {
+    if (dmIsProAccount(acc)) {
       showToast(_i18nText('pa_err_already_pro', 'Tu cuenta ya es Profesional.'));
       return;
     }
@@ -13727,7 +13727,7 @@ async function _checkProPaymentReturn() {
         await new Promise(function(r) { setTimeout(r, 2000); });
         await loadAccountInfo();
         await fetchBalance();
-        if (window._myAccount && window._myAccount.account_type === 'professional') {
+        if (dmIsProAccount(window._myAccount)) {
           showToast(_i18nText('pa_success_done', '¡Bienvenido a Profesional! Tokens acreditados.'));
           goTo('s-home');
           return;
@@ -17265,7 +17265,7 @@ function renderHomeDogs() {
   // (margin-left:auto) y abre s-pro-company al pulsar.
   var entityHtml = '';
   var acc = window._myAccount || null;
-  if (acc && acc.account_type === 'professional') {
+  if (dmIsProAccount(acc)) {
     var company = acc.company || null;
     var logoData = window._myCompanyLogo || null;  // data URL del logo (cargado aparte)
     var entLabel = (company && company.name)
@@ -17314,7 +17314,7 @@ async function loadAccountInfo() {
     window._myAccount = await res.json();
 
     // Logo aparte: solo cargar si has_company_logo (evita request inútil)
-    if (window._myAccount.has_company_logo && window._myAccount.account_type === 'professional') {
+    if (window._myAccount.has_company_logo && dmIsProAccount(window._myAccount)) {
       try {
         var lr = await fetch(API_BASE + '/me/company/logo', {
           headers: authHeaders(), cache: 'no-store',
@@ -17346,18 +17346,28 @@ function renderHomeProBadge() {
   var el = document.getElementById('home-pro-badge');
   if (!el) return;
   var acc = window._myAccount || null;
-  var isPro = !!(acc && acc.account_type === 'professional');
+  var isPro = dmIsProAccount(acc);
   el.style.display = isPro ? 'flex' : 'none';
 }
 window.renderHomeProBadge = renderHomeProBadge;
 
 // Muestra/oculta la card "Inspiración Profesional" en el home según el tier.
 // Mismo gating que renderHomeProBadge(): solo account_type === 'professional'.
+// Cuenta "pro-like": professional O corporativo. El tipo corporativo (ilimitado,
+// asignado a mano en DB) debe ver TODO lo de professional — bug 2026-07-28:
+// al pasar la cuenta del founder a corporativo desapareció Inspiración
+// Profesional (y demás features pro) porque los gates comparaban solo
+// === 'professional'.
+function dmIsProAccount(acc) {
+  return !!(acc && (acc.account_type === 'professional' || acc.account_type === 'corporativo'));
+}
+window.dmIsProAccount = dmIsProAccount;
+
 function renderHomeInspBtn() {
   var el = document.getElementById('home-insp-btn');
   if (!el) return;
   var acc = window._myAccount || null;
-  var isPro = !!(acc && acc.account_type === 'professional');
+  var isPro = dmIsProAccount(acc);
   // Founder 2026-07-11: Inspiración Profesional se incorpora a las APPS tal
   // cual está en la web — visible para profesionales en todas las plataformas.
   // (El gate de plataforma nativa de la v1 App Store queda retirado.)

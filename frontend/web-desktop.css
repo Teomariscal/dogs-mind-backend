@@ -511,6 +511,60 @@
   body.dm-web .dmw-social p {
     margin: 0; font-size: 14.5px; line-height: 1.7; color: var(--w-muted); max-width: 68ch;
   }
+  /* ── Prototipo de rutas ───────────────────────────────────────────────── */
+  body.dm-web .dmw-proto {
+    margin-top: var(--w-s8); border-radius: var(--w-r-card);
+    border: 1.5px solid var(--w-cyan-45); overflow: hidden;
+    background: linear-gradient(180deg, rgba(20,48,42,.96), rgba(10,26,20,.96));
+    box-shadow: var(--w-e2);
+  }
+  body.dm-web .dmw-proto-h {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: var(--w-s4); padding: var(--w-s3) var(--w-s4);
+    border-bottom: 1px solid var(--w-line);
+  }
+  body.dm-web .dmw-proto-tag {
+    font-size: 10.5px; letter-spacing: 1.8px; text-transform: uppercase;
+    font-weight: 700; color: var(--w-cyan);
+  }
+  body.dm-web .dmw-proto-loc { font-size: 12.5px; color: var(--w-muted); }
+  body.dm-web .dmw-proto-body {
+    display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: 0;
+  }
+  body.dm-web .dmw-map { width: 100%; height: 100%; display: block; }
+  body.dm-web .dmw-ruta { transition: opacity 180ms ease, stroke-width 180ms ease; }
+  body.dm-web .dmw-poi-m { cursor: help; }
+  body.dm-web .dmw-rutas {
+    display: flex; flex-direction: column; gap: var(--w-s3);
+    padding: var(--w-s4); border-left: 1px solid var(--w-line);
+    max-height: 400px; overflow-y: auto;
+  }
+  body.dm-web .dmw-ruta-c {
+    text-align: left; font-family: inherit; cursor: pointer;
+    background: var(--w-surface); border: 1px solid var(--w-line);
+    border-radius: var(--w-r-ctrl); padding: var(--w-s4); color: var(--w-text);
+    transition: border-color 160ms ease, background 160ms ease;
+  }
+  body.dm-web .dmw-ruta-c.on { border-color: var(--w-cyan); background: var(--w-cyan-12); }
+  body.dm-web .dmw-ruta-top {
+    display: flex; align-items: baseline; justify-content: space-between; gap: var(--w-s3);
+    margin-bottom: 6px;
+  }
+  body.dm-web .dmw-ruta-top b { font-size: 15px; color: #fff; }
+  body.dm-web .dmw-ruta-top span { font-size: 12.5px; color: var(--w-cyan); font-weight: 600; }
+  body.dm-web .dmw-ruta-c p { margin: 0 0 var(--w-s3); font-size: 13px; line-height: 1.55; color: var(--w-muted); }
+  body.dm-web .dmw-ruta-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  body.dm-web .dmw-ruta-tags span {
+    font-size: 11.5px; padding: 4px 10px; border-radius: var(--w-r-pill);
+  }
+  body.dm-web .dmw-ruta-tags .ok {
+    background: rgba(126,184,106,.14); border: 1px solid rgba(126,184,106,.35); color: #a9d69a;
+  }
+  body.dm-web .dmw-ruta-tags .warn {
+    background: rgba(212,167,106,.12); border: 1px solid rgba(212,167,106,.35); color: #e0bd8c;
+  }
+
   body.dm-web .dmw-cita {
     margin: var(--w-s6) 0 0; padding-left: var(--w-s4);
     border-left: 2px solid var(--w-lime);

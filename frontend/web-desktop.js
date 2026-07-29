@@ -219,6 +219,7 @@
   var CONTENIDO = {
     wwdw: {
       claim: 'Pasea con tu perro.',
+      proto: true,
       intro: 'Estés en la ciudad o en el país que estés, si estás con tu perro The Dogs’ Mind te ayuda a elegir la mejor ruta de paseo.',
       como: {
         t: 'Cómo funciona',
@@ -280,7 +281,103 @@
            '<p>' + c.social.p + '</p>' +
            '<blockquote class="dmw-cita">' + c.social.cita + '</blockquote>' +
          '</div>';
+    if (c.proto) h += htmlPrototipo();
     return h;
+  }
+
+  /* ── Prototipo navegable de World Wide Dog Walking ─────────────────────
+     DATOS DE EJEMPLO. Todavía no hay Google Maps ni IA detrás: sirve para
+     decidir si el planteamiento encaja antes de construirlo de verdad. */
+  var RUTAS = [
+    { id: 'corta', nom: 'Vuelta corta', km: '1,2 km', min: '18 min',
+      d: 'M 90 300 L 170 300 L 170 215 L 300 215 L 300 150 L 360 150',
+      bien: ['2 zonas de sombra', 'Fuente de agua a mitad'], mal: [],
+      why: 'Máxima sombra y agua. Ideal ahora, con calor y para un paseo rápido.' },
+    { id: 'media', nom: 'Parque y vuelta', km: '2,8 km', min: '40 min',
+      d: 'M 90 300 L 90 200 L 200 200 L 200 110 L 380 110 L 470 165 L 470 260 L 300 260 L 300 300 L 200 300 L 200 330 L 120 330 L 90 300',
+      bien: ['Zona verde amplia', 'Zona de perros', 'Clínica veterinaria en ruta'],
+      mal: ['Cruza una avenida con tráfico denso'],
+      why: 'La más equilibrada: verde, servicios y distancia media.' },
+    { id: 'larga', nom: 'Río y regreso', km: '4,5 km', min: '1 h 05',
+      d: 'M 90 300 L 60 220 L 120 140 L 250 90 L 400 70 L 520 120 L 560 220 L 500 310 L 380 340 L 250 330 L 150 345 L 90 300',
+      bien: ['Recorrido junto al río', 'Bares pet friendly'],
+      mal: ['Tramo final sin sombra', 'Se han reportado perros sueltos'],
+      why: 'Para cuando tenéis tiempo y ganas de kilómetros.' }
+  ];
+  var POIS = [
+    { x: 200, y: 145, t: 'verde',  n: 'Parque de la Alameda' },
+    { x: 430, y: 175, t: 'vet',    n: 'Clínica veterinaria' },
+    { x: 250, y: 215, t: 'agua',   n: 'Fuente de agua' },
+    { x: 330, y: 265, t: 'perros', n: 'Zona de perros' },
+    { x: 145, y: 265, t: 'pet',    n: 'Café pet friendly' },
+    { x: 470, y: 300, t: 'aviso',  n: 'Tráfico denso' },
+    { x: 520, y: 130, t: 'aviso',  n: 'Sin sombra en verano' }
+  ];
+  var POI_COLOR = { verde: '#7eb86a', vet: '#5ec8e6', agua: '#5ec8e6',
+                    perros: '#7eb86a', pet: '#7eb86a', aviso: '#d4a76a' };
+
+  function htmlPrototipo() {
+    var mapa =
+      '<svg class="dmw-map" viewBox="0 0 640 400" role="img" aria-label="Mapa de ejemplo con rutas">' +
+        '<defs>' +
+          '<pattern id="dmwgrid" width="32" height="32" patternUnits="userSpaceOnUse">' +
+            '<path d="M32 0H0V32" fill="none" stroke="rgba(94,200,230,.10)" stroke-width="1"/>' +
+          '</pattern>' +
+        '</defs>' +
+        '<rect width="640" height="400" fill="#0a1a14"/>' +
+        '<rect width="640" height="400" fill="url(#dmwgrid)"/>' +
+        '<circle cx="200" cy="145" r="52" fill="rgba(126,184,106,.16)"/>' +
+        '<circle cx="330" cy="265" r="34" fill="rgba(126,184,106,.12)"/>' +
+        RUTAS.map(function (r) {
+          return '<path class="dmw-ruta" data-r="' + r.id + '" d="' + r.d + '" fill="none" ' +
+                 'stroke="#5ec8e6" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity=".18"/>';
+        }).join('') +
+        POIS.map(function (p) {
+          return '<g class="dmw-poi-m"><circle cx="' + p.x + '" cy="' + p.y + '" r="7" fill="' + POI_COLOR[p.t] + '" opacity=".9"/>' +
+                 '<circle cx="' + p.x + '" cy="' + p.y + '" r="12" fill="none" stroke="' + POI_COLOR[p.t] + '" opacity=".35"/>' +
+                 '<title>' + p.n + '</title></g>';
+        }).join('') +
+        '<g><circle cx="90" cy="300" r="9" fill="#fff"/><circle cx="90" cy="300" r="18" fill="none" stroke="#fff" opacity=".35"/>' +
+        '<title>Estáis aquí</title></g>' +
+      '</svg>';
+
+    var lista = RUTAS.map(function (r, i) {
+      return '<button class="dmw-ruta-c' + (i === 1 ? ' on' : '') + '" data-r="' + r.id + '">' +
+               '<div class="dmw-ruta-top"><b>' + r.nom + '</b><span>' + r.km + ' · ' + r.min + '</span></div>' +
+               '<p>' + r.why + '</p>' +
+               '<div class="dmw-ruta-tags">' +
+                 r.bien.map(function (b) { return '<span class="ok">' + b + '</span>'; }).join('') +
+                 r.mal.map(function (m) { return '<span class="warn">' + m + '</span>'; }).join('') +
+               '</div>' +
+             '</button>';
+    }).join('');
+
+    return '<div class="dmw-proto">' +
+             '<div class="dmw-proto-h">' +
+               '<span class="dmw-proto-tag">Prototipo · datos de ejemplo</span>' +
+               '<span class="dmw-proto-loc">Tu ubicación · ahora · 31°C</span>' +
+             '</div>' +
+             '<div class="dmw-proto-body">' + mapa + '<div class="dmw-rutas">' + lista + '</div></div>' +
+           '</div>';
+  }
+
+  function cablearPrototipo(root) {
+    var paths = root.querySelectorAll('.dmw-ruta');
+    var cards = root.querySelectorAll('.dmw-ruta-c');
+    function marcar(id) {
+      paths.forEach(function (p) {
+        var on = p.getAttribute('data-r') === id;
+        p.setAttribute('opacity', on ? '1' : '.15');
+        p.setAttribute('stroke', on ? '#5ec8e6' : '#e8efea');
+        p.setAttribute('stroke-width', on ? '5' : '3');
+      });
+      cards.forEach(function (c) { c.classList.toggle('on', c.getAttribute('data-r') === id); });
+    }
+    cards.forEach(function (c) {
+      c.onclick = function () { marcar(c.getAttribute('data-r')); };
+      c.onmouseenter = function () { marcar(c.getAttribute('data-r')); };
+    });
+    marcar('media');
   }
 
   function abrirPanel(id, titulo) {
@@ -298,6 +395,7 @@
     ovl.classList.add('on');
     ovl.setAttribute('data-panel', id);
     ovl.querySelector('.dmw-panel-card').scrollTop = 0;
+    if (ovl.querySelector('.dmw-proto')) cablearPrototipo(ovl);
     document.addEventListener('keydown', escCerrar);
   }
   function cerrarPanel() {

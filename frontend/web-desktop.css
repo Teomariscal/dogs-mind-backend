@@ -168,10 +168,40 @@
     padding-left: var(--w-s6); padding-right: var(--w-s6);
     box-sizing: border-box;
   }
-  /* Cromo móvil que NO pinta en escritorio */
+  /* Cromo móvil que NO pinta en escritorio.
+     .cards-row son las tarjetas verde claro de la app (Registros / Aigents /
+     Analysis by Teo Mariscal): mismas funciones que la barra y la rejilla, y
+     otro lenguaje visual → fuera por redundantes (founder 2026-07-29). */
   body.dm-web .home-topbar,
   body.dm-web #s-home .hero-banner,
+  body.dm-web #s-home .cards-row,
   body.dm-web #global-nav { display: none !important; }
+
+  /* Consejo del día: se queda (no es redundante) pero en el lenguaje nuevo.
+     El anillo de tokens se retira de aquí — su sitio es la barra superior. */
+  body.dm-web #s-home .insight-row {
+    background: linear-gradient(180deg, rgba(20,48,42,.92), rgba(10,26,20,.92)) !important;
+    border: 1px solid var(--w-line) !important;
+    border-radius: var(--w-r-card) !important;
+    padding: var(--w-s4) var(--w-s6) !important;
+    margin-bottom: var(--w-s6) !important;
+    box-shadow: var(--w-e1);
+  }
+  body.dm-web #s-home .insight-text { color: var(--w-muted) !important; font-size: 13.5px !important; }
+  body.dm-web #s-home .insight-icon { background: var(--w-cyan-12) !important; border: 1px solid var(--w-cyan-20); color: var(--w-cyan) !important; }
+  body.dm-web #s-home .token-slot { display: none !important; }
+
+  /* Saldo en la barra superior */
+  body.dm-web .dmw-saldo {
+    display: flex; align-items: center; gap: var(--w-s2);
+    padding: 8px var(--w-s4); border-radius: var(--w-r-pill);
+    background: var(--w-surface); border: 1px solid var(--w-cyan-20);
+    color: var(--w-text); font-family: inherit; font-size: 13px; cursor: pointer;
+    transition: background 180ms ease, border-color 180ms ease;
+  }
+  body.dm-web .dmw-saldo:hover { background: var(--w-cyan-12); border-color: var(--w-cyan-45); }
+  body.dm-web .dmw-saldo b { font-size: 14px; font-weight: 700; color: var(--w-cyan); }
+  body.dm-web .dmw-saldo span { color: var(--w-muted); }
 
   /* ══ HERO EN VÍDEO ════════════════════════════════════════════════════ */
   body.dm-web .dmw-hero {
@@ -296,6 +326,61 @@
     font-size: 26px; font-weight: 600; color: #fff;
   }
   body.dm-web .dmw-sec-h span { font-size: 13px; color: var(--w-subtle); }
+
+  /* ══ FRANJA DE AIGENTS (tercio inferior) ══════════════════════════════ */
+  body.dm-web .dmw-aigents {
+    position: relative;
+    margin: var(--w-s8) 0 var(--w-s16);
+    padding: var(--w-s8) var(--w-s8) var(--w-s6);
+    border-radius: var(--w-r-card);
+    border: 1.5px solid var(--w-cyan-45);
+    background:
+      radial-gradient(ellipse 80% 120% at 50% 0%, rgba(94,200,230,.10), transparent 65%),
+      linear-gradient(180deg, rgba(20,48,42,.96), rgba(10,26,20,.96));
+    box-shadow: var(--w-e2), inset 0 0 0 1px rgba(126,184,106,.10);
+    overflow: hidden;
+  }
+  body.dm-web .dmw-aigents::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(94,200,230,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(94,200,230,.05) 1px, transparent 1px);
+    background-size: 46px 46px;
+  }
+  body.dm-web .dmw-aigents-h {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: var(--w-s6); margin-bottom: var(--w-s6);
+  }
+  body.dm-web .dmw-aigents-h h2 {
+    margin: 0; font-family: var(--ff-serif, 'Cormorant Garamond', serif);
+    font-size: 28px; font-weight: 600; color: #fff;
+  }
+  body.dm-web .dmw-aigents-cta {
+    font-family: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer;
+    padding: 11px var(--w-s6); border-radius: var(--w-r-pill);
+    background: var(--w-cyan-12); color: var(--w-text);
+    border: 1.5px solid var(--w-cyan-45);
+    transition: background 180ms ease, border-color 180ms ease;
+  }
+  body.dm-web .dmw-aigents-cta:hover { background: rgba(94,200,230,.22); border-color: var(--w-cyan); }
+  /* Foto de grupo: centrada, grande, marco verde-cyan */
+  body.dm-web .dmw-aigents-ph {
+    position: relative; z-index: 1;
+    display: block; width: 100%; max-width: 980px; margin: 0 auto;
+    padding: 0; background: none; cursor: pointer;
+    border: 2px solid var(--w-lime); border-radius: var(--w-r-card);
+    overflow: hidden;
+    box-shadow: 0 0 0 4px rgba(94,200,230,.16), var(--w-e2);
+    transition: transform 200ms ease, box-shadow 240ms ease, border-color 200ms ease;
+  }
+  body.dm-web .dmw-aigents-ph img { width: 100%; height: auto; display: block; }
+  body.dm-web .dmw-aigents-ph:hover {
+    transform: translateY(-4px);
+    border-color: var(--w-cyan);
+    box-shadow: 0 0 0 5px rgba(94,200,230,.28), var(--w-e3);
+  }
+  body.dm-web .dmw-aigents-ph:active { transform: translateY(-1px); }
 
   /* ══ LECTURA CLÍNICA ══════════════════════════════════════════════════ */
   body.dm-web .analysis-content,

@@ -119,6 +119,20 @@
       nav.appendChild(n);
     });
     inner.appendChild(nav);
+
+    /* Saldo: sustituye al anillo de tokens de la home móvil (que en escritorio
+       se oculta). Se refresca solo leyendo el contador que ya mantiene la app. */
+    var saldo = el('button', 'dmw-saldo', '<b id="dmw-saldo-n">–</b><span>créditos</span>');
+    saldo.onclick = function () { irA('s-tokens'); };
+    inner.appendChild(saldo);
+    var pinta = function () {
+      var src = document.getElementById('tok-home');
+      var n = document.getElementById('dmw-saldo-n');
+      if (src && n) n.textContent = (src.textContent || '').trim() || '–';
+    };
+    pinta();
+    setInterval(pinta, 2500);
+
     bar.appendChild(inner);
 
     var row2 = el('div', 'dmw-bar2');
@@ -183,6 +197,21 @@
 
     scroll.insertBefore(grid, scroll.firstChild);
     scroll.insertBefore(hero, scroll.firstChild);
+
+    /* Franja inferior: la foto de grupo de los Aigents (la misma de la app),
+       centrada y grande, enmarcada en verde-cyan. */
+    var band = el('section', 'dmw-aigents',
+      '<div class="dmw-aigents-h">' +
+        '<h2>The Dogs Aigents</h2>' +
+        '<button class="dmw-aigents-cta" data-go="s-avatars">Hablar con un Aigent</button>' +
+      '</div>' +
+      '<button class="dmw-aigents-ph" data-go="s-avatars" aria-label="The Dogs Aigents">' +
+        '<img src="aigents-final.webp" alt="Los Aigents — Niaz, Ale, Leo, Katja, Mario, Borja y Cecilia con Maximus" loading="lazy">' +
+      '</button>');
+    band.querySelectorAll('[data-go]').forEach(function (b) {
+      b.onclick = function () { irA(b.getAttribute('data-go')); };
+    });
+    scroll.appendChild(band);
   }
 
   /* ── Paneles de sección (copy pendiente del founder) ───────────────────── */

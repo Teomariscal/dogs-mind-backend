@@ -214,20 +214,90 @@
     scroll.appendChild(band);
   }
 
-  /* ── Paneles de sección (copy pendiente del founder) ───────────────────── */
+  /* ── Contenido de las secciones ─────────────────────────────────────────
+     El copy es del founder. Lo que falta se queda en hueco a propósito. */
+  var CONTENIDO = {
+    wwdw: {
+      claim: 'Pasea con tu perro.',
+      intro: 'Estés en la ciudad o en el país que estés, si estás con tu perro The Dogs’ Mind te ayuda a elegir la mejor ruta de paseo.',
+      como: {
+        t: 'Cómo funciona',
+        pasos: [
+          ['Tu ubicación', 'Google Maps sitúa dónde estáis tu perro y tú en ese momento.'],
+          ['La IA decide', 'Analiza el entorno real: zonas verdes, servicios, sombra y riesgos.'],
+          ['Tres rutas', 'La app te propone tres opciones, de distancias diferentes, y eliges la que mejor os venga hoy.']
+        ]
+      },
+      bloques: [
+        { t: 'La ruta te marca', tipo: 'bien', items: [
+          ['Zonas verdes', IC.mundo],
+          ['Clínicas veterinarias en la ruta', IC.cert],
+          ['Zonas de perros', IC.entrenar],
+          ['Fuentes de agua', IC.novedad],
+          ['Tiendas, restaurantes y bares pet friendly', IC.proyecto],
+          ['Tiendas de animales', IC.suscribe],
+          ['Zonas de sombra', IC.inspira]
+        ]},
+        { t: 'Y te avisa de peligros y molestias', tipo: 'aviso', items: [
+          ['Perros sueltos por la calle'],
+          ['Tráfico denso'],
+          ['Zonas de alta contaminación'],
+          ['Zonas sin sombra en verano']
+        ]}
+      ],
+      social: {
+        t: 'Pasea acompañado',
+        p: 'Si quieres pasear acompañado por otro contacto registrado en la app, solo tienes que dar acceso a otros usuarios para que te encuentren durante el paseo o contacten contigo antes para pasear a los perros juntos.',
+        cita: 'La mejor forma de conocer esa ciudad o ese lugar que te interesa es con un «local» y su perro.'
+      }
+    }
+  };
+
+  function htmlSeccion(c) {
+    var h = '<p class="dmw-claim">' + c.claim + '</p>' +
+            '<p class="dmw-intro">' + c.intro + '</p>';
+    if (c.como) {
+      h += '<h3 class="dmw-h3">' + c.como.t + '</h3><div class="dmw-pasos">';
+      h += c.como.pasos.map(function (p, i) {
+        return '<div class="dmw-paso"><span class="dmw-paso-n">' + (i + 1) + '</span>' +
+               '<b>' + p[0] + '</b><span>' + p[1] + '</span></div>';
+      }).join('') + '</div>';
+    }
+    c.bloques.forEach(function (b) {
+      h += '<h3 class="dmw-h3">' + b.t + '</h3>';
+      if (b.tipo === 'bien') {
+        h += '<div class="dmw-poi">' + b.items.map(function (it) {
+          return '<div class="dmw-poi-i"><span class="dmw-poi-ic">' + svg(it[1]) + '</span>' + it[0] + '</div>';
+        }).join('') + '</div>';
+      } else {
+        h += '<ul class="dmw-avisos">' + b.items.map(function (it) {
+          return '<li>' + it[0] + '</li>';
+        }).join('') + '</ul>';
+      }
+    });
+    h += '<div class="dmw-social">' +
+           '<h3 class="dmw-h3" style="margin-top:0">' + c.social.t + '</h3>' +
+           '<p>' + c.social.p + '</p>' +
+           '<blockquote class="dmw-cita">' + c.social.cita + '</blockquote>' +
+         '</div>';
+    return h;
+  }
+
   function abrirPanel(id, titulo) {
     var ovl = document.getElementById('dmw-panel');
     if (!ovl) return;
     ovl.querySelector('.dmw-panel-title').textContent = titulo;
-    ovl.querySelector('.dmw-panel-body').innerHTML =
-      '<div class="dmw-hueco">' +
-        '<div class="dmw-hueco-tag">Sección preparada</div>' +
-        '<p>La estructura está lista y enlazada desde la barra y desde el panel. ' +
-        'El contenido de esta sección — textos, imágenes, enlaces — lo defines tú. ' +
-        'Dime qué va aquí y lo monto.</p>' +
-      '</div>';
+    ovl.querySelector('.dmw-panel-body').innerHTML = CONTENIDO[id]
+      ? htmlSeccion(CONTENIDO[id])
+      : '<div class="dmw-hueco">' +
+          '<div class="dmw-hueco-tag">Sección preparada</div>' +
+          '<p>La estructura está lista y enlazada desde la barra y desde el panel. ' +
+          'El contenido de esta sección — textos, imágenes, enlaces — lo defines tú. ' +
+          'Dime qué va aquí y lo monto.</p>' +
+        '</div>';
     ovl.classList.add('on');
     ovl.setAttribute('data-panel', id);
+    ovl.querySelector('.dmw-panel-card').scrollTop = 0;
     document.addEventListener('keydown', escCerrar);
   }
   function cerrarPanel() {

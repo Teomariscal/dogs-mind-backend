@@ -5306,6 +5306,19 @@ button:not(:disabled):active{ transform:scale(0.98); }
   transition: border-color 120ms ease, box-shadow 120ms ease;
   min-height: 44px; /* touch target accessibility */
 }
+/* Ojo mostrar/ocultar contraseña dentro del campo (área pro) — 2026-07-28 */
+#s-pro-signup .ps-pw-wrap,
+#s-pro-login .ps-pw-wrap { position: relative; display: block; }
+#s-pro-signup .ps-pw-wrap input,
+#s-pro-login .ps-pw-wrap input { width: 100%; box-sizing: border-box; padding-right: 46px; }
+#s-pro-signup .ps-pw-eye,
+#s-pro-login .ps-pw-eye {
+  position: absolute; top: 50%; right: 8px; transform: translateY(-50%);
+  background: transparent; border: none; cursor: pointer;
+  padding: 8px; line-height: 0; color: var(--ps-text-muted);
+  display: flex; align-items: center; justify-content: center;
+  min-width: 36px; min-height: 36px;
+}
 #s-pro-signup .ps-field input:focus,
 #s-pro-login .ps-field input:focus,
 #s-pro-signup .ps-field select:focus,
@@ -14779,6 +14792,36 @@ function dmApplyIosNativeUI() {
 window.dmApplyIosNativeUI = dmApplyIosNativeUI;
 if (document.readyState !== 'loading') { dmApplyIosNativeUI(); }
 else { document.addEventListener('DOMContentLoaded', dmApplyIosNativeUI); }
+
+// ════ Capa WEB de escritorio — AISLADA de las apps ═══════════════════════════
+// Founder 2026-07-28: la web debe poder crecer (layout ancho, features nuevas,
+// vídeos…) SIN riesgo de tocar App Store / Google Play.
+// TRIPLE CIERRE:
+//   1. Si estamos dentro de una app nativa (Capacitor), esta función sale sin
+//      hacer nada: no se marca el body, no se inyecta CSS, no se carga JS.
+//      Esto es lo que protege también a TABLETS Android y Chrome OS, donde una
+//      media query de ancho sí se activaría dentro de la app.
+//   2. La clase body.dm-web es el único gancho de todas las reglas nuevas.
+//   3. El CSS vive en web-desktop.css (archivo aparte) y además va dentro de
+//      @media (min-width:1024px).
+function dmInitWebLayer() {
+  try {
+    if (typeof dmIsNativeApp === 'function' && dmIsNativeApp()) return;  // app → inerte
+    if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) return;
+    document.body.classList.add('dm-web');
+    var l = document.createElement('link');
+    l.rel = 'stylesheet';
+    l.href = 'web-desktop.css?v=5';
+    document.head.appendChild(l);
+    var s = document.createElement('script');
+    s.src = 'web-desktop.js?v=5';
+    s.defer = true;
+    document.head.appendChild(s);
+  } catch (e) { /* ante la duda, no hacer nada */ }
+}
+window.dmInitWebLayer = dmInitWebLayer;
+if (document.readyState !== 'loading') { dmInitWebLayer(); }
+else { document.addEventListener('DOMContentLoaded', dmInitWebLayer); }
 
 // ════ RevenueCat IAP (iOS) — Fase 2 ════════════════════════════════════════════
 // Cablea los 3 puntos de compra de iOS sobre los guards dmIsIosNative(). INERTE en

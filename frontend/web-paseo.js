@@ -46,15 +46,19 @@
   + '.pf-ts{display:block;font-family:var(--ff-sans,sans-serif);font-size:11.5px;color:#5ec8e6;letter-spacing:.4px;}'
   + '.pf-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 14px 14px;}'
   /* Hero + presentación de Ale (copy del founder 2026-07-29) */
-  + '.pf-hero{position:relative;margin:0 -14px 0;height:180px;overflow:hidden;}'
-  + '.pf-hero img{width:100%;height:100%;object-fit:cover;display:block;}'
+  + '.pf-hero{position:relative;margin:0 -14px 0;height:210px;overflow:hidden;}'
+  + '.pf-hero img{width:100%;height:100%;object-fit:cover;object-position:center 45%;display:block;}'
   + '.pf-hero::after{content:"";position:absolute;inset:0;'
-  +   'background:linear-gradient(0deg,rgba(10,26,20,1) 0%,rgba(10,26,20,.45) 55%,rgba(10,26,20,.15) 100%);}'
-  + '.pf-intro{position:relative;margin:-38px 0 18px;padding:0 2px;z-index:1;}'
-  /* Ale de cuerpo entero con su perra, sin recorte circular (founder 2026-07-29) */
-  + '.pf-intro-top{display:flex;align-items:flex-end;gap:10px;margin-bottom:14px;}'
-  + '.pf-intro-ale{flex:none;width:190px;margin-bottom:-6px;'
-  +   'filter:drop-shadow(0 10px 24px rgba(0,0,0,.55));}'
+  +   'background:linear-gradient(0deg,rgba(10,26,20,1) 2%,rgba(10,26,20,.55) 45%,rgba(10,26,20,.10) 100%);}'
+  + '.pf-hero-cap{position:absolute;left:16px;bottom:12px;z-index:2;font-size:10.5px;'
+  +   'letter-spacing:1.8px;text-transform:uppercase;color:rgba(232,239,234,.62);font-weight:600;}'
+  /* La presentación empieza DEBAJO de la foto: Ale no la pisa */
+  + '.pf-intro{position:relative;margin:16px 0 18px;padding:0 2px;z-index:1;}'
+  /* Ale con su labradora negra, recortada del grupo con el motor de visión de
+     macOS (fondo real eliminado): pequeña, debajo de la foto, sin pisarla. */
+  + '.pf-intro-top{display:flex;align-items:flex-end;gap:12px;margin-bottom:14px;}'
+  + '.pf-intro-ale{flex:none;width:86px;margin-bottom:-2px;'
+  +   'filter:drop-shadow(0 8px 18px rgba(0,0,0,.55));}'
   + '.pf-intro-ale img{width:100%;height:auto;display:block;}'
   + '.pf-intro-n{font-family:var(--ff-serif,serif);font-size:22px;font-weight:600;color:#fff;'
   +   'line-height:1.1;padding-bottom:10px;}'
@@ -120,10 +124,11 @@
     /* Cabecera: hero + Ale presentando la sección (copy del founder) */
     var cab = document.createElement('div');
     cab.innerHTML =
-      '<div class="pf-hero"><img src="assets/images/img-16.webp" alt=""></div>' +
+      '<div class="pf-hero"><img src="assets/images/soho-paseo.webp" alt="Escaparate en Soho, Nueva York">' +
+        '<span class="pf-hero-cap">Soho · Nueva York</span></div>' +
       '<div class="pf-intro">' +
         '<div class="pf-intro-top">' +
-          '<span class="pf-intro-ale"><img src="aig-ale.webp" alt="Ale con su perra"></span>' +
+          '<span class="pf-intro-ale"><img src="ale-paseo.webp?v=2" alt="Ale con su labradora"></span>' +
           '<span class="pf-intro-n">Ale<small>Tu Aigent de paseos</small></span>' +
         '</div>' +
         '<p class="pf-claim">Estés en el lugar del mundo que estés, te ayudamos a elegir ' +

@@ -439,6 +439,23 @@
   }
 
   /* ── Contenido de sección ─────────────────────────────────────────────── */
+  body.dm-web .dmw-ale {
+    display: flex; align-items: flex-end; gap: var(--w-s4); margin-bottom: var(--w-s4);
+  }
+  body.dm-web .dmw-ale img {
+    width: 150px; height: auto; display: block; flex: none;
+    filter: drop-shadow(0 8px 18px rgba(0,0,0,.55));
+  }
+  body.dm-web .dmw-ale span { padding-bottom: 12px; }
+  body.dm-web .dmw-ale b {
+    display: block; font-family: var(--ff-serif, 'Cormorant Garamond', serif);
+    font-size: 24px; font-weight: 600; color: #fff; line-height: 1.1;
+  }
+  body.dm-web .dmw-ale i {
+    display: block; font-style: normal; font-size: 11px; letter-spacing: 1.4px;
+    text-transform: uppercase; color: var(--w-lime); font-weight: 600; margin-top: 4px;
+  }
+
   body.dm-web .dmw-claim {
     margin: 0 0 var(--w-s3); font-family: var(--ff-serif, 'Cormorant Garamond', serif);
     font-size: 24px; font-style: italic; color: var(--w-cyan);
@@ -552,6 +569,33 @@
   body.dm-web .dmw-walk-vacio {
     font-size: 13.5px; line-height: 1.6; color: var(--w-muted); padding: var(--w-s4);
   }
+  /* Cómo empezar + navegación GPS */
+  body.dm-web .dmw-walk-nav:empty { display: none; }
+  body.dm-web .dmw-walk-nav { padding: var(--w-s4); border-top: 1px solid var(--w-line); }
+  body.dm-web .dmw-nav-h {
+    font-size: 10.5px; letter-spacing: 1.8px; text-transform: uppercase;
+    font-weight: 700; color: var(--w-cyan); margin-bottom: var(--w-s3);
+  }
+  body.dm-web .dmw-nav-pasos { margin: 0 0 var(--w-s4); padding-left: 20px; }
+  body.dm-web .dmw-nav-pasos li {
+    font-size: 13.5px; line-height: 1.55; color: var(--w-text); margin-bottom: 6px;
+  }
+  body.dm-web .dmw-nav-pasos li.mas { list-style: none; margin-left: -20px; color: var(--w-subtle); font-size: 12.5px; }
+  body.dm-web .dmw-nav-btns { display: flex; gap: var(--w-s3); flex-wrap: wrap; margin-bottom: var(--w-s3); }
+  body.dm-web .dmw-nav-btn {
+    text-decoration: none; font-size: 13.5px; font-weight: 700;
+    padding: 12px var(--w-s6); border-radius: var(--w-r-pill);
+    background: linear-gradient(135deg, var(--w-lime), var(--w-green)); color: #fff;
+    box-shadow: 0 4px 14px rgba(74,103,65,.35);
+  }
+  body.dm-web .dmw-nav-btn.alt {
+    background: var(--w-cyan-12); color: var(--w-text);
+    border: 1.5px solid var(--w-cyan-45); box-shadow: none;
+  }
+  body.dm-web .dmw-nav-nota, body.dm-web .dmw-nav-vacio {
+    font-size: 12px; line-height: 1.5; color: var(--w-subtle);
+  }
+
   /* Perfil del perro (nivel de actividad + suelto) */
   body.dm-web .dmw-perfil { padding: var(--w-s4); border-top: 1px solid var(--w-line); }
   body.dm-web .dmw-perfil-h {

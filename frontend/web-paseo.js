@@ -106,6 +106,21 @@
   +   '#paseo-full .dmw-foto span{display:block;padding:7px 9px;font-size:11px;color:rgba(232,239,234,.62);'
   +     'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}'
   +   '#paseo-full .dmw-fotos-cred,#paseo-full .dmw-walk-f{font-size:11px;color:rgba(232,239,234,.38);padding:8px 12px;}'
+  +   '#paseo-full .dmw-walk-nav{padding:12px;border-top:1px solid rgba(232,239,234,.10);}'
+  +   '#paseo-full .dmw-nav-h{font-size:10.5px;letter-spacing:1.8px;text-transform:uppercase;'
+  +     'font-weight:700;color:#5ec8e6;margin-bottom:10px;}'
+  +   '#paseo-full .dmw-nav-pasos{margin:0 0 14px;padding-left:20px;}'
+  +   '#paseo-full .dmw-nav-pasos li{font-size:13.5px;line-height:1.55;color:#e8efea;margin-bottom:6px;}'
+  +   '#paseo-full .dmw-nav-pasos li.mas{list-style:none;margin-left:-20px;'
+  +     'color:rgba(232,239,234,.38);font-size:12.5px;}'
+  +   '#paseo-full .dmw-nav-btns{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;}'
+  +   '#paseo-full .dmw-nav-btn{text-decoration:none;font-size:13.5px;font-weight:700;'
+  +     'padding:12px 22px;border-radius:100px;color:#fff;'
+  +     'background:linear-gradient(135deg,#7eb86a,#4a6741);box-shadow:0 4px 14px rgba(74,103,65,.35);}'
+  +   '#paseo-full .dmw-nav-btn.alt{background:rgba(94,200,230,.12);color:#e8efea;'
+  +     'border:1.5px solid rgba(94,200,230,.45);box-shadow:none;}'
+  +   '#paseo-full .dmw-nav-nota,#paseo-full .dmw-nav-vacio{font-size:12px;line-height:1.5;'
+  +     'color:rgba(232,239,234,.38);}'
   +   '#paseo-full .dmw-perfil{padding:12px;border-top:1px solid rgba(232,239,234,.10);}'
   +   '#paseo-full .dmw-perfil-h{font-size:10.5px;letter-spacing:1.8px;text-transform:uppercase;'
   +     'font-weight:700;color:#5ec8e6;margin-bottom:10px;}'
@@ -159,7 +174,7 @@
     host.appendChild(caja);
     if (window.dmwWalkMontar) { window.dmwWalkMontar(caja); return; }
     var s = document.createElement('script');
-    s.src = 'web-walk.js?v=5';
+    s.src = 'web-walk.js?v=6';
     s.onload = function () { if (window.dmwWalkMontar) window.dmwWalkMontar(caja); };
     document.head.appendChild(s);
   }

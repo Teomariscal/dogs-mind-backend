@@ -101,15 +101,41 @@
     }).filter(Boolean);
   }
 
+  /* Traducción de las maniobras que devuelve OSRM (vienen en inglés) */
+  var GIROS = {
+    left: 'gira a la izquierda', right: 'gira a la derecha',
+    'slight left': 'ligeramente a la izquierda', 'slight right': 'ligeramente a la derecha',
+    'sharp left': 'giro cerrado a la izquierda', 'sharp right': 'giro cerrado a la derecha',
+    straight: 'sigue recto', uturn: 'da la vuelta'
+  };
+  function instruccion(paso) {
+    var m = paso.maneuver || {};
+    var via = paso.name ? ' por ' + paso.name : '';
+    var d = paso.distance ? ' (' + Math.round(paso.distance) + ' m)' : '';
+    if (m.type === 'depart')  return 'Sal' + via + d;
+    if (m.type === 'arrive')  return 'Has llegado al punto de partida';
+    if (m.type === 'roundabout' || m.type === 'rotary') return 'En la rotonda, toma la salida' + via + d;
+    var g = GIROS[m.modifier] || 'continúa';
+    return g.charAt(0).toUpperCase() + g.slice(1) + via + d;
+  }
+
   async function ruta(puntos) {          // puntos: [[lat,lon], …] — vuelve al inicio
     var coords = puntos.concat([puntos[0]]).map(function (p) { return p[1] + ',' + p[0]; }).join(';');
-    var r = await fetch(OSRM + coords + '?overview=full&geometries=geojson');
+    var r = await fetch(OSRM + coords + '?overview=full&geometries=geojson&steps=true');
     if (!r.ok) throw new Error('osrm');
     var d = await r.json();
     if (!d.routes || !d.routes.length) throw new Error('sin ruta');
+    var pasos = [];
+    (d.routes[0].legs || []).forEach(function (leg) {
+      (leg.steps || []).forEach(function (s) {
+        if (s.distance > 25 || (s.maneuver && s.maneuver.type === 'depart')) pasos.push(instruccion(s));
+      });
+    });
     return {
       metros: d.routes[0].distance,
-      linea: d.routes[0].geometry.coordinates.map(function (c) { return [c[1], c[0]]; })
+      linea: d.routes[0].geometry.coordinates.map(function (c) { return [c[1], c[0]]; }),
+      pasos: pasos,
+      puntos: puntos
     };
   }
 
@@ -277,7 +303,54 @@
     document.querySelectorAll('#dmw-walk-lista .dmw-ruta-c').forEach(function (c, j) {
       c.classList.toggle('on', j === i);
     });
+    pintarNavegacion(i);
     pintarFotos(i);
+  }
+
+  /* ── Cómo empezar + navegación con GPS ─────────────────────────────────
+     Las indicaciones vienen del propio motor de rutas (OSRM). Para seguir el
+     paseo con el GPS en marcha abrimos la ruta completa —con sus paradas— en
+     la app de mapas del móvil, que es la que sabe hacia dónde miras y te va
+     avisando de cada giro. */
+  function urlNavegacion(r) {
+    var pts = r.puntos || [];
+    if (!pts.length) return null;
+    var o = pts[0];
+    var medios = pts.slice(1).map(function (p) { return p[0] + ',' + p[1]; }).join('|');
+    return 'https://www.google.com/maps/dir/?api=1' +
+           '&origin=' + o[0] + ',' + o[1] +
+           '&destination=' + o[0] + ',' + o[1] +
+           (medios ? '&waypoints=' + encodeURIComponent(medios) : '') +
+           '&travelmode=walking';
+  }
+  function urlOsm(r) {
+    var pts = r.puntos || [];
+    if (pts.length < 2) return null;
+    var ruta = pts.concat([pts[0]]).map(function (p) { return p[0] + ',' + p[1]; }).join(';');
+    return 'https://www.openstreetmap.org/directions?engine=fossgis_osrm_foot&route=' + encodeURIComponent(ruta);
+  }
+
+  function pintarNavegacion(i) {
+    var cont = document.getElementById('dmw-walk-nav');
+    if (!cont) return;
+    var r = estado.rutas[i];
+    if (!r) { cont.innerHTML = ''; return; }
+    var pasos = (r.pasos || []).slice(0, 4);
+    var g = urlNavegacion(r), o = urlOsm(r);
+    cont.innerHTML =
+      '<div class="dmw-nav-h">Cómo empezar · ' + r.nombre + '</div>' +
+      (pasos.length
+        ? '<ol class="dmw-nav-pasos">' + pasos.map(function (p) { return '<li>' + p + '</li>'; }).join('') +
+          (r.pasos.length > pasos.length
+            ? '<li class="mas">y ' + (r.pasos.length - pasos.length) + ' indicaciones más durante el paseo</li>' : '') +
+          '</ol>'
+        : '<div class="dmw-nav-vacio">Sin indicaciones detalladas para esta ruta.</div>') +
+      '<div class="dmw-nav-btns">' +
+        (g ? '<a class="dmw-nav-btn" href="' + g + '" target="_blank" rel="noopener">Seguir con GPS</a>' : '') +
+        (o ? '<a class="dmw-nav-btn alt" href="' + o + '" target="_blank" rel="noopener">Ver en OpenStreetMap</a>' : '') +
+      '</div>' +
+      '<div class="dmw-nav-nota">Se abre en tu app de mapas, con la ruta y sus paradas cargadas: ' +
+      'ahí el GPS te va indicando cada giro.</div>';
   }
 
   function estadoTexto(t) {
@@ -322,6 +395,7 @@
         var capa = L.polyline(res.linea, { color: '#e8efea', weight: 3, opacity: .25 }).addTo(capaRutas);
         estado.rutas.push({
           nombre: o.nombre, por: o.por, metros: res.metros, linea: res.linea,
+          pasos: res.pasos, puntos: res.puntos,
           pois: poisEnRuta(pois, res.linea), capa: capa
         });
       } catch (e) { /* esa distancia no sale: seguimos con las demás */ }
@@ -350,6 +424,7 @@
             'con las zonas verdes y los servicios que hay de verdad alrededor.</div>' +
           '</div>' +
         '</div>' +
+        '<div class="dmw-walk-nav" id="dmw-walk-nav"></div>' +
         '<div class="dmw-walk-fotos" id="dmw-walk-fotos"></div>' +
         '<div class="dmw-perfil">' +
           '<div class="dmw-perfil-h">¿Cómo es tu perro?</div>' +

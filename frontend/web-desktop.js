@@ -255,7 +255,10 @@
   };
 
   function htmlSeccion(c) {
-    var h = '<p class="dmw-claim">' + c.claim + '</p>' +
+    /* Ale presenta también la sección de escritorio (founder 2026-07-30) */
+    var h = '<div class="dmw-ale"><img src="aig-ale.webp" alt="Ale con su perra">' +
+              '<span><b>Ale</b><i>Tu Aigent de paseos</i></span></div>' +
+            '<p class="dmw-claim">' + c.claim + '</p>' +
             '<p class="dmw-intro">' + c.intro + '</p>';
     if (c.como) {
       h += '<h3 class="dmw-h3">' + c.como.t + '</h3><div class="dmw-pasos">';
@@ -401,7 +404,7 @@
       if (window.dmwWalkMontar) { window.dmwWalkMontar(host); }
       else {
         var s = document.createElement('script');
-        s.src = 'web-walk.js?v=5';
+        s.src = 'web-walk.js?v=6';
         s.onload = function () { if (window.dmwWalkMontar) window.dmwWalkMontar(host); };
         document.head.appendChild(s);
       }

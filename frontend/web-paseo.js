@@ -47,7 +47,7 @@
   + '.pf-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 14px 14px;}'
   /* Hero + presentación de Ale (copy del founder 2026-07-29) */
   + '.pf-hero{position:relative;margin:0 -14px 0;height:210px;overflow:hidden;}'
-  + '.pf-hero img{width:100%;height:100%;object-fit:cover;object-position:center 45%;display:block;}'
+  + '.pf-hero img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;}'
   + '.pf-hero::after{content:"";position:absolute;inset:0;'
   +   'background:linear-gradient(0deg,rgba(10,26,20,1) 2%,rgba(10,26,20,.55) 45%,rgba(10,26,20,.10) 100%);}'
   + '.pf-hero-cap{position:absolute;left:16px;bottom:12px;z-index:2;font-size:10.5px;'
@@ -141,7 +141,7 @@
     /* Cabecera: hero + Ale presentando la sección (copy del founder) */
     var cab = document.createElement('div');
     cab.innerHTML =
-      '<div class="pf-hero"><img src="assets/images/soho-paseo.webp" alt="Escaparate en Soho, Nueva York">' +
+      '<div class="pf-hero"><img src="assets/images/soho-paseo.webp?v=2" alt="Escaparate en Soho, Nueva York">' +
         '<span class="pf-hero-cap">Soho · Nueva York</span></div>' +
       '<div class="pf-intro">' +
         '<div class="pf-intro-top">' +

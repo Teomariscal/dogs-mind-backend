@@ -432,7 +432,13 @@
     document.body.appendChild(ovl);
   }
 
+  /* Solo pantalla grande: en la web desde el móvil el usuario debe ver la app
+     tal cual, no la barra ni el hero de escritorio (que dependen de un CSS
+     que allí no se activa). Se construye al cruzar el umbral, no antes. */
+  var GRANDE = window.matchMedia('(min-width: 1024px)');
+
   function init() {
+    if (!GRANDE.matches) return;
     if (document.querySelector('.dmw-bar')) return;   // idempotente
     construirBarra();
     construirOverlay();
@@ -441,4 +447,6 @@
 
   if (document.readyState !== 'loading') init();
   else document.addEventListener('DOMContentLoaded', init);
+  if (GRANDE.addEventListener) GRANDE.addEventListener('change', init);
+  else if (GRANDE.addListener) GRANDE.addListener(init);
 })();

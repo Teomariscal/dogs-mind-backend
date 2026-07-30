@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TDM · Dónde va el Paseo en la app</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --deep:#0a1a14; --elev:#14302a; --surf:rgba(255,255,255,.06);
+    --cyan:#5ec8e6; --cyan2:#80d6ee; --lime:#7eb86a; --green:#4a6741;
+    --tx:#e8efea; --mut:rgba(232,239,234,.62); --sub:rgba(232,239,234,.38);
+    --line:rgba(232,239,234,.10);
+    --serif:'Cormorant Garamond',serif; --sans:'Jost',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#06090b;font-family:var(--sans);color:var(--tx);padding:32px 20px 70px}
+  h1{font-family:var(--serif);font-size:30px;text-align:center;margin-bottom:6px}
+  .sub{color:var(--mut);text-align:center;font-size:13.5px;margin-bottom:34px}
+  .row{display:flex;gap:34px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
+  .col{width:350px}
+  .phone{width:350px;height:720px;border-radius:40px;border:7px solid #1c1c1e;overflow:hidden;
+    background:linear-gradient(180deg,var(--deep) 0%,var(--elev) 60%,#2e4a3a 100%);
+    box-shadow:0 20px 56px rgba(0,0,0,.6);position:relative;display:flex;flex-direction:column}
+  .phone::before{content:'';position:absolute;inset:0;pointer-events:none;
+    background-image:linear-gradient(rgba(94,200,230,.05) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(94,200,230,.05) 1px,transparent 1px);background-size:40px 40px}
+  .tag{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:5;
+    background:rgba(94,200,230,.14);border:1px solid rgba(94,200,230,.4);color:var(--cyan2);
+    font-size:10px;letter-spacing:1.2px;padding:3px 12px;border-radius:100px;text-transform:uppercase;font-weight:600}
+  .in{position:relative;z-index:1;flex:1;overflow:hidden;padding:52px 18px 0;display:flex;flex-direction:column}
+  .hi{font-family:var(--serif);font-size:23px;font-weight:600}
+  .hi-s{font-size:12.5px;color:var(--mut);margin-bottom:16px}
+
+  /* Tarjeta del paseo */
+  .paseo{width:100%;text-align:left;font-family:inherit;cursor:pointer;color:var(--tx);
+    background:linear-gradient(135deg,rgba(126,184,106,.16),rgba(94,200,230,.12));
+    border:1.5px solid rgba(126,184,106,.45);border-radius:20px;padding:16px;
+    box-shadow:0 8px 26px rgba(0,0,0,.32)}
+  .paseo-top{display:flex;align-items:center;gap:12px}
+  .paseo-ic{width:46px;height:46px;flex:none;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    background:rgba(126,184,106,.20);border:1px solid rgba(126,184,106,.45);color:var(--lime)}
+  .paseo-ic svg{width:24px;height:24px}
+  .paseo-t{font-family:var(--serif);font-size:21px;font-weight:600;line-height:1.1}
+  .paseo-t small{display:block;font-family:var(--sans);font-size:12px;color:var(--mut);margin-top:3px;font-weight:400}
+  .paseo-r{display:flex;gap:8px;margin-top:14px}
+  .paseo-r span{flex:1;text-align:center;font-size:12.5px;font-weight:600;color:var(--cyan2);
+    background:rgba(94,200,230,.10);border:1px solid rgba(94,200,230,.30);border-radius:100px;padding:7px 0}
+
+  .card{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:18px;padding:15px;margin-top:13px}
+  .eyebrow{font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--cyan);font-weight:700;margin-bottom:7px}
+  .big{font-family:var(--serif);font-size:26px;line-height:1}
+  .big small{font-size:14px;color:var(--mut);font-family:var(--sans)}
+  .trend{font-size:13px;font-weight:600;color:var(--lime)}
+  .lbl{font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--sub);font-weight:600;margin:16px 0 9px}
+  .mini{display:flex;gap:9px}
+  .mini div{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:13px;
+    padding:11px 6px;font-size:11.5px;color:var(--mut);text-align:center}
+
+  .dock{margin-top:auto;display:flex;justify-content:space-around;padding:11px 6px calc(11px + env(safe-area-inset-bottom,0px));
+    border-top:1px solid var(--line);background:rgba(6,12,10,.55)}
+  .dock span{font-size:10.5px;color:var(--sub)}
+  .dock .on{color:var(--cyan)}
+
+  /* Pantalla 2 */
+  .h1b{font-family:var(--serif);font-size:24px;font-weight:600}
+  .h1b-s{font-size:12.5px;color:var(--cyan);margin-bottom:14px;letter-spacing:.4px}
+  .plan{background:rgba(126,184,106,.10);border:1.5px solid rgba(126,184,106,.42);border-radius:16px;padding:14px;margin-bottom:14px}
+  .plan b{display:block;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--lime);margin-bottom:6px}
+  .plan p{font-size:13px;line-height:1.55;color:rgba(255,255,255,.82)}
+  .op{border:1px solid var(--line);background:rgba(255,255,255,.05);border-radius:15px;padding:13px;margin-bottom:10px}
+  .op.on{border-color:var(--cyan);background:rgba(94,200,230,.10)}
+  .op b{font-size:14.5px}
+  .op span{float:right;font-size:12.5px;color:var(--cyan2);font-weight:600}
+  .op i{display:block;font-style:normal;font-size:12px;color:var(--mut);margin-top:5px;line-height:1.5}
+  .cta{margin-top:6px;width:100%;padding:15px;border:none;border-radius:100px;font-family:inherit;
+    font-size:15px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--lime),var(--green));
+    box-shadow:0 6px 20px rgba(74,103,65,.45);cursor:pointer}
+  .foot{text-align:center;font-size:11px;color:var(--sub);margin-top:9px}
+  .cap{width:350px;font-size:12.5px;line-height:1.6;color:var(--mut);margin-top:14px}
+  .cap b{color:#fff}
+</style>
+</head>
+<body>
+<h1>El Paseo dentro de la app</h1>
+<div class="sub">Dos puntos de entrada · maqueta para decidir ubicación y nombre</div>
+
+<div class="row">
+
+  <div class="col">
+    <div class="phone">
+      <div class="tag">1 · Inicio</div>
+      <div class="in">
+        <div class="hi">Hola, Teo</div>
+        <div class="hi-s">Día 9 del plan de Bimba</div>
+
+        <button class="paseo">
+          <div class="paseo-top">
+            <span class="paseo-ic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 21s7-6.1 7-11a7 7 0 1 0-14 0c0 4.9 7 11 7 11Z"/>
+                <circle cx="9.6" cy="8.2" r="1"/><circle cx="14.4" cy="8.2" r="1"/><circle cx="12" cy="11.6" r="1.7"/>
+              </svg>
+            </span>
+            <span class="paseo-t">El paseo de hoy<small>3 rutas cerca de ti · 22°C</small></span>
+          </div>
+          <div class="paseo-r"><span>1,4 km</span><span>3,2 km</span><span>5,0 km</span></div>
+        </button>
+
+        <div class="card">
+          <div class="eyebrow">Caso · Bimba</div>
+          <div style="display:flex;align-items:baseline;gap:10px">
+            <div class="big">8<small>/10 días</small></div>
+            <div class="trend">↗ mejorando</div>
+          </div>
+        </div>
+
+        <div class="lbl">Todo lo demás, como siempre</div>
+        <div class="mini"><div>Registros</div><div>Aigents</div><div>Entrenar</div></div>
+
+        <div class="dock"><span class="on">Inicio</span><span>Aigents</span><span>Progreso</span><span>Teo</span><span>Registro</span></div>
+      </div>
+    </div>
+    <div class="cap"><b>1 · En el inicio, arriba del todo.</b> Es la función de uso diario, así que se ve sin desplazar. La barra inferior no cambia: sigue con cinco pestañas.</div>
+  </div>
+
+  <div class="col">
+    <div class="phone">
+      <div class="tag">2 · Dentro del caso</div>
+      <div class="in">
+        <div class="h1b">El paseo de hoy</div>
+        <div class="h1b-s">World Wide Dog Walking</div>
+
+        <div class="plan">
+          <b>Según el plan de Bimba</b>
+          <p>Fase 1: paseo tranquilo, evitando encuentros con otros perros. Las rutas se eligen con ese criterio.</p>
+        </div>
+
+        <div class="op on"><b>Vuelta corta</b><span>1,4 km · 20 min</span><i>Sin zonas de perros. Dos tramos de sombra.</i></div>
+        <div class="op"><b>Ruta media</b><span>3,2 km · 43 min</span><i>Parque amplio, poca afluencia a esta hora.</i></div>
+        <div class="op"><b>Ruta larga</b><span>5,0 km · 1 h 07</span><i>Junto al río. Fuente de agua a mitad.</i></div>
+
+        <button class="cta">Empezar el paseo</button>
+        <div class="foot">Al terminar se registra en el seguimiento del caso</div>
+
+        <div class="dock"><span>Inicio</span><span>Aigents</span><span class="on">Progreso</span><span>Teo</span><span>Registro</span></div>
+      </div>
+    </div>
+    <div class="cap"><b>2 · Dentro del seguimiento del caso.</b> Aquí el paseo deja de ser un accesorio: las rutas cumplen el criterio clínico de la fase, y al terminar cuenta como adherencia al plan.</div>
+  </div>
+
+</div>
+</body>
+</html>

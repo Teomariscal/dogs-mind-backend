@@ -51,11 +51,13 @@
   + '.pf-hero::after{content:"";position:absolute;inset:0;'
   +   'background:linear-gradient(0deg,rgba(10,26,20,1) 0%,rgba(10,26,20,.45) 55%,rgba(10,26,20,.15) 100%);}'
   + '.pf-intro{position:relative;margin:-38px 0 18px;padding:0 2px;z-index:1;}'
-  + '.pf-intro-top{display:flex;align-items:flex-end;gap:12px;margin-bottom:12px;}'
-  + '.pf-intro-ale{width:64px;height:64px;flex:none;border-radius:50%;overflow:hidden;'
-  +   'border:2.5px solid #7eb86a;box-shadow:0 0 0 4px rgba(94,200,230,.18),0 8px 22px rgba(0,0,0,.45);}'
-  + '.pf-intro-ale img{width:100%;height:100%;object-fit:cover;display:block;}'
-  + '.pf-intro-n{font-family:var(--ff-serif,serif);font-size:22px;font-weight:600;color:#fff;line-height:1.1;}'
+  /* Ale de cuerpo entero con su perra, sin recorte circular (founder 2026-07-29) */
+  + '.pf-intro-top{display:flex;align-items:flex-end;gap:10px;margin-bottom:14px;}'
+  + '.pf-intro-ale{flex:none;width:190px;margin-bottom:-6px;'
+  +   'filter:drop-shadow(0 10px 24px rgba(0,0,0,.55));}'
+  + '.pf-intro-ale img{width:100%;height:auto;display:block;}'
+  + '.pf-intro-n{font-family:var(--ff-serif,serif);font-size:22px;font-weight:600;color:#fff;'
+  +   'line-height:1.1;padding-bottom:10px;}'
   + '.pf-intro-n small{display:block;font-family:var(--ff-sans,sans-serif);font-size:11px;'
   +   'letter-spacing:1.4px;text-transform:uppercase;color:#7eb86a;font-weight:600;margin-top:3px;}'
   + '.pf-claim{font-size:14.5px;line-height:1.65;color:rgba(232,239,234,.88);margin-bottom:12px;}'
@@ -121,14 +123,13 @@
       '<div class="pf-hero"><img src="assets/images/img-16.webp" alt=""></div>' +
       '<div class="pf-intro">' +
         '<div class="pf-intro-top">' +
-          '<span class="pf-intro-ale"><img src="aig-ale-pixar.webp" alt="Ale"></span>' +
+          '<span class="pf-intro-ale"><img src="aig-ale.webp" alt="Ale con su perra"></span>' +
           '<span class="pf-intro-n">Ale<small>Tu Aigent de paseos</small></span>' +
         '</div>' +
         '<p class="pf-claim">Estés en el lugar del mundo que estés, te ayudamos a elegir ' +
         'las mejores y más seguras rutas para pasear con tu perro.</p>' +
-        '<p class="pf-challenge">Antes, encontrar dónde pasear en un sitio desconocido era ' +
-        'todo un <b>challenge</b>. Ahora tu único <b>challenge</b> es que tu perro disfrute ' +
-        'como nunca en un entorno seguro.</p>' +
+        '<p class="pf-challenge">Antes, encontrar dónde pasear en una ciudad desconocida era ' +
+        'el <b>reto</b>. Ahora el único <b>reto</b> es que tu perro disfrute como nunca, y seguro.</p>' +
       '</div>';
     host.appendChild(cab);
 

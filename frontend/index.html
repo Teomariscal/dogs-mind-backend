@@ -7191,16 +7191,77 @@ button:not(:disabled):active{ transform:scale(0.98); }
   color:#f3f1ea !important;
 }
 
-/* Cuerpo del formulario: card blanca amplia que envuelve TODO el form
-   para preservar la legibility de labels, eyebrows, inputs y botones
-   sin tocar sus inline styles. Premium clinical sobre vibrant. */
+/* Cuerpo del formulario — EXTERMINIO DEL CREAM (founder 2026-07-29):
+   pasa del card blanco al mismo lenguaje que Entrenamiento Específico
+   (#s-anamnesis-training / .tc-*): superficie glass sobre vibrant emerald,
+   labels cyan en versalitas, inputs translúcidos con foco cyan.
+   Los estilos internos son inline (y algunos los pinta JS), por eso todas
+   las reglas van con !important y cubren las dos formas en que el color
+   blanco puede aparecer en el atributo style (#fff y rgb(255,255,255)). */
 #s-anamnesis > div:nth-of-type(2){
   margin:14px !important;
   padding:20px 18px !important;
-  background:#fff !important;
+  background:rgba(255,255,255,0.05) !important;
   border-radius:20px !important;
-  border:1px solid rgba(94,200,230,0.20);
+  border:1px solid rgba(94,200,230,0.28) !important;
   box-shadow:0 12px 36px rgba(0,0,0,0.28);
+  backdrop-filter:saturate(130%) blur(10px);
+  -webkit-backdrop-filter:saturate(130%) blur(10px);
+}
+/* Texto: oscuro → claro; los eyebrows/labels pasan a cyan */
+#s-anamnesis [style*="color:var(--dark)"],
+#s-anamnesis [style*="color: var(--dark)"]{ color:#f3f1ea !important; }
+#s-anamnesis [style*="color:var(--text2)"]{ color:rgba(243,241,234,0.75) !important; }
+#s-anamnesis [style*="color:var(--text3)"]{ color:#5ec8e6 !important; }
+#s-anamnesis label{ color:#5ec8e6 !important; }
+#s-anamnesis h3, #s-anamnesis h4{ color:#f3f1ea !important; }
+/* Tarjetas y bloques blancos internos → glass */
+#s-anamnesis div[style*="background:#fff"],
+#s-anamnesis div[style*="background:var(--white)"],
+#s-anamnesis div[style*="background: rgb(255, 255, 255)"]{
+  background:rgba(255,255,255,0.06) !important;
+  border-color:rgba(255,255,255,0.14) !important;
+}
+/* Campos */
+#s-anamnesis input[type="text"],
+#s-anamnesis input[type="number"],
+#s-anamnesis input[type="date"],
+#s-anamnesis textarea,
+#s-anamnesis select{
+  background:rgba(255,255,255,0.06) !important;
+  border:1px solid rgba(255,255,255,0.18) !important;
+  color:#fff !important;
+}
+#s-anamnesis input::placeholder,
+#s-anamnesis textarea::placeholder{ color:rgba(255,255,255,0.42) !important; }
+#s-anamnesis input:focus,
+#s-anamnesis textarea:focus,
+#s-anamnesis select:focus{
+  border-color:rgba(94,200,230,0.65) !important;
+  background:rgba(255,255,255,0.10) !important;
+  box-shadow:0 0 0 3px rgba(94,200,230,0.18) !important;
+}
+/* Toggles SIN seleccionar (Macho/Hembra, Sí/No, frecuencia…): el JS les
+   pone background #fff inline → los devolvemos a glass. El seleccionado
+   conserva su verde y por eso sigue distinguiéndose. */
+#s-anamnesis button[style*="background:#fff"],
+#s-anamnesis button[style*="background: rgb(255, 255, 255)"]{
+  background:rgba(255,255,255,0.06) !important;
+  border-color:rgba(255,255,255,0.22) !important;
+  color:#f3f1ea !important;
+}
+/* Chips "Análisis basado en" */
+#s-anamnesis [style*="border:1px solid var(--green2)"],
+#s-anamnesis [style*="border:1.5px solid var(--green2)"]{
+  border-color:rgba(94,200,230,0.45) !important;
+  color:#80d6ee !important;
+}
+/* Cabeceras de sección (EL PERRO, EL ENTORNO…): el verde oscuro no se lee
+   sobre el fondo vibrant → lima claro, que es el acento de sección. */
+#s-anamnesis div[style*="color:var(--green2)"][style*="text-transform:uppercase"],
+#s-anamnesis div[style*="color:#E8A020"][style*="text-transform:uppercase"]{
+  color:#9ed08c !important;
+  letter-spacing:1.6px !important;
 }
 
 /* ── E extendido: rediseño vibrant de #s-home — intensidad subida ────── */

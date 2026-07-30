@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>App Icon · The Dogs' Mind · Candidatos viables App Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+  :root{
+    --emerald-deep:#0a1a14; --emerald:#122a23; --emerald-mid:#1a3b34; --olive:#4a6741;
+    --cyan:#5ec8e6; --cyan-light:#80d6ee; --green:#7eb86a;
+  }
+  body{
+    min-height:100vh;
+    background:
+      linear-gradient(135deg, transparent 0%, transparent 30%, rgba(94,200,230,0.06) 45%, rgba(126,184,106,0.04) 55%, transparent 70%, transparent 100%),
+      radial-gradient(ellipse at 50% 100%, #0b1518 0%, #06090b 70%);
+    background-color:#06090b;
+    font-family:'Jost',sans-serif;color:#fff;padding:46px 22px 100px;
+  }
+  .tag{font-size:11px;font-weight:600;letter-spacing:.20em;text-transform:uppercase;color:var(--cyan);text-align:center;margin-bottom:10px}
+  h1.title{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:600;text-align:center;margin-bottom:8px;text-shadow:0 2px 14px rgba(0,0,0,.4)}
+  .sub{text-align:center;color:rgba(255,255,255,.6);font-size:14px;margin-bottom:6px;font-weight:300}
+  .brief{text-align:center;color:rgba(255,255,255,.5);font-size:12.5px;margin:0 auto 40px;max-width:700px;line-height:1.7;font-weight:300}
+  .brief em{color:var(--cyan-light);font-style:normal;font-weight:500}
+
+  /* spec panel */
+  .spec{max-width:880px;margin:0 auto 56px;padding:20px 24px;border-radius:16px;
+    background:rgba(94,200,230,.05);border:1px solid rgba(94,200,230,.18)}
+  .spec .lbl{display:block;color:var(--cyan);font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-size:10px;margin-bottom:10px}
+  .spec ul{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px 28px;font-size:12.5px;color:rgba(255,255,255,.74);line-height:1.5}
+  .spec li::before{content:'·';color:var(--cyan);font-weight:700;margin-right:8px}
+  @media(max-width:760px){.spec ul{grid-template-columns:1fr}}
+
+  .cand{max-width:1000px;margin:0 auto 70px}
+  .cand-head{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:8px;flex-wrap:wrap}
+  .cand-num{color:var(--cyan);font-size:12px;letter-spacing:.24em;font-weight:600;text-transform:uppercase}
+  .cand-name{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600}
+  .verdict{padding:4px 12px;border-radius:999px;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+  .verdict.ok{background:rgba(126,184,106,.16);border:1px solid rgba(126,184,106,.5);color:#aee29a}
+  .verdict.warn{background:rgba(230,180,94,.14);border:1px solid rgba(230,180,94,.46);color:#f0cd8b}
+  .verdict.rec{background:rgba(94,200,230,.16);border:1px solid rgba(94,200,230,.5);color:var(--cyan-light)}
+  .concept{font-size:13px;color:rgba(255,255,255,.66);line-height:1.7;margin:0 auto 30px;max-width:620px;text-align:center}
+  .concept em{color:var(--cyan-light);font-style:normal;font-weight:500}
+
+  .sizes{display:flex;align-items:flex-end;justify-content:center;gap:30px;flex-wrap:wrap;margin-bottom:18px}
+  .size-cell{display:flex;flex-direction:column;align-items:center;gap:9px}
+  .size-cell .px{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.42);font-weight:600}
+
+  /* icon base — square with iOS superellipse-ish radius (~22.5%) */
+  .ic{position:relative;overflow:hidden;box-shadow:0 10px 26px rgba(0,0,0,.45)}
+  .ic.r{border-radius:22.5%}
+  .s200{width:200px;height:200px} .s120{width:120px;height:120px}
+  .s80{width:80px;height:80px} .s60{width:60px;height:60px} .s40{width:40px;height:40px}
+
+  /* A — photo head crop */
+  .photo-ic{background:#0a1a14}
+  .photo-ic .img{position:absolute;inset:0;background-image:url('assets/images/img-00.webp');
+    background-size:235%;background-position:39% 17%;background-repeat:no-repeat}
+  .photo-ic .vig{position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(10,26,20,.55) 100%)}
+
+  /* B — lettermark Cormorant on emerald */
+  .mark-ic{background:linear-gradient(160deg,var(--emerald-deep) 0%,var(--emerald) 52%,var(--emerald-mid) 100%);
+    display:flex;align-items:center;justify-content:center}
+  .mark-ic::after{content:'';position:absolute;left:-30%;top:-40%;width:130%;height:120%;
+    background:radial-gradient(ellipse at 30% 20%,rgba(94,200,230,.22),transparent 60%);pointer-events:none}
+  .mark-ic .glyph{font-family:'Cormorant Garamond',serif;font-weight:600;color:#fff;
+    line-height:.86;letter-spacing:-.02em;text-shadow:0 2px 10px rgba(0,0,0,.45);position:relative;z-index:1}
+  .mark-ic .glyph em{color:var(--cyan-light);font-style:normal}
+  .s200 .glyph{font-size:104px} .s120 .glyph{font-size:62px} .s80 .glyph{font-size:42px}
+  .s60 .glyph{font-size:31px} .s40 .glyph{font-size:21px}
+
+  /* C — hybrid: circular face on emerald field */
+  .hybrid-ic{background:linear-gradient(160deg,var(--emerald-deep) 0%,var(--emerald) 60%,var(--emerald-mid) 100%);
+    display:flex;align-items:center;justify-content:center}
+  .hybrid-ic::after{content:'';position:absolute;left:-30%;top:-40%;width:130%;height:120%;
+    background:radial-gradient(ellipse at 30% 20%,rgba(94,200,230,.20),transparent 60%);pointer-events:none}
+  .hybrid-ic .disc{border-radius:50%;overflow:hidden;position:relative;z-index:1;
+    box-shadow:0 0 0 1.5px rgba(255,255,255,.18),0 0 0 4px rgba(94,200,230,.16),0 8px 20px rgba(0,0,0,.4)}
+  .hybrid-ic .disc .img{position:absolute;inset:0;background-image:url('assets/images/img-00.webp');
+    background-size:240%;background-position:39% 16%;background-repeat:no-repeat}
+  .s200 .disc{width:140px;height:140px} .s120 .disc{width:86px;height:86px}
+  .s80 .disc{width:58px;height:58px} .s60 .disc{width:44px;height:44px} .s40 .disc{width:30px;height:30px}
+
+  .notes{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:920px;margin:22px auto 0;
+    font-size:11.5px;line-height:1.6;color:rgba(255,255,255,.62)}
+  .notes .it{padding:13px 15px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:11px}
+  .notes .it .l{display:block;color:var(--cyan);font-weight:600;letter-spacing:.13em;text-transform:uppercase;font-size:9.5px;margin-bottom:6px}
+  @media(max-width:760px){.notes{grid-template-columns:1fr}}
+
+  .home-row{display:flex;justify-content:center;gap:20px;margin-top:24px;flex-wrap:wrap}
+  .home-tile{display:flex;flex-direction:column;align-items:center;gap:8px}
+  .home-tile .nm{font-family:'Jost',sans-serif;font-size:10px;color:rgba(255,255,255,.78);text-align:center;max-width:74px;line-height:1.2}
+
+  .closing{max-width:800px;margin:24px auto 0;text-align:center;padding:30px 28px;
+    background:rgba(94,200,230,.04);border:1px solid rgba(94,200,230,.18);border-radius:20px}
+  .closing h2{font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:600;margin-bottom:10px}
+  .closing p{font-size:13px;color:rgba(255,255,255,.74);line-height:1.7}
+  .closing p em{color:var(--cyan-light);font-style:normal;font-weight:500}
+</style>
+</head>
+<body>
+  <p class="tag">App Icon · The Dogs' Mind · Compliance-checked</p>
+  <h1 class="title">Candidatos de icono viables para App Store</h1>
+  <p class="sub">Cada uno probado a tamaños reales de iOS (200 → 40 px) con su veredicto</p>
+  <p class="brief">
+    La foto del border collie es <em>la imagen de marca</em> y se queda en el splash y el marketing, donde brilla. Pero el <em>icono de App Store</em> juega en otra liga: Apple lo muestra a 40–60 px y desaconseja fotos. Aquí van tres caminos, del más fiel a tu foto al más óptimo para Apple.
+  </p>
+
+  <div class="spec">
+    <span class="lbl">Requisitos DUROS del icono (Apple)</span>
+    <ul>
+      <li>1024×1024 px, PNG plano</li>
+      <li>SIN transparencia / canal alfa</li>
+      <li>SIN esquinas redondeadas (Apple aplica la máscara)</li>
+      <li>sRGB o Display P3</li>
+      <li>Sin imágenes de hardware Apple</li>
+      <li>HIG: simple, legible a tamaño pequeño, evitar fotos</li>
+    </ul>
+  </div>
+
+  <!-- A -->
+  <div class="cand">
+    <div class="cand-head">
+      <span class="cand-num">A</span>
+      <span class="cand-name">Foto · encuadre cara</span>
+      <span class="verdict warn">⚠ Permitido · riesgo a tamaño pequeño</span>
+    </div>
+    <p class="concept">Lo más fiel a lo que tienes hoy: recorte cerrado sobre la cara del collie + viñeta emerald abajo. <em>Mira la columna de 40 px</em> — ahí se ve por qué Apple desaconseja fotos: la cara se empasta y deja de reconocerse.</p>
+    <div class="sizes">
+      <div class="size-cell"><div class="ic r s200 photo-ic"><div class="img"></div><div class="vig"></div></div><span class="px">1024 px</span></div>
+      <div class="size-cell"><div class="ic r s120 photo-ic"><div class="img"></div><div class="vig"></div></div><span class="px">120 px</span></div>
+      <div class="size-cell"><div class="ic r s80 photo-ic"><div class="img"></div><div class="vig"></div></div><span class="px">80 px</span></div>
+      <div class="size-cell"><div class="ic r s60 photo-ic"><div class="img"></div><div class="vig"></div></div><span class="px">60 px</span></div>
+      <div class="size-cell"><div class="ic r s40 photo-ic"><div class="img"></div><div class="vig"></div></div><span class="px">40 px</span></div>
+    </div>
+    <div class="notes">
+      <div class="it"><span class="l">Fortaleza</span>Reconocimiento inmediato de marca. Cero abstracción: ves el perro y entiendes qué es.</div>
+      <div class="it"><span class="l">Riesgo App Store</span>HIG desaconseja fotos. No es rechazo seguro, pero baja la percepción premium y puede traer una nota de calidad.</div>
+      <div class="it"><span class="l">Veredicto</span>Viable como último recurso, no recomendado. Si lo quieres, conviene cerrar aún más el encuadre.</div>
+    </div>
+  </div>
+
+  <!-- B -->
+  <div class="cand">
+    <div class="cand-head">
+      <span class="cand-num">B</span>
+      <span class="cand-name">Monograma Cormorant</span>
+      <span class="verdict rec">★ Mi recomendación</span>
+      <span class="verdict ok">✓ Óptimo App Store</span>
+    </div>
+    <p class="concept">El nombre <em>The Dogs' Mind</em> resuelto en sus iniciales <em>Td·M</em> en Cormorant Garamond, la <em>d</em> en cyan, sobre el gradiente emerald con halo. Escala perfecto, se reconoce a 40 px, y es exactamente tu lenguaje tipográfico del splash.</p>
+    <div class="sizes">
+      <div class="size-cell"><div class="ic r s200 mark-ic"><span class="glyph">T<em>d</em>M</span></div><span class="px">1024 px</span></div>
+      <div class="size-cell"><div class="ic r s120 mark-ic"><span class="glyph">T<em>d</em>M</span></div><span class="px">120 px</span></div>
+      <div class="size-cell"><div class="ic r s80 mark-ic"><span class="glyph">T<em>d</em>M</span></div><span class="px">80 px</span></div>
+      <div class="size-cell"><div class="ic r s60 mark-ic"><span class="glyph">T<em>d</em>M</span></div><span class="px">60 px</span></div>
+      <div class="size-cell"><div class="ic r s40 mark-ic"><span class="glyph">T<em>d</em>M</span></div><span class="px">40 px</span></div>
+    </div>
+    <div class="notes">
+      <div class="it"><span class="l">Fortaleza</span>Legible a todos los tamaños, premium, coherente con la tipografía de la app. Cero riesgo HIG.</div>
+      <div class="it"><span class="l">Riesgo App Store</span>Ninguno relevante. Es justo lo que Apple premia: marca simple y reconocible.</div>
+      <div class="it"><span class="l">Veredicto</span>Óptimo. La foto sigue viva en splash/marketing; el icono es el sello tipográfico.</div>
+    </div>
+  </div>
+
+  <!-- C -->
+  <div class="cand">
+    <div class="cand-head">
+      <span class="cand-num">C</span>
+      <span class="cand-name">Híbrido · cara en círculo</span>
+      <span class="verdict warn">⚠ Mejor que A · sigue siendo foto</span>
+    </div>
+    <p class="concept">El compromiso: si quieres al perro <em>dentro</em> del icono, lo metemos en un disco centrado sobre el campo emerald con anillo cyan. El marco le da estructura de icono y enfoca la cara — aguanta mejor que A, pero a 40 px sigue dependiendo de la foto.</p>
+    <div class="sizes">
+      <div class="size-cell"><div class="ic r s200 hybrid-ic"><div class="disc"><div class="img"></div></div></div><span class="px">1024 px</span></div>
+      <div class="size-cell"><div class="ic r s120 hybrid-ic"><div class="disc"><div class="img"></div></div></div><span class="px">120 px</span></div>
+      <div class="size-cell"><div class="ic r s80 hybrid-ic"><div class="disc"><div class="img"></div></div></div><span class="px">80 px</span></div>
+      <div class="size-cell"><div class="ic r s60 hybrid-ic"><div class="disc"><div class="img"></div></div></div><span class="px">60 px</span></div>
+      <div class="size-cell"><div class="ic r s40 hybrid-ic"><div class="disc"><div class="img"></div></div></div><span class="px">40 px</span></div>
+    </div>
+    <div class="notes">
+      <div class="it"><span class="l">Fortaleza</span>Conserva al perro y gana estructura. El emerald + anillo cyan lo hacen leer como icono, no como recorte.</div>
+      <div class="it"><span class="l">Riesgo App Store</span>Menor que A, pero sigue siendo foto: misma observación HIG, atenuada.</div>
+      <div class="it"><span class="l">Veredicto</span>Buen punto medio si el perro en el icono es innegociable.</div>
+    </div>
+  </div>
+
+  <!-- Home screen mockup -->
+  <p class="tag" style="margin-top:10px">Cómo se ven en la pantalla de inicio (60 px)</p>
+  <div class="home-row">
+    <div class="home-tile">
+      <div class="ic r s60 photo-ic"><div class="img"></div><div class="vig"></div></div>
+      <span class="nm">A · foto</span>
+    </div>
+    <div class="home-tile">
+      <div class="ic r s60 mark-ic"><span class="glyph">T<em>d</em>M</span></div>
+      <span class="nm">B · monograma</span>
+    </div>
+    <div class="home-tile">
+      <div class="ic r s60 hybrid-ic"><div class="disc"><div class="img"></div></div></div>
+      <span class="nm">C · híbrido</span>
+    </div>
+  </div>
+
+  <div class="closing">
+    <h2>Mi lectura honesta</h2>
+    <p>
+      Para App Store, <em>B (monograma)</em> es la opción de menor riesgo y mayor calidad — y no pierdes el perro: la foto sigue siendo la cara de la marca en el splash, el onboarding y todo el marketing. Si quieres al collie también en el icono, <em>C</em> es el compromiso correcto. <em>A</em> queda como último recurso.<br><br>
+      Dime <em>A · B · C</em> (o un ajuste: monograma distinto, otro encuadre) y lo convierto en los PNG reales 1024 + todos los tamaños, sustituyo los iconos y el favicon, y dejo backup del actual. No toco producción hasta que elijas.
+    </p>
+  </div>
+</body>
+</html>

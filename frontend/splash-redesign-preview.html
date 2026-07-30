@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Splash · 3 opciones godmode · The Dogs Mind</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+    body {
+      min-height:100vh;
+      background:
+        linear-gradient(135deg, transparent 0%, transparent 30%, rgba(94,200,230,0.06) 45%, rgba(126,184,106,0.04) 55%, transparent 70%, transparent 100%),
+        radial-gradient(ellipse at 50% 100%, #0b1518 0%, #06090b 70%);
+      background-color:#06090b;
+      font-family:'Jost', sans-serif;
+      color:#fff;
+      padding:48px 24px 96px;
+    }
+    .page-tag {
+      font-family:'Jost',sans-serif;font-size:11px;font-weight:600;
+      letter-spacing:0.20em;text-transform:uppercase;
+      color:#5ec8e6;text-align:center;margin-bottom:10px;
+    }
+    .page-title {
+      font-family:'Cormorant Garamond', serif;
+      font-size:38px;font-weight:600;
+      text-align:center;margin-bottom:8px;
+      color:#fff;text-shadow:0 2px 14px rgba(0,0,0,0.40);
+    }
+    .page-sub {
+      text-align:center;
+      color:rgba(255,255,255,0.62);
+      font-size:14px;margin-bottom:56px;font-weight:300;
+    }
+    .row {
+      display:flex;justify-content:center;
+      gap:56px;flex-wrap:wrap;align-items:flex-start;
+    }
+    .col { width:390px;max-width:100%; }
+    .col-tag {
+      font-family:'Jost',sans-serif;font-size:11px;font-weight:600;
+      letter-spacing:0.18em;text-transform:uppercase;
+      color:#80d6ee;text-align:center;margin-bottom:10px;
+    }
+    .col-name {
+      font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;
+      text-align:center;margin-bottom:8px;color:#fff;
+    }
+    .col-desc {
+      font-size:13px;text-align:center;color:rgba(255,255,255,0.66);
+      margin-bottom:22px;max-width:340px;margin-left:auto;margin-right:auto;line-height:1.5;
+    }
+
+    /* iPhone mockup */
+    .phone {
+      width:390px;height:680px;max-width:100%;
+      position:relative;background:#0a1a14;overflow:hidden;
+      border-radius:50px;
+      box-shadow:
+        0 0 0 10px #1a1a1a,
+        0 0 0 12px #2a2a2a,
+        0 30px 80px rgba(0,0,0,0.5),
+        0 10px 30px rgba(0,0,0,0.3);
+      display:flex;flex-direction:column;
+    }
+    .notch {
+      position:absolute;top:0;left:50%;transform:translateX(-50%);
+      width:120px;height:34px;background:#1a1a1a;border-radius:0 0 22px 22px;z-index:100;
+    }
+    .status-bar {
+      height:32px;display:flex;align-items:flex-end;justify-content:space-between;
+      padding:0 24px 4px;font-size:12px;font-weight:600;
+      color:rgba(255,255,255,0.92);
+      position:relative;z-index:10;flex-shrink:0;
+    }
+    .splash { flex:1;position:relative;overflow:hidden; }
+    .splash-bg { position:absolute;inset:0;z-index:0; }
+    .splash-bg img {
+      width:100%;height:100%;object-fit:cover;object-position:42% 28%;display:block;
+    }
+    .splash-overlay {
+      position:absolute;inset:0;z-index:1;
+      background:linear-gradient(to bottom,
+        rgba(20,28,18,0.0) 0%,
+        rgba(20,28,18,0.22) 30%,
+        rgba(20,28,18,0.70) 62%,
+        rgba(15,22,13,0.94) 100%);
+    }
+    .splash-content {
+      position:relative;z-index:2;height:100%;
+      display:flex;flex-direction:column;justify-content:flex-end;
+      padding:0 28px 22px;text-align:center;align-items:center;
+    }
+    .splash-eyebrow {
+      font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;
+      color:rgba(255,255,255,0.55);margin-bottom:8px;
+    }
+    .splash-title {
+      font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:600;color:#fff;
+      line-height:1.05;margin-bottom:4px;
+    }
+    .splash-by {
+      font-style:italic;font-size:12px;color:rgba(255,255,255,0.62);margin-bottom:12px;
+    }
+    .splash-tagline {
+      font-weight:300;font-size:12.5px;color:rgba(255,255,255,0.78);
+      line-height:1.55;max-width:280px;margin-bottom:22px;
+    }
+
+    /* ════════════════════════════════════════════
+       OPCIÓN A — "Vidrio etéreo"
+       Todo glass blanco, mínima invasión sobre foto.
+    ═══════════════════════════════════════════════ */
+    .a-cta { display:flex;flex-direction:column;align-items:center;gap:10px;max-width:260px;width:100%; }
+    .a-primary {
+      width:100%;padding:12px 22px;border-radius:999px;
+      background:rgba(255,255,255,0.13);
+      border:1px solid rgba(255,255,255,0.30);
+      backdrop-filter:blur(14px) saturate(1.2);
+      -webkit-backdrop-filter:blur(14px) saturate(1.2);
+      color:#fff;font-family:'Jost',sans-serif;font-weight:500;font-size:14px;
+      letter-spacing:0.04em;cursor:pointer;
+      box-shadow:0 1px 0 rgba(255,255,255,0.20) inset, 0 8px 22px rgba(0,0,0,0.20);
+    }
+    .a-links {
+      display:flex;align-items:center;gap:14px;
+      font-size:12.5px;color:rgba(255,255,255,0.78);
+    }
+    .a-links a { color:inherit;cursor:pointer;text-decoration:none; }
+    .a-links a:hover { color:#fff; }
+    .a-links .sep { opacity:0.30; }
+    .a-pro {
+      font-family:'Jost',sans-serif;font-size:11.5px;font-weight:500;
+      color:#80d6ee;letter-spacing:0.10em;text-transform:uppercase;
+      cursor:pointer;padding:6px 0;margin-top:2px;
+    }
+    .a-pro::after { content:' →';opacity:0.80;margin-left:2px; }
+    .a-privacy {
+      font-size:10.5px;color:rgba(255,255,255,0.30);margin-top:6px;letter-spacing:0.03em;
+    }
+
+    /* ════════════════════════════════════════════
+       OPCIÓN B — "Perla líquida"  ★ recomendada
+       Un solo pill premium glass (joya flotante).
+       Micro-row de 3 links iguales debajo.
+    ═══════════════════════════════════════════════ */
+    .b-cta { display:flex;flex-direction:column;align-items:center;gap:14px;max-width:280px;width:100%; }
+    .b-primary {
+      width:100%;padding:15px 26px;border-radius:999px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.26) 0%, rgba(255,255,255,0.16) 100%);
+      border:1px solid rgba(255,255,255,0.42);
+      backdrop-filter:blur(24px) saturate(1.6);
+      -webkit-backdrop-filter:blur(24px) saturate(1.6);
+      color:#fff;font-family:'Jost',sans-serif;font-weight:500;font-size:14.5px;
+      letter-spacing:0.05em;cursor:pointer;
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.45) inset,
+        0 -1px 0 rgba(0,0,0,0.14) inset,
+        0 12px 32px rgba(0,0,0,0.32),
+        0 0 28px rgba(255,255,255,0.10);
+      position:relative;overflow:hidden;
+    }
+    .b-primary::after {
+      content:'';position:absolute;inset:0;border-radius:inherit;
+      background:linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+      transform:translateX(-100%);transition:transform 0.6s ease;pointer-events:none;
+    }
+    .b-primary:hover::after { transform:translateX(100%); }
+    .b-micro {
+      display:flex;align-items:center;justify-content:center;gap:12px;
+      font-size:11.5px;color:rgba(255,255,255,0.72);letter-spacing:0.06em;
+    }
+    .b-micro a { color:inherit;cursor:pointer;text-decoration:none; }
+    .b-micro a:hover { color:#fff; }
+    .b-micro .pro { color:#80d6ee;font-weight:500; }
+    .b-micro .sep { opacity:0.30; }
+    .b-privacy {
+      font-size:10.5px;color:rgba(255,255,255,0.28);margin-top:2px;
+    }
+
+    /* ════════════════════════════════════════════
+       OPCIÓN C — "Acción dual"
+       Dos pills medianos lado a lado.
+       Nano-row debajo. Action bar familiar.
+    ═══════════════════════════════════════════════ */
+    .c-cta { display:flex;flex-direction:column;align-items:center;gap:12px;max-width:300px;width:100%; }
+    .c-row { display:flex;gap:10px;width:100%; }
+    .c-start {
+      flex:1.3;padding:12px 16px;border-radius:999px;
+      background:linear-gradient(180deg, #5e8154 0%, #4a6741 60%, #3d5636 100%);
+      color:#fffaf0;border:none;
+      font-family:'Jost',sans-serif;font-weight:500;font-size:13px;letter-spacing:0.03em;
+      cursor:pointer;
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.20) inset,
+        0 -2px 0 rgba(0,0,0,0.28) inset,
+        0 6px 18px rgba(74,103,65,0.42);
+    }
+    .c-pro {
+      flex:1;padding:12px 16px;border-radius:999px;
+      background:rgba(94,200,230,0.10);
+      color:#cdebf6;
+      border:1px solid rgba(94,200,230,0.42);
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+      font-family:'Jost',sans-serif;font-weight:500;font-size:13px;letter-spacing:0.03em;
+      cursor:pointer;
+      box-shadow:0 0 16px rgba(94,200,230,0.10);
+    }
+    .c-pro::after { content:' →';opacity:0.85;margin-left:4px; }
+    .c-nano {
+      font-size:11.5px;color:rgba(255,255,255,0.55);letter-spacing:0.04em;
+    }
+    .c-nano a { color:rgba(255,255,255,0.85);cursor:pointer;text-decoration:none; }
+    .c-nano a:hover { color:#fff; }
+    .c-nano .sep { opacity:0.30;margin:0 6px; }
+    .c-privacy {
+      font-size:10.5px;color:rgba(255,255,255,0.28);margin-top:2px;
+    }
+
+    /* Notas debajo de cada mockup */
+    .notes {
+      max-width:340px;margin:18px auto 0;
+      font-size:11.5px;line-height:1.6;color:rgba(255,255,255,0.62);
+    }
+    .notes .lbl {
+      display:inline-block;color:#5ec8e6;font-weight:600;
+      letter-spacing:0.10em;text-transform:uppercase;font-size:10px;
+      margin-right:6px;
+    }
+    .recommended {
+      display:inline-block;margin-left:8px;padding:2px 10px;border-radius:999px;
+      background:rgba(94,200,230,0.14);border:1px solid rgba(94,200,230,0.40);
+      color:#80d6ee;font-size:10px;font-weight:600;letter-spacing:0.10em;
+      text-transform:uppercase;vertical-align:middle;
+    }
+
+    @media(max-width:1320px){ .row { gap:32px; } }
+    @media(max-width:900px){
+      .row { gap:48px; }
+      .col { width:100%;max-width:390px; }
+      .phone { height:640px; }
+    }
+  </style>
+</head>
+<body>
+  <p class="page-tag">Splash redesign · godmode</p>
+  <h1 class="page-title">Menos invasivo · más sticky</h1>
+  <p class="page-sub">3 propuestas que reducen peso visual sobre la foto y elevan el nivel premium del CTA.</p>
+
+  <div class="row">
+
+    <!-- ════════════════════ OPCIÓN A ════════════════════ -->
+    <div class="col">
+      <div class="col-tag">Opción A</div>
+      <div class="col-name">Vidrio etéreo</div>
+      <p class="col-desc">Todo glass blanco translúcido. Mínima invasión sobre la foto del border collie. Pesa lo justo para ser navegable.</p>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="status-bar"><span>9:41</span><span>··· WiFi</span></div>
+        <div class="splash">
+          <div class="splash-bg"><img src="assets/images/img-00.webp" alt=""></div>
+          <div class="splash-overlay"></div>
+          <div class="splash-content">
+            <p class="splash-eyebrow">The Dogs Mind</p>
+            <h2 class="splash-title">Canine Behavior<br>Consultancy</h2>
+            <p class="splash-by">by Teo Mariscal</p>
+            <p class="splash-tagline">Análisis funcional experto para entender y mejorar el comportamiento de tu perro</p>
+            <div class="a-cta">
+              <button class="a-primary">Comenzar · Log In</button>
+              <div class="a-links">
+                <a>Inicio</a>
+                <span class="sep">·</span>
+                <a>▶ Ver el tour</a>
+              </div>
+              <a class="a-pro">Área profesional</a>
+              <p class="a-privacy">Política de Privacidad</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="notes">
+        <span class="lbl">Peso</span>bajísimo · todo glass translúcido sin pills sólidos.<br>
+        <span class="lbl">Sticky</span>vibra tipo Vision Pro / iOS glass moderno.<br>
+        <span class="lbl">Riesgo</span>si una zona de la foto detrás es muy clara, el glass puede perder contraste · `backdrop-filter` lo mitiga.
+      </p>
+    </div>
+
+    <!-- ════════════════════ OPCIÓN B ════════════════════ -->
+    <div class="col">
+      <div class="col-tag">Opción B <span class="recommended">recomendada</span></div>
+      <div class="col-name">Perla líquida</div>
+      <p class="col-desc">Un único pill glass premium como joya flotante. Brillo sutil en hover. Micro-row de 3 links iguales debajo. Jerarquía por contraste, no por tamaño.</p>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="status-bar"><span>9:41</span><span>··· WiFi</span></div>
+        <div class="splash">
+          <div class="splash-bg"><img src="assets/images/img-00.webp" alt=""></div>
+          <div class="splash-overlay"></div>
+          <div class="splash-content">
+            <p class="splash-eyebrow">The Dogs Mind</p>
+            <h2 class="splash-title">Canine Behavior<br>Consultancy</h2>
+            <p class="splash-by">by Teo Mariscal</p>
+            <p class="splash-tagline">Análisis funcional experto para entender y mejorar el comportamiento de tu perro</p>
+            <div class="b-cta">
+              <button class="b-primary">Comenzar · Log In</button>
+              <div class="b-micro">
+                <a>Inicio</a>
+                <span class="sep">·</span>
+                <a>Ver el tour</a>
+                <span class="sep">·</span>
+                <a class="pro">Área Pro</a>
+              </div>
+              <p class="b-privacy">Política de Privacidad</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="notes">
+        <span class="lbl">Peso</span>1 pill premium + 1 línea micro · footprint minúsculo.<br>
+        <span class="lbl">Sticky</span>el pill glass con blur 24px + saturate + shimmer en hover parece una joya iOS 18 / Vision Pro · muy memorable.<br>
+        <span class="lbl">Riesgo</span>"Área Pro" en la micro-row pesa igual que los otros · si quieres destacarlo más, se sube su font-weight o se mantiene el color cyan.
+      </p>
+    </div>
+
+    <!-- ════════════════════ OPCIÓN C ════════════════════ -->
+    <div class="col">
+      <div class="col-tag">Opción C</div>
+      <div class="col-name">Acción dual</div>
+      <p class="col-desc">Dos pills compactos lado a lado (Comenzar verde + Área Pro cyan). Nano-row debajo con Inicio · Tour. Acción rápida tipo App Store onboarding.</p>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="status-bar"><span>9:41</span><span>··· WiFi</span></div>
+        <div class="splash">
+          <div class="splash-bg"><img src="assets/images/img-00.webp" alt=""></div>
+          <div class="splash-overlay"></div>
+          <div class="splash-content">
+            <p class="splash-eyebrow">The Dogs Mind</p>
+            <h2 class="splash-title">Canine Behavior<br>Consultancy</h2>
+            <p class="splash-by">by Teo Mariscal</p>
+            <p class="splash-tagline">Análisis funcional experto para entender y mejorar el comportamiento de tu perro</p>
+            <div class="c-cta">
+              <div class="c-row">
+                <button class="c-start">Comenzar · Log In</button>
+                <button class="c-pro">Área Pro</button>
+              </div>
+              <div class="c-nano">
+                ¿Solo mirar? <a>Inicio</a><span class="sep">·</span><a>▶ Tour</a>
+              </div>
+              <p class="c-privacy">Política de Privacidad</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="notes">
+        <span class="lbl">Peso</span>2 pills medianos en fila + nano-link · compact action bar.<br>
+        <span class="lbl">Sticky</span>patrón familiar de App Store y onboarding moderno · distingue al usuario Pro desde el primer toque.<br>
+        <span class="lbl">Riesgo</span>la fila de 2 pills puede sentirse algo "transaccional" en una pantalla emocional · el copy "¿Solo mirar?" se puede omitir.
+      </p>
+    </div>
+
+  </div>
+</body>
+</html>

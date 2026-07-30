@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Splash · v2 iOS designer · The Dogs Mind</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+    body {
+      min-height:100vh;
+      background:
+        linear-gradient(135deg, transparent 0%, transparent 30%, rgba(94,200,230,0.06) 45%, rgba(126,184,106,0.04) 55%, transparent 70%, transparent 100%),
+        radial-gradient(ellipse at 50% 100%, #0b1518 0%, #06090b 70%);
+      background-color:#06090b;
+      font-family:'Jost', sans-serif;color:#fff;
+      padding:48px 24px 96px;
+    }
+    .page-tag {
+      font-size:11px;font-weight:600;letter-spacing:0.20em;text-transform:uppercase;
+      color:#5ec8e6;text-align:center;margin-bottom:10px;
+    }
+    .page-title {
+      font-family:'Cormorant Garamond', serif;font-size:38px;font-weight:600;
+      text-align:center;margin-bottom:8px;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,0.40);
+    }
+    .page-sub {
+      text-align:center;color:rgba(255,255,255,0.62);font-size:14px;margin-bottom:6px;font-weight:300;
+    }
+    .page-thesis {
+      text-align:center;color:rgba(255,255,255,0.45);font-size:12.5px;margin:0 auto 56px;
+      max-width:580px;line-height:1.6;font-weight:300;
+    }
+    .page-thesis em { color:#80d6ee;font-style:normal;font-weight:500; }
+    .row {
+      display:flex;justify-content:center;gap:56px;flex-wrap:wrap;align-items:flex-start;
+    }
+    .col { width:390px;max-width:100%; }
+    .col-tag {
+      font-size:11px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;
+      color:#80d6ee;text-align:center;margin-bottom:10px;
+    }
+    .col-name {
+      font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;
+      text-align:center;margin-bottom:8px;color:#fff;
+    }
+    .col-desc {
+      font-size:13px;text-align:center;color:rgba(255,255,255,0.66);
+      margin:0 auto 22px;max-width:340px;line-height:1.5;
+    }
+
+    /* iPhone mockup */
+    .phone {
+      width:390px;height:720px;max-width:100%;
+      position:relative;background:#0a1a14;overflow:hidden;
+      border-radius:50px;
+      box-shadow:
+        0 0 0 10px #1a1a1a,
+        0 0 0 12px #2a2a2a,
+        0 30px 80px rgba(0,0,0,0.5),
+        0 10px 30px rgba(0,0,0,0.3);
+      display:flex;flex-direction:column;
+    }
+    .notch {
+      position:absolute;top:0;left:50%;transform:translateX(-50%);
+      width:120px;height:34px;background:#1a1a1a;border-radius:0 0 22px 22px;z-index:100;
+    }
+    .status-bar {
+      height:32px;display:flex;align-items:flex-end;justify-content:space-between;
+      padding:0 24px 4px;font-size:12px;font-weight:600;
+      color:rgba(255,255,255,0.92);position:relative;z-index:10;flex-shrink:0;
+    }
+    .splash { flex:1;position:relative;overflow:hidden; }
+    .splash-bg { position:absolute;inset:0;z-index:0; }
+    .splash-bg img {
+      width:100%;height:100%;object-fit:cover;object-position:42% 28%;display:block;
+    }
+    .splash-overlay {
+      position:absolute;inset:0;z-index:1;
+      background:linear-gradient(to bottom,
+        rgba(20,28,18,0.0) 0%,
+        rgba(20,28,18,0.20) 28%,
+        rgba(20,28,18,0.68) 60%,
+        rgba(15,22,13,0.94) 100%);
+    }
+    .splash-content {
+      position:relative;z-index:2;height:100%;
+      display:flex;flex-direction:column;justify-content:flex-end;
+      padding:0 22px 22px;align-items:center;text-align:center;
+    }
+    .splash-eyebrow {
+      font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;
+      color:rgba(255,255,255,0.55);margin-bottom:8px;
+    }
+    .splash-title {
+      font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;color:#fff;
+      line-height:1.05;margin-bottom:4px;
+    }
+    .splash-by {
+      font-style:italic;font-size:12px;color:rgba(255,255,255,0.62);margin-bottom:12px;
+    }
+    .splash-tagline {
+      font-weight:300;font-size:12.5px;color:rgba(255,255,255,0.78);
+      line-height:1.55;max-width:280px;margin-bottom:20px;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       OPCIÓN A — "Liquid Sheet"
+       Apple Music subscriptions sheet / Settings.app rows pattern.
+       Material único + hairlines + chevrons. Sin pills.
+    ═══════════════════════════════════════════════════════════════════ */
+    .a-sheet {
+      width:100%;max-width:330px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.08) 100%);
+      border:1px solid rgba(255,255,255,0.18);
+      border-radius:24px;
+      backdrop-filter:blur(28px) saturate(1.6);
+      -webkit-backdrop-filter:blur(28px) saturate(1.6);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.20) inset,
+        0 16px 36px rgba(0,0,0,0.32),
+        0 0 0 0.5px rgba(255,255,255,0.04) inset;
+      overflow:hidden;
+    }
+    .a-row {
+      display:flex;align-items:center;justify-content:space-between;
+      padding:14px 18px;cursor:pointer;
+      transition:background 0.15s ease;
+      font-family:'Jost',sans-serif;
+    }
+    .a-row + .a-row { border-top:1px solid rgba(255,255,255,0.10); }
+    .a-row:hover { background:rgba(255,255,255,0.04); }
+    .a-row .label {
+      font-size:14px;font-weight:500;color:rgba(255,255,255,0.94);letter-spacing:0.01em;
+      display:flex;align-items:center;gap:8px;
+    }
+    .a-row .label .icon {
+      width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;
+      color:rgba(255,255,255,0.70);font-size:10px;
+    }
+    .a-row .chev { color:rgba(255,255,255,0.40);font-size:14px;font-weight:300; }
+    .a-row--primary .label { font-size:15px;font-weight:600;color:#fff; }
+    .a-row--pro .label { color:#a8e2f2; }
+    .a-row--pro .badge {
+      display:inline-block;padding:1px 8px;border-radius:6px;
+      background:rgba(94,200,230,0.16);border:1px solid rgba(94,200,230,0.45);
+      color:#80d6ee;font-size:9.5px;font-weight:600;letter-spacing:0.12em;
+      margin-left:8px;text-transform:uppercase;
+    }
+    .a-row--pro .chev { color:#80d6ee; }
+    .a-privacy {
+      font-size:10.5px;color:rgba(255,255,255,0.28);
+      margin-top:14px;letter-spacing:0.04em;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       OPCIÓN B — "Hero Gesture"
+       Apple TV+ / Apple Watch onboarding pattern. No pills.
+       Acción primaria como TYPOGRAPHY+arrow grande. Chip segmentado abajo.
+    ═══════════════════════════════════════════════════════════════════ */
+    .b-cta { display:flex;flex-direction:column;align-items:center;gap:18px;width:100%;max-width:320px; }
+    .b-hero {
+      display:flex;align-items:center;justify-content:center;gap:10px;
+      padding:12px 20px;border-radius:18px;
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.10);
+      backdrop-filter:blur(20px) saturate(1.4);
+      -webkit-backdrop-filter:blur(20px) saturate(1.4);
+      cursor:pointer;width:100%;
+      font-family:'Jost',sans-serif;font-weight:500;
+      font-size:17px;color:#fff;letter-spacing:0.02em;
+      transition:background 0.15s ease, border-color 0.15s ease;
+    }
+    .b-hero:hover { background:rgba(255,255,255,0.10);border-color:rgba(255,255,255,0.20); }
+    .b-hero .arrow {
+      font-size:16px;color:#80d6ee;font-weight:300;
+      transition:transform 0.2s ease;
+    }
+    .b-hero:hover .arrow { transform:translateX(3px); }
+    .b-segmented {
+      display:flex;align-items:stretch;
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.14);
+      border-radius:14px;
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+      overflow:hidden;
+    }
+    .b-seg {
+      flex:1;padding:9px 12px;cursor:pointer;
+      font-family:'Jost',sans-serif;font-size:12px;font-weight:500;
+      color:rgba(255,255,255,0.80);letter-spacing:0.04em;
+      text-align:center;
+      transition:background 0.15s ease;
+      display:flex;align-items:center;justify-content:center;gap:5px;
+    }
+    .b-seg + .b-seg { border-left:1px solid rgba(255,255,255,0.10); }
+    .b-seg:hover { background:rgba(255,255,255,0.06);color:#fff; }
+    .b-seg .play { font-size:8px;opacity:0.85; }
+    .b-seg--pro { color:#80d6ee; }
+    .b-privacy {
+      font-size:10.5px;color:rgba(255,255,255,0.28);margin-top:2px;letter-spacing:0.04em;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       OPCIÓN C — "Floating Dock"  ★ recomendada
+       Vision Pro / Apple Maps panel. Material continuo, asimétrico,
+       jerarquía clara, todo integrado en una sola "tableta flotante".
+    ═══════════════════════════════════════════════════════════════════ */
+    .c-dock {
+      width:100%;max-width:330px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.09) 100%);
+      border:1px solid rgba(255,255,255,0.22);
+      border-radius:26px;
+      backdrop-filter:blur(30px) saturate(1.7);
+      -webkit-backdrop-filter:blur(30px) saturate(1.7);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.28) inset,
+        0 -1px 0 rgba(0,0,0,0.08) inset,
+        0 18px 40px rgba(0,0,0,0.34),
+        0 0 28px rgba(255,255,255,0.06);
+      padding:6px;
+      overflow:hidden;
+    }
+    .c-main {
+      display:flex;align-items:stretch;
+      border-radius:20px;overflow:hidden;
+    }
+    .c-main-cta {
+      flex:1.6;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:14px 16px 14px 18px;cursor:pointer;
+      transition:background 0.15s ease;
+      font-family:'Jost',sans-serif;
+    }
+    .c-main-cta:hover { background:rgba(255,255,255,0.06); }
+    .c-main-cta .text {
+      display:flex;flex-direction:column;align-items:flex-start;gap:2px;
+    }
+    .c-main-cta .text .top {
+      font-size:9.5px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;
+      color:rgba(255,255,255,0.55);
+    }
+    .c-main-cta .text .main {
+      font-size:15px;font-weight:600;color:#fff;letter-spacing:0.01em;
+    }
+    .c-main-cta .arrow {
+      font-size:18px;color:#fff;font-weight:300;opacity:0.85;
+    }
+    .c-divider { width:1px;background:rgba(255,255,255,0.12); }
+    .c-pro-cta {
+      flex:1;
+      display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;
+      padding:14px 16px;cursor:pointer;
+      transition:background 0.15s ease;
+      font-family:'Jost',sans-serif;
+    }
+    .c-pro-cta:hover { background:rgba(94,200,230,0.06); }
+    .c-pro-cta .top {
+      font-size:9.5px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;
+      color:#5ec8e6;
+    }
+    .c-pro-cta .main {
+      font-size:13px;font-weight:500;color:#a8e2f2;letter-spacing:0.01em;
+      display:flex;align-items:center;gap:6px;
+    }
+    .c-pro-cta .main::after {
+      content:'→';font-size:13px;color:#80d6ee;font-weight:300;opacity:0.85;
+    }
+    .c-secondary {
+      display:flex;align-items:center;justify-content:center;gap:14px;
+      padding:10px 12px 8px;
+      border-top:1px solid rgba(255,255,255,0.08);
+      margin-top:4px;
+    }
+    .c-sec-link {
+      font-family:'Jost',sans-serif;font-size:11.5px;font-weight:500;
+      color:rgba(255,255,255,0.72);cursor:pointer;letter-spacing:0.04em;
+      display:flex;align-items:center;gap:5px;
+    }
+    .c-sec-link:hover { color:#fff; }
+    .c-sec-link .play { font-size:8px;opacity:0.80; }
+    .c-sec-sep { color:rgba(255,255,255,0.22);font-size:11px; }
+    .c-privacy {
+      font-size:10.5px;color:rgba(255,255,255,0.28);
+      margin-top:14px;letter-spacing:0.04em;
+    }
+
+    /* Notas */
+    .notes {
+      max-width:340px;margin:18px auto 0;
+      font-size:11.5px;line-height:1.6;color:rgba(255,255,255,0.62);
+    }
+    .notes .lbl {
+      display:inline-block;color:#5ec8e6;font-weight:600;
+      letter-spacing:0.10em;text-transform:uppercase;font-size:10px;margin-right:6px;
+    }
+    .recommended {
+      display:inline-block;margin-left:8px;padding:2px 10px;border-radius:999px;
+      background:rgba(94,200,230,0.14);border:1px solid rgba(94,200,230,0.40);
+      color:#80d6ee;font-size:10px;font-weight:600;letter-spacing:0.10em;
+      text-transform:uppercase;vertical-align:middle;
+    }
+
+    @media(max-width:1320px){ .row { gap:32px; } }
+    @media(max-width:900px){
+      .row { gap:48px; }
+      .col { width:100%;max-width:390px; }
+      .phone { height:680px; }
+    }
+  </style>
+</head>
+<body>
+  <p class="page-tag">Splash redesign · v2 iOS designer</p>
+  <h1 class="page-title">Material continuo, no pills</h1>
+  <p class="page-sub">Lenguaje iOS 18 / Vision Pro 2026</p>
+  <p class="page-thesis">
+    Las pills aisladas (incluso glass) son <em>Material Design 2019</em>. iOS hoy va por <em>material continuo</em>: containers únicos con acciones agrupadas, jerarquía por tipografía y hairlines, no por forma del botón. Las 3 propuestas comparten esa lógica.
+  </p>
+
+  <div class="row">
+
+    <!-- ════════════════════ OPCIÓN A ════════════════════ -->
+    <div class="col">
+      <div class="col-tag">Opción A</div>
+      <div class="col-name">Liquid Sheet</div>
+      <p class="col-desc">Settings.app / Apple Music subscriptions sheet. Un único material, 4 filas separadas por hairlines, chevrons a la derecha. Jerarquía por weight del texto.</p>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="status-bar"><span>9:41</span><span>··· WiFi</span></div>
+        <div class="splash">
+          <div class="splash-bg"><img src="assets/images/img-00.webp" alt=""></div>
+          <div class="splash-overlay"></div>
+          <div class="splash-content">
+            <p class="splash-eyebrow">The Dogs Mind</p>
+            <h2 class="splash-title">Canine Behavior<br>Consultancy</h2>
+            <p class="splash-by">by Teo Mariscal</p>
+            <p class="splash-tagline">Análisis funcional experto para entender y mejorar el comportamiento de tu perro</p>
+
+            <div class="a-sheet">
+              <div class="a-row a-row--primary">
+                <span class="label">Comenzar · Log In</span>
+                <span class="chev">›</span>
+              </div>
+              <div class="a-row">
+                <span class="label">Inicio</span>
+                <span class="chev">›</span>
+              </div>
+              <div class="a-row">
+                <span class="label"><span class="icon">▶</span>Ver el tour</span>
+                <span class="chev">›</span>
+              </div>
+              <div class="a-row a-row--pro">
+                <span class="label">Área profesional<span class="badge">Pro</span></span>
+                <span class="chev">›</span>
+              </div>
+            </div>
+            <p class="a-privacy">Política de Privacidad</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="notes">
+        <span class="lbl">Tipo</span>Sheet nativa iOS (Settings/Música/Wallet).<br>
+        <span class="lbl">Jerarquía</span>weight de la tipografía + badge "Pro" + acento cyan en la última fila.<br>
+        <span class="lbl">Sticky</span>se siente <em>de Apple</em>, no de Material Design. Familiar para cualquier iPhone user.<br>
+        <span class="lbl">Riesgo</span>4 filas = mucho contenido en pantalla. Reduce a 3 fusionando "Inicio" en footer.
+      </p>
+    </div>
+
+    <!-- ════════════════════ OPCIÓN B ════════════════════ -->
+    <div class="col">
+      <div class="col-tag">Opción B</div>
+      <div class="col-name">Hero Gesture</div>
+      <p class="col-desc">Apple TV+ / Watch onboarding. La acción primaria es tipografía + flecha (no es un pill, es un gesto). Debajo, segmented control fino con 3 segmentos para navegación secundaria.</p>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="status-bar"><span>9:41</span><span>··· WiFi</span></div>
+        <div class="splash">
+          <div class="splash-bg"><img src="assets/images/img-00.webp" alt=""></div>
+          <div class="splash-overlay"></div>
+          <div class="splash-content">
+            <p class="splash-eyebrow">The Dogs Mind</p>
+            <h2 class="splash-title">Canine Behavior<br>Consultancy</h2>
+            <p class="splash-by">by Teo Mariscal</p>
+            <p class="splash-tagline">Análisis funcional experto para entender y mejorar el comportamiento de tu perro</p>
+
+            <div class="b-cta">
+              <div class="b-hero">
+                <span>Comenzar · Log In</span>
+                <span class="arrow">→</span>
+              </div>
+              <div class="b-segmented">
+                <div class="b-seg">Inicio</div>
+                <div class="b-seg"><span class="play">▶</span>Tour</div>
+                <div class="b-seg b-seg--pro">Área Pro</div>
+              </div>
+              <p class="b-privacy">Política de Privacidad</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="notes">
+        <span class="lbl">Tipo</span>hero typography + segmented control.<br>
+        <span class="lbl">Jerarquía</span>el "Comenzar →" es mucho más grande (17px vs 12px) sin necesidad de pill verde dominante.<br>
+        <span class="lbl">Sticky</span>la flecha cyan que se desliza al hover es la animación memorable.<br>
+        <span class="lbl">Riesgo</span>el segmented puede leerse como "selector activo" — solo navegación, no toggle. Hover/touch claros lo resuelven.
+      </p>
+    </div>
+
+    <!-- ════════════════════ OPCIÓN C ════════════════════ -->
+    <div class="col">
+      <div class="col-tag">Opción C <span class="recommended">recomendada</span></div>
+      <div class="col-name">Floating Dock</div>
+      <p class="col-desc">Vision Pro / Apple Maps panel. Un único dock flotante con asimetría: bloque mayor "Comenzar" + bloque "Pro" separado por hairline vertical. Debajo, dentro del mismo material, Inicio · Tour como microacciones.</p>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="status-bar"><span>9:41</span><span>··· WiFi</span></div>
+        <div class="splash">
+          <div class="splash-bg"><img src="assets/images/img-00.webp" alt=""></div>
+          <div class="splash-overlay"></div>
+          <div class="splash-content">
+            <p class="splash-eyebrow">The Dogs Mind</p>
+            <h2 class="splash-title">Canine Behavior<br>Consultancy</h2>
+            <p class="splash-by">by Teo Mariscal</p>
+            <p class="splash-tagline">Análisis funcional experto para entender y mejorar el comportamiento de tu perro</p>
+
+            <div class="c-dock">
+              <div class="c-main">
+                <div class="c-main-cta">
+                  <div class="text">
+                    <span class="top">Empieza</span>
+                    <span class="main">Comenzar · Log In</span>
+                  </div>
+                  <span class="arrow">→</span>
+                </div>
+                <div class="c-divider"></div>
+                <div class="c-pro-cta">
+                  <span class="top">Profesional</span>
+                  <span class="main">Área Pro</span>
+                </div>
+              </div>
+              <div class="c-secondary">
+                <span class="c-sec-link">Inicio</span>
+                <span class="c-sec-sep">·</span>
+                <span class="c-sec-link"><span class="play">▶</span>Tour</span>
+              </div>
+            </div>
+            <p class="c-privacy">Política de Privacidad</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="notes">
+        <span class="lbl">Tipo</span>floating dock iPad / Vision Pro panel.<br>
+        <span class="lbl">Jerarquía</span>asimétrica (60/40), 2 niveles de typography por bloque (eyebrow + main), acción Pro destacada por color sin ser igual de grande.<br>
+        <span class="lbl">Sticky</span>el dock es <em>un solo objeto flotante</em>, no una colección de botones · sensación tablet/spatial computing.<br>
+        <span class="lbl">Riesgo</span>backdrop blur fuerte (30px + saturate 1.7) sobre foto puede pesar en GPU low-end · medible y reducible.
+      </p>
+    </div>
+
+  </div>
+</body>
+</html>

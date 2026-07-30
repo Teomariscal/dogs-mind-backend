@@ -346,11 +346,11 @@
           '</ol>'
         : '<div class="dmw-nav-vacio">Sin indicaciones detalladas para esta ruta.</div>') +
       '<div class="dmw-nav-btns">' +
-        (g ? '<a class="dmw-nav-btn" href="' + g + '" target="_blank" rel="noopener">Seguir con GPS</a>' : '') +
+        (g ? '<a class="dmw-nav-btn" href="' + g + '" target="_blank" rel="noopener">Abrir en mi app de mapas</a>' : '') +
         (o ? '<a class="dmw-nav-btn alt" href="' + o + '" target="_blank" rel="noopener">Ver en OpenStreetMap</a>' : '') +
       '</div>' +
-      '<div class="dmw-nav-nota">Se abre en tu app de mapas, con la ruta y sus paradas cargadas: ' +
-      'ahí el GPS te va indicando cada giro.</div>';
+      '<div class="dmw-nav-nota">Se abre tu app de mapas con esta ruta ya elegida — ' +
+      'salida, paradas y vuelta — y la sigues desde ahí con tu GPS.</div>';
   }
 
   function estadoTexto(t) {

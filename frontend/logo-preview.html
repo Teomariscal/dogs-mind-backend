@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Logo · The Dogs Mind · Editorial · Foto + Tipografía</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+    body {
+      min-height:100vh;
+      background:
+        linear-gradient(135deg, transparent 0%, transparent 30%, rgba(94,200,230,0.06) 45%, rgba(126,184,106,0.04) 55%, transparent 70%, transparent 100%),
+        radial-gradient(ellipse at 50% 100%, #0b1518 0%, #06090b 70%);
+      background-color:#06090b;
+      font-family:'Jost', sans-serif;color:#fff;
+      padding:48px 24px 96px;
+    }
+    .page-tag {
+      font-size:11px;font-weight:600;letter-spacing:0.20em;text-transform:uppercase;
+      color:#5ec8e6;text-align:center;margin-bottom:10px;
+    }
+    .page-title {
+      font-family:'Cormorant Garamond', serif;font-size:40px;font-weight:600;
+      text-align:center;margin-bottom:8px;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,0.40);
+      letter-spacing:-0.005em;
+    }
+    .page-sub {
+      text-align:center;color:rgba(255,255,255,0.62);font-size:14px;margin-bottom:8px;font-weight:300;
+    }
+    .page-brief {
+      text-align:center;color:rgba(255,255,255,0.50);font-size:12.5px;margin:0 auto 64px;
+      max-width:680px;line-height:1.7;font-weight:300;
+    }
+    .page-brief em { color:#80d6ee;font-style:normal;font-weight:500; }
+
+    .proposal {
+      max-width:1180px;margin:0 auto 96px;
+    }
+    .proposal-head {
+      display:flex;align-items:baseline;justify-content:center;gap:18px;
+      margin-bottom:14px;flex-wrap:wrap;
+    }
+    .proposal-num {
+      color:#5ec8e6;font-size:12px;letter-spacing:0.24em;
+      font-family:'Jost',sans-serif;font-weight:600;text-transform:uppercase;
+    }
+    .proposal-name {
+      font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;color:#fff;
+      letter-spacing:-0.005em;
+    }
+    .proposal-rec {
+      padding:3px 10px;border-radius:999px;
+      background:rgba(94,200,230,0.14);border:1px solid rgba(94,200,230,0.42);
+      color:#80d6ee;font-size:10px;font-weight:600;letter-spacing:0.10em;
+      text-transform:uppercase;
+    }
+    .proposal-concept {
+      font-size:13.5px;color:rgba(255,255,255,0.65);line-height:1.7;
+      margin:0 auto 36px;max-width:640px;text-align:center;
+    }
+    .proposal-concept em { color:#80d6ee;font-style:normal;font-weight:500; }
+
+    .row {
+      display:flex;gap:24px;justify-content:center;flex-wrap:wrap;
+      margin-bottom:24px;
+    }
+
+    /* ───── Hero piece (símbolo de marca grande) ───── */
+    .hero-piece {
+      position:relative;
+      background:#0a1a14;
+      border-radius:8px;
+      overflow:hidden;
+      box-shadow:0 20px 50px rgba(0,0,0,0.45);
+    }
+
+    /* A: Editorial Hero — foto vertical con título arriba */
+    .editorial-hero {
+      width:380px;height:560px;
+      position:relative;overflow:hidden;border-radius:6px;
+    }
+    .editorial-hero img {
+      width:100%;height:100%;object-fit:cover;object-position:42% 28%;display:block;
+    }
+    .editorial-hero .overlay {
+      position:absolute;inset:0;
+      background:linear-gradient(to bottom,
+        rgba(15,22,13,0.55) 0%,
+        rgba(15,22,13,0.18) 24%,
+        rgba(15,22,13,0.0) 48%,
+        rgba(15,22,13,0.45) 100%);
+    }
+    .editorial-hero .content {
+      position:absolute;top:34px;left:0;right:0;
+      display:flex;flex-direction:column;align-items:center;
+      padding:0 24px;
+    }
+    .editorial-hero .eyebrow {
+      font-family:'Jost',sans-serif;font-size:9.5px;font-weight:600;letter-spacing:0.28em;
+      text-transform:uppercase;color:rgba(255,255,255,0.75);margin-bottom:10px;
+    }
+    .editorial-hero .title {
+      font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:600;
+      color:#fff;line-height:0.95;text-align:center;letter-spacing:-0.01em;
+      text-shadow:0 2px 14px rgba(0,0,0,0.42);
+    }
+    .editorial-hero .title .small {
+      display:block;font-size:14px;font-style:italic;font-weight:400;
+      color:rgba(255,255,255,0.85);letter-spacing:0.04em;margin-top:8px;
+    }
+    .editorial-hero .bottom {
+      position:absolute;bottom:24px;left:0;right:0;text-align:center;
+    }
+    .editorial-hero .bottom-text {
+      font-family:'Jost',sans-serif;font-size:9px;font-weight:500;letter-spacing:0.30em;
+      text-transform:uppercase;color:rgba(255,255,255,0.62);
+    }
+
+    /* B: Circle mark — círculo con foto + tipografía debajo */
+    .circle-mark {
+      display:flex;flex-direction:column;align-items:center;gap:20px;
+      padding:34px 28px;
+      background:linear-gradient(180deg, #0a1a14 0%, #122a23 60%, #1a3b34 100%);
+      border-radius:18px;
+      border:1px solid rgba(94,200,230,0.18);
+      width:340px;
+    }
+    .circle-mark .photo {
+      width:200px;height:200px;border-radius:50%;
+      overflow:hidden;
+      border:1.5px solid rgba(255,255,255,0.20);
+      box-shadow:
+        0 0 0 1px rgba(94,200,230,0.18),
+        0 14px 32px rgba(0,0,0,0.42);
+      position:relative;
+    }
+    .circle-mark .photo img {
+      width:100%;height:100%;object-fit:cover;object-position:50% 26%;display:block;
+    }
+    .circle-mark .text { text-align:center; }
+    .circle-mark .title {
+      font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:#fff;
+      line-height:1.0;letter-spacing:-0.005em;
+    }
+    .circle-mark .sub {
+      font-family:'Jost',sans-serif;font-size:9.5px;font-weight:500;letter-spacing:0.28em;
+      text-transform:uppercase;color:rgba(94,200,230,0.85);margin-top:10px;
+    }
+
+    /* C: Square crop — cuadrado con foto centrada (cara) + tipografía debajo */
+    .square-crop {
+      display:flex;flex-direction:column;align-items:stretch;gap:0;
+      width:340px;
+      background:#0a1a14;
+      border-radius:18px;
+      overflow:hidden;
+      border:1px solid rgba(94,200,230,0.14);
+      box-shadow:0 16px 38px rgba(0,0,0,0.42);
+    }
+    .square-crop .photo {
+      width:100%;aspect-ratio:1/1;overflow:hidden;
+      position:relative;
+    }
+    .square-crop .photo img {
+      width:100%;height:100%;object-fit:cover;object-position:50% 22%;display:block;
+    }
+    .square-crop .photo::after {
+      content:'';position:absolute;inset:0;
+      background:linear-gradient(to bottom, transparent 50%, rgba(15,22,13,0.45) 100%);
+    }
+    .square-crop .text {
+      padding:22px 24px 26px;text-align:center;
+      background:linear-gradient(180deg, #0a1a14 0%, #122a23 100%);
+    }
+    .square-crop .title {
+      font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:#fff;
+      line-height:1.0;letter-spacing:-0.005em;
+    }
+    .square-crop .sub {
+      font-family:'Jost',sans-serif;font-size:9px;font-weight:500;letter-spacing:0.28em;
+      text-transform:uppercase;color:rgba(94,200,230,0.78);margin-top:10px;
+    }
+
+    /* ───── Aplicaciones ───── */
+    .apps-title {
+      text-align:center;font-size:10px;font-weight:600;letter-spacing:0.20em;
+      text-transform:uppercase;color:rgba(255,255,255,0.40);margin:36px 0 18px;
+    }
+    .apps-row {
+      display:flex;justify-content:center;gap:22px;flex-wrap:wrap;
+      margin-bottom:20px;
+    }
+    .app-card {
+      display:flex;flex-direction:column;align-items:center;gap:10px;
+    }
+    .app-card .label {
+      font-size:9.5px;letter-spacing:0.18em;text-transform:uppercase;
+      color:rgba(255,255,255,0.42);font-weight:600;
+    }
+
+    /* App icon: square 96px rounded 22px */
+    .app-icon {
+      width:96px;height:96px;border-radius:22px;overflow:hidden;
+      box-shadow:0 10px 24px rgba(0,0,0,0.42);
+      position:relative;
+    }
+    .app-icon-photo img {
+      width:100%;height:100%;object-fit:cover;object-position:50% 24%;display:block;
+    }
+    .app-icon-mono {
+      background:linear-gradient(180deg, #0a1a14 0%, #1a3b34 100%);
+      display:flex;align-items:center;justify-content:center;
+      border:1px solid rgba(94,200,230,0.22);
+    }
+    .app-icon-mono .glyph {
+      font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:600;color:#fff;
+      line-height:0.9;letter-spacing:-0.01em;
+      text-shadow:0 2px 8px rgba(0,0,0,0.42);
+    }
+    .app-icon-mono .glyph em {
+      color:#80d6ee;font-style:normal;
+    }
+
+    /* Header lockup horizontal */
+    .header-lockup {
+      width:380px;height:64px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
+      border:1px solid rgba(94,200,230,0.14);
+      border-radius:12px;
+      display:flex;align-items:center;padding:0 18px;gap:14px;
+    }
+    .header-lockup .photo {
+      width:42px;height:42px;border-radius:50%;overflow:hidden;
+      border:1px solid rgba(255,255,255,0.20);flex-shrink:0;
+    }
+    .header-lockup .photo img {
+      width:100%;height:100%;object-fit:cover;object-position:50% 26%;display:block;
+    }
+    .header-lockup .text {
+      display:flex;flex-direction:column;
+    }
+    .header-lockup .title {
+      font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#fff;
+      line-height:1.0;letter-spacing:-0.005em;
+    }
+    .header-lockup .sub {
+      font-family:'Jost',sans-serif;font-size:8px;font-weight:500;letter-spacing:0.22em;
+      text-transform:uppercase;color:rgba(94,200,230,0.85);margin-top:4px;
+    }
+
+    /* Notas */
+    .notes {
+      display:grid;grid-template-columns:repeat(3, 1fr);gap:16px;
+      max-width:1100px;margin:24px auto 0;
+      font-size:11.5px;line-height:1.6;color:rgba(255,255,255,0.62);
+    }
+    .notes .item {
+      padding:14px 16px;
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.06);
+      border-radius:12px;
+    }
+    .notes .item .lbl {
+      display:block;color:#5ec8e6;font-weight:600;
+      letter-spacing:0.14em;text-transform:uppercase;font-size:10px;margin-bottom:6px;
+    }
+
+    .closing {
+      max-width:780px;margin:0 auto;text-align:center;
+      padding:32px 28px;
+      background:rgba(94,200,230,0.04);
+      border:1px solid rgba(94,200,230,0.18);
+      border-radius:20px;
+    }
+    .closing h2 {
+      font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:#fff;
+      margin-bottom:10px;
+    }
+    .closing p {
+      font-size:13px;color:rgba(255,255,255,0.72);line-height:1.65;
+    }
+    .closing p em { color:#80d6ee;font-style:normal;font-weight:500; }
+
+    @media(max-width:900px){
+      .notes { grid-template-columns:1fr; }
+      .editorial-hero { width:300px;height:444px; }
+      .editorial-hero .title { font-size:30px; }
+      .circle-mark, .square-crop { width:300px; }
+      .header-lockup { width:300px; }
+    }
+  </style>
+</head>
+<body>
+  <p class="page-tag">Logo · The Dogs Mind · Editorial · v2</p>
+  <h1 class="page-title">Foto del perro real + tipografía Cormorant</h1>
+  <p class="page-sub">Identidad editorial estilo Hermès / Aesop / Acne Studios</p>
+  <p class="page-brief">
+    Reset de dirección tras feedback ("son horrorosos"). Olvidamos los SVG dibujados a mano. La foto del border collie ya es <em>la imagen de marca</em> — el logo solo necesita resolverla con tipografía elegante. Tres composiciones distintas, mismo principio: <em>foto fotográfica + Cormorant Garamond</em>.
+  </p>
+
+  <!-- ════════════════════ A — EDITORIAL HERO ════════════════════ -->
+  <div class="proposal">
+    <div class="proposal-head">
+      <span class="proposal-num">A</span>
+      <span class="proposal-name">Editorial Hero</span>
+    </div>
+    <p class="proposal-concept">
+      Tipografía superpuesta arriba sobre la foto vertical — composición tipo portada de <em>Wallpaper*</em> / <em>T Magazine</em>. Lo que ya tienes en el splash pero formalizado como pieza de marca. Sirve directamente para splash, marketing, social vertical (Instagram stories, posters), email signature.
+    </p>
+
+    <div class="row">
+      <div class="editorial-hero">
+        <img src="assets/images/img-00.webp" alt="">
+        <div class="overlay"></div>
+        <div class="content">
+          <p class="eyebrow">The Dogs Mind</p>
+          <h2 class="title">Canine Behavior<br>Consultancy<span class="small">by Teo Mariscal</span></h2>
+        </div>
+        <div class="bottom">
+          <p class="bottom-text">Análisis funcional · LIMA</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="apps-title">Aplicaciones derivadas</p>
+    <div class="apps-row">
+      <div class="app-card">
+        <span class="label">App icon · foto</span>
+        <div class="app-icon app-icon-photo">
+          <img src="assets/images/img-00.webp" alt="">
+        </div>
+      </div>
+      <div class="app-card">
+        <span class="label">App icon · monograma</span>
+        <div class="app-icon app-icon-mono">
+          <span class="glyph">T<em>d</em>M</span>
+        </div>
+      </div>
+      <div class="app-card">
+        <span class="label">Header app</span>
+        <div class="header-lockup">
+          <div class="photo"><img src="assets/images/img-00.webp" alt=""></div>
+          <div class="text">
+            <div class="title">The Dogs Mind</div>
+            <div class="sub">Canine Behavior Consultancy</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes">
+      <div class="item"><span class="lbl">Concepto</span>La foto ES la marca. Tipografía solo sirve para nombrarla. Mismo lenguaje que el splash actual, ahora consolidado como identidad.</div>
+      <div class="item"><span class="lbl">Fortaleza</span>Cero abstracción visual. El cliente que ve esto ya entiende qué es Dogs Mind antes de leer una palabra. Premium editorial sin esfuerzo.</div>
+      <div class="item"><span class="lbl">Riesgo</span>Una foto rectangular no funciona como favicon 16px. Por eso el app icon va con el monograma <em>T·d·M</em> en Cormorant + cyan accent — pieza separada de marca.</div>
+    </div>
+  </div>
+
+  <!-- ════════════════════ B — CIRCLE MARK ════════════════════ -->
+  <div class="proposal">
+    <div class="proposal-head">
+      <span class="proposal-num">B</span>
+      <span class="proposal-name">Circle Mark</span>
+      <span class="proposal-rec">mi voto</span>
+    </div>
+    <p class="proposal-concept">
+      Foto recortada en círculo perfecto (cabeza del border collie centrada) + tipografía debajo. Composición tipo <em>profile picture premium</em>: funciona como avatar de Instagram, como sello, como botón circular. La cabeza del perro es lo que el ojo busca antes que el texto.
+    </p>
+
+    <div class="row">
+      <div class="circle-mark">
+        <div class="photo">
+          <img src="assets/images/img-00.webp" alt="">
+        </div>
+        <div class="text">
+          <div class="title">The Dogs Mind</div>
+          <div class="sub">Canine Behavior</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="apps-title">Aplicaciones derivadas</p>
+    <div class="apps-row">
+      <div class="app-card">
+        <span class="label">App icon · círculo</span>
+        <div class="app-icon" style="border-radius:50%;width:96px;height:96px;border:1.5px solid rgba(255,255,255,0.20);box-shadow:0 0 0 1px rgba(94,200,230,0.18),0 10px 24px rgba(0,0,0,0.42);">
+          <img src="assets/images/img-00.webp" alt="" style="width:100%;height:100%;object-fit:cover;object-position:50% 26%;display:block;">
+        </div>
+      </div>
+      <div class="app-card">
+        <span class="label">App icon · square</span>
+        <div class="app-icon" style="background:linear-gradient(180deg, #0a1a14 0%, #1a3b34 100%);display:flex;align-items:center;justify-content:center;border:1px solid rgba(94,200,230,0.22);">
+          <div style="width:64px;height:64px;border-radius:50%;overflow:hidden;border:1px solid rgba(255,255,255,0.18);">
+            <img src="assets/images/img-00.webp" alt="" style="width:100%;height:100%;object-fit:cover;object-position:50% 26%;display:block;">
+          </div>
+        </div>
+      </div>
+      <div class="app-card">
+        <span class="label">Header app</span>
+        <div class="header-lockup">
+          <div class="photo"><img src="assets/images/img-00.webp" alt=""></div>
+          <div class="text">
+            <div class="title">The Dogs Mind</div>
+            <div class="sub">Canine Behavior Consultancy</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes">
+      <div class="item"><span class="lbl">Concepto</span>El círculo es la "ventana de observación" — análisis es siempre mirar al sujeto. El perro está centrado, contenido, observable.</div>
+      <div class="item"><span class="lbl">Fortaleza</span>Versátil: funciona como avatar, como app icon (ambas formas), como sello en watermark, como header. Una sola pieza visual para todos los usos.</div>
+      <div class="item"><span class="lbl">Riesgo</span>El círculo es un patrón muy usado en avatares de redes sociales. Hay que diferenciar con la calidad de la foto + tipografía Cormorant abajo.</div>
+    </div>
+  </div>
+
+  <!-- ════════════════════ C — SQUARE CROP ════════════════════ -->
+  <div class="proposal">
+    <div class="proposal-head">
+      <span class="proposal-num">C</span>
+      <span class="proposal-name">Square Crop</span>
+    </div>
+    <p class="proposal-concept">
+      Foto cuadrada (encuadre cara del border collie) + bloque tipográfico debajo, todo dentro de una <em>card</em> con border-radius. Composición tipo etiqueta de wine premium / packaging editorial. Compacto, modular, funciona en columnas de marketing y en feed cuadrado de Instagram.
+    </p>
+
+    <div class="row">
+      <div class="square-crop">
+        <div class="photo">
+          <img src="assets/images/img-00.webp" alt="">
+        </div>
+        <div class="text">
+          <div class="title">The Dogs Mind</div>
+          <div class="sub">Canine Behavior Consultancy</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="apps-title">Aplicaciones derivadas</p>
+    <div class="apps-row">
+      <div class="app-card">
+        <span class="label">App icon · foto sola</span>
+        <div class="app-icon app-icon-photo">
+          <img src="assets/images/img-00.webp" alt="">
+        </div>
+      </div>
+      <div class="app-card">
+        <span class="label">App icon · monograma</span>
+        <div class="app-icon app-icon-mono">
+          <span class="glyph">T<em>d</em>M</span>
+        </div>
+      </div>
+      <div class="app-card">
+        <span class="label">Header app</span>
+        <div class="header-lockup">
+          <div class="photo" style="border-radius:6px;">
+            <img src="assets/images/img-00.webp" alt="" style="object-position:50% 22%;">
+          </div>
+          <div class="text">
+            <div class="title">The Dogs Mind</div>
+            <div class="sub">Canine Behavior Consultancy</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes">
+      <div class="item"><span class="lbl">Concepto</span>Pieza modular tipo "card de membresía" — la foto y el texto viven juntos en un objeto único. Sensación de tarjeta de presentación premium.</div>
+      <div class="item"><span class="lbl">Fortaleza</span>Funciona perfecto como Instagram post 1:1, como home tile en webview, como elemento de packaging. La estructura "foto arriba · texto abajo" es muy estable.</div>
+      <div class="item"><span class="lbl">Riesgo</span>El border-radius del bloque puede sentirse "card de app" en lugar de "logo". Si se aplica como marca pura (sin card), pierde cohesión.</div>
+    </div>
+  </div>
+
+  <!-- ════════════════════ CIERRE ════════════════════ -->
+  <div class="closing">
+    <h2>Una última cosa</h2>
+    <p>
+      Esta dirección (foto + Cormorant) <em>ya es prácticamente tu identidad actual</em>. El splash ya hace esto. Lo único que añadimos es: (1) <em>app icon coherente</em> (monograma <em>T·d·M</em> o crop circular para iOS), (2) <em>lockup horizontal</em> formal para header / email / marketing, (3) <em>favicon</em> derivado.<br><br>
+      Esto significa que el "logo" no exige re-skin de nada en la app — solo formaliza lo que ya tienes y añade las piezas pequeñas que faltan. Dime cuál (A · B · C) y pasamos al refinamiento + integración.
+    </p>
+  </div>
+</body>
+</html>

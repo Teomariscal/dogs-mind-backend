@@ -22,8 +22,10 @@
   +   'transition:transform .12s ease;}'
   + '#paseo-card:active{transform:scale(.99);}'
   + '.pc-top{display:flex;align-items:center;gap:12px;}'
-  + '.pc-ic{width:44px;height:44px;flex:none;border-radius:14px;display:flex;align-items:center;'
-  +   'justify-content:center;background:rgba(126,184,106,.20);border:1px solid rgba(126,184,106,.45);color:#7eb86a;}'
+  /* Ale, la Aigent que acompaña el paseo (founder 2026-07-29) */
+  + '.pc-ic{width:52px;height:52px;flex:none;border-radius:50%;overflow:hidden;'
+  +   'border:2px solid #7eb86a;box-shadow:0 0 0 3px rgba(94,200,230,.18);background:rgba(126,184,106,.15);}'
+  + '.pc-ic img{width:100%;height:100%;object-fit:cover;display:block;}'
   + '.pc-t{display:block;font-family:var(--ff-serif,serif);font-size:20px;font-weight:600;line-height:1.1;color:#fff;}'
   + '.pc-s{display:block;font-size:12px;color:rgba(232,239,234,.62);margin-top:3px;}'
   + '.pc-km{display:flex;gap:8px;margin-top:13px;}'
@@ -37,9 +39,29 @@
   +   'border-bottom:1px solid rgba(232,239,234,.10);}'
   + '.pf-x{width:38px;height:38px;flex:none;border-radius:50%;background:rgba(255,255,255,.08);'
   +   'border:1px solid rgba(255,255,255,.20);color:#e8efea;font-size:16px;cursor:pointer;}'
+  + '.pf-ale{width:40px;height:40px;flex:none;border-radius:50%;overflow:hidden;'
+  +   'border:2px solid #7eb86a;box-shadow:0 0 0 2px rgba(94,200,230,.18);}'
+  + '.pf-ale img{width:100%;height:100%;object-fit:cover;display:block;}'
   + '.pf-tt{font-family:var(--ff-serif,serif);font-size:20px;font-weight:600;color:#fff;line-height:1.1;}'
   + '.pf-ts{display:block;font-family:var(--ff-sans,sans-serif);font-size:11.5px;color:#5ec8e6;letter-spacing:.4px;}'
-  + '.pf-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;}'
+  + '.pf-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 14px 14px;}'
+  /* Hero + presentación de Ale (copy del founder 2026-07-29) */
+  + '.pf-hero{position:relative;margin:0 -14px 0;height:180px;overflow:hidden;}'
+  + '.pf-hero img{width:100%;height:100%;object-fit:cover;display:block;}'
+  + '.pf-hero::after{content:"";position:absolute;inset:0;'
+  +   'background:linear-gradient(0deg,rgba(10,26,20,1) 0%,rgba(10,26,20,.45) 55%,rgba(10,26,20,.15) 100%);}'
+  + '.pf-intro{position:relative;margin:-38px 0 18px;padding:0 2px;z-index:1;}'
+  + '.pf-intro-top{display:flex;align-items:flex-end;gap:12px;margin-bottom:12px;}'
+  + '.pf-intro-ale{width:64px;height:64px;flex:none;border-radius:50%;overflow:hidden;'
+  +   'border:2.5px solid #7eb86a;box-shadow:0 0 0 4px rgba(94,200,230,.18),0 8px 22px rgba(0,0,0,.45);}'
+  + '.pf-intro-ale img{width:100%;height:100%;object-fit:cover;display:block;}'
+  + '.pf-intro-n{font-family:var(--ff-serif,serif);font-size:22px;font-weight:600;color:#fff;line-height:1.1;}'
+  + '.pf-intro-n small{display:block;font-family:var(--ff-sans,sans-serif);font-size:11px;'
+  +   'letter-spacing:1.4px;text-transform:uppercase;color:#7eb86a;font-weight:600;margin-top:3px;}'
+  + '.pf-claim{font-size:14.5px;line-height:1.65;color:rgba(232,239,234,.88);margin-bottom:12px;}'
+  + '.pf-challenge{border-left:2px solid #5ec8e6;padding-left:13px;font-size:13.5px;'
+  +   'line-height:1.6;color:rgba(232,239,234,.72);}'
+  + '.pf-challenge b{color:#80d6ee;font-weight:600;}'
   /* El planificador en móvil: mapa arriba, rutas debajo */
   + '@media (max-width:1023px){'
   +   '#paseo-full .dmw-walk{border:1px solid rgba(94,200,230,.35);border-radius:18px;overflow:hidden;'
@@ -92,10 +114,30 @@
     var host = f.querySelector('.pf-body');
     if (host.getAttribute('data-listo')) return;
     host.setAttribute('data-listo', '1');
-    if (window.dmwWalkMontar) { window.dmwWalkMontar(host); return; }
+
+    /* Cabecera: hero + Ale presentando la sección (copy del founder) */
+    var cab = document.createElement('div');
+    cab.innerHTML =
+      '<div class="pf-hero"><img src="assets/images/img-16.webp" alt=""></div>' +
+      '<div class="pf-intro">' +
+        '<div class="pf-intro-top">' +
+          '<span class="pf-intro-ale"><img src="aig-ale-pixar.webp" alt="Ale"></span>' +
+          '<span class="pf-intro-n">Ale<small>Tu Aigent de paseos</small></span>' +
+        '</div>' +
+        '<p class="pf-claim">Estés en el lugar del mundo que estés, te ayudamos a elegir ' +
+        'las mejores y más seguras rutas para pasear con tu perro.</p>' +
+        '<p class="pf-challenge">Antes, encontrar dónde pasear en un sitio desconocido era ' +
+        'todo un <b>challenge</b>. Ahora tu único <b>challenge</b> es que tu perro disfrute ' +
+        'como nunca en un entorno seguro.</p>' +
+      '</div>';
+    host.appendChild(cab);
+
+    var caja = document.createElement('div');
+    host.appendChild(caja);
+    if (window.dmwWalkMontar) { window.dmwWalkMontar(caja); return; }
     var s = document.createElement('script');
     s.src = 'web-walk.js?v=4';
-    s.onload = function () { if (window.dmwWalkMontar) window.dmwWalkMontar(host); };
+    s.onload = function () { if (window.dmwWalkMontar) window.dmwWalkMontar(caja); };
     document.head.appendChild(s);
   }
   function cerrar() {
@@ -110,8 +152,9 @@
     f.innerHTML =
       '<div class="pf-bar">' +
         '<button class="pf-x" aria-label="Cerrar">&#10005;</button>' +
+        '<span class="pf-ale"><img src="aig-ale-pixar.webp" alt="Ale"></span>' +
         '<div><span class="pf-tt">El paseo de hoy</span>' +
-        '<span class="pf-ts">World Wide Dog Walking</span></div>' +
+        '<span class="pf-ts">con Ale · World Wide Dog Walking</span></div>' +
       '</div>' +
       '<div class="pf-body"></div>';
     f.querySelector('.pf-x').onclick = cerrar;
@@ -125,13 +168,7 @@
     c.id = 'paseo-card';
     c.innerHTML =
       '<span class="pc-top">' +
-        '<span class="pc-ic">' +
-          '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" ' +
-          'stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">' +
-          '<path d="M12 21s7-6.1 7-11a7 7 0 1 0-14 0c0 4.9 7 11 7 11Z"/>' +
-          '<circle cx="9.6" cy="8.2" r="1"/><circle cx="14.4" cy="8.2" r="1"/>' +
-          '<circle cx="12" cy="11.6" r="1.7"/></svg>' +
-        '</span>' +
+        '<span class="pc-ic"><img src="aig-ale-pixar.webp" alt="Ale"></span>' +
         '<span><span class="pc-t">El paseo de hoy</span>' +
         '<span class="pc-s">Tres rutas cerca de ti</span></span>' +
       '</span>' +

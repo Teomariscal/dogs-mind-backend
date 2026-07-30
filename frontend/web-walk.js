@@ -139,6 +139,73 @@
     });
   }
 
+  /* ── Fotos de interés del camino ───────────────────────────────────────
+     Wikimedia Commons: imágenes geolocalizadas (parques, monumentos,
+     fuentes, edificios señalados). Gratis, sin clave y con autoría visible.
+     Street View daría fotos de cualquier punto, pero exige cuenta de Google
+     con facturación — se puede añadir después sin tocar esta interfaz. */
+  var COMMONS = 'https://commons.wikimedia.org/w/api.php';
+
+  async function fotosCerca(lat, lon, radio) {
+    var u = COMMONS + '?action=query&format=json&origin=*' +
+            '&generator=geosearch&ggsnamespace=6' +
+            '&ggscoord=' + lat + '%7C' + lon +
+            '&ggsradius=' + radio + '&ggslimit=8' +
+            '&prop=imageinfo&iiprop=url%7Cextmetadata&iiurlwidth=360';
+    var r = await fetch(u);
+    if (!r.ok) return [];
+    var d = await r.json();
+    var pages = (d.query && d.query.pages) || {};
+    return Object.keys(pages).map(function (k) {
+      var p = pages[k], ii = p.imageinfo && p.imageinfo[0];
+      if (!ii || !ii.thumburl) return null;
+      var meta = ii.extmetadata || {};
+      var autor = (meta.Artist && meta.Artist.value || '').replace(/<[^>]*>/g, '').trim();
+      return {
+        src: ii.thumburl,
+        pagina: ii.descriptionurl,
+        titulo: (p.title || '').replace(/^File:/, '').replace(/\.[a-z]+$/i, '').replace(/_/g, ' '),
+        autor: autor.slice(0, 40)
+      };
+    }).filter(Boolean);
+  }
+
+  async function pintarFotos(rutaIdx) {
+    var cont = document.getElementById('dmw-walk-fotos');
+    if (!cont) return;
+    var r = estado.rutas[rutaIdx];
+    if (!r || !r.linea || !r.linea.length) { cont.innerHTML = ''; return; }
+    cont.innerHTML = '<div class="dmw-fotos-cargando">Buscando fotos del camino…</div>';
+
+    /* Tres puntos repartidos por la ruta: inicio, mitad y dos tercios */
+    var idx = [0, Math.floor(r.linea.length * 0.4), Math.floor(r.linea.length * 0.7)];
+    var vistas = {}, fotos = [];
+    for (var i = 0; i < idx.length && fotos.length < 6; i++) {
+      var p = r.linea[idx[i]];
+      if (!p) continue;
+      try {
+        var lote = await fotosCerca(p[0], p[1], 350);
+        lote.forEach(function (f) {
+          if (!vistas[f.src] && fotos.length < 6) { vistas[f.src] = 1; fotos.push(f); }
+        });
+      } catch (e) { /* seguimos con el siguiente punto */ }
+    }
+    if (!fotos.length) {
+      cont.innerHTML = '<div class="dmw-fotos-vacio">No hay fotos geolocalizadas de este recorrido.</div>';
+      return;
+    }
+    cont.innerHTML =
+      '<div class="dmw-fotos-h">Del camino · ' + fotos.length + ' fotos</div>' +
+      '<div class="dmw-fotos-row">' + fotos.map(function (f) {
+        return '<a class="dmw-foto" href="' + f.pagina + '" target="_blank" rel="noopener" title="' +
+               f.titulo.replace(/"/g, '') + (f.autor ? ' — ' + f.autor.replace(/"/g, '') : '') + '">' +
+                 '<img src="' + f.src + '" alt="' + f.titulo.replace(/"/g, '') + '" loading="lazy">' +
+                 '<span>' + f.titulo + '</span>' +
+               '</a>';
+      }).join('') + '</div>' +
+      '<div class="dmw-fotos-cred">Fotografías de Wikimedia Commons</div>';
+  }
+
   /* ── Render ────────────────────────────────────────────────────────────── */
   function pintarLista(cont) {
     if (!estado.rutas.length) {
@@ -147,8 +214,19 @@
       return;
     }
     cont.innerHTML = estado.rutas.map(function (r, i) {
-      var tags = r.pois.slice(0, 5).map(function (p) {
-        return '<span class="ok">' + p.nombre + '</span>';
+      /* Agrupamos por tipo: cinco "Fuente de agua" seguidas no informan.
+         Si el sitio tiene nombre propio y es único, se muestra el nombre. */
+      var porTipo = {};
+      r.pois.forEach(function (p) {
+        (porTipo[p.tipo] = porTipo[p.tipo] || []).push(p);
+      });
+      var tags = Object.keys(porTipo).slice(0, 4).map(function (t) {
+        var lista = porTipo[t];
+        var conNombre = lista.filter(function (p) { return p.nombre !== TIPOS[t].n; });
+        var txt = lista.length === 1
+          ? (conNombre.length ? conNombre[0].nombre : TIPOS[t].n)
+          : lista.length + ' · ' + TIPOS[t].n;
+        return '<span class="ok">' + txt + '</span>';
       }).join('');
       return '<button class="dmw-ruta-c' + (i === 0 ? ' on' : '') + '" data-i="' + i + '">' +
                '<div class="dmw-ruta-top"><b>' + r.nombre + '</b><span>' + km(r.metros) + ' · ' + mins(r.metros) + '</span></div>' +
@@ -170,6 +248,7 @@
     document.querySelectorAll('#dmw-walk-lista .dmw-ruta-c').forEach(function (c, j) {
       c.classList.toggle('on', j === i);
     });
+    pintarFotos(i);
   }
 
   function estadoTexto(t) {
@@ -213,7 +292,7 @@
         var res = await ruta(pts);
         var capa = L.polyline(res.linea, { color: '#e8efea', weight: 3, opacity: .25 }).addTo(capaRutas);
         estado.rutas.push({
-          nombre: o.nombre, por: o.por, metros: res.metros,
+          nombre: o.nombre, por: o.por, metros: res.metros, linea: res.linea,
           pois: poisEnRuta(pois, res.linea), capa: capa
         });
       } catch (e) { /* esa distancia no sale: seguimos con las demás */ }
@@ -242,6 +321,7 @@
             'con las zonas verdes y los servicios que hay de verdad alrededor.</div>' +
           '</div>' +
         '</div>' +
+        '<div class="dmw-walk-fotos" id="dmw-walk-fotos"></div>' +
         '<div class="dmw-walk-f"><span id="dmw-walk-estado">Datos de OpenStreetMap · rutas a pie por OSRM</span></div>' +
       '</div>';
 

@@ -552,6 +552,35 @@
   body.dm-web .dmw-walk-vacio {
     font-size: 13.5px; line-height: 1.6; color: var(--w-muted); padding: var(--w-s4);
   }
+  /* Fotos del camino */
+  body.dm-web .dmw-walk-fotos:empty { display: none; }
+  body.dm-web .dmw-walk-fotos {
+    padding: var(--w-s4); border-top: 1px solid var(--w-line);
+  }
+  body.dm-web .dmw-fotos-h {
+    font-size: 10.5px; letter-spacing: 1.8px; text-transform: uppercase;
+    font-weight: 700; color: var(--w-cyan); margin-bottom: var(--w-s3);
+  }
+  body.dm-web .dmw-fotos-cargando,
+  body.dm-web .dmw-fotos-vacio { font-size: 13px; color: var(--w-muted); }
+  body.dm-web .dmw-fotos-row {
+    display: grid; grid-auto-flow: column; grid-auto-columns: minmax(150px, 1fr);
+    gap: var(--w-s3); overflow-x: auto; padding-bottom: 4px;
+  }
+  body.dm-web .dmw-foto {
+    display: block; text-decoration: none; color: var(--w-text);
+    border-radius: var(--w-r-ctrl); overflow: hidden;
+    border: 1px solid var(--w-line); background: var(--w-surface);
+    transition: transform 160ms ease, border-color 160ms ease;
+  }
+  body.dm-web .dmw-foto:hover { transform: translateY(-3px); border-color: var(--w-cyan-45); }
+  body.dm-web .dmw-foto img { width: 100%; height: 100px; object-fit: cover; display: block; }
+  body.dm-web .dmw-foto span {
+    display: block; padding: 8px 10px; font-size: 11.5px; line-height: 1.35;
+    color: var(--w-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  body.dm-web .dmw-fotos-cred { margin-top: 8px; font-size: 11px; color: var(--w-subtle); }
+
   body.dm-web .dmw-walk-f {
     padding: 10px var(--w-s4); border-top: 1px solid var(--w-line);
     font-size: 12px; color: var(--w-subtle);

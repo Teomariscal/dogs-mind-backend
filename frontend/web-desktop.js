@@ -281,7 +281,7 @@
            '<p>' + c.social.p + '</p>' +
            '<blockquote class="dmw-cita">' + c.social.cita + '</blockquote>' +
          '</div>';
-    if (c.proto) h += htmlPrototipo();
+    if (c.proto) h += '<h3 class="dmw-h3">Pru&eacute;balo ahora</h3><div id="dmw-walk-host"></div>';
     return h;
   }
 
@@ -395,7 +395,17 @@
     ovl.classList.add('on');
     ovl.setAttribute('data-panel', id);
     ovl.querySelector('.dmw-panel-card').scrollTop = 0;
-    if (ovl.querySelector('.dmw-proto')) cablearPrototipo(ovl);
+    /* World Wide Dog Walking: monta el planificador real (carga diferida) */
+    var host = ovl.querySelector('#dmw-walk-host');
+    if (host) {
+      if (window.dmwWalkMontar) { window.dmwWalkMontar(host); }
+      else {
+        var s = document.createElement('script');
+        s.src = 'web-walk.js?v=2';
+        s.onload = function () { if (window.dmwWalkMontar) window.dmwWalkMontar(host); };
+        document.head.appendChild(s);
+      }
+    }
     document.addEventListener('keydown', escCerrar);
   }
   function cerrarPanel() {

@@ -511,6 +511,52 @@
   body.dm-web .dmw-social p {
     margin: 0; font-size: 14.5px; line-height: 1.7; color: var(--w-muted); max-width: 68ch;
   }
+  /* ── Planificador real de paseos ──────────────────────────────────────── */
+  body.dm-web .dmw-walk {
+    border-radius: var(--w-r-card); overflow: hidden;
+    border: 1.5px solid var(--w-cyan-45);
+    background: linear-gradient(180deg, rgba(20,48,42,.96), rgba(10,26,20,.96));
+    box-shadow: var(--w-e2);
+  }
+  body.dm-web .dmw-walk-h {
+    display: flex; align-items: center; gap: var(--w-s3);
+    padding: var(--w-s4); border-bottom: 1px solid var(--w-line); flex-wrap: wrap;
+  }
+  body.dm-web .dmw-walk-btn {
+    font-family: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer;
+    padding: 11px var(--w-s4); border-radius: var(--w-r-pill);
+    background: linear-gradient(135deg, var(--w-lime), var(--w-green));
+    color: #fff; border: none; box-shadow: 0 4px 14px rgba(74,103,65,.35);
+  }
+  body.dm-web .dmw-walk-btn.alt {
+    background: var(--w-cyan-12); color: var(--w-text);
+    border: 1.5px solid var(--w-cyan-45); box-shadow: none;
+  }
+  body.dm-web .dmw-walk-sep { font-size: 12.5px; color: var(--w-subtle); }
+  body.dm-web .dmw-walk-in {
+    flex: 1; min-width: 200px; font-family: inherit; font-size: 14px;
+    padding: 11px var(--w-s4); border-radius: var(--w-r-ctrl);
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.18);
+    color: #fff; outline: none;
+  }
+  body.dm-web .dmw-walk-in::placeholder { color: rgba(255,255,255,.42); }
+  body.dm-web .dmw-walk-in:focus { border-color: var(--w-cyan); background: rgba(255,255,255,.10); }
+  body.dm-web .dmw-walk-body {
+    display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  }
+  body.dm-web .dmw-walk-map { height: 420px; background: #0a1a14; }
+  body.dm-web .dmw-walk-map .leaflet-control-attribution {
+    background: rgba(10,26,20,.75); color: rgba(232,239,234,.55);
+  }
+  body.dm-web .dmw-walk-map .leaflet-control-attribution a { color: var(--w-cyan); }
+  body.dm-web .dmw-walk-vacio {
+    font-size: 13.5px; line-height: 1.6; color: var(--w-muted); padding: var(--w-s4);
+  }
+  body.dm-web .dmw-walk-f {
+    padding: 10px var(--w-s4); border-top: 1px solid var(--w-line);
+    font-size: 12px; color: var(--w-subtle);
+  }
+
   /* ── Prototipo de rutas ───────────────────────────────────────────────── */
   body.dm-web .dmw-proto {
     margin-top: var(--w-s8); border-radius: var(--w-r-card);

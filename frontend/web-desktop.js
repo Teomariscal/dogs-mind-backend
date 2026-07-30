@@ -404,7 +404,7 @@
       if (window.dmwWalkMontar) { window.dmwWalkMontar(host); }
       else {
         var s = document.createElement('script');
-        s.src = 'web-walk.js?v=7';
+        s.src = 'web-walk.js?v=9';
         s.onload = function () { if (window.dmwWalkMontar) window.dmwWalkMontar(host); };
         document.head.appendChild(s);
       }

@@ -304,7 +304,137 @@
       c.classList.toggle('on', j === i);
     });
     pintarNavegacion(i);
+    pintarRelato(i);
     pintarFotos(i);
+  }
+
+  /* ── Qué vas a ver: rasgos REALES del terreno a lo largo de la ruta ─────
+     Se consulta un corredor alrededor del recorrido y se recogen elementos
+     con nombre propio en OpenStreetMap: ríos, montes, bosques, elementos
+     históricos, miradores, hileras de árboles. La app NO inventa: si algo no
+     está cartografiado, no se menciona. (Cuando esto pase al backend, la IA
+     redactará el texto ENCIMA de esta misma lista, sin añadir nada nuevo.) */
+  async function rasgosRuta(linea) {
+    var muestra = [];
+    var salto = Math.max(1, Math.floor(linea.length / 24));
+    for (var i = 0; i < linea.length; i += salto) muestra.push(linea[i][0] + ',' + linea[i][1]);
+    var c = muestra.join(',');
+    var q = '[out:json][timeout:25];(' +
+      'way["waterway"~"^(river|stream|canal)$"]["name"](around:130,' + c + ');' +
+      'way["natural"~"^(wood|scrub)$"](around:120,' + c + ');' +
+      'way["landuse"="forest"](around:120,' + c + ');' +
+      'way["natural"="tree_row"](around:60,' + c + ');' +
+      'node["natural"="peak"]["name"](around:1500,' + c + ');' +
+      'way["historic"]["name"](around:160,' + c + ');' +
+      'node["historic"]["name"](around:160,' + c + ');' +
+      'node["tourism"="viewpoint"](around:250,' + c + ');' +
+      'way["leisure"="park"]["name"](around:120,' + c + ');' +
+      ');out center 90;';
+    var servidores = [OVERPASS, 'https://overpass.kumi.systems/api/interpreter'];
+    var d = null;
+    for (var s = 0; s < servidores.length && !d; s++) {
+      try {
+        var r = await fetch(servidores[s], {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'data=' + encodeURIComponent(q)
+        });
+        if (r.ok) d = await r.json();
+      } catch (e) {}
+    }
+    if (!d) return null;
+    var out = { agua: [], bosque: 0, arboles: 0, montes: [], historico: [], miradores: 0, parques: [] };
+    (d.elements || []).forEach(function (e) {
+      var t = e.tags || {};
+      if (t.waterway && t.name) { if (out.agua.indexOf(t.name) < 0) out.agua.push(t.name); }
+      else if (t.natural === 'wood' || t.natural === 'scrub' || t.landuse === 'forest') out.bosque++;
+      else if (t.natural === 'tree_row') out.arboles++;
+      else if (t.natural === 'peak' && t.name) { if (out.montes.indexOf(t.name) < 0) out.montes.push(t.name); }
+      else if (t.historic && t.name) {
+        if (!out.historico.some(function (h) { return h.n === t.name; }))
+          out.historico.push({ n: t.name, t: t.historic });
+      }
+      else if (t.tourism === 'viewpoint') out.miradores++;
+      else if (t.leisure === 'park' && t.name) { if (out.parques.indexOf(t.name) < 0) out.parques.push(t.name); }
+    });
+    return out;
+  }
+
+  /* Posición del sol — cálculo astronómico, sin servicios externos.
+     Sirve para decir a qué hora las sombras son más largas y útiles. */
+  function alturaSol(fecha, lat, lon) {
+    var rad = Math.PI / 180;
+    var dias = (fecha - Date.UTC(2000, 0, 1, 12)) / 86400000;
+    var M = rad * (357.5291 + 0.98560028 * dias);
+    var C = rad * (1.9148 * Math.sin(M) + 0.02 * Math.sin(2 * M) + 0.0003 * Math.sin(3 * M));
+    var L = M + C + rad * 102.9372 + Math.PI;
+    var dec = Math.asin(Math.sin(rad * 23.4397) * Math.sin(L));
+    var ar = Math.atan2(Math.sin(L) * Math.cos(rad * 23.4397), Math.cos(L));
+    var th = rad * (280.16 + 360.9856235 * dias) - rad * (-lon);
+    var H = th - ar;
+    return Math.asin(Math.sin(rad * lat) * Math.sin(dec) +
+                     Math.cos(rad * lat) * Math.cos(dec) * Math.cos(H)) / rad;
+  }
+  function mejorHoraSombra(lat, lon) {
+    /* La hora del reloj depende del huso del DESTINO, no del de quien mira la
+       pantalla (el founder consulta desde Uruguay rutas de España). Para no
+       depender de husos ni de servicios externos, expresamos el momento
+       respecto al ATARDECER, que se calcula aquí mismo: "1 h 40 antes de que
+       se ponga el sol". Es exacto en cualquier país y no caduca. */
+    var hoy = new Date();
+    var base = Date.UTC(hoy.getUTCFullYear(), hoy.getUTCMonth(), hoy.getUTCDate(), 0, 0);
+    var ocaso = null, sombraLarga = null;
+    var prev = alturaSol(base, lat, lon);
+    for (var m = 10; m <= 24 * 60; m += 10) {
+      var a = alturaSol(base + m * 60000, lat, lon);
+      if (prev > 0 && a <= 0 && ocaso === null) ocaso = m;              // el sol se pone
+      if (prev > 18 && a <= 18 && sombraLarga === null) sombraLarga = { m: m, alt: a };
+      prev = a;
+    }
+    if (ocaso === null || sombraLarga === null || sombraLarga.m > ocaso) return null;
+    var antes = Math.round((ocaso - sombraLarga.m) / 10) * 10;         // minutos antes del ocaso
+    var h = Math.floor(antes / 60), mi = antes % 60;
+    return {
+      antes: (h ? h + ' h ' : '') + (mi ? mi + ' min' : '').trim() || '1 h',
+      sombra: (1 / Math.tan(Math.max(sombraLarga.alt, 8) * Math.PI / 180)).toFixed(1).replace('.', ',')
+    };
+  }
+
+  function textoRasgos(g, centro) {
+    if (!g) return '';
+    var f = [];
+    if (g.agua.length)   f.push('Caminaréis junto ' + (g.agua.length > 1 ? 'a ' + g.agua.slice(0, 2).join(' y ') : 'al ' + g.agua[0]) + '.');
+    if (g.parques.length) f.push('Cruza ' + (g.parques.length > 1 ? 'las zonas verdes de ' + g.parques.slice(0, 2).join(' y ') : g.parques[0]) + '.');
+    if (g.montes.length) f.push('Con ' + g.montes.slice(0, 2).join(' y ') + ' a la vista.');
+    if (g.historico.length) {
+      var h = g.historico.slice(0, 2).map(function (x) { return x.n; }).join(' y ');
+      f.push('De paso, ' + h + '.');
+    }
+    if (g.miradores) f.push(g.miradores > 1 ? 'Hay ' + g.miradores + ' miradores en el recorrido.' : 'Hay un mirador en el recorrido.');
+    if (g.bosque || g.arboles) {
+      var sombra = centro ? mejorHoraSombra(centro.lat, centro.lon) : null;
+      var base = g.bosque ? 'Tramos arbolados donde parar a la sombra' : 'Hileras de árboles a lo largo del camino';
+      f.push(base + (sombra ? '; la sombra más larga llega unas ' + sombra.antes +
+             ' antes del atardecer (unas ' + sombra.sombra + ' veces la altura del arbolado)' : '') + '.');
+    }
+    if (!f.length) return '';
+    return '<div class="dmw-relato"><div class="dmw-relato-h">Lo que vais a ver</div>' +
+           '<p>' + f.join(' ') + '</p>' +
+           '<div class="dmw-relato-f">Elementos cartografiados en OpenStreetMap sobre el recorrido. ' +
+           'Hora de sombra calculada con la posición real del sol.</div></div>';
+  }
+
+  async function pintarRelato(i) {
+    var cont = document.getElementById('dmw-walk-relato');
+    if (!cont) return;
+    var r = estado.rutas[i];
+    if (!r) { cont.innerHTML = ''; return; }
+    if (r._relato !== undefined) { cont.innerHTML = r._relato; return; }
+    cont.innerHTML = '<div class="dmw-relato-cargando">Leyendo el terreno del recorrido…</div>';
+    var g = null;
+    try { g = await rasgosRuta(r.linea); } catch (e) {}
+    r._relato = textoRasgos(g, estado.centro);
+    cont.innerHTML = r._relato;
   }
 
   /* ── Cómo empezar + navegación con GPS ─────────────────────────────────
@@ -424,6 +554,7 @@
             'con las zonas verdes y los servicios que hay de verdad alrededor.</div>' +
           '</div>' +
         '</div>' +
+        '<div class="dmw-walk-relato" id="dmw-walk-relato"></div>' +
         '<div class="dmw-walk-nav" id="dmw-walk-nav"></div>' +
         '<div class="dmw-walk-fotos" id="dmw-walk-fotos"></div>' +
         '<div class="dmw-perfil">' +

@@ -569,6 +569,20 @@
   body.dm-web .dmw-walk-vacio {
     font-size: 13.5px; line-height: 1.6; color: var(--w-muted); padding: var(--w-s4);
   }
+  /* Relato del recorrido */
+  body.dm-web .dmw-walk-relato:empty { display: none; }
+  body.dm-web .dmw-walk-relato { padding: var(--w-s4); border-top: 1px solid var(--w-line); }
+  body.dm-web .dmw-relato-h {
+    font-size: 10.5px; letter-spacing: 1.8px; text-transform: uppercase;
+    font-weight: 700; color: var(--w-lime); margin-bottom: var(--w-s3);
+  }
+  body.dm-web .dmw-relato p {
+    margin: 0 0 var(--w-s3); font-size: 14.5px; line-height: 1.7; color: var(--w-text); max-width: 68ch;
+  }
+  body.dm-web .dmw-relato-f, body.dm-web .dmw-relato-cargando {
+    font-size: 11.5px; line-height: 1.5; color: var(--w-subtle);
+  }
+
   /* Cómo empezar + navegación GPS */
   body.dm-web .dmw-walk-nav:empty { display: none; }
   body.dm-web .dmw-walk-nav { padding: var(--w-s4); border-top: 1px solid var(--w-line); }

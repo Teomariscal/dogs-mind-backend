@@ -106,6 +106,12 @@
   +   '#paseo-full .dmw-foto span{display:block;padding:7px 9px;font-size:11px;color:rgba(232,239,234,.62);'
   +     'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}'
   +   '#paseo-full .dmw-fotos-cred,#paseo-full .dmw-walk-f{font-size:11px;color:rgba(232,239,234,.38);padding:8px 12px;}'
+  +   '#paseo-full .dmw-walk-relato{padding:12px;border-top:1px solid rgba(232,239,234,.10);}'
+  +   '#paseo-full .dmw-relato-h{font-size:10.5px;letter-spacing:1.8px;text-transform:uppercase;'
+  +     'font-weight:700;color:#7eb86a;margin-bottom:10px;}'
+  +   '#paseo-full .dmw-relato p{margin:0 0 10px;font-size:14px;line-height:1.7;color:#e8efea;}'
+  +   '#paseo-full .dmw-relato-f,#paseo-full .dmw-relato-cargando{font-size:11.5px;line-height:1.5;'
+  +     'color:rgba(232,239,234,.38);}'
   +   '#paseo-full .dmw-walk-nav{padding:12px;border-top:1px solid rgba(232,239,234,.10);}'
   +   '#paseo-full .dmw-nav-h{font-size:10.5px;letter-spacing:1.8px;text-transform:uppercase;'
   +     'font-weight:700;color:#5ec8e6;margin-bottom:10px;}'
@@ -174,7 +180,7 @@
     host.appendChild(caja);
     if (window.dmwWalkMontar) { window.dmwWalkMontar(caja); return; }
     var s = document.createElement('script');
-    s.src = 'web-walk.js?v=7';
+    s.src = 'web-walk.js?v=9';
     s.onload = function () { if (window.dmwWalkMontar) window.dmwWalkMontar(caja); };
     document.head.appendChild(s);
   }

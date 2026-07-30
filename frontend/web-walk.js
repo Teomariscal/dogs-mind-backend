@@ -207,6 +207,30 @@
   }
 
   /* ── Render ────────────────────────────────────────────────────────────── */
+  /* ── Distancia que recorre el PERRO ────────────────────────────────────
+     Base: Foltin & Ganslosser (30 perros, 120 paseos, 3.145 tramos con GPS).
+     El perro suelto recorre una mediana de +1.000 m por paseo sobre su dueño,
+     lo que el propio estudio cifra en un +43 %; cuartil bajo +400 m y alto
+     +2.300 m. Convertidos a porcentaje sobre la misma distancia de referencia:
+     +17 % / +43 % / +99 %. Atado, el perro hace tu misma distancia.
+     NO se inventa nada: cada nivel corresponde a un cuartil publicado. */
+  var NIVELES = {
+    bajo:  { f: 1.17, n: 'Poco activo',  d: 'cuartil bajo del estudio' },
+    medio: { f: 1.43, n: 'Normal',       d: 'mediana del estudio' },
+    alto:  { f: 1.99, n: 'Muy activo',   d: 'cuartil alto del estudio' }
+  };
+  function nivelActual() {
+    var v = 'medio';
+    try { v = localStorage.getItem('dm_walk_nivel') || 'medio'; } catch (e) {}
+    return NIVELES[v] ? v : 'medio';
+  }
+  function sueltoActual() {
+    try { return localStorage.getItem('dm_walk_suelto') !== '0'; } catch (e) { return true; }
+  }
+  function metrosPerro(m) {
+    return sueltoActual() ? m * NIVELES[nivelActual()].f : m;
+  }
+
   function pintarLista(cont) {
     if (!estado.rutas.length) {
       cont.innerHTML = '<div class="dmw-walk-vacio">No hemos encontrado zonas verdes ni servicios ' +
@@ -228,9 +252,14 @@
           : lista.length + ' · ' + TIPOS[t].n;
         return '<span class="ok">' + txt + '</span>';
       }).join('');
+      var perro = metrosPerro(r.metros);
+      var extra = perro > r.metros
+        ? '<div class="dmw-perro-km"><b>' + km(perro) + '</b> recorrerá tu perro ' +
+          '<span title="Estimación sobre datos publicados (Foltin &amp; Ganslosser)">estimado</span></div>'
+        : '';
       return '<button class="dmw-ruta-c' + (i === 0 ? ' on' : '') + '" data-i="' + i + '">' +
                '<div class="dmw-ruta-top"><b>' + r.nombre + '</b><span>' + km(r.metros) + ' · ' + mins(r.metros) + '</span></div>' +
-               '<p>' + r.por + '</p>' +
+               '<p>' + r.por + '</p>' + extra +
                '<div class="dmw-ruta-tags">' + tags + '</div>' +
              '</button>';
     }).join('');
@@ -322,6 +351,16 @@
           '</div>' +
         '</div>' +
         '<div class="dmw-walk-fotos" id="dmw-walk-fotos"></div>' +
+        '<div class="dmw-perfil">' +
+          '<div class="dmw-perfil-h">¿Cómo es tu perro?</div>' +
+          '<div class="dmw-perfil-ops" id="dmw-perfil-ops">' +
+            Object.keys(NIVELES).map(function (k) {
+              return '<button data-n="' + k + '">' + NIVELES[k].n + '</button>';
+            }).join('') +
+          '</div>' +
+          '<label class="dmw-suelto"><input type="checkbox" id="dmw-suelto"> Va suelto durante el paseo</label>' +
+          '<div class="dmw-perfil-nota" id="dmw-perfil-nota"></div>' +
+        '</div>' +
         '<div class="dmw-walk-f"><span id="dmw-walk-estado">Datos de OpenStreetMap · rutas a pie por OSRM</span></div>' +
       '</div>';
 
@@ -336,6 +375,34 @@
     }).addTo(mapa);
     capaRutas = L.layerGroup().addTo(mapa);
     capaPois  = L.layerGroup().addTo(mapa);
+
+    /* Perfil del perro: nivel de actividad + si va suelto */
+    var ops = document.getElementById('dmw-perfil-ops');
+    var chk = document.getElementById('dmw-suelto');
+    var nota = document.getElementById('dmw-perfil-nota');
+    function pintaPerfil() {
+      var n = nivelActual(), s = sueltoActual();
+      ops.querySelectorAll('button').forEach(function (b) {
+        b.classList.toggle('on', b.getAttribute('data-n') === n);
+      });
+      chk.checked = s;
+      nota.innerHTML = s
+        ? 'Suelto y ' + NIVELES[n].n.toLowerCase() + ': tu perro recorre alrededor de un <b>' +
+          Math.round((NIVELES[n].f - 1) * 100) + ' %</b> más que tú (' + NIVELES[n].d + ').'
+        : 'Atado a tu lado recorre <b>tu misma distancia</b>. Marca la casilla si va suelto.';
+      if (estado.rutas.length) pintarLista(document.getElementById('dmw-walk-lista'));
+    }
+    ops.querySelectorAll('button').forEach(function (b) {
+      b.onclick = function () {
+        try { localStorage.setItem('dm_walk_nivel', b.getAttribute('data-n')); } catch (e) {}
+        pintaPerfil();
+      };
+    });
+    chk.onchange = function () {
+      try { localStorage.setItem('dm_walk_suelto', chk.checked ? '1' : '0'); } catch (e) {}
+      pintaPerfil();
+    };
+    pintaPerfil();
 
     document.getElementById('dmw-walk-geo').onclick = function () {
       estadoTexto('Pidiendo tu ubicación…');

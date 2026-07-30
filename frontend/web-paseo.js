@@ -106,6 +106,22 @@
   +   '#paseo-full .dmw-foto span{display:block;padding:7px 9px;font-size:11px;color:rgba(232,239,234,.62);'
   +     'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}'
   +   '#paseo-full .dmw-fotos-cred,#paseo-full .dmw-walk-f{font-size:11px;color:rgba(232,239,234,.38);padding:8px 12px;}'
+  +   '#paseo-full .dmw-perfil{padding:12px;border-top:1px solid rgba(232,239,234,.10);}'
+  +   '#paseo-full .dmw-perfil-h{font-size:10.5px;letter-spacing:1.8px;text-transform:uppercase;'
+  +     'font-weight:700;color:#5ec8e6;margin-bottom:10px;}'
+  +   '#paseo-full .dmw-perfil-ops{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}'
+  +   '#paseo-full .dmw-perfil-ops button{font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;'
+  +     'padding:8px 14px;border-radius:100px;color:#e8efea;background:rgba(255,255,255,.05);'
+  +     'border:1px solid rgba(232,239,234,.10);}'
+  +   '#paseo-full .dmw-perfil-ops button.on{background:rgba(94,200,230,.12);border-color:#5ec8e6;color:#fff;}'
+  +   '#paseo-full .dmw-suelto{display:flex;align-items:center;gap:8px;font-size:13px;'
+  +     'color:rgba(232,239,234,.62);margin-bottom:10px;}'
+  +   '#paseo-full .dmw-perfil-nota{font-size:12.5px;line-height:1.55;color:rgba(232,239,234,.62);}'
+  +   '#paseo-full .dmw-perfil-nota b{color:#7eb86a;}'
+  +   '#paseo-full .dmw-perro-km{margin:0 0 10px;font-size:12.5px;color:rgba(232,239,234,.62);}'
+  +   '#paseo-full .dmw-perro-km b{color:#7eb86a;font-size:13.5px;}'
+  +   '#paseo-full .dmw-perro-km span{font-size:10px;letter-spacing:1px;text-transform:uppercase;'
+  +     'color:rgba(232,239,234,.38);border-bottom:1px dotted rgba(232,239,234,.38);}'
   +   '#paseo-full .dmw-walk-vacio,#paseo-full .dmw-fotos-cargando,#paseo-full .dmw-fotos-vacio{'
   +     'font-size:13px;color:rgba(232,239,234,.62);padding:12px;}'
   + '}';
@@ -143,7 +159,7 @@
     host.appendChild(caja);
     if (window.dmwWalkMontar) { window.dmwWalkMontar(caja); return; }
     var s = document.createElement('script');
-    s.src = 'web-walk.js?v=4';
+    s.src = 'web-walk.js?v=5';
     s.onload = function () { if (window.dmwWalkMontar) window.dmwWalkMontar(caja); };
     document.head.appendChild(s);
   }

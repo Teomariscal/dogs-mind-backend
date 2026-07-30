@@ -552,6 +552,35 @@
   body.dm-web .dmw-walk-vacio {
     font-size: 13.5px; line-height: 1.6; color: var(--w-muted); padding: var(--w-s4);
   }
+  /* Perfil del perro (nivel de actividad + suelto) */
+  body.dm-web .dmw-perfil { padding: var(--w-s4); border-top: 1px solid var(--w-line); }
+  body.dm-web .dmw-perfil-h {
+    font-size: 10.5px; letter-spacing: 1.8px; text-transform: uppercase;
+    font-weight: 700; color: var(--w-cyan); margin-bottom: var(--w-s3);
+  }
+  body.dm-web .dmw-perfil-ops { display: flex; gap: var(--w-s2); flex-wrap: wrap; margin-bottom: var(--w-s3); }
+  body.dm-web .dmw-perfil-ops button {
+    font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+    padding: 8px 16px; border-radius: var(--w-r-pill); color: var(--w-text);
+    background: var(--w-surface); border: 1px solid var(--w-line);
+    transition: background .18s, border-color .18s;
+  }
+  body.dm-web .dmw-perfil-ops button.on { background: var(--w-cyan-12); border-color: var(--w-cyan); color: #fff; }
+  body.dm-web .dmw-suelto {
+    display: flex; align-items: center; gap: 8px; font-size: 13px;
+    color: var(--w-muted); cursor: pointer; margin-bottom: var(--w-s3);
+  }
+  body.dm-web .dmw-perfil-nota { font-size: 12.5px; line-height: 1.55; color: var(--w-muted); }
+  body.dm-web .dmw-perfil-nota b { color: var(--w-lime); }
+  body.dm-web .dmw-perro-km {
+    margin: 0 0 10px; font-size: 12.5px; color: var(--w-muted);
+  }
+  body.dm-web .dmw-perro-km b { color: var(--w-lime); font-size: 13.5px; }
+  body.dm-web .dmw-perro-km span {
+    font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--w-subtle); border-bottom: 1px dotted var(--w-subtle); cursor: help;
+  }
+
   /* Fotos del camino */
   body.dm-web .dmw-walk-fotos:empty { display: none; }
   body.dm-web .dmw-walk-fotos {

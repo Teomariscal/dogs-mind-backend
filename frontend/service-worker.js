@@ -1,3 +1,4 @@
+// v229 (PRODUCCIÓN 2026-07-31: [1] reset.html — página donde el usuario elige su contraseña desde el enlace del correo; IMPRESCINDIBLE, el email apunta aquí. [2] capa web de escritorio: panel propio, aislada de las apps por triple cierre. [3] World Wide Dog Walking: mapas, rutas reales a pie, fotos del camino, relato del terreno y km estimados del perro. [4] El paseo de hoy en el inicio con Ale. Backend a la vez: sesión de 1 año + recuperación por enlace.)
 // v228 (EXTERMINIO DEL CREAM en s-anamnesis — founder 2026-07-29: el formulario de "Problema de conducta" pasa del card blanco al lenguaje de Entrenamiento Específico: superficie glass sobre vibrant emerald, labels cyan, inputs translúcidos con foco cyan, toggles glass, chips cyan y cabeceras de sección unificadas en lima. Afecta a web Y apps en el próximo build; cero elementos blancos verificados.)
 // v227 (capa WEB de escritorio: panel propio — barra superior con acciones + secciones, hero en vídeo, rejilla bento, malla radar; archivos web-desktop.css/js cargados SOLO si no es app nativa y todo scoped a body.dm-web → triple cierre para no afectar a App Store/Google Play, incluidas tablets Android y Chrome OS. Founder 2026-07-28.)
 // v226 (FIX EXPRESS founder 2026-07-28: al pasar su cuenta a "corporativo" desaparecieron Inspiración Profesional, badge Pro, slot Entidad/logo y demás features pro — 7 gates comparaban account_type === 'professional' a secas. Nuevo helper dmIsProAccount(acc) = professional O corporativo aplicado a todos. Backend ya trataba corporativo como pro; era solo frontend.)
@@ -35,7 +36,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v228';
+const CACHE_NAME = 'dogs-mind-v229';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

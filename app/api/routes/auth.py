@@ -1,6 +1,7 @@
 import os
 import secrets
 import string
+import hashlib
 import httpx
 from datetime import datetime, timedelta
 from typing import Optional
@@ -30,7 +31,13 @@ if not JWT_SECRET or JWT_SECRET == _JWT_INSECURE_DEFAULT:
         "Genera uno con: python -c 'import secrets; print(secrets.token_urlsafe(48))'"
     )
 JWT_ALGORITHM = "HS256"
-JWT_EXPIRE_DAYS = 30
+# Founder 2026-07-31: la sesión pasa de 30 días a un AÑO. Con 30 días, a todo
+# usuario que no volviera a entrar en un mes se le caducaba la sesión en
+# silencio: la app seguía mostrándole su cuenta (solo mira si hay token
+# guardado) y el fallo aparecía al tocar el servidor — típicamente en mitad de
+# un análisis. Caso real jpcarmid@gmail.com y 569 usuarios en la misma
+# situación. Ver también la recuperación por enlace más abajo.
+JWT_EXPIRE_DAYS = 365
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -461,11 +468,73 @@ class ForgotPasswordRequest(BaseModel):
 
 
 def _generate_temp_password(length: int = 10) -> str:
-    """Random readable password (no ambiguous chars)."""
+    """Random readable password (no ambiguous chars). Legacy — ya no se usa
+    en /forgot-password (ahora se manda un enlace), se conserva por si algún
+    flujo interno lo necesita."""
     alphabet = (string.ascii_letters + string.digits).translate(
         str.maketrans("", "", "lI1O0o")
     )
     return "".join(secrets.choice(alphabet) for _ in range(length))
+
+
+# ── Recuperación por ENLACE (founder 2026-07-31) ─────────────────────────────
+# Antes se enviaba una contraseña generada que el usuario tenía que teclear a
+# mano, y CADA nueva solicitud invalidaba la anterior. Como los correos son
+# idénticos y sin hora, el usuario que reintentaba se dejaba fuera él solo
+# (caso real jpcarmid@gmail.com). Ahora se envía un enlace firmado:
+#   · No hay nada que teclear ni que copiar mal.
+#   · Pedir varios enlaces NO rompe nada: todos siguen siendo válidos hasta
+#     que se use uno; al cambiar la contraseña, la huella deja de coincidir y
+#     todos los enlaces mueren a la vez (un solo uso efectivo).
+#   · Sin tabla nueva ni migración: el estado va firmado dentro del token.
+RESET_TOKEN_HOURS = 2
+
+
+def _reset_fingerprint(password_hash: str) -> str:
+    """Huella del hash actual: si la contraseña cambia, los enlaces caducan."""
+    return hashlib.sha256((password_hash or "").encode()).hexdigest()[:16]
+
+
+def create_reset_token(user) -> str:
+    payload = {
+        "sub": str(user.id),
+        "typ": "pwreset",
+        "pw":  _reset_fingerprint(user.password_hash),
+        "exp": datetime.utcnow() + timedelta(hours=RESET_TOKEN_HOURS),
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+
+def _send_reset_link_email(to_email: str, link: str) -> None:
+    """Envía el enlace de restablecimiento vía Resend."""
+    if not RESEND_API_KEY:
+        raise HTTPException(status_code=500, detail="RESEND_API_KEY no configurada en el servidor.")
+
+    subject = "Restablece tu contraseña — The Dogs' Mind"
+    html = f"""
+    <div style="font-family: -apple-system, system-ui, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px 24px; color: #1a1f17;">
+      <div style="font-family: Georgia, serif; font-size: 24px; font-weight: 600; color: #4a6741; margin-bottom: 8px;">The Dogs' Mind</div>
+      <div style="font-style: italic; color: #6a6a55; margin-bottom: 24px;">by Teo Mariscal</div>
+      <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">Has pedido restablecer tu contraseña. Pulsa el botón y elige una nueva:</p>
+      <p style="text-align:center; margin: 0 0 24px;">
+        <a href="{link}" style="display:inline-block; background:#4a6741; color:#fff; text-decoration:none; font-size:16px; font-weight:700; padding:14px 28px; border-radius:100px;">Elegir mi contraseña</a>
+      </p>
+      <p style="font-size: 14px; line-height: 1.6; color:#555; margin-bottom: 16px;">El enlace caduca en {RESET_TOKEN_HOURS} horas. Si has pedido varios correos, <strong>cualquiera de ellos sirve</strong>: en cuanto uses uno, los demás dejan de funcionar.</p>
+      <p style="font-size: 12px; line-height:1.5; color:#999; margin-top: 28px; border-top: 1px solid #eee; padding-top: 16px;">Si el botón no funciona, copia esta dirección en tu navegador:<br><span style="word-break:break-all;">{link}</span></p>
+      <p style="font-size: 12px; color: #999; margin-top: 16px;">Si no has pedido este cambio, ignora este correo: tu contraseña actual sigue siendo válida. Ante cualquier duda escríbenos a <a href="mailto:privacy@thedogsmind.net" style="color:#999;">privacy@thedogsmind.net</a>.</p>
+    </div>
+    """
+    try:
+        with httpx.Client(timeout=10.0) as client:
+            r = client.post(
+                "https://api.resend.com/emails",
+                headers={"Authorization": f"Bearer {RESEND_API_KEY}", "Content-Type": "application/json"},
+                json={"from": RESEND_FROM, "to": [to_email], "subject": subject, "html": html},
+            )
+            if r.status_code >= 400:
+                raise HTTPException(status_code=502, detail=f"Error enviando email: {r.text[:200]}")
+    except httpx.HTTPError as e:
+        raise HTTPException(status_code=502, detail=f"Error de red enviando email: {e}")
 
 
 def _send_password_email(to_email: str, temp_password: str) -> None:
@@ -532,23 +601,52 @@ def forgot_password(req: ForgotPasswordRequest, db: Session = Depends(get_db)):
     email_norm = (req.email or "").strip().lower()
     user = db.query(User).filter(func.lower(User.email) == email_norm).first()
     if user and user.deleted_at is None:
-        new_password = _generate_temp_password()
-        user.password_hash = hash_password(new_password)
-        db.commit()
-        try:
-            _send_password_email(user.email, new_password)
-        except HTTPException:
-            # El email falló pero el password ya quedó cambiado en DB —
-            # log explícito para diagnosticar y rollback NO se hace porque
-            # el usuario ya no podría usar el password viejo de todas formas
-            import logging
-            logging.getLogger(__name__).warning(
-                "forgot-password: hash actualizado pero envío email falló (user_id=%s)",
-                str(user.id)
-            )
-            raise
+        # NO se toca la contraseña actual: sigue siendo válida hasta que el
+        # usuario elija una nueva desde el enlace. Así, pedir el correo varias
+        # veces (o pedirlo por error) nunca deja a nadie fuera.
+        token = create_reset_token(user)
+        link = f"{APP_URL.rstrip('/')}/reset.html?t={token}"
+        _send_reset_link_email(user.email, link)
     # Always return same response regardless of email existence
-    return {"ok": True, "message": "Si el email existe, recibirás una nueva contraseña en unos segundos."}
+    return {"ok": True, "message": "Si el email existe, recibirás un enlace en unos segundos."}
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+
+
+@router.post("/reset-password")
+def reset_password(req: ResetPasswordRequest, db: Session = Depends(get_db)):
+    """Fija la contraseña elegida por el usuario desde el enlace del correo.
+
+    El enlace lleva firmada la huella del hash actual: al cambiar la
+    contraseña, esa huella deja de coincidir y TODOS los enlaces emitidos
+    quedan invalidados de golpe (un solo uso efectivo, sin tabla extra).
+    """
+    if len(req.new_password or "") < 6:
+        raise HTTPException(status_code=400, detail="La contraseña debe tener al menos 6 caracteres")
+    try:
+        payload = jwt.decode(req.token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+    except Exception:
+        raise HTTPException(status_code=400, detail="El enlace ha caducado o no es válido. Pide uno nuevo.")
+    if payload.get("typ") != "pwreset":
+        raise HTTPException(status_code=400, detail="Enlace no válido.")
+    user = db.query(User).filter(User.id == payload.get("sub")).first()
+    if not user or user.deleted_at is not None:
+        raise HTTPException(status_code=400, detail="Enlace no válido.")
+    if payload.get("pw") != _reset_fingerprint(user.password_hash):
+        raise HTTPException(status_code=400, detail="Este enlace ya se ha usado. Pide uno nuevo si lo necesitas.")
+
+    user.password_hash = hash_password(req.new_password)
+    db.commit()
+    # Sesión lista: el usuario entra directo, sin volver a escribir nada.
+    return {
+        "ok": True,
+        "token": create_token(str(user.id)),
+        "email": user.email,
+        "account_type": user.account_type,
+    }
 
 
 # ── Change password (logged in) ──────────────────────────────────────────────

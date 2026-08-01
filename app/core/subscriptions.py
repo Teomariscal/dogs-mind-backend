@@ -104,8 +104,21 @@ def _env_bool(name: str, default: bool = False) -> bool:
     return os.environ.get(name, str(default)).strip().lower() in ("1", "true", "yes", "on")
 
 
-def paywall_enabled() -> bool:
-    return _env_bool("SUBS_PAYWALL_ENABLED", False)
+def paywall_enabled(user=None) -> bool:
+    """
+    ¿Está el muro activo para este usuario?
+
+    SUBS_PAYWALL_ENABLED lo enciende para todo el mundo (interruptor del 10-ago).
+    SUBS_PAYWALL_TEST_EMAILS lo enciende SOLO para las cuentas listadas, que es
+    como se prueba el flujo completo en producción sin tocar a ningún cliente.
+    """
+    if _env_bool("SUBS_PAYWALL_ENABLED", False):
+        return True
+    if user is not None:
+        pruebas = {e.strip().lower() for e in os.environ.get("SUBS_PAYWALL_TEST_EMAILS", "").split(",") if e.strip()}
+        if pruebas and (getattr(user, "email", "") or "").lower() in pruebas:
+            return True
+    return False
 
 
 def cutover_date() -> datetime:
@@ -215,10 +228,10 @@ def access_state(user, now: Optional[datetime] = None) -> dict:
             "trial_days_left": trial["days_left"],
             "trial_ends_at": trial["ends_at"],
             "legacy": is_legacy(user),
-            "paywall_enabled": paywall_enabled(),
+            "paywall_enabled": paywall_enabled(user),
         }
 
-    if not paywall_enabled():
+    if not paywall_enabled(user):
         return out(True, "paywall_off")
     if (getattr(user, "role", "user") or "user") in ("admin", "developer"):
         return out(True, "privileged")

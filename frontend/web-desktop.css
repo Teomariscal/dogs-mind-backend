@@ -737,9 +737,13 @@
   /* ── Pantalla de planes: columna centrada, no a todo lo ancho ─────────── */
   /* Solo capa web (body.dm-web + ≥1024px). En la app nativa esta regla no
      existe siquiera: web-desktop.css no se carga. */
+  /* !important porque las tarjetas llevan margen en línea (margin:0 16px). */
   body.dm-web #s-planes > div,
-  body.dm-web #s-planes > button { max-width: 640px; margin-left: auto; margin-right: auto; }
-  body.dm-web #s-planes #planes-lista { max-width: 672px; margin: 0 auto; }
+  body.dm-web #s-planes > button {
+    max-width: 640px;
+    margin-left: auto !important; margin-right: auto !important;
+  }
+  body.dm-web #s-planes #planes-lista { max-width: 672px; }
 
   /* ── Pantallas grandes: más aire ──────────────────────────────────────── */
   @media (min-width: 1500px) {

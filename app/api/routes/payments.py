@@ -143,6 +143,56 @@ def create_checkout(
     return {"checkout_url": session.url}
 
 
+# ── Suscripción por Stripe (web) ──────────────────────────────────────────────
+class PlanCheckoutRequest(BaseModel):
+    plan_id: str  # basico | medio | pro | max
+
+
+@router.post("/payments/plan-checkout")
+def create_plan_checkout(
+    req: PlanCheckoutRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Checkout de suscripción mensual para la WEB. En iOS/Android la compra va por
+    la tienda (RevenueCat) — aquí no.
+
+    El price_id de Stripe se toma de la env var que declara el plan
+    (STRIPE_PRICE_BASICO, …). Si no está configurada todavía, se responde 503
+    con un mensaje claro en vez de crear un cobro a medias.
+    """
+    from app.core import subscriptions as _subs
+
+    plan = _subs.plan_by_id(req.plan_id)
+    if not plan:
+        raise HTTPException(status_code=400, detail="Plan desconocido.")
+    if not stripe.api_key:
+        raise HTTPException(status_code=500, detail="STRIPE_SECRET_KEY no configurada en el servidor")
+
+    price_id = os.environ.get(plan.get("stripe_price_env", ""), "").strip()
+    if not price_id:
+        raise HTTPException(
+            status_code=503,
+            detail="Este plan aún no está disponible para pago por web. Suscríbete desde la app.",
+        )
+
+    try:
+        session = stripe.checkout.Session.create(
+            mode="subscription",
+            line_items=[{"price": price_id, "quantity": 1}],
+            metadata={"user_id": str(current_user.id), "plan_id": plan["id"]},
+            subscription_data={"metadata": {"user_id": str(current_user.id), "plan_id": plan["id"]}},
+            customer_email=current_user.email,
+            success_url=f"{APP_URL}?sub=ok&plan={plan['id']}",
+            cancel_url=f"{APP_URL}?sub=cancelled",
+        )
+    except stripe.error.StripeError as e:
+        raise HTTPException(status_code=500, detail=f"Error de Stripe: {str(e)}")
+
+    return {"checkout_url": session.url}
+
+
 # ── Crear sesión de pago — flujo Profesional ──────────────────────────────────
 class ProCheckoutRequest(BaseModel):
     with_bundle: bool = False  # añade el pack 60 tokens promo (37,80 €) opcional
@@ -428,6 +478,31 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+    # ── Renovación mensual de una suscripción web ───────────────────────────
+    if event["type"] == "invoice.paid":
+        from datetime import datetime as _now, timedelta as _delta
+        from app.core import subscriptions as _subs
+
+        inv = event["data"]["object"]
+        # La primera factura la cubre checkout.session.completed → no duplicar.
+        if inv.get("billing_reason") == "subscription_create":
+            return {"status": "ignored (alta ya acreditada)"}
+        meta = (inv.get("subscription_details") or {}).get("metadata") or inv.get("metadata") or {}
+        plan = _subs.plan_by_id(meta.get("plan_id", ""))
+        user = db.query(User).filter(User.id == meta.get("user_id")).first() if meta.get("user_id") else None
+        if not plan or not user:
+            return {"status": "ignored"}
+        clave = f"stripe:inv:{inv.get('id')}"
+        if (user.subscription_last_grant or "") == clave:
+            return {"status": "already processed"}
+        user.subscription_status = "active"
+        user.subscription_expires_at = _now.utcnow() + _delta(days=31)
+        user.subscription_last_grant = clave
+        user.tokens = float(user.tokens) + float(plan["credits"]) / _subs.CREDITS_PER_TOKEN
+        db.commit()
+        print(f"[Stripe-SUB] renovación {user.email} plan={plan['id']} saldo={user.tokens}")
+        return {"status": "ok"}
+
     if event["type"] == "checkout.session.completed":
         session  = event["data"]["object"]
         metadata = session.get("metadata", {})
@@ -440,6 +515,30 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
         ).first()
         if existing:
             return {"status": "already processed"}
+
+        # ── Suscripción mensual por web (modelo agosto 2026) ────────────────
+        # Alta inicial. Las renovaciones llegan como invoice.paid (abajo).
+        if metadata.get("plan_id"):
+            from datetime import datetime as _now, timedelta as _delta
+            from app.core import subscriptions as _subs
+
+            plan = _subs.plan_by_id(metadata["plan_id"])
+            user = db.query(User).filter(User.id == metadata.get("user_id")).first()
+            if not plan or not user:
+                return {"status": "ignored"}
+            user.subscription_plan = plan["id"]
+            user.subscription_status = "active"
+            user.subscription_store = "stripe"
+            user.subscription_expires_at = _now.utcnow() + _delta(days=31)
+            user.subscription_started_at = user.subscription_started_at or _now.utcnow()
+            user.subscription_last_grant = f"stripe:{session['id']}"
+            user.tokens = float(user.tokens) + float(plan["credits"]) / _subs.CREDITS_PER_TOKEN
+            pago = db.query(Payment).filter(Payment.stripe_session_id == session["id"]).first()
+            if pago:
+                pago.status = "paid"
+            db.commit()
+            print(f"[Stripe-SUB] {user.email} plan={plan['id']} +{plan['credits']}cr saldo={user.tokens}")
+            return {"status": "ok"}
 
         # ── Flujo Profesional (membresía + opcional bundle) ─────────────────
         if kind == "pro_membership":
@@ -492,6 +591,40 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
 
 
 # ── Webhook de RevenueCat (iOS IAP, automático) ───────────────────────────────
+def _rc_marcar_fin_suscripcion(event, etype, app_user_id, db):
+    """CANCELLATION/EXPIRATION/BILLING_ISSUE de un plan → actualiza el estado.
+
+    NO toca el saldo: los créditos ya abonados son del usuario. El acceso sigue
+    vivo hasta subscription_expires_at (access_state lo comprueba).
+    """
+    from datetime import datetime as _now
+    from app.core import subscriptions as _subs
+
+    product_id = (event.get("product_id", "") or "").split(":")[0]
+    if not _subs.plan_by_product_id(product_id):
+        return {"status": "ignored", "type": etype}
+    try:
+        uuid.UUID(str(app_user_id))
+    except (ValueError, TypeError, AttributeError):
+        return {"status": "invalid app_user_id"}
+    user = db.query(User).filter(User.id == app_user_id).first()
+    if not user:
+        return {"status": "user not found"}
+
+    user.subscription_status = {
+        "CANCELLATION": "canceled",
+        "BILLING_ISSUE": "in_grace",
+        "SUBSCRIPTION_PAUSED": "canceled",
+    }.get(etype, "expired")
+    exp_ms = event.get("expiration_at_ms")
+    if exp_ms:
+        user.subscription_expires_at = _now.utcfromtimestamp(exp_ms / 1000.0)
+    db.commit()
+    print(f"[RevenueCat-SUB] {user.email} {etype} → {user.subscription_status} "
+          f"(acceso hasta {user.subscription_expires_at})")
+    return {"status": "ok", "subscription_status": user.subscription_status}
+
+
 @router.post("/webhooks/revenuecat")
 async def revenuecat_webhook(request: Request, db: Session = Depends(get_db)):
     """
@@ -531,6 +664,11 @@ async def revenuecat_webhook(request: Request, db: Session = Depends(get_db)):
 
     # Solo eventos de compra que acreditan algo. El resto (TEST, CANCELLATION,
     # EXPIRATION, BILLING_ISSUE, etc.) se ignoran con 200 para que RC no reintente.
+    # Fin de suscripción: marca el estado (no retira créditos — lo comprado es
+    # del usuario) y deja que el acceso dure hasta expiration_at_ms.
+    if etype in ("CANCELLATION", "EXPIRATION", "BILLING_ISSUE", "SUBSCRIPTION_PAUSED"):
+        return _rc_marcar_fin_suscripcion(event, etype, app_user_id, db)
+
     if etype not in ("NON_RENEWING_PURCHASE", "INITIAL_PURCHASE", "RENEWAL"):
         return {"status": "ignored", "type": etype}
     if not event_id or not app_user_id:
@@ -558,7 +696,35 @@ async def revenuecat_webhook(request: Request, db: Session = Depends(get_db)):
 
     credited = 0
     amount_cents = 0
-    if product_id in RC_TOKEN_PRODUCTS:
+    # ── Planes de suscripción (modelo agosto 2026) ───────────────────────────
+    # Se comprueba ANTES que los packs: los ids de plan son propios
+    # (tdm_*_mensual) y no colisionan con los packs ni con el Pro.
+    from datetime import datetime as _now
+    from app.core import subscriptions as _subs
+
+    _plan = _subs.plan_by_product_id(product_id)
+    if _plan:
+        credited = float(_plan["credits"]) / _subs.CREDITS_PER_TOKEN
+        amount_cents = int(round(float(_plan.get("price", 0)) * 100))
+        _exp_ms = event.get("expiration_at_ms")
+        _exp = _now.utcfromtimestamp(_exp_ms / 1000.0) if _exp_ms else None
+        _trial = (event.get("period_type") or "").upper() == "TRIAL"
+        user.subscription_plan = _plan["id"]
+        user.subscription_status = "trialing" if _trial else "active"
+        user.subscription_store = (event.get("store") or "app_store").lower()
+        user.subscription_expires_at = _exp
+        if not user.subscription_started_at:
+            user.subscription_started_at = _now.utcnow()
+        user.subscription_last_grant = rc_key
+        # En TRIAL no se abonan los créditos del plan: el usuario ya tiene los
+        # 500 de bienvenida. Se abonan al primer cobro real (RENEWAL/INITIAL no-trial).
+        if _trial:
+            credited = 0
+        else:
+            user.tokens = float(user.tokens) + credited
+        print(f"[RevenueCat-SUB] {user.email} plan={_plan['id']} {etype} "
+              f"trial={_trial} +{credited}tk saldo={user.tokens} exp={_exp}")
+    elif product_id in RC_TOKEN_PRODUCTS:
         credited = RC_TOKEN_PRODUCTS[product_id]
         amount_cents = PACKS.get(credited, {}).get("amount_cents", 0)
         user.tokens = float(user.tokens) + credited
@@ -579,7 +745,7 @@ async def revenuecat_webhook(request: Request, db: Session = Depends(get_db)):
         db.add(Payment(
             user_id=user.id,
             stripe_session_id=rc_key,
-            tokens=int(credited),
+            tokens=int(round(credited)),
             amount_cents=int(amount_cents),
             status="paid",
         ))

@@ -52,6 +52,27 @@ def deduct_token(
             _log.info("deduct_token: privileged role=%s — skipping deduction for %s", user.role, user.email)
             return float(user.tokens)
 
+        # ── Muro de suscripción (10-ago-2026) ───────────────────────────────
+        # Con SUBS_PAYWALL_ENABLED apagado esto no niega nada a nadie.
+        # Reglas (prueba de 3 días, saldo heredado, exenciones): core/subscriptions.py
+        # Fail-open a propósito: si algo peta calculando el estado, el usuario
+        # PASA. Bloquear a un cliente que paga por un bug del muro es peor que
+        # dejar pasar un análisis de más.
+        try:
+            from app.core import subscriptions as _subs
+
+            estado = _subs.access_state(user)
+            bloqueado = not estado["allowed"]
+            motivo = estado["reason"]
+            mensaje = _subs.paywall_message(estado) if bloqueado else ""
+        except Exception as exc:                      # noqa: BLE001
+            _log.exception("deduct_token: fallo evaluando el muro — dejo pasar (%s)", exc)
+            bloqueado, motivo, mensaje = False, "", ""
+
+        if bloqueado:
+            _log.info("deduct_token: muro → %s (%s)", user.email, motivo)
+            raise HTTPException(status_code=402, detail=mensaje)
+
         if float(user.tokens) < amount:
             raise HTTPException(status_code=402, detail="Sin tokens. Recarga para continuar.")
 

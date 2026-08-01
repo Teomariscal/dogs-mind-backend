@@ -8439,6 +8439,15 @@ button:not(:disabled):active{ transform:scale(0.98); }
 
     <!-- paquetes -->
     <div style="padding:0 16px 24px;">
+      <!-- Acceso a los planes de suscripción (modelo agosto 2026) -->
+      <button onclick="dmAbrirPlanes('menu')" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;padding:16px;border:none;border-radius:16px;cursor:pointer;font-family:inherit;text-align:left;background:linear-gradient(135deg,#14302a,#0e1f1a);box-shadow:0 6px 20px rgba(10,26,20,.28);">
+        <div>
+          <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#5ec8e6;font-weight:700;">The Dogs&rsquo; Mind</div>
+          <div style="font-size:15.5px;font-weight:700;color:#fff;margin-top:3px;" data-i18n="home_plans">Planes y créditos</div>
+        </div>
+        <div style="font-size:20px;color:#5ec8e6;flex-shrink:0;">&#8594;</div>
+      </button>
+
       <div style="font-size:10px;font-weight:700;color:var(--grey);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;" data-i18n="tokens_recharge">Recargar tokens</div>
 
       <!-- pack 5 -->
@@ -8547,6 +8556,56 @@ button:not(:disabled):active{ transform:scale(0.98); }
     </div>
 
   </div><!-- /s-tokens -->
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       PANTALLA DE PLANES (modelo suscripción agosto 2026)
+       Se abre con dmAbrirPlanes(motivo). Contenido pintado por renderPlanes()
+       desde GET /subscription/status → los precios y créditos vienen del
+       backend (env SUBS_PLANS o catálogo de código), nunca hardcodeados aquí.
+       Diseño vibrant emerald — norma: cero crema en pantallas nuevas.
+       ══════════════════════════════════════════════════════════════════════ -->
+  <div id="s-planes" class="screen" style="overflow-y:auto;background:
+       radial-gradient(ellipse 700px 420px at 50% -8%, rgba(94,200,230,.12), transparent 62%),
+       linear-gradient(180deg,#0a1a14 0%,#0e1f1a 55%,#14302a 100%);">
+
+    <div style="display:flex;align-items:center;gap:12px;padding:18px 16px 12px;flex-shrink:0;">
+      <button id="planes-back" onclick="goTo('s-home')" style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);color:#e8efea;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0;">&#8592;</button>
+      <div>
+        <div style="font-size:18px;font-weight:700;color:#fff;letter-spacing:-0.3px;" data-i18n="pw_title">Elige tu plan</div>
+        <div id="planes-sub" style="font-size:11.5px;color:rgba(232,239,234,.6);margin-top:1px;" data-i18n="pw_sub">Créditos que se renuevan cada mes</div>
+      </div>
+    </div>
+
+    <!-- aviso de por qué está aquí (prueba terminada / saldo bajo) -->
+    <div id="planes-motivo" style="display:none;margin:0 16px 14px;padding:13px 15px;border-radius:14px;
+         background:rgba(94,200,230,.10);border:1px solid rgba(94,200,230,.32);
+         font-size:13.5px;line-height:1.55;color:#cfe9f2;"></div>
+
+    <!-- saldo actual -->
+    <div id="planes-saldo" style="margin:0 16px 16px;padding:14px 16px;border-radius:16px;
+         background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
+         display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#5ec8e6;font-weight:600;" data-i18n="pw_balance">Tu saldo</div>
+        <div id="planes-saldo-num" style="font-size:22px;font-weight:800;color:#fff;line-height:1.2;">—</div>
+      </div>
+      <div id="planes-saldo-nota" style="font-size:11.5px;color:rgba(232,239,234,.55);text-align:right;max-width:170px;line-height:1.45;"></div>
+    </div>
+
+    <div id="planes-lista" style="padding:0 16px 8px;"></div>
+
+    <div style="padding:6px 20px 30px;">
+      <div style="font-size:11.5px;color:rgba(232,239,234,.48);line-height:1.65;text-align:center;" data-i18n="pw_legal">
+        Suscripción mensual con renovación automática. Puedes cancelarla cuando quieras
+        desde los ajustes de tu tienda (App Store o Google Play). Los créditos que compres
+        no caducan.
+      </div>
+      <div style="margin-top:14px;text-align:center;">
+        <button onclick="dmRestaurarCompras()" style="background:none;border:none;color:#80d6ee;font-family:inherit;font-size:13px;cursor:pointer;text-decoration:underline;" data-i18n="pw_restore">Restaurar compras</button>
+      </div>
+    </div>
+
+  </div><!-- /s-planes -->
 
   <!-- ══ Modal cambiar contraseña ══ -->
   <div id="change-password-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center;padding:20px;">
@@ -15755,7 +15814,23 @@ function getVal(id, fallback) {
   // Sustituye el patrón toast+goTo: modal premium coherente con la identidad
   // (backdrop esmeralda profundo, card blanca, CTA gradiente verde) con el
   // detalle del saldo y botón "Recargar tokens" → s-tokens.
+  /* Puerta única del "no puedes gastar": si el 402 viene del MURO de suscripción
+     (prueba terminada o saldo heredado agotado) abrimos la pantalla de planes;
+     si es simplemente falta de saldo, sale el aviso de recarga de siempre.
+     Con el muro apagado dmManejar402() devuelve false → comportamiento actual. */
   function showRechargeNotice(needed) {
+    try {
+      if (typeof window.dmManejar402 === 'function') {
+        window.dmManejar402().then(function(gestionado) {
+          if (!gestionado) _showRechargeNoticeInner(needed);
+        }).catch(function() { _showRechargeNoticeInner(needed); });
+        return;
+      }
+    } catch (e) {}
+    _showRechargeNoticeInner(needed);
+  }
+
+  function _showRechargeNoticeInner(needed) {
     try {
       var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
       var t = {
@@ -16166,6 +16241,252 @@ function getVal(id, fallback) {
     var tokChat = document.getElementById('tok-chat');
     if (tokChat) tokChat.textContent = fmtTokens(t) + ' tok.';
   }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     PLANES DE SUSCRIPCIÓN (modelo agosto 2026)
+
+     Todo lo que se ve aquí viene de GET /subscription/status: precios, créditos
+     y estado del muro los decide el backend (env SUBS_PLANS en Railway), así
+     que cambiar la tabla NO exige build nuevo de iOS/Android.
+
+     Mientras SUBS_PAYWALL_ENABLED esté apagado, el backend responde
+     allowed:true y esta pantalla solo se abre si el usuario la pide.
+     ═════════════════════════════════════════════════════════════════════════ */
+
+  var _planesData = null;
+
+  function _cr(n) { return Number(n).toLocaleString(getCurrentLang() === 'en' ? 'en-US' : 'es-ES'); }
+
+  function _txtPlanes(k) {
+    var L = (typeof getCurrentLang === 'function' ? getCurrentLang() : 'es');
+    var D = {
+      es: { credits:'créditos', month:'/mes', per:'créditos por euro', save:'más créditos por euro que el Básico',
+            consults:'consultas completas', choose:'Elegir', current:'Tu plan actual', trial_cta:'Empezar prueba de 3 días',
+            trial_note:'3 días de prueba. Después {p}/mes. Cancela cuando quieras.',
+            balance_locked:'Tus créditos de bienvenida se desbloquean al suscribirte.',
+            balance_ok:'Los créditos comprados no caducan.',
+            wait:'Cargando planes…', err:'No se han podido cargar los planes. Inténtalo en un minuto.' },
+      en: { credits:'credits', month:'/month', per:'credits per euro', save:'more credits per euro than Basic',
+            consults:'full consultations', choose:'Choose', current:'Your current plan', trial_cta:'Start 3-day trial',
+            trial_note:'3-day trial. Then {p}/month. Cancel anytime.',
+            balance_locked:'Your welcome credits unlock as soon as you subscribe.',
+            balance_ok:'Purchased credits never expire.',
+            wait:'Loading plans…', err:'Plans could not be loaded. Try again in a minute.' },
+      it: { credits:'crediti', month:'/mese', per:'crediti per euro', save:'più crediti per euro del piano Base',
+            consults:'consulti completi', choose:'Scegli', current:'Il tuo piano attuale', trial_cta:'Inizia la prova di 3 giorni',
+            trial_note:'3 giorni di prova. Poi {p}/mese. Disdici quando vuoi.',
+            balance_locked:'I crediti di benvenuto si sbloccano appena ti abboni.',
+            balance_ok:'I crediti acquistati non scadono.',
+            wait:'Caricamento piani…', err:'Impossibile caricare i piani. Riprova tra un minuto.' }
+    };
+    return (D[L] || D.es)[k];
+  }
+
+  function _nombrePlan(p) {
+    var L = (typeof getCurrentLang === 'function' ? getCurrentLang() : 'es');
+    if (p.name && typeof p.name === 'object') return p.name[L] || p.name.es || p.id;
+    return p.name || p.id;
+  }
+
+  function _badgePlan(p) {
+    var L = (typeof getCurrentLang === 'function' ? getCurrentLang() : 'es');
+    if (p.badge && typeof p.badge === 'object') return p.badge[L] || p.badge.es || '';
+    return p.badge || '';
+  }
+
+  function renderPlanes(d) {
+    _planesData = d;
+    var lista = document.getElementById('planes-lista');
+    if (!lista) return;
+
+    /* saldo */
+    var saldoNum = document.getElementById('planes-saldo-num');
+    if (saldoNum) saldoNum.textContent = _cr(d.credits) + ' ' + _txtPlanes('credits');
+    var saldoNota = document.getElementById('planes-saldo-nota');
+    if (saldoNota) saldoNota.textContent = d.allowed ? _txtPlanes('balance_ok') : _txtPlanes('balance_locked');
+
+    /* por qué está viendo esto */
+    var motivo = document.getElementById('planes-motivo');
+    if (motivo) {
+      if (d.message) { motivo.textContent = d.message; motivo.style.display = 'block'; }
+      else { motivo.style.display = 'none'; }
+    }
+
+    /* subtítulo con la prueba si sigue viva */
+    var sub = document.getElementById('planes-sub');
+    if (sub && d.trial && d.trial.active && d.trial.days_left > 0) {
+      var dias = d.trial.days_left;
+      sub.textContent = (getCurrentLang() === 'en'
+        ? 'Trial: ' + dias + (dias === 1 ? ' day left' : ' days left')
+        : getCurrentLang() === 'it'
+        ? 'Prova: ' + dias + (dias === 1 ? ' giorno rimasto' : ' giorni rimasti')
+        : 'Prueba: ' + (dias === 1 ? 'queda 1 día' : 'quedan ' + dias + ' días'));
+    }
+
+    var actual = (d.subscription && d.subscription.active) ? d.subscription.plan : null;
+
+    lista.innerHTML = (d.plans || []).map(function(p) {
+      var esActual  = (p.id === actual);
+      var destacado = !!_badgePlan(p) && !esActual;
+      var borde  = esActual ? 'rgba(126,184,106,.75)' : (destacado ? 'rgba(94,200,230,.55)' : 'rgba(255,255,255,.14)');
+      var fondo  = destacado ? 'rgba(94,200,230,.07)' : 'rgba(255,255,255,.045)';
+      var ahorro = p.savings_vs_basic_pct || 0;
+
+      return '' +
+      '<div style="position:relative;margin-bottom:12px;padding:18px 16px 16px;border-radius:18px;' +
+           'background:' + fondo + ';border:1.5px solid ' + borde + ';">' +
+        (_badgePlan(p) ?
+          '<div style="position:absolute;top:-9px;left:16px;padding:3px 10px;border-radius:100px;' +
+               'background:linear-gradient(135deg,#5ec8e6,#7eb86a);color:#08201a;font-size:10px;' +
+               'font-weight:800;letter-spacing:.04em;">' + _badgePlan(p) + '</div>' : '') +
+        (esActual ?
+          '<div style="position:absolute;top:-9px;right:16px;padding:3px 10px;border-radius:100px;' +
+               'background:#7eb86a;color:#08201a;font-size:10px;font-weight:800;">' +
+               _txtPlanes('current') + '</div>' : '') +
+
+        '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">' +
+          '<div>' +
+            '<div style="font-family:\'Cormorant Garamond\',serif;font-size:23px;font-weight:600;color:#fff;line-height:1.15;">' +
+              _nombrePlan(p) + '</div>' +
+            '<div style="margin-top:4px;font-size:15px;font-weight:700;color:#5ec8e6;">' +
+              _cr(p.credits) + ' ' + _txtPlanes('credits') + '</div>' +
+            '<div style="margin-top:2px;font-size:12px;color:rgba(232,239,234,.55);">' +
+              p.full_consults + ' ' + _txtPlanes('consults') +
+              (ahorro > 0 ? ' · +' + ahorro + '% ' + _txtPlanes('save') : '') + '</div>' +
+          '</div>' +
+          '<div style="text-align:right;flex-shrink:0;">' +
+            '<div style="font-size:24px;font-weight:800;color:#fff;letter-spacing:-.5px;">' + p.price_display + '</div>' +
+            '<div style="font-size:11px;color:rgba(232,239,234,.5);">' + _txtPlanes('month') + '</div>' +
+          '</div>' +
+        '</div>' +
+
+        (esActual ? '' :
+        '<button onclick="dmComprarPlan(\'' + p.id + '\')" style="width:100%;margin-top:14px;padding:13px;' +
+             'border:none;border-radius:100px;font-family:inherit;font-size:15px;font-weight:700;color:#fff;' +
+             'cursor:pointer;background:' + (destacado
+                ? 'linear-gradient(135deg,#5ec8e6,#4a6741)'
+                : 'linear-gradient(135deg,#7eb86a,#4a6741)') + ';">' +
+          ((p.trial_days > 0 && d.trial && !d.subscription.active && d.trial.active)
+             ? _txtPlanes('trial_cta')
+             : _txtPlanes('choose') + ' ' + _nombrePlan(p)) +
+        '</button>' +
+        ((p.trial_days > 0 && d.trial && d.trial.active) ?
+          '<div style="margin-top:8px;font-size:11px;color:rgba(232,239,234,.5);text-align:center;line-height:1.5;">' +
+            _txtPlanes('trial_note').replace('{p}', p.price_display) + '</div>' : '')) +
+      '</div>';
+    }).join('');
+  }
+
+  async function dmCargarPlanes() {
+    var lista = document.getElementById('planes-lista');
+    if (lista) lista.innerHTML = '<div style="padding:26px 4px;text-align:center;color:rgba(232,239,234,.55);' +
+                                 'font-size:13.5px;">' + _txtPlanes('wait') + '</div>';
+    try {
+      var jwt = localStorage.getItem('dm_jwt') || '';
+      var r = await fetch(API_URL + '/subscription/status', { headers: { 'Authorization': 'Bearer ' + jwt } });
+      if (!r.ok) throw new Error('status ' + r.status);
+      renderPlanes(await r.json());
+    } catch (e) {
+      if (lista) lista.innerHTML = '<div style="padding:26px 4px;text-align:center;color:#e0bd8c;' +
+                                   'font-size:13.5px;line-height:1.6;">' + _txtPlanes('err') + '</div>';
+    }
+  }
+
+  /* Punto de entrada único. motivo: 'sin_saldo' | 'menu' | undefined */
+  window.dmAbrirPlanes = function(motivo) {
+    var volver = document.getElementById('planes-back');
+    if (volver) volver.onclick = function() { goTo(motivo === 'sin_saldo' ? 's-home' : 's-tokens'); };
+    goTo('s-planes');
+    dmCargarPlanes();
+  };
+
+  /* Compra. En iOS/Android pasa por la tienda (RevenueCat); en web, por Stripe.
+     La fontanería nativa se conecta en el build que active los IAP: si el puente
+     no está, se avisa en lugar de fallar en silencio. */
+  window.dmComprarPlan = async function(planId) {
+    var puente = (window.Capacitor && window.Purchases) ? window.Purchases : null;
+    if (puente && typeof puente.purchaseProduct === 'function') {
+      try {
+        var plan = (_planesData.plans || []).filter(function(p){ return p.id === planId; })[0];
+        var pid  = (window.Capacitor.getPlatform && window.Capacitor.getPlatform() === 'android')
+                     ? plan.product_id_android : plan.product_id_ios;
+        var res  = await puente.purchaseProduct({ productIdentifier: pid });
+        await dmConfirmarCompraPlan(planId, res);
+        return;
+      } catch (e) {
+        if (e && (e.code === 'PURCHASE_CANCELLED' || e.userCancelled)) return;
+        alert(_txtPlanes('err'));
+        return;
+      }
+    }
+    /* Web: checkout de Stripe (mismo camino que los packs de tokens). */
+    try {
+      var jwt = localStorage.getItem('dm_jwt') || '';
+      var r = await fetch(API_URL + '/payments/plan-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+        body: JSON.stringify({ plan_id: planId })
+      });
+      var d = await r.json();
+      if (r.ok && d.checkout_url) { window.location.href = d.checkout_url; return; }
+      alert(d.detail || _txtPlanes('err'));
+    } catch (e) { alert(_txtPlanes('err')); }
+  };
+
+  /* Confirma la compra contra el backend para abonar los créditos al instante.
+     El webhook de la tienda es la fuente de verdad; esto solo adelanta el saldo. */
+  async function dmConfirmarCompraPlan(planId, res) {
+    var jwt = localStorage.getItem('dm_jwt') || '';
+    var body = { plan_id: planId, store: (window.Capacitor && window.Capacitor.getPlatform() === 'android') ? 'google' : 'apple' };
+    try {
+      var info = res && (res.customerInfo || res.customer_info);
+      var ent  = info && info.entitlements && info.entitlements.active;
+      if (ent) {
+        var k = Object.keys(ent)[0];
+        if (k && ent[k].expirationDate) body.expires_at = ent[k].expirationDate;
+        if (k && ent[k].periodType === 'TRIAL') body.is_trial = true;
+      }
+    } catch (e) {}
+    var r = await fetch(API_URL + '/subscription/activate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+      body: JSON.stringify(body)
+    });
+    if (r.ok) {
+      var d = await r.json();
+      try { setTokens(d.credits / 100); } catch (e) {}
+      if (typeof fetchBalance === 'function') fetchBalance();
+      dmCargarPlanes();
+    }
+  }
+
+  window.dmRestaurarCompras = async function() {
+    if (window.Purchases && typeof window.Purchases.restorePurchases === 'function') {
+      try {
+        await window.Purchases.restorePurchases();
+        if (typeof fetchBalance === 'function') fetchBalance();
+        dmCargarPlanes();
+      } catch (e) { alert(_txtPlanes('err')); }
+    } else {
+      if (typeof fetchBalance === 'function') fetchBalance();
+      dmCargarPlanes();
+    }
+  };
+
+  /* Muro: cualquier 402 del backend abre los planes en vez de dejar al usuario
+     con un mensaje suelto. Se consulta el estado para distinguir "hay que
+     suscribirse" de "queda sin saldo con plan activo" (→ recarga). */
+  window.dmManejar402 = async function(mensaje) {
+    try {
+      var jwt = localStorage.getItem('dm_jwt') || '';
+      var r = await fetch(API_URL + '/subscription/status', { headers: { 'Authorization': 'Bearer ' + jwt } });
+      if (r.ok) {
+        var d = await r.json();
+        if (!d.allowed) { renderPlanes(d); window.dmAbrirPlanes('sin_saldo'); return true; }
+      }
+    } catch (e) {}
+    return false;
+  };
 
   // Al cargar: refrescar balance si hay sesión activa
   fetchBalance();
@@ -19272,6 +19593,13 @@ function endTourIntro() {
       analyze_btn:     'Analizar con IA →',
       // Tokens
       tokens_title:    'Mis Tokens',
+      // Planes de suscripción (agosto 2026)
+      pw_title:   'Elige tu plan',
+      pw_sub:     'Créditos que se renuevan cada mes',
+      pw_balance: 'Tu saldo',
+      pw_legal:   'Suscripción mensual con renovación automática. Puedes cancelarla cuando quieras desde los ajustes de tu tienda (App Store o Google Play). Los créditos que compres no caducan.',
+      pw_restore: 'Restaurar compras',
+      home_plans: 'Planes y créditos',
       tokens_sub:      'Saldo disponible · Dogs’ Mind',
       tokens_recharge: 'Recargar tokens',
       // Home extras
@@ -20256,6 +20584,13 @@ function endTourIntro() {
       analyze_btn:     'Analyze with AI →',
       // Tokens
       tokens_title:    'My Tokens',
+      // Subscription plans (August 2026)
+      pw_title:   'Choose your plan',
+      pw_sub:     'Credits that renew every month',
+      pw_balance: 'Your balance',
+      pw_legal:   'Monthly auto-renewing subscription. You can cancel it any time from your store settings (App Store or Google Play). Credits you buy never expire.',
+      pw_restore: 'Restore purchases',
+      home_plans: 'Plans and credits',
       tokens_sub:      'Available balance · Dogs’ Mind',
       tokens_recharge: 'Recharge tokens',
       // Home extras
@@ -21242,6 +21577,13 @@ function endTourIntro() {
           analyze_btn:     'Analizza con IA →',
           // Tokens
           tokens_title:    'I miei Tokens',
+          // Piani di abbonamento (agosto 2026)
+          pw_title:   'Scegli il tuo piano',
+          pw_sub:     'Crediti che si rinnovano ogni mese',
+          pw_balance: 'Il tuo saldo',
+          pw_legal:   'Abbonamento mensile a rinnovo automatico. Puoi disdirlo quando vuoi dalle impostazioni del tuo store (App Store o Google Play). I crediti acquistati non scadono.',
+          pw_restore: 'Ripristina acquisti',
+          home_plans: 'Piani e crediti',
           tokens_sub:      'Saldo disponibile · Dogs’ Mind',
           tokens_recharge: 'Ricaricare tokens',
           // Extra home

@@ -46,3 +46,19 @@ class User(Base):
     # cambiar (atribución inmutable para coherencia de reporting de comisiones).
     # NULL = usuario no atribuido a ninguna delegación.
     delegation_id                = Column(UUID(as_uuid=True), ForeignKey("delegations.id"), nullable=True, index=True)
+
+    # ── Suscripción mensual (modelo agosto 2026) ────────────────────────────
+    # Todo nullable: sin suscripción = NULL, que es el estado de todos hoy.
+    # El saldo sigue viviendo en `tokens` (1 token = 100 créditos); estas
+    # columnas solo dicen QUIÉN puede gastarlo y cuándo se recarga.
+    # Reglas y catálogo: app/core/subscriptions.py
+    subscription_plan        = Column(String(20), nullable=True)   # basico|medio|pro|max
+    subscription_status      = Column(String(20), nullable=True)   # active|trialing|in_grace|canceled|expired
+    subscription_store       = Column(String(20), nullable=True)   # apple|google|stripe
+    subscription_expires_at  = Column(DateTime, nullable=True)     # fin del ciclo pagado
+    subscription_started_at  = Column(DateTime, nullable=True)
+    # Clave del último ciclo al que ya se le abonaron créditos — evita doble
+    # abono si la tienda reenvía el mismo webhook.
+    subscription_last_grant  = Column(String(64), nullable=True)
+    # Arranque de la prueba de 3 días. NULL → se usa created_at.
+    trial_started_at         = Column(DateTime, nullable=True)

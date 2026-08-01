@@ -12,8 +12,10 @@ from app.api.routes import account as account_router
 from app.api.routes import daily_followup as daily_followup_router
 from app.api.routes import daily_tip as daily_tip_router
 from app.api.routes import delegations as delegations_router
+from app.api.routes import subscriptions as subscriptions_router
 from app.api.routes import training as training_router
 from app.api.routes import training_consult as training_consult_router
+from app.api.routes import app_config as app_config_router
 
 # Path to the frontend HTML — override via FRONTEND_HTML env var
 FRONTEND_HTML = os.environ.get(
@@ -40,6 +42,17 @@ async def lifespan(app: FastAPI):
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(32)",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP",
             "CREATE INDEX IF NOT EXISTS ix_users_deleted_at ON users(deleted_at)",
+            # ── Suscripción mensual (modelo agosto 2026) ─────────────────────
+            # Columnas nullable: no tocan a ningún usuario existente. El saldo
+            # sigue en `tokens`. Reglas: app/core/subscriptions.py
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_plan VARCHAR(20)",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_status VARCHAR(20)",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_store VARCHAR(20)",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_expires_at TIMESTAMP",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_started_at TIMESTAMP",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_last_grant VARCHAR(64)",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS trial_started_at TIMESTAMP",
+            "CREATE INDEX IF NOT EXISTS ix_users_subscription_status ON users(subscription_status)",
             # Permitir user_id NULL en payments para conservar historial fiscal tras delete del user
             "ALTER TABLE payments ALTER COLUMN user_id DROP NOT NULL",
             # Safety classifier shadow log (Apple Guideline 1.1.6 + IA risk mitigation)
@@ -292,6 +305,8 @@ app.include_router(daily_tip_router.router)
 app.include_router(delegations_router.router)
 app.include_router(training_router.router)
 app.include_router(training_consult_router.router)
+app.include_router(app_config_router.router)
+app.include_router(subscriptions_router.router)
 
 
 @app.get("/", include_in_schema=False)

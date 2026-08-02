@@ -1,3 +1,4 @@
+// v233 (planes: franja de transparencia arriba, antes de las tarjetas — "Cancela tu suscripción cuando quieras. Total transparencia." (copy del founder, es/en/it). 2026-08-02)
 // v232 (planes en escritorio: el centrado necesitaba !important porque las tarjetas llevan margen en línea. 2026-08-01)
 // v231 (planes: en la web de escritorio la columna se centra a 640px en vez de ocupar todo el ancho; regla dentro de web-desktop.css, que la app nativa ni siquiera carga. 2026-08-01)
 // v230 (SUSCRIPCIONES — planes de agosto 2026, DORMIDO tras flags: pantalla s-planes (vibrant, cero crema) que pinta el catálogo que sirve el backend en GET /subscription/status (Básico 5 €/800 cr · Medio 12 €/2.160 · Pro 22 €/4.400 · Max 75 €/17.250; el descuento va en créditos y se mide contra el Básico). Entrada: prueba de 3 días con 500 créditos de bienvenida que se desbloquean al suscribirse. Usuarios anteriores al corte siguen gastando su saldo sin suscribirse hasta bajar de 300 cr. Compra por RevenueCat en iOS/Android y por Stripe en web (/payments/plan-checkout). Cualquier 402 pasa por dmManejar402(): si es el muro abre los planes, si es falta de saldo sale el aviso de recarga de siempre. Con SUBS_PAYWALL_ENABLED apagado el backend responde allowed:true y NADA cambia para nadie. 2026-08-01)
@@ -39,7 +40,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v232';
+const CACHE_NAME = 'dogs-mind-v233';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

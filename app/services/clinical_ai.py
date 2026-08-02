@@ -133,7 +133,7 @@ def run_clinical_analysis(
     anamnesis_block = build_anamnesis_block(anamnesis.model_dump())
 
     video_note = (
-        "\nNOTE: Video frames of the dog's behavior have been provided above. "
+        "\nNOTE: Video frames of the observed behavior have been provided above. "
         "Integrate your visual observations into the ABC analysis — describe "
         "observable body language signals as part of BLOQUE A and BLOQUE B.\n"
         if video_frames

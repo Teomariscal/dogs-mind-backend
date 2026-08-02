@@ -183,6 +183,11 @@ def generate_puppy_plan(*, datos: dict, lang: str = "es") -> PuppySchoolResult:
         system_prompt = {"en": PUPPY_SCHOOL_PROMPT_EN,
                          "it": PUPPY_SCHOOL_PROMPT_IT}.get(lang_norm, PUPPY_SCHOOL_PROMPT_ES)
 
+    from app.services.tea_pilot import apply_tea_override
+    system_prompt = apply_tea_override(
+        system_prompt,
+        datos.get("conducta_problema", ""), datos.get("breed", ""), datos.get("dog_name", ""),
+    )
     query = _build_rag_query(
         breed=datos["breed"], edad_semanas=int(datos["edad_semanas"]),
         area=datos["area_texto"], objetivo=datos["objetivo"],

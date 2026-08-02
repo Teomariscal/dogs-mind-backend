@@ -111,7 +111,11 @@ def run_seguimiento(case_summary_full: Optional[str], form: SeguimientoFormData)
     # 2. Construir prompt
     user_message = _build_user_message(case_summary_full, form, rag_block)
     from app.services.tea_pilot import apply_tea_override
-    _seg_sys = apply_tea_override(SEGUIMIENTO_SYSTEM_PROMPT, case_summary_full)
+    _seg_sys = apply_tea_override(
+        SEGUIMIENTO_SYSTEM_PROMPT, case_summary_full,
+        getattr(form, 'motivo_consulta_resumido', ''), getattr(form, 'descripcion_evolucion', ''),
+        getattr(form, 'dificultades', ''), getattr(form, 'informacion_extra', ''),
+    )
 
     # 3. Llamada Sonnet 4.6 con prompt caching del system prompt
     response = client.messages.create(

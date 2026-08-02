@@ -127,6 +127,7 @@ def generate_daily_checkin(
     plan_text: str,
     dog_name: str,
     diagnosis_type: str,
+    gate_text: str = "",
     day_index: int,
     history: list[dict[str, Any]],
     lang: str = "es",
@@ -160,6 +161,8 @@ def generate_daily_checkin(
         DAILY_FOLLOWUP_COACH_PROMPT_EN if lang_norm == "en"
         else DAILY_FOLLOWUP_COACH_PROMPT_ES
     )
+    from app.services.tea_pilot import apply_tea_override
+    system_prompt = apply_tea_override(system_prompt, plan_text, dog_name, gate_text)
 
     today_iso = (today or datetime.utcnow().date()).isoformat()
 

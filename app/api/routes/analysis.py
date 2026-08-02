@@ -418,6 +418,10 @@ def analysis_chat(
     lang = (req.lang or "es").lower()
     lang_instr = LANG_INSTRUCTION_EN if lang == "en" else LANG_INSTRUCTION_ES
     system_prompt_localized = CHAT_SYSTEM_PROMPT.replace("{LANG_INSTRUCTION}", lang_instr)
+    from app.services.tea_pilot import apply_tea_override
+    system_prompt_localized = apply_tea_override(
+        system_prompt_localized, str(req.anamnesis), req.original_analysis
+    )
     try:
         response = client.messages.create(
             model=chat_model,

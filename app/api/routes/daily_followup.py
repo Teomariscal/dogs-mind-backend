@@ -394,7 +394,10 @@ def get_daily_followup_today(
     if not case.diagnosis_type:
         # Reclasificación defensiva si por alguna razón init no la hizo.
         try:
-            case.diagnosis_type = classify_diagnosis(plan_text)
+            case.diagnosis_type = (
+                "other" if ("autismo" in (plan_text or "").lower() or "autismo" in (case.summary_full or "").lower())
+                else classify_diagnosis(plan_text)
+            )
             db.commit()
         except Exception:
             case.diagnosis_type = "other"

@@ -324,6 +324,8 @@ def generate_training_session(
     # it → base ES (mantiene intactas las reglas duras LIMA del system prompt) +
     # instrucción explícita de salida en italiano dentro del user prompt.
     system = _SYSTEM_EN if lang == "en" else _SYSTEM_ES
+    from app.services.tea_pilot import apply_tea_override
+    system = apply_tea_override(system, objetivo)
     user_prompt = _build_user_prompt(
         objetivo=objetivo,
         nivel_perro=nivel_perro,

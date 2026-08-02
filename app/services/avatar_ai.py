@@ -31,6 +31,8 @@ def chat(request: AvatarChatRequest) -> AvatarChatResponse:
 
     # Select the system prompt for the requested avatar
     system_prompt = AVATAR_PROMPTS.get(request.avatar_id, AVATAR_SYSTEM_PROMPT)
+    from app.services.tea_pilot import apply_tea_override
+    system_prompt = apply_tea_override(system_prompt, *[getattr(m, 'content', '') for m in request.messages])
 
     # Append a hard language instruction based on the UI language
     lang = (request.lang or "es").lower()

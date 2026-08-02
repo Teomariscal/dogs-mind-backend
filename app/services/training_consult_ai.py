@@ -214,6 +214,8 @@ def generate_training_consult(
     is_petowner = (audience or "professional").lower() != "professional"
     if is_petowner:
         system_prompt = system_prompt + PETOWNER_TRAINING_VOICE_OVERLAY
+    from app.services.tea_pilot import apply_tea_override
+    system_prompt = apply_tea_override(system_prompt, goal, dog_name, breed)
 
     # ── 1. RAG retrieval ────────────────────────────────────────────────────
     query = _build_rag_query(

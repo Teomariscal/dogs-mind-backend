@@ -164,8 +164,11 @@
         '<h1 class="dmw-hero-h1">AI for Canine Behavior</h1>' +
         '<p class="dmw-hero-p">Anamnesis, hipótesis funcional y plan de intervención con criterio clínico y métodos respetuosos (LIMA).</p>' +
         '<div class="dmw-hero-cta">' +
-          '<button class="dmw-cta dmw-cta-1" data-go="s-anamnesis">Iniciar análisis</button>' +
+          /* Botones del hero (founder 2026-08-02): 1 renombrado, 2 igual,
+             3 nuevo hacia la anamnesis de Escuela de Cachorros. */
+          '<button class="dmw-cta dmw-cta-1" data-go="s-anamnesis">Análisis Problema de Conducta</button>' +
           '<button class="dmw-cta dmw-cta-2" data-go="s-anamnesis-training">Educación y entrenamiento</button>' +
+          '<button class="dmw-cta dmw-cta-2" data-go="s-anamnesis-puppy">Escuela de Cachorros</button>' +
         '</div>' +
       '</div>');
     hero.querySelectorAll('[data-go]').forEach(function (b) {
@@ -438,7 +441,7 @@
   /* Solo pantalla grande: en la web desde el móvil el usuario debe ver la app
      tal cual, no la barra ni el hero de escritorio (que dependen de un CSS
      que allí no se activa). Se construye al cruzar el umbral, no antes. */
-  var GRANDE = window.matchMedia('(min-width: 1024px)');
+  var GRANDE = window.matchMedia('(min-width: 700px) and (hover: hover) and (pointer: fine)');
 
   function init() {
     if (!GRANDE.matches) return;
@@ -446,6 +449,16 @@
     construirBarra();
     construirOverlay();
     construirPanelHome();
+    /* Altura real de la barra (cambia con el modo compacto) → variable CSS
+       que usa la portada para dejarle hueco. */
+    try {
+      var _bar = document.querySelector('.dmw-bar');
+      var _fija = function () {
+        document.documentElement.style.setProperty('--w-bar-total', _bar.offsetHeight + 'px');
+      };
+      _fija();
+      window.addEventListener('resize', _fija);
+    } catch (e) {}
   }
 
   if (document.readyState !== 'loading') init();

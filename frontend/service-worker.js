@@ -1,3 +1,14 @@
+// v245 (hero web, cambio pedido por el founder: botón 1 renombrado a "Análisis Problema de Conducta", botón 2 igual, botón 3 NUEVO "Escuela de Cachorros" → anamnesis de cachorros (s-anamnesis-puppy). Incluye además, ya probado en local: portada recolocada bajo la barra (los bloques ya no se estiran a todo lo ancho) y modo compacto 700-1100 px. Base = diseño aprobado v229. css v20 · js v23. 2026-08-02)
+// v244 (modo compacto 700-1100 px para la capa de escritorio: el diseño estaba dimensionado para ≥1024 y al abrirse en anchos menores —ventana estrecha o zoom del navegador— la barra se amontonaba en tres filas (founder: "se te ha mezclado todo"). Ahora en ese rango todo encoge y las filas hacen scroll horizontal en vez de romperse. css v19. 2026-08-02)
+// v243 (dos cambios para que el founder VEA por fin la web: [1] formato escritorio en cualquier ordenador — pointer:fine + hover + min-width 700, con lo que el zoom del navegador ya no lo desactiva; [2] el service worker nuevo se activa SOLO (skipWaiting) en vez de esperar al botón Actualizar, que es lo que le ha tenido viendo versiones viejas todo el día. css v18 · js v21. 2026-08-02)
+// v242 (CAUSA RAÍZ del "sigue mal todo" de hoy, señalada por el founder con el alias web--: al bloquear el exterminio del crema restauré el deploy en Netlify pero NO quité la capa oscura de index.html en el repo, y cada deploy posterior la volvió a subir. ELIMINADA del fichero: la web vuelve a los tokens claros originales que se veían en el alias. Además, formato escritorio SOLO en ordenador: min-width 860 + hover + pointer:fine (tablets y móviles ven la app tal cual). Puente con las apps intacto: dmIsNativeApp() primero, body.dm-web segundo, media query tercero. css v17 · js v20. 2026-08-02)
+// v241 (capa de escritorio: umbral 1024 → 860 px CSS. Dato medido, no supuesto: la ventana del founder da ~1000 px CSS (2000 físicos en Retina) y el CSS no se activaba — en su captura se veía la status-bar del mockup, que es la primera regla que el CSS oculta. Misma capa del 1-ago sin ningún otro cambio; esta vez el ?v= sube CON los ficheros (css v16, js v19). 2026-08-02)
+// v240 (vuelta atrás: web-desktop.css y web-desktop.js restaurados EXACTAMENTE al commit 9884de0 del 1-ago, que es la versión que el founder veía bien. Se retiran todos mis cambios de hoy sobre esos dos ficheros: umbral 900, activación por puntero, centinela, guarda de abortado y etiqueta de diagnóstico. El índice vuelve a pedirlos con ?v=14 y ?v=17, como ese día. 2026-08-02)
+// v239 (la capa de escritorio no monta en el portátil del founder y desde aquí no puedo ver su navegador: se activa ahora por ancho O por puntero fino (ratón/trackpad), que no depende del zoom; y se añade una etiqueta de diagnóstico abajo a la izquierda que dice el motivo exacto —no elegible / css y js no coinciden / montada— con ancho, puntero y versiones. La etiqueta se quita en cuanto esté resuelto. 2026-08-02)
+// v238 (capa de escritorio BLINDADA, founder 2026-08-02 "que sea inatacable por error": el CSS lleva un centinela --dmw-build y el JS comprueba que es SU misma versión antes de montar nada. Si no coinciden, reintenta el CSS saltándose la caché y, si sigue sin cuadrar, quita body.dm-web y deja la web como siempre en lugar del estado roto de esta mañana (barra sin estilos + mockup a la vez). Además CSS y JS se piden con UNA sola constante DM_WEB_BUILD, así que no pueden desincronizarse por descuido. Umbral 900 px. 2026-08-02)
+// v237 (fallo mío: al bajar el umbral a 900 px edité web-desktop.css/js pero dejé el mismo ?v= en el índice, así que las cachés seguían sirviendo los ficheros viejos y la maqueta de escritorio salía rota —barra sin estilos y mockup de iPhone a la vez—. Subidos a css?v=15, js?v=18, paseo?v=16. 2026-08-02)
+// v236 (el diseño de escritorio no aparecía en el portátil del founder: el umbral estaba en 1024 px CSS y una pantalla Retina escalada da ~1000. Bajado a 900 px en web-desktop.css y web-desktop.js. La protección de las apps no depende de este umbral: manda dmIsNativeApp(), que sale antes de inyectar nada. 2026-08-02)
+// v235 (EXTERMINIO DEL CREMA, capa final: se voltean los tokens en :root (--cream/--cream2/--cream3/--white/--text*/--cm-*) en vez de ir pantalla por pantalla, con lo que las ~180 superficies y ~280 textos que los usaban pasan a vibrant de golpe. Se DEFINEN --dark y --grey, que se usaban 182 veces sin existir (referencia antigua: `color:var(--dark)` era inválida y el texto heredaba). Fondo vibrant por defecto en .screen para cualquier pantalla presente o futura; captura por atributo de los 110 background:#fff escritos en línea; inputs, bordes y nav global en oscuro. 2026-08-02)
 // v234 (ESCUELA CACHORROS: el botón del hero de inicio pasa de "Comenzar consulta" a "Escuela Cachorros" (los otros 9 accesos a consulta de conducta siguen intactos). Anamnesis propia de cachorro definida por el founder + 5 campos aprobados a propuesta mía; la edad se prerrellena desde la fecha de nacimiento y se guarda CONGELADA, porque el registro debe conservar la edad que tenía el día de la consulta. Dos salidas en el mismo formulario, nunca mezclado con el flujo de adultos: "Prevenir y educar" → plan de crianza (150 cr) y "Problema de conducta" → análisis funcional con lente evolutiva que decide primero si es ontogenia normal (300 cr). Pantallas con fondo vibrant propio: sin esa regla caían al crema por defecto de .screen. 2026-08-02)
 // v233 (planes: franja de transparencia arriba, antes de las tarjetas — "Cancela tu suscripción cuando quieras. Total transparencia." (copy del founder, es/en/it). 2026-08-02)
 // v232 (planes en escritorio: el centrado necesitaba !important porque las tarjetas llevan margen en línea. 2026-08-01)
@@ -41,7 +52,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v234';
+const CACHE_NAME = 'dogs-mind-v245';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [
@@ -56,6 +67,10 @@ const API_ORIGIN = 'https://dogs-mind-backend-production.up.railway.app';
 // ── INSTALL: pre-cache shell. NO skipWaiting: el SW nuevo ESPERA hasta que ──
 // el usuario pulse "Actualizar" (postMessage SKIP_WAITING) o cierre la app.
 self.addEventListener('install', event => {
+  // Activación inmediata (2026-08-02): el patrón de esperar al botón "Actualizar"
+  // dejó al founder viendo versiones viejas durante horas. El SW nuevo entra solo;
+  // no recarga páginas abiertas, solo pasa a servirlas él.
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(PRECACHE_ASSETS))

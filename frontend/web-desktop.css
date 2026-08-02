@@ -20,7 +20,15 @@
      · Respeta prefers-reduced-motion
    ═══════════════════════════════════════════════════════════════════════════ */
 
-@media (min-width: 1024px) {
+/* SOLO ORDENADOR (founder 2026-08-02): ancho ≥860 px CSS Y puntero fino con
+   hover, es decir, ratón o trackpad. Tablets y móviles (pointer:coarse) ven la
+   app tal cual aunque su pantalla sea ancha.
+   El umbral era 1024 y la ventana del founder mide ~1000 px CSS (2000 físicos
+   en Retina): la capa no llegaba a activarse — por eso 860.
+   EL PUENTE con la app sigue triple y no depende de esto: 1º dmIsNativeApp()
+   sale antes de inyectar nada en iOS/Android; 2º todo va scoped a body.dm-web;
+   3º este media query. */
+@media (min-width: 700px) and (hover: hover) and (pointer: fine) {
 
   body.dm-web {
     /* ── Tokens ─────────────────────────────────────────────────────────── */
@@ -744,6 +752,52 @@
     margin-left: auto !important; margin-right: auto !important;
   }
   body.dm-web #s-planes #planes-lista { max-width: 672px; }
+
+  /* ── SPLASH bajo la barra de escritorio (2026-08-02) ──────────────────
+     La regla genérica `.screen > div { width:100% }` estiraba los bloques de
+     la portada: el selector de idioma salía como una banda a todo lo ancho y
+     el título quedaba oculto detrás de la barra ("está desconfigurado").
+     Aquí la portada recupera su composición: fondo a sangre, contenido en
+     columna centrada con hueco para la barra, idiomas arriba a la derecha. */
+  body.dm-web #s-splash > div { max-width: none; }
+  body.dm-web #s-splash .splash-lang {
+    position: absolute; width: auto; left: auto;
+    top: calc(var(--w-bar-total, 118px) + 18px); right: 26px;
+    background: rgba(0,0,0,0.30);
+  }
+  body.dm-web #s-splash .splash-content {
+    max-width: 620px; width: 100%;
+    margin: 0 auto;
+    padding-top: calc(var(--w-bar-total, 118px) + 40px);
+  }
+
+  /* ── Modo COMPACTO 700-1100 px (2026-08-02) ───────────────────────────
+     El diseño se dimensionó para ≥1024. Si la ventana (o el zoom del
+     navegador) deja el ancho CSS entre 700 y 1100, sin esto la barra se
+     amontonaba en tres filas ("se te ha mezclado todo"). Aquí todo encoge
+     y las filas pasan a scroll horizontal en vez de romperse. */
+  @media (max-width: 1100px) {
+    body.dm-web .dmw-bar-in { gap: 10px; padding: 8px 14px; }
+    body.dm-web .dmw-brand img { width: 30px; height: 30px; }
+    body.dm-web .dmw-brand b { font-size: 15px; }
+    body.dm-web .dmw-brand i { display: none; }
+    body.dm-web .dmw-nav {
+      flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;
+      justify-content: flex-start;
+    }
+    body.dm-web .dmw-nav::-webkit-scrollbar { display: none; }
+    body.dm-web .dmw-btn-accion { font-size: 11.5px; padding: 6px 11px; }
+    body.dm-web .dmw-saldo { padding: 5px 10px; }
+    body.dm-web .dmw-saldo b { font-size: 13px; }
+    body.dm-web .dmw-bar2-in {
+      flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;
+      gap: 14px; padding: 4px 14px 8px;
+    }
+    body.dm-web .dmw-bar2-in::-webkit-scrollbar { display: none; }
+    body.dm-web .dmw-btn-sec { font-size: 11px; }
+    body.dm-web .dmw-hero { height: 260px; }
+    body.dm-web .dmw-hero-h1 { font-size: 30px; }
+  }
 
   /* ── Pantallas grandes: más aire ──────────────────────────────────────── */
   @media (min-width: 1500px) {

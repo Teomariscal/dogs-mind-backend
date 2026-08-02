@@ -8091,7 +8091,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
       <div class="hero-banner">
         <div class="hero-overlay">
           <div class="hero-title" data-i18n="hero_title">Start a new behavioral analysis</div>
-          <button class="btn-hero" onclick="goToConsultType()" data-i18n="begin_consultation">Begin Consultation</button>
+          <button class="btn-hero" onclick="goToPuppySchool()" data-i18n="hero_puppy_btn">Escuela Cachorros</button>
         </div>
       </div>
 
@@ -9715,6 +9715,175 @@ button:not(:disabled):active{ transform:scale(0.98); }
               style="background:transparent;color:var(--cyan, #5ec8e6);border:1.5px solid rgba(94,200,230,0.5);">Nueva consulta</button>
     </div>
   </div><!-- /s-training-result -->
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       ESCUELA CACHORROS — anamnesis propia (founder 2026-08-02)
+       Reutiliza las clases tc-* del módulo de Entrenamiento (vibrant emerald):
+       cero CSS nuevo, mismo lenguaje visual. Endpoint POST /puppy-school.
+       ══════════════════════════════════════════════════════════════════════ -->
+  <div id="s-anamnesis-puppy" class="screen" style="overflow-y:auto;">
+    <header class="tc-header">
+      <button class="tc-back" onclick="goTo('s-home')" aria-label="Volver">&#8592;</button>
+      <div class="tc-header-text">
+        <p class="tc-eyebrow" data-i18n="pup_eyebrow">Escuela Cachorros</p>
+        <h1 class="tc-title" data-i18n="pup_title">Cuéntanos de tu cachorro</h1>
+      </div>
+    </header>
+
+    <div class="tc-lima-callout" data-i18n="pup_callout">Con un cachorro, la edad lo cambia todo: lo que se trabaja a las 9 semanas no es lo que se trabaja a las 20. Cuanto más preciso seas con la edad y con lo que hace ahora, mejor será el plan. Solo refuerzo positivo, sin castigos ni aversivos.</div>
+
+    <form id="pup-form" class="tc-form" onsubmit="event.preventDefault(); submitPuppySchool();" novalidate>
+
+      <div class="tc-field">
+        <label for="pup-name" data-i18n="pup_f_name">Nombre</label>
+        <input id="pup-name" type="text" maxlength="80" required>
+      </div>
+
+      <div class="tc-field">
+        <label for="pup-dob" data-i18n="pup_f_dob">Fecha de nacimiento</label>
+        <input id="pup-dob" type="date" onchange="pupCalcEdad()" required>
+      </div>
+
+      <div class="tc-field">
+        <label for="pup-weeks" data-i18n="pup_f_age">Edad actual, en semanas</label>
+        <input id="pup-weeks" type="number" min="0" max="104" inputmode="numeric" required>
+        <div id="pup-weeks-hint" style="font-size:12px;color:rgba(232,239,234,.55);margin-top:6px;line-height:1.45;" data-i18n="pup_age_hint">La calculamos desde la fecha de nacimiento. Si es adoptado y la fecha es aproximada, corrígela aquí. Esta edad queda guardada en el registro tal cual, para saber siempre qué edad tenía al empezar.</div>
+      </div>
+
+      <div class="tc-field">
+        <label for="pup-breed" data-i18n="pup_f_breed">Tipología racial</label>
+        <input id="pup-breed" type="text" maxlength="120" required>
+      </div>
+
+      <div class="tc-field">
+        <label data-i18n="pup_f_origin">¿Adoptado o de criadero?</label>
+        <div class="tc-radio-row" role="radiogroup">
+          <label class="tc-radio-pill"><input type="radio" name="pup-origin" value="adoptado" required><span data-i18n="pup_o_adopted">Adoptado</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-origin" value="criadero"><span data-i18n="pup_o_breeder">De criadero</span></label>
+        </div>
+      </div>
+
+      <div class="tc-field">
+        <label data-i18n="pup_f_wean">¿A qué edad se separó de su madre y sus hermanos?</label>
+        <div class="tc-radio-row" role="radiogroup">
+          <label class="tc-radio-pill"><input type="radio" name="pup-wean" value="antes_7" required><span data-i18n="pup_wn_early">Antes de las 7 semanas</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-wean" value="sobre_8"><span data-i18n="pup_wn_8">Sobre las 8 semanas</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-wean" value="despues_8"><span data-i18n="pup_wn_late">Después de las 8</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-wean" value="no_sabe"><span data-i18n="pup_wn_unknown">No lo sé</span></label>
+        </div>
+      </div>
+
+      <div class="tc-field">
+        <label for="pup-athome" data-i18n="pup_f_athome">¿Cuántas semanas lleva en casa?</label>
+        <input id="pup-athome" type="number" min="0" max="104" inputmode="numeric" required>
+      </div>
+
+      <div class="tc-field">
+        <label data-i18n="pup_f_dogs">¿Convive con otros perros?</label>
+        <div class="tc-radio-row" role="radiogroup">
+          <label class="tc-radio-pill"><input type="radio" name="pup-dogs" value="si" onchange="pupToggleDogs()" required><span data-i18n="pup_yes">Sí</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-dogs" value="no" onchange="pupToggleDogs()"><span data-i18n="pup_no">No</span></label>
+        </div>
+      </div>
+
+      <div class="tc-field" id="pup-dogs-ages-wrap" style="display:none;">
+        <label for="pup-dogs-ages" data-i18n="pup_f_dogs_ages">Edades de los otros perros</label>
+        <input id="pup-dogs-ages" type="text" maxlength="200" data-i18n-placeholder="pup_dogs_ages_ph" placeholder="Por ejemplo: 4 años y 9 meses">
+      </div>
+
+      <div class="tc-field">
+        <label data-i18n="pup_f_kids">¿Hay niños en casa?</label>
+        <div class="tc-radio-row" role="radiogroup">
+          <label class="tc-radio-pill"><input type="radio" name="pup-kids" value="si" onchange="pupToggleKids()" required><span data-i18n="pup_yes">Sí</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-kids" value="no" onchange="pupToggleKids()"><span data-i18n="pup_no">No</span></label>
+        </div>
+      </div>
+
+      <div class="tc-field" id="pup-kids-ages-wrap" style="display:none;">
+        <label for="pup-kids-ages" data-i18n="pup_f_kids_ages">Edades de los niños</label>
+        <input id="pup-kids-ages" type="text" maxlength="200" data-i18n-placeholder="pup_kids_ages_ph" placeholder="Por ejemplo: 4 y 9 años">
+      </div>
+
+      <div class="tc-field">
+        <label for="pup-alone" data-i18n="pup_f_alone">Horas que pasa solo al día</label>
+        <input id="pup-alone" type="number" min="0" max="16" inputmode="numeric" required>
+      </div>
+
+      <div class="tc-field">
+        <label for="pup-walks" data-i18n="pup_f_walks">Paseos al día</label>
+        <input id="pup-walks" type="number" min="0" max="12" inputmode="numeric" required>
+      </div>
+
+      <div class="tc-field">
+        <label data-i18n="pup_f_sleep">¿Dónde duerme?</label>
+        <div class="tc-radio-row" role="radiogroup">
+          <label class="tc-radio-pill"><input type="radio" name="pup-sleep" value="zona_propia" required><span data-i18n="pup_s_own">En su cama o zona propia</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-sleep" value="habitacion_familia"><span data-i18n="pup_s_room">En la habitación de alguien</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-sleep" value="cama_sofa"><span data-i18n="pup_s_bed">En la cama o el sofá con alguien</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-sleep" value="transportin"><span data-i18n="pup_s_crate">En transportín o jaula</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-sleep" value="fuera"><span data-i18n="pup_s_out">Fuera de casa</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-sleep" value="sin_sitio"><span data-i18n="pup_s_none">Sin sitio fijo</span></label>
+        </div>
+      </div>
+
+      <div class="tc-field">
+        <label data-i18n="pup_f_want">¿Qué buscas?</label>
+        <div class="tc-radio-row" role="radiogroup">
+          <label class="tc-radio-pill"><input type="radio" name="pup-want" value="prevenir" onchange="pupToggleProblema()" required><span data-i18n="pup_w_prevent">Prevenir y educar</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-want" value="problema" onchange="pupToggleProblema()"><span data-i18n="pup_w_problem">Solucionar un problema de conducta</span></label>
+        </div>
+      </div>
+
+      <div class="tc-field">
+        <label data-i18n="pup_f_area">¿Sobre qué quieres que trabajemos?</label>
+        <div style="font-size:12px;color:rgba(232,239,234,.55);margin:-2px 0 10px;line-height:1.45;" data-i18n="pup_area_hint">Empieza por una y ya trabajaremos las otras.</div>
+        <div class="tc-radio-row" role="radiogroup">
+          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="esfinteres" required><span data-i18n="pup_a_toilet">Control de esfínteres, ser limpio</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="destrozos"><span data-i18n="pup_a_damage">Evitar destrozos por falta de estimulación</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="vinculo"><span data-i18n="pup_a_bond">Trabajar un vínculo sano</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="socializacion"><span data-i18n="pup_a_social">Socialización y estimulación sensorial</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="otros_perros"><span data-i18n="pup_a_dogs">Conducta con otros perros</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="veterinario"><span data-i18n="pup_a_vet">Conducta en la clínica veterinaria</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="educacion_basica"><span data-i18n="pup_a_basic">Educación básica</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="altas_capacidades"><span data-i18n="pup_a_gifted">Escuela de altas capacidades</span></label>
+        </div>
+      </div>
+
+      <div class="tc-field" id="pup-problema-wrap" style="display:none;">
+        <label for="pup-problema" data-i18n="pup_f_problem">Describe la conducta problema lo más precisa y claramente que puedas</label>
+        <textarea id="pup-problema" rows="4" maxlength="1500" data-i18n-placeholder="pup_problem_ph" placeholder="Qué hace exactamente, cuándo empezó, en qué situaciones aparece y qué hacéis vosotros cuando ocurre"></textarea>
+      </div>
+
+      <div class="tc-field">
+        <label data-i18n="pup_f_vax">Calendario de vacunación completo (heptavalente hace más de una semana)</label>
+        <div class="tc-radio-row" role="radiogroup">
+          <label class="tc-radio-pill"><input type="radio" name="pup-vax" value="si" required><span data-i18n="pup_yes">Sí</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-vax" value="no"><span data-i18n="pup_no">No</span></label>
+        </div>
+      </div>
+
+      <button type="submit" id="pup-submit" class="tc-submit-btn" data-i18n="pup_submit">Crear el plan →</button>
+      <p id="pup-error" class="tc-error" style="display:none;"></p>
+    </form>
+
+  </div><!-- /s-anamnesis-puppy -->
+
+  <!-- Resultado del plan de crianza -->
+  <div id="s-puppy-result" class="screen" style="overflow-y:auto;">
+    <header class="tc-header">
+      <button class="tc-back" onclick="goTo('s-home')" aria-label="Volver">&#8592;</button>
+      <div class="tc-header-text">
+        <p class="tc-eyebrow" data-i18n="pupr_eyebrow">Escuela Cachorros</p>
+        <h1 class="tc-title" id="pupr-title" data-i18n="pupr_title">El plan de tu cachorro</h1>
+      </div>
+    </header>
+    <article id="pupr-content" class="tr-content"></article>
+    <div class="tr-actions" style="display:flex;flex-direction:column;gap:10px;">
+      <button id="pupr-save-btn" class="tc-submit-btn" onclick="acceptPuppyPlan()" data-i18n="pupr_save">Guardar plan</button>
+      <button class="tc-submit-btn" onclick="goTo('s-home')" data-i18n="pupr_home"
+              style="background:transparent;color:var(--cyan, #5ec8e6);border:1.5px solid rgba(94,200,230,0.5);">Volver al inicio</button>
+    </div>
+  </div><!-- /s-puppy-result -->
 
   <!-- anamnesis screen -->
   <div id="s-anamnesis" class="screen" style="overflow-y:auto;">
@@ -18378,6 +18547,177 @@ window._mdToHtml = function(md) {
 
 // Submit del formulario de entrenamiento específico.
 // Llama POST /training-analysis. Maneja 401/403/422/500. Renderiza output.
+/* ══════════════════════════════════════════════════════════════════════════
+   ESCUELA CACHORROS — envío de la anamnesis y render del plan.
+   Mismo esqueleto que submitTrainingConsult (validación → pantalla de espera →
+   POST → render), con su propio endpoint y sus propios campos.
+   ══════════════════════════════════════════════════════════════════════════ */
+window.goToPuppySchool = function() {
+  goTo('s-anamnesis-puppy');
+  try { var n = document.getElementById('pup-name'); if (n && !n.value) n.focus(); } catch(e) {}
+};
+
+/* Edad prerrellenada desde la fecha de nacimiento. Editable: si es adoptado y
+   la fecha es aproximada, manda lo que escriba el tutor. La edad que se envía
+   es la que queda congelada en el registro. */
+window.pupCalcEdad = function() {
+  var dob = document.getElementById('pup-dob');
+  var w   = document.getElementById('pup-weeks');
+  if (!dob || !w || !dob.value) return;
+  var nac = new Date(dob.value + 'T00:00:00');
+  if (isNaN(nac.getTime())) return;
+  var semanas = Math.floor((Date.now() - nac.getTime()) / 604800000);
+  if (semanas < 0) semanas = 0;
+  w.value = semanas;
+};
+
+window.pupToggleDogs = function() {
+  var el = document.querySelector('input[name="pup-dogs"]:checked');
+  var wrap = document.getElementById('pup-dogs-ages-wrap');
+  if (wrap) wrap.style.display = (el && el.value === 'si') ? '' : 'none';
+};
+
+window.pupToggleKids = function() {
+  var el = document.querySelector('input[name="pup-kids"]:checked');
+  var wrap = document.getElementById('pup-kids-ages-wrap');
+  if (wrap) wrap.style.display = (el && el.value === 'si') ? '' : 'none';
+};
+
+window.pupToggleProblema = function() {
+  var el = document.querySelector('input[name="pup-want"]:checked');
+  var wrap = document.getElementById('pup-problema-wrap');
+  if (wrap) wrap.style.display = (el && el.value === 'problema') ? '' : 'none';
+};
+
+window.submitPuppySchool = async function() {
+  var btn   = document.getElementById('pup-submit');
+  var errEl = document.getElementById('pup-error');
+  if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
+
+  function v(id){ var el=document.getElementById(id); return el ? (el.value||'').trim() : ''; }
+  function rad(n){ var el=document.querySelector('input[name="'+n+'"]:checked'); return el?el.value:''; }
+  function err(msg){ if(errEl){ errEl.textContent=msg; errEl.style.display=''; errEl.scrollIntoView({block:'center',behavior:'smooth'}); } }
+
+  var quiere = rad('pup-want');
+  var conOtros = rad('pup-dogs');
+  var conNinos = rad('pup-kids');
+
+  var d = {
+    dog_name:            v('pup-name'),
+    birth_date:          v('pup-dob'),
+    edad_semanas:        parseInt(v('pup-weeks'), 10),
+    breed:               v('pup-breed'),
+    origen:              rad('pup-origin'),
+    otros_perros:        conOtros === 'si',
+    edades_otros_perros: conOtros === 'si' ? v('pup-dogs-ages') : '',
+    paseos_dia:          parseInt(v('pup-walks'), 10),
+    donde_duerme:        rad('pup-sleep'),
+    destete:             rad('pup-wean'),
+    horas_solo:          parseInt(v('pup-alone'), 10),
+    semanas_en_casa:     parseInt(v('pup-athome'), 10),
+    ninos:               conNinos === 'si',
+    edades_ninos:        conNinos === 'si' ? v('pup-kids-ages') : '',
+    objetivo:            quiere,
+    area:                rad('pup-area'),
+    conducta_problema:   quiere === 'problema' ? v('pup-problema') : '',
+    vacunacion_completa: rad('pup-vax') === 'si',
+    lang: (typeof getCurrentLang === 'function') ? getCurrentLang() : 'es'
+  };
+
+  if (!d.dog_name)   { err(_i18nText('pup_err_name','Falta el nombre.')); return; }
+  if (!d.birth_date) { err(_i18nText('pup_err_dob','Falta la fecha de nacimiento.')); return; }
+  if (!(d.edad_semanas >= 0 && d.edad_semanas <= 104)) { err(_i18nText('pup_err_age','Revisa la edad en semanas.')); return; }
+  if (!d.breed)      { err(_i18nText('pup_err_breed','Falta la tipología racial.')); return; }
+  if (!d.origen)     { err(_i18nText('pup_err_origin','Marca si es adoptado o de criadero.')); return; }
+  if (!d.destete)    { err(_i18nText('pup_err_wean','Marca a qué edad se separó de su madre.')); return; }
+  if (!(d.semanas_en_casa >= 0)) { err(_i18nText('pup_err_athome','¿Cuántas semanas lleva en casa?')); return; }
+  if (d.semanas_en_casa > d.edad_semanas) { err(_i18nText('pup_err_athome_gt','No puede llevar en casa más semanas de las que tiene.')); return; }
+  if (!conOtros)     { err(_i18nText('pup_err_dogs','Dinos si convive con otros perros.')); return; }
+  if (!conNinos)     { err(_i18nText('pup_err_kids','Dinos si hay niños en casa.')); return; }
+  if (conNinos === 'si' && !d.edades_ninos) { err(_i18nText('pup_err_kids_ages','Pon las edades de los niños.')); return; }
+  if (!(d.horas_solo >= 0)) { err(_i18nText('pup_err_alone','¿Cuántas horas pasa solo al día?')); return; }
+  if (conOtros === 'si' && !d.edades_otros_perros) { err(_i18nText('pup_err_dogs_ages','Pon las edades de los otros perros.')); return; }
+  if (!(d.paseos_dia >= 0)) { err(_i18nText('pup_err_walks','¿Cuántos paseos al día?')); return; }
+  if (!d.donde_duerme) { err(_i18nText('pup_err_sleep','Marca dónde duerme.')); return; }
+  if (!quiere)       { err(_i18nText('pup_err_want','Marca qué buscas.')); return; }
+  if (!d.area)       { err(_i18nText('pup_err_area','Elige por dónde empezamos.')); return; }
+  if (quiere === 'problema' && d.conducta_problema.length < 10) { err(_i18nText('pup_err_problem','Describe la conducta problema con algo más de detalle.')); return; }
+  if (!rad('pup-vax')) { err(_i18nText('pup_err_vax','Marca si el calendario de vacunación está completo.')); return; }
+
+  var jwt=''; try { jwt = localStorage.getItem('dm_jwt') || ''; } catch(e) {}
+  if (!jwt) { err(_i18nText('session_expired','Sesión caducada.')); goTo('s-splash'); return; }
+
+  var prev = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = _i18nText('pup_submitting','Creando el plan…'); }
+  goTo('s-training-loading');
+  try { var _e=document.querySelector('#s-training-loading .tl-eyebrow'); if(_e) _e.textContent=_i18nText('pup_eyebrow','Escuela Cachorros'); } catch(e) {}
+
+  try {
+    var res = await fetch(API_BASE + '/puppy-school', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+jwt},
+      body: JSON.stringify(d)
+    });
+    if (res.status === 401) { if(btn){btn.disabled=false;btn.textContent=prev;} goTo('s-splash'); return; }
+    if (res.status === 402) { if(btn){btn.disabled=false;btn.textContent=prev;} goTo('s-anamnesis-puppy'); showRechargeNotice(quiere === 'problema' ? 3 : 1.5); return; }
+    if (!res.ok) {
+      var de={}; try { de = await res.json(); } catch(e){}
+      var msg = Array.isArray(de.detail) ? de.detail.map(function(x){return x.msg||'';}).join(' · ')
+                                         : (de.detail || ('HTTP '+res.status));
+      goTo('s-anamnesis-puppy'); err(msg);
+      if (btn) { btn.disabled=false; btn.textContent=prev; }
+      return;
+    }
+    var data = await res.json();
+    var md = data.plan || '';
+    var cont = document.getElementById('pupr-content');
+    if (cont) cont.innerHTML = window._mdToHtml(md);
+    var tit = document.getElementById('pupr-title');
+    if (tit) tit.textContent = (data.tipo === 'analisis_funcional')
+      ? _i18nText('pupr_title_abc', 'El análisis de ' + d.dog_name)
+      : _i18nText('pupr_title', 'El plan de ' + d.dog_name);
+    var sb = document.getElementById('pupr-save-btn'); if (sb) sb.style.display = '';
+    window._lastPuppyData = d;
+    window._lastPuppyPlan = md;
+    window._lastPuppyDogName = d.dog_name;
+    try { if (typeof fetchBalance === 'function') fetchBalance(); } catch(e) {}
+    if (btn) { btn.disabled=false; btn.textContent=prev; }
+    goTo('s-puppy-result');
+  } catch (e) {
+    goTo('s-anamnesis-puppy');
+    err(_i18nText('pup_err_network','No se pudo conectar. Comprueba tu red e inténtalo de nuevo.'));
+    if (btn) { btn.disabled=false; btn.textContent=prev; }
+  }
+};
+
+/* Guarda el plan como caso, para que quede en Registros de conducta. */
+window.acceptPuppyPlan = async function() {
+  var btn = document.getElementById('pupr-save-btn');
+  if (!window._lastPuppyPlan) return;
+  var prev = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = _i18nText('pup_saving','Guardando…'); }
+  try {
+    var jwt = localStorage.getItem('dm_jwt') || '';
+    var r = await fetch(API_BASE + '/cases/migrate', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+jwt},
+      body: JSON.stringify({
+        dog_name: window._lastPuppyDogName || '',
+        case_type: 'puppy',
+        abc_analysis: window._lastPuppyPlan
+      })
+    });
+    if (r.ok) {
+      if (btn) { btn.textContent = _i18nText('pup_saved','Plan guardado'); btn.style.display='none'; }
+      if (typeof syncBackendCases === 'function') syncBackendCases();
+    } else {
+      if (btn) { btn.disabled=false; btn.textContent=prev; }
+    }
+  } catch (e) {
+    if (btn) { btn.disabled=false; btn.textContent=prev; }
+  }
+};
+
 window.submitTrainingConsult = async function() {
   var btn = document.getElementById('tc-submit');
   var errEl = document.getElementById('tc-error');
@@ -19606,6 +19946,60 @@ function endTourIntro() {
       // Tokens
       tokens_title:    'Mis Tokens',
       // Planes de suscripción (agosto 2026)
+      // Escuela Cachorros (founder 2026-08-02)
+      hero_puppy_btn:  'Escuela Cachorros',
+      pup_eyebrow:     'Escuela Cachorros',
+      pup_title:       'Cuéntanos de tu cachorro',
+      pup_callout:     'Con un cachorro la edad lo cambia todo: lo que se trabaja a las 9 semanas no es lo que se trabaja a las 20. Solo refuerzo positivo, sin castigos ni aversivos.',
+      pup_f_name:      'Nombre',
+      pup_f_dob:       'Fecha de nacimiento',
+      pup_f_age:       'Edad actual, en semanas',
+      pup_age_hint:    'La calculamos desde la fecha de nacimiento. Si es adoptado y la fecha es aproximada, corrígela aquí. Esta edad queda guardada en el registro tal cual, para saber siempre qué edad tenía al empezar.',
+      pup_f_breed:     'Tipología racial',
+      pup_f_origin:    '¿Adoptado o de criadero?',
+      pup_o_adopted:   'Adoptado',
+      pup_o_breeder:   'De criadero',
+      pup_f_wean:      '¿A qué edad se separó de su madre y sus hermanos?',
+      pup_wn_early:    'Antes de las 7 semanas',
+      pup_wn_8:        'Sobre las 8 semanas',
+      pup_wn_late:     'Después de las 8',
+      pup_wn_unknown:  'No lo sé',
+      pup_f_athome:    '¿Cuántas semanas lleva en casa?',
+      pup_f_dogs:      '¿Convive con otros perros?',
+      pup_f_dogs_ages: 'Edades de los otros perros',
+      pup_f_kids:      '¿Hay niños en casa?',
+      pup_f_kids_ages: 'Edades de los niños',
+      pup_f_alone:     'Horas que pasa solo al día',
+      pup_f_walks:     'Paseos al día',
+      pup_f_sleep:     '¿Dónde duerme?',
+      pup_s_own:       'En su cama o zona propia',
+      pup_s_room:      'En la habitación de alguien',
+      pup_s_bed:       'En la cama o el sofá con alguien',
+      pup_s_crate:     'En transportín o jaula',
+      pup_s_out:       'Fuera de casa',
+      pup_s_none:      'Sin sitio fijo',
+      pup_f_want:      '¿Qué buscas?',
+      pup_w_prevent:   'Prevenir y educar',
+      pup_w_problem:   'Solucionar un problema de conducta',
+      pup_f_area:      '¿Sobre qué quieres que trabajemos?',
+      pup_area_hint:   'Empieza por una y ya trabajaremos las otras.',
+      pup_a_toilet:    'Control de esfínteres, ser limpio',
+      pup_a_damage:    'Evitar destrozos por falta de estimulación',
+      pup_a_bond:      'Trabajar un vínculo sano',
+      pup_a_social:    'Socialización y estimulación sensorial',
+      pup_a_dogs:      'Conducta con otros perros',
+      pup_a_vet:       'Conducta en la clínica veterinaria',
+      pup_a_basic:     'Educación básica',
+      pup_a_gifted:    'Escuela de altas capacidades',
+      pup_f_problem:   'Describe la conducta problema lo más precisa y claramente que puedas',
+      pup_f_vax:       'Calendario de vacunación completo (heptavalente hace más de una semana)',
+      pup_yes:         'Sí',
+      pup_no:          'No',
+      pup_submit:      'Crear el plan →',
+      pup_submitting:  'Creando el plan…',
+      pupr_eyebrow:    'Escuela Cachorros',
+      pupr_save:       'Guardar',
+      pupr_home:       'Volver al inicio',
       pw_title:   'Elige tu plan',
       pw_sub:     'Créditos que se renuevan cada mes',
       pw_balance: 'Tu saldo',
@@ -20598,6 +20992,60 @@ function endTourIntro() {
       // Tokens
       tokens_title:    'My Tokens',
       // Subscription plans (August 2026)
+      // Puppy School
+      hero_puppy_btn:  'Puppy School',
+      pup_eyebrow:     'Puppy School',
+      pup_title:       'Tell us about your puppy',
+      pup_callout:     'With a puppy, age changes everything: what you work on at 9 weeks is not what you work on at 20. Positive reinforcement only, no punishment, no aversives.',
+      pup_f_name:      'Name',
+      pup_f_dob:       'Date of birth',
+      pup_f_age:       'Age today, in weeks',
+      pup_age_hint:    'We work it out from the date of birth. If the puppy was adopted and the date is approximate, correct it here. This age is stored in the record as it is, so you always know how old the puppy was at the start.',
+      pup_f_breed:     'Breed type',
+      pup_f_origin:    'Adopted or from a breeder?',
+      pup_o_adopted:   'Adopted',
+      pup_o_breeder:   'From a breeder',
+      pup_f_wean:      'At what age did it leave its mother and littermates?',
+      pup_wn_early:    'Before 7 weeks',
+      pup_wn_8:        'Around 8 weeks',
+      pup_wn_late:     'After 8 weeks',
+      pup_wn_unknown:  "I don't know",
+      pup_f_athome:    'How many weeks has it been at home?',
+      pup_f_dogs:      'Does it live with other dogs?',
+      pup_f_dogs_ages: 'Ages of the other dogs',
+      pup_f_kids:      'Are there children at home?',
+      pup_f_kids_ages: 'Ages of the children',
+      pup_f_alone:     'Hours alone per day',
+      pup_f_walks:     'Walks per day',
+      pup_f_sleep:     'Where does it sleep?',
+      pup_s_own:       'In its own bed or space',
+      pup_s_room:      "In someone's bedroom",
+      pup_s_bed:       'In the bed or sofa with someone',
+      pup_s_crate:     'In a crate',
+      pup_s_out:       'Outside the house',
+      pup_s_none:      'No fixed place',
+      pup_f_want:      'What are you looking for?',
+      pup_w_prevent:   'Prevent and educate',
+      pup_w_problem:   'Solve a behaviour problem',
+      pup_f_area:      'What should we work on?',
+      pup_area_hint:   'Start with one, we will work on the others later.',
+      pup_a_toilet:    'House training',
+      pup_a_damage:    'Avoiding damage from under-stimulation',
+      pup_a_bond:      'Building a healthy bond',
+      pup_a_social:    'Socialisation and sensory enrichment',
+      pup_a_dogs:      'Behaviour with other dogs',
+      pup_a_vet:       'Behaviour at the vet clinic',
+      pup_a_basic:     'Basic education',
+      pup_a_gifted:    'Gifted school: maximising genetic potential',
+      pup_f_problem:   'Describe the problem behaviour as precisely and clearly as you can',
+      pup_f_vax:       'Full vaccination schedule (heptavalent more than a week ago)',
+      pup_yes:         'Yes',
+      pup_no:          'No',
+      pup_submit:      'Create the plan →',
+      pup_submitting:  'Creating the plan…',
+      pupr_eyebrow:    'Puppy School',
+      pupr_save:       'Save',
+      pupr_home:       'Back to home',
       pw_title:   'Choose your plan',
       pw_sub:     'Credits that renew every month',
       pw_balance: 'Your balance',
@@ -21592,6 +22040,60 @@ function endTourIntro() {
           // Tokens
           tokens_title:    'I miei Tokens',
           // Piani di abbonamento (agosto 2026)
+          // Scuola Cuccioli
+          hero_puppy_btn:  'Scuola Cuccioli',
+          pup_eyebrow:     'Scuola Cuccioli',
+          pup_title:       'Raccontaci del tuo cucciolo',
+          pup_callout:     "Con un cucciolo l'età cambia tutto: quello che si lavora a 9 settimane non è quello che si lavora a 20. Solo rinforzo positivo, senza punizioni né aversivi.",
+          pup_f_name:      'Nome',
+          pup_f_dob:       'Data di nascita',
+          pup_f_age:       'Età attuale, in settimane',
+          pup_age_hint:    "La calcoliamo dalla data di nascita. Se è adottato e la data è approssimativa, correggila qui. Questa età resta salvata nel registro così com'è.",
+          pup_f_breed:     'Tipologia razziale',
+          pup_f_origin:    'Adottato o da allevamento?',
+          pup_o_adopted:   'Adottato',
+          pup_o_breeder:   'Da allevamento',
+          pup_f_wean:      'A che età si è separato da madre e fratelli?',
+          pup_wn_early:    'Prima delle 7 settimane',
+          pup_wn_8:        'Intorno alle 8 settimane',
+          pup_wn_late:     'Dopo le 8',
+          pup_wn_unknown:  'Non lo so',
+          pup_f_athome:    'Da quante settimane è in casa?',
+          pup_f_dogs:      'Convive con altri cani?',
+          pup_f_dogs_ages: 'Età degli altri cani',
+          pup_f_kids:      'Ci sono bambini in casa?',
+          pup_f_kids_ages: 'Età dei bambini',
+          pup_f_alone:     'Ore da solo al giorno',
+          pup_f_walks:     'Passeggiate al giorno',
+          pup_f_sleep:     'Dove dorme?',
+          pup_s_own:       'Nella sua cuccia o zona propria',
+          pup_s_room:      'Nella camera di qualcuno',
+          pup_s_bed:       'Nel letto o sul divano con qualcuno',
+          pup_s_crate:     'In trasportino o gabbia',
+          pup_s_out:       'Fuori casa',
+          pup_s_none:      'Senza posto fisso',
+          pup_f_want:      'Che cosa cerchi?',
+          pup_w_prevent:   'Prevenire ed educare',
+          pup_w_problem:   'Risolvere un problema di comportamento',
+          pup_f_area:      'Su cosa vuoi che lavoriamo?',
+          pup_area_hint:   'Inizia da una, le altre le lavoreremo poi.',
+          pup_a_toilet:    'Controllo degli sfinteri, essere pulito',
+          pup_a_damage:    'Evitare danni per mancanza di stimolazione',
+          pup_a_bond:      'Costruire un legame sano',
+          pup_a_social:    'Socializzazione e stimolazione sensoriale',
+          pup_a_dogs:      'Comportamento con altri cani',
+          pup_a_vet:       'Comportamento in clinica veterinaria',
+          pup_a_basic:     'Educazione di base',
+          pup_a_gifted:    'Scuola di alte capacità',
+          pup_f_problem:   'Descrivi il comportamento problema nel modo più preciso e chiaro possibile',
+          pup_f_vax:       'Calendario vaccinale completo (eptavalente da più di una settimana)',
+          pup_yes:         'Sì',
+          pup_no:          'No',
+          pup_submit:      'Crea il piano →',
+          pup_submitting:  'Sto creando il piano…',
+          pupr_eyebrow:    'Scuola Cuccioli',
+          pupr_save:       'Salva',
+          pupr_home:       'Torna alla home',
           pw_title:   'Scegli il tuo piano',
           pw_sub:     'Crediti che si rinnovano ogni mese',
           pw_balance: 'Il tuo saldo',

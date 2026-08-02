@@ -14,6 +14,7 @@ from app.config import get_settings
 from app.core.anthropic_client import get_anthropic_client, create_message_resilient
 from app.core.prompts.intervention import INTERVENTION_SYSTEM_PROMPT
 from app.core.prompts.petowner_intervention import PETOWNER_INTERVENTION_SYSTEM_PROMPT
+from app.services.tea_pilot import apply_tea_override
 from app.models.intervention import InterventionRequest, InterventionResponse
 from app.services.italian_veneer import maybe_apply_italian_veneer
 from app.services.italian_cognitive import cognitive_path_applies, apply_cognitive_reexpression
@@ -35,6 +36,7 @@ def run_intervention_plan(request: InterventionRequest, account_type=None) -> In
     sys_prompt = PETOWNER_INTERVENTION_SYSTEM_PROMPT if is_petowner else INTERVENTION_SYSTEM_PROMPT
 
     a = request.anamnesis
+    sys_prompt = apply_tea_override(sys_prompt, getattr(a, 'problem_description', ''))
 
     # Build a concise anamnesis summary for the user message
     _sex = "Male" if a.dog_sex == "male" else ("Female" if a.dog_sex == "female" else "Not provided")

@@ -70,6 +70,8 @@ def run_plan_simple(*, original_plan_text: str, lang: str = "es") -> PlanSimpleR
                   "proprietario del cane. Applica le tue regole, e scrivi TUTTO in italiano:\n\n")
     else:
         _intro = "Aquí tienes el plan de intervención técnico que debes reformular como guía paso-a-paso para el dueño del perro. Aplica tus reglas duras:\n\n"
+    from app.services.tea_pilot import apply_tea_override
+    system_prompt = apply_tea_override(system_prompt, original_plan_text)
     user_message = _intro + original_plan_text.strip()
 
     response = client.messages.create(

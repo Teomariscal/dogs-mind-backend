@@ -20,6 +20,7 @@ from app.config import get_settings
 from app.core.anthropic_client import get_anthropic_client, create_message_resilient
 from app.core.prompts.clinical import CLINICAL_SYSTEM_PROMPT
 from app.core.prompts.petowner_clinical import PETOWNER_CLINICAL_SYSTEM_PROMPT
+from app.services.tea_pilot import apply_tea_override
 from app.models.anamnesis import AnamnesisInput, AnalysisResponse, RetrievedChunk
 from app.services.rag import retrieve, build_rag_context_block, build_anamnesis_block
 from app.services.italian_veneer import maybe_apply_italian_veneer
@@ -122,6 +123,7 @@ def run_clinical_analysis(
     # (el sistema cae SIEMPRE hacia la versión más completa ante la duda).
     is_petowner = (account_type or "").strip().lower() == "particular"
     sys_prompt = PETOWNER_CLINICAL_SYSTEM_PROMPT if is_petowner else CLINICAL_SYSTEM_PROMPT
+    sys_prompt = apply_tea_override(sys_prompt, getattr(anamnesis, 'problem_description', ''))
 
     # ── 1. RAG retrieval ────────────────────────────────────────────────────
     query = _build_query_from_anamnesis(anamnesis)

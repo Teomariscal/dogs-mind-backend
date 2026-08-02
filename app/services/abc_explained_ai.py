@@ -70,6 +70,8 @@ def run_abc_explained(*, original_abc_text: str, lang: str = "es") -> AbcExplain
     else:
         _intro = ("Aquí tienes el análisis ABC técnico que debes traducir a lenguaje sencillo para el dueño del perro. "
                   "Aplica tus reglas duras y la estructura de 4 párrafos:\n\n")
+    from app.services.tea_pilot import apply_tea_override
+    system_prompt = apply_tea_override(system_prompt, original_abc_text)
     user_message = _intro + original_abc_text.strip()
 
     response = client.messages.create(

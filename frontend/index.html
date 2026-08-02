@@ -6016,6 +6016,18 @@ button:not(:disabled):active{ transform:scale(0.98); }
   padding: 0;
 }
 #s-anamnesis-training.active { display: block; }
+
+/* Escuela Cachorros — mismo fondo vibrant que Entrenamiento. Sin esto las
+   pantallas caían al crema por defecto de .screen. */
+#s-anamnesis-puppy,
+#s-puppy-result {
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(94,200,230,0.10) 0%, transparent 60%),
+    linear-gradient(180deg, #0a1a14 0%, #122a23 28%, #1a3b34 55%, #2e4a3a 80%, #4a6741 100%);
+  padding: 0;
+}
+#s-anamnesis-puppy.active,
+#s-puppy-result.active { display: block; }
 .tc-header {
   display: flex;
   align-items: center;

@@ -1,3 +1,4 @@
+// v234 (ESCUELA CACHORROS: el botón del hero de inicio pasa de "Comenzar consulta" a "Escuela Cachorros" (los otros 9 accesos a consulta de conducta siguen intactos). Anamnesis propia de cachorro definida por el founder + 5 campos aprobados a propuesta mía; la edad se prerrellena desde la fecha de nacimiento y se guarda CONGELADA, porque el registro debe conservar la edad que tenía el día de la consulta. Dos salidas en el mismo formulario, nunca mezclado con el flujo de adultos: "Prevenir y educar" → plan de crianza (150 cr) y "Problema de conducta" → análisis funcional con lente evolutiva que decide primero si es ontogenia normal (300 cr). Pantallas con fondo vibrant propio: sin esa regla caían al crema por defecto de .screen. 2026-08-02)
 // v233 (planes: franja de transparencia arriba, antes de las tarjetas — "Cancela tu suscripción cuando quieras. Total transparencia." (copy del founder, es/en/it). 2026-08-02)
 // v232 (planes en escritorio: el centrado necesitaba !important porque las tarjetas llevan margen en línea. 2026-08-01)
 // v231 (planes: en la web de escritorio la columna se centra a 640px en vez de ocupar todo el ancho; regla dentro de web-desktop.css, que la app nativa ni siquiera carga. 2026-08-01)
@@ -40,7 +41,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v233';
+const CACHE_NAME = 'dogs-mind-v234';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

@@ -14,6 +14,7 @@ from app.api.routes import daily_tip as daily_tip_router
 from app.api.routes import delegations as delegations_router
 from app.api.routes import subscriptions as subscriptions_router
 from app.api.routes import puppy_school as puppy_school_router
+from app.api.routes import walks as walks_router
 from app.api.routes import training as training_router
 from app.api.routes import training_consult as training_consult_router
 from app.api.routes import app_config as app_config_router
@@ -309,6 +310,7 @@ app.include_router(training_consult_router.router)
 app.include_router(app_config_router.router)
 app.include_router(subscriptions_router.router)
 app.include_router(puppy_school_router.router)
+app.include_router(walks_router.router)
 
 
 @app.get("/", include_in_schema=False)

@@ -1,7 +1,9 @@
 import os
 import uuid
 import stripe
-from fastapi import APIRouter, Depends, HTTPException, Request
+from typing import Optional
+
+from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from pydantic import BaseModel
@@ -17,6 +19,20 @@ stripe.api_key = os.environ.get("STRIPE_SECRET_KEY", "").strip()
 WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
 
 APP_URL = os.environ.get("APP_URL", "https://thedogsmindbeta.netlify.app")
+
+# Retorno de Stripe multi-dominio (2026-08-04): la misma API sirve a varios
+# frontends (thedogsmind.net y abacompanion.net). Si el Origin de la petición
+# está en la allowlist de CORS, el usuario vuelve a SU web tras pagar; si no,
+# se usa APP_URL como hasta ahora (cero cambio para el tráfico existente).
+def _return_base(origin: str | None) -> str:
+    try:
+        from app.main import _ALLOWED_ORIGINS
+        o = (origin or "").strip().rstrip("/")
+        if o and o in _ALLOWED_ORIGINS and o.startswith("https://"):
+            return o
+    except Exception:
+        pass
+    return APP_URL
 
 # Packs disponibles (1 token ≈ €1 → análisis=3tok, chat=0.25tok, avatar=0.10tok)
 PACKS = {
@@ -95,6 +111,7 @@ class CheckoutRequest(BaseModel):
 @router.post("/payments/checkout")
 def create_checkout(
     req: CheckoutRequest,
+    origin: Optional[str] = Header(None),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -121,8 +138,8 @@ def create_checkout(
                 "tokens":  str(pack["tokens"]),
             },
             customer_email=current_user.email,
-            success_url=f"{APP_URL}?payment=success&tokens={pack['tokens']}",
-            cancel_url=f"{APP_URL}?payment=cancelled",
+            success_url=f"{_return_base(origin)}?payment=success&tokens={pack['tokens']}",
+            cancel_url=f"{_return_base(origin)}?payment=cancelled",
         )
     except stripe.error.AuthenticationError:
         raise HTTPException(status_code=500, detail="STRIPE_SECRET_KEY inválida. Revisa la variable en Railway.")
@@ -151,6 +168,7 @@ class PlanCheckoutRequest(BaseModel):
 @router.post("/payments/plan-checkout")
 def create_plan_checkout(
     req: PlanCheckoutRequest,
+    origin: Optional[str] = Header(None),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -184,8 +202,8 @@ def create_plan_checkout(
             metadata={"user_id": str(current_user.id), "plan_id": plan["id"]},
             subscription_data={"metadata": {"user_id": str(current_user.id), "plan_id": plan["id"]}},
             customer_email=current_user.email,
-            success_url=f"{APP_URL}?sub=ok&plan={plan['id']}",
-            cancel_url=f"{APP_URL}?sub=cancelled",
+            success_url=f"{_return_base(origin)}?sub=ok&plan={plan['id']}",
+            cancel_url=f"{_return_base(origin)}?sub=cancelled",
         )
     except stripe.error.StripeError as e:
         raise HTTPException(status_code=500, detail=f"Error de Stripe: {str(e)}")
@@ -201,6 +219,7 @@ class ProCheckoutRequest(BaseModel):
 @router.post("/payments/pro-checkout")
 def create_pro_checkout(
     req: ProCheckoutRequest,
+    origin: Optional[str] = Header(None),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -246,8 +265,8 @@ def create_pro_checkout(
                 "with_bundle":  "true" if req.with_bundle else "false",
             },
             customer_email=current_user.email,
-            success_url=f"{APP_URL}?payment=pro_success",
-            cancel_url=f"{APP_URL}?payment=pro_cancelled",
+            success_url=f"{_return_base(origin)}?payment=pro_success",
+            cancel_url=f"{_return_base(origin)}?payment=pro_cancelled",
         )
     except stripe.error.AuthenticationError:
         raise HTTPException(status_code=500, detail="STRIPE_SECRET_KEY inválida. Revisa la variable en Railway.")

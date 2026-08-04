@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   WORLD WIDE DOG WALKING — versión real (v1), solo WEB
+   WORLD WIDE DOG WALKING — versión real (v1): web Y app desde 1.0.5
    ---------------------------------------------------------------------------
    AISLAMIENTO (founder 2026-07-28, "prioridad máxima: no afectar a las apps"):
    este archivo lo carga web-desktop.js bajo demanda, y web-desktop.js solo
@@ -18,9 +18,16 @@
 (function () {
   'use strict';
 
+  /* Desde 1.0.5 el paseo TAMBIÉN va en la app (founder 2026-08-02 "metelos"):
+     en nativo pasa siempre; en web sigue exigiendo la capa dm-web, que solo
+     existe fuera de la app. Antes esta guarda cortaba el fichero en nativo:
+     el script cargaba pero no llegaba a definir dmwWalkMontar, así que el
+     planificador abría sin mapa. */
   try {
-    if (typeof window.dmIsNativeApp === 'function' && window.dmIsNativeApp()) return;
-    if (!document.body || !document.body.classList.contains('dm-web')) return;
+    var _nativo = (typeof window.dmIsNativeApp === 'function' && window.dmIsNativeApp()) ||
+                  !!(window.Capacitor && window.Capacitor.isNativePlatform &&
+                     window.Capacitor.isNativePlatform());
+    if (!_nativo && (!document.body || !document.body.classList.contains('dm-web'))) return;
   } catch (e) { return; }
 
   var LEAFLET_CSS = 'vendor/leaflet/leaflet.css';  /* local: sin CDN en el binario */

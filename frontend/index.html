@@ -15193,10 +15193,9 @@ function dmInitPaseoNativo() {
     var nativo = (typeof dmIsNativeApp === 'function' && dmIsNativeApp()) ||
                  (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
     if (!nativo) return;   /* en web lo gestiona dmInitWebLayer */
-    var sw = document.createElement('script');
-    sw.src = 'web-walk.js';
-    sw.defer = true;
-    document.head.appendChild(sw);
+    /* Solo web-paseo.js: él carga web-walk.js bajo demanda cuando el usuario
+       abre "El paseo de hoy". Cargarlo aquí eran 34 KB de más en cada
+       arranque, sin ganar nada. */
     var sp = document.createElement('script');
     sp.src = 'web-paseo.js';
     sp.defer = true;

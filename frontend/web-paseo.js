@@ -9,9 +9,12 @@
   'use strict';
 
   try {
-    if (typeof window.dmIsNativeApp === 'function' && window.dmIsNativeApp()) return;
-    if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) return;
-    if (!document.body || !document.body.classList.contains('dm-web')) return;
+    /* En la APP el paseo entra en 1.0.5 (founder 2026-08-02 "metelos"):
+       nativo pasa siempre; en web sigue exigiendo la capa dm-web. */
+    var _nativo = false;
+    try { _nativo = (typeof window.dmIsNativeApp === 'function' && window.dmIsNativeApp()) ||
+                    !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()); } catch (e) {}
+    if (!_nativo && (!document.body || !document.body.classList.contains('dm-web'))) return;
   } catch (e) { return; }
 
   var CSS = ''

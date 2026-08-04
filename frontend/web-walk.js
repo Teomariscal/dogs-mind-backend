@@ -23,8 +23,8 @@
     if (!document.body || !document.body.classList.contains('dm-web')) return;
   } catch (e) { return; }
 
-  var LEAFLET_CSS = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-  var LEAFLET_JS  = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  var LEAFLET_CSS = 'vendor/leaflet/leaflet.css';  /* local: sin CDN en el binario */
+  var LEAFLET_JS  = 'vendor/leaflet/leaflet.js';
   var OVERPASS    = 'https://overpass-api.de/api/interpreter';
   var OSRM        = 'https://routing.openstreetmap.de/routed-foot/route/v1/foot/';
   var NOMINATIM   = 'https://nominatim.openstreetmap.org/search';
@@ -488,7 +488,32 @@
     if (e) e.textContent = t;
   }
 
+  /* Cobro del paseo: 10 créditos (0,1 tk) por planificación, precio de salida
+     del founder — "ningún uso es gratis". Solo con sesión; si no hay saldo,
+     sale el aviso de recarga y no se genera. Si el cobro falla por red, el
+     paseo NO se bloquea (fail-open, como el resto de la app). */
+  async function cobrarPaseo() {
+    var jwt = ''; try { jwt = localStorage.getItem('dm_jwt') || ''; } catch (e) {}
+    if (!jwt) return true;  /* sin sesión (web pública): no hay a quién cobrar */
+    try {
+      var base = (typeof API_URL !== 'undefined' && API_URL) ? API_URL
+                : 'https://dogs-mind-backend-production.up.railway.app';
+      var r = await fetch(base + '/walks/charge', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + jwt }
+      });
+      if (r.status === 402) {
+        if (typeof showRechargeNotice === 'function') showRechargeNotice(0.1);
+        else estadoTexto('Te has quedado sin créditos para el paseo.');
+        return false;
+      }
+      if (r.ok && typeof fetchBalance === 'function') { try { fetchBalance(); } catch (e) {} }
+      return true;
+    } catch (e) { return true; }
+  }
+
   async function generar(centro, etiqueta) {
+    if (!(await cobrarPaseo())) return;
     estado.centro = centro;
     estadoTexto('Buscando zonas verdes y servicios…');
     capaRutas.clearLayers(); capaPois.clearLayers();

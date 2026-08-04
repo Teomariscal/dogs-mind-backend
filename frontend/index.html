@@ -6032,7 +6032,10 @@ button:not(:disabled):active{ transform:scale(0.98); }
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 24px 20px 12px;
+  /* Área segura de iOS: sin esto la cabecera se mete bajo el reloj y la isla
+     dinámica (visto en simulador 2026-08-04). Afecta a Entrenamiento
+     Específico y a las dos pantallas de Escuela Cachorros. */
+  padding: max(24px, calc(env(safe-area-inset-top, 0px) + 12px)) 20px 12px;
 }
 .tc-back {
   flex-shrink: 0;
@@ -8580,7 +8583,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
        radial-gradient(ellipse 700px 420px at 50% -8%, rgba(94,200,230,.12), transparent 62%),
        linear-gradient(180deg,#0a1a14 0%,#0e1f1a 55%,#14302a 100%);">
 
-    <div style="display:flex;align-items:center;gap:12px;padding:18px 16px 12px;flex-shrink:0;">
+    <div style="display:flex;align-items:center;gap:12px;padding:max(18px, calc(env(safe-area-inset-top, 0px) + 12px)) 16px 12px;flex-shrink:0;">
       <button id="planes-back" onclick="goTo('s-home')" style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);color:#e8efea;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0;">&#8592;</button>
       <div>
         <div style="font-size:18px;font-weight:700;color:#fff;letter-spacing:-0.3px;" data-i18n="pw_title">Elige tu plan</div>
@@ -13276,6 +13279,38 @@ async function plSubmit() {
 }
 window.plSubmit = plSubmit;
 
+/* Desde el formulario de ALTA: mismo correo de restablecimiento, cogiendo el
+   email que el usuario acaba de escribir. */
+/* Añade el enlace de recuperación como elemento DOM dentro del error del alta.
+   No se puede ir por _psShowError porque esa función escribe textContent. */
+function _psAppendForgotLink() {
+  try {
+    var el = document.getElementById('ps-error');
+    if (!el || el.querySelector('.ps-forgot-link')) return;
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'ps-forgot-link';
+    b.textContent = _i18nText('ps_forgot_link', '¿No recuerdas la contraseña? Te enviamos un enlace');
+    b.style.cssText = 'display:block;margin-top:8px;background:none;border:none;padding:0;' +
+                      'color:#5ec8e6;text-decoration:underline;cursor:pointer;font:inherit;';
+    b.onclick = function () { window.psForgotFromSignup(); };
+    el.appendChild(b);
+  } catch (e) {}
+}
+
+window.psForgotFromSignup = async function() {
+  var email = ((document.getElementById('ps-email') || {}).value || '').trim();
+  if (!email || !/.+@.+\..+/.test(email)) return;
+  try {
+    await fetch(API_BASE + '/auth/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    });
+    showToast(_i18nText('pl_forgot_sent', 'Si el email existe, te hemos enviado un enlace para restablecer la contraseña.'));
+  } catch (e) {}
+};
+
 async function plForgotPassword() {
   var email = (document.getElementById('pl-email') || {}).value || '';
   email = email.trim();
@@ -13645,7 +13680,11 @@ async function psSubmit() {
         try { msg = await regRes.text(); } catch(e) {}
         // Si el email ya existe, sugerimos login (backend devuelve 400 con detail)
         if (regRes.status === 409 || /exist|already|registr/i.test(msg)) {
+          /* Salida del callejón (crisis 31-jul): además del aviso, un enlace
+             que manda el correo de restablecer AHÍ MISMO, sin obligar a
+             navegar buscando el "olvidé mi contraseña". */
           _psShowError(_i18nText('ps_err_email_exists', 'Este email ya está registrado. Inicia sesión y vuelve a Activar Profesional.'));
+          _psAppendForgotLink();
         } else {
           _psShowError(_i18nText('ps_err_register', 'No se pudo crear la cuenta.') + ' ' + (msg || ''));
         }
@@ -15143,6 +15182,30 @@ window.dmInitWebLayer = dmInitWebLayer;
 if (document.readyState !== 'loading') { dmInitWebLayer(); }
 else { document.addEventListener('DOMContentLoaded', dmInitWebLayer); }
 
+/* ════ PASEOS EN LA APP (founder 2026-08-02 "metelos") ══════════════════════
+   En nativo la capa de escritorio no se carga, pero el paseo SÍ: tarjeta
+   "El paseo de hoy" bajo el hero + planificador a pantalla completa.
+   Los ficheros llevan su propio CSS móvil y Leaflet va empaquetado en el
+   binario (vendor/leaflet, sin CDN). El cobro de 10 créditos lo hace el
+   propio planificador contra /walks/charge. */
+function dmInitPaseoNativo() {
+  try {
+    var nativo = (typeof dmIsNativeApp === 'function' && dmIsNativeApp()) ||
+                 (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+    if (!nativo) return;   /* en web lo gestiona dmInitWebLayer */
+    var sw = document.createElement('script');
+    sw.src = 'web-walk.js';
+    sw.defer = true;
+    document.head.appendChild(sw);
+    var sp = document.createElement('script');
+    sp.src = 'web-paseo.js';
+    sp.defer = true;
+    document.head.appendChild(sp);
+  } catch (e) { /* nunca romper el arranque de la app por el paseo */ }
+}
+if (document.readyState !== 'loading') { dmInitPaseoNativo(); }
+else { document.addEventListener('DOMContentLoaded', dmInitPaseoNativo); }
+
 // ════ RevenueCat IAP (iOS) — Fase 2 ════════════════════════════════════════════
 // Cablea los 3 puntos de compra de iOS sobre los guards dmIsIosNative(). INERTE en
 // web/Android: dmRcPlugin() devuelve null (el plugin nativo no existe) y nada se
@@ -15193,12 +15256,23 @@ async function _dmRcBuyProduct(storeProductId) {
   var P = dmRcPlugin(); if (!P) throw new Error('no-plugin');
   await dmRcInit();
   var offs = await P.getOfferings();
-  var cur = offs && offs.current;
-  var pkgs = (cur && cur.availablePackages) || [];
+  /* Los packs de tokens viven en el offering current y los PLANES de
+     suscripción en el offering planes_2026 → se busca en current primero
+     y después en todos (2026-08-03). */
+  var listas = [];
+  if (offs && offs.current && offs.current.availablePackages) listas.push(offs.current.availablePackages);
+  if (offs && offs.all) {
+    for (var k in offs.all) {
+      if (offs.all[k] && offs.all[k].availablePackages) listas.push(offs.all[k].availablePackages);
+    }
+  }
   var pkg = null;
-  for (var i = 0; i < pkgs.length; i++) {
-    var pr = pkgs[i] && pkgs[i].product;
-    if (pr && pr.identifier === storeProductId) { pkg = pkgs[i]; break; }
+  for (var li = 0; li < listas.length && !pkg; li++) {
+    var pkgs = listas[li];
+    for (var i = 0; i < pkgs.length; i++) {
+      var pr = pkgs[i] && pkgs[i].product;
+      if (pr && pr.identifier === storeProductId) { pkg = pkgs[i]; break; }
+    }
   }
   if (!pkg) throw new Error('package-not-found:' + storeProductId);
   return await P.purchasePackage({ aPackage: pkg }); // { customerInfo, productIdentifier }
@@ -16169,7 +16243,18 @@ function getVal(id, fallback) {
     var jwt = getJWT();
     if (!jwt) return;
     fetch(API_URL + '/auth/me', { headers: { ...authHeaders(), 'Cache-Control': 'no-cache' }, cache: 'no-store' })
-    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(r) {
+      /* Chequeo de sesión al arrancar (crisis del 31-jul: la sesión caducaba a
+         MITAD de un análisis y el usuario quedaba atrapado). Con la sesión de
+         un año esto será rarísimo, pero si el token ya no vale, se limpia AQUÍ
+         y se lleva al login con la app recién abierta, no a medio trabajo. */
+      if (r.status === 401) {
+        try { localStorage.removeItem('dm_jwt'); } catch (e) {}
+        try { if (document.querySelector('.screen.active') && document.querySelector('.screen.active').id === 's-home') goTo('s-splash'); } catch (e) {}
+        return null;
+      }
+      return r.ok ? r.json() : null;
+    })
     .then(function(d) {
       if (d && d.tokens !== undefined) {
         localStorage.setItem('dm_role', d.role || 'user');
@@ -16593,26 +16678,28 @@ function getVal(id, fallback) {
     dmCargarPlanes();
   };
 
-  /* Compra. En iOS/Android pasa por la tienda (RevenueCat); en web, por Stripe.
-     La fontanería nativa se conecta en el build que active los IAP: si el puente
-     no está, se avisa en lugar de fallar en silencio. */
+  /* Compra de un plan. En la app va por la tienda con la MISMA fontanería
+     RevenueCat que los packs de tokens (_dmRcBuyProduct, offerings). En web,
+     por Stripe. */
   window.dmComprarPlan = async function(planId) {
-    var puente = (window.Capacitor && window.Purchases) ? window.Purchases : null;
-    if (puente && typeof puente.purchaseProduct === 'function') {
+    var plan = ((_planesData && _planesData.plans) || []).filter(function(p){ return p.id === planId; })[0];
+    if (!plan) return;
+
+    if (typeof dmIsNativeApp === 'function' && dmIsNativeApp() && dmRcPlugin()) {
       try {
-        var plan = (_planesData.plans || []).filter(function(p){ return p.id === planId; })[0];
-        var pid  = (window.Capacitor.getPlatform && window.Capacitor.getPlatform() === 'android')
-                     ? plan.product_id_android : plan.product_id_ios;
-        var res  = await puente.purchaseProduct({ productIdentifier: pid });
+        var pid = (window.Capacitor.getPlatform && window.Capacitor.getPlatform() === 'android')
+                    ? plan.product_id_android : plan.product_id_ios;
+        var res = await _dmRcBuyProduct(pid);
         await dmConfirmarCompraPlan(planId, res);
-        return;
       } catch (e) {
-        if (e && (e.code === 'PURCHASE_CANCELLED' || e.userCancelled)) return;
+        if (_dmRcIsCancel(e)) return;
+        console.warn('[RC] compra plan', e);
         alert(_txtPlanes('err'));
-        return;
       }
+      return;
     }
-    /* Web: checkout de Stripe (mismo camino que los packs de tokens). */
+
+    /* Web: checkout de Stripe (mismo camino que los packs). */
     try {
       var jwt = localStorage.getItem('dm_jwt') || '';
       var r = await fetch(API_URL + '/payments/plan-checkout', {
@@ -16626,11 +16713,12 @@ function getVal(id, fallback) {
     } catch (e) { alert(_txtPlanes('err')); }
   };
 
-  /* Confirma la compra contra el backend para abonar los créditos al instante.
-     El webhook de la tienda es la fuente de verdad; esto solo adelanta el saldo. */
+  /* Confirma contra el backend para abonar los créditos al instante.
+     El webhook de RevenueCat es la fuente de verdad; esto solo adelanta. */
   async function dmConfirmarCompraPlan(planId, res) {
     var jwt = localStorage.getItem('dm_jwt') || '';
-    var body = { plan_id: planId, store: (window.Capacitor && window.Capacitor.getPlatform() === 'android') ? 'google' : 'apple' };
+    var body = { plan_id: planId,
+                 store: (window.Capacitor && window.Capacitor.getPlatform && window.Capacitor.getPlatform() === 'android') ? 'google' : 'apple' };
     try {
       var info = res && (res.customerInfo || res.customer_info);
       var ent  = info && info.entitlements && info.entitlements.active;
@@ -16654,16 +16742,15 @@ function getVal(id, fallback) {
   }
 
   window.dmRestaurarCompras = async function() {
-    if (window.Purchases && typeof window.Purchases.restorePurchases === 'function') {
+    var P = (typeof dmRcPlugin === 'function') ? dmRcPlugin() : null;
+    if (P && typeof P.restorePurchases === 'function') {
       try {
-        await window.Purchases.restorePurchases();
-        if (typeof fetchBalance === 'function') fetchBalance();
-        dmCargarPlanes();
-      } catch (e) { alert(_txtPlanes('err')); }
-    } else {
-      if (typeof fetchBalance === 'function') fetchBalance();
-      dmCargarPlanes();
+        await dmRcInit();
+        await P.restorePurchases();
+      } catch (e) { console.warn('[RC] restore', e); }
     }
+    if (typeof fetchBalance === 'function') fetchBalance();
+    dmCargarPlanes();
   };
 
   /* Muro: cualquier 402 del backend abre los planes en vez de dejar al usuario
@@ -20269,6 +20356,7 @@ function endTourIntro() {
       ps_err_city:             'Indica la ciudad.',
       ps_err_country:          'Indica el país.',
       ps_err_email_exists:     'Este email ya está registrado. Inicia sesión y vuelve a Activar Profesional.',
+      ps_forgot_link:          '¿No recuerdas la contraseña? Te enviamos un enlace',
       ps_err_register:         'No se pudo crear la cuenta.',
       ps_err_company:          'No se pudieron guardar los datos de empresa.',
       ps_err_checkout:         'No se pudo iniciar el pago.',

@@ -4,6 +4,7 @@
 # pero ayuda mantener el orden topológico para legibilidad).
 from app.models.delegation import Delegation
 from app.models.corporate import Corporate
+from app.models.invite import Invite
 from app.models.user import User
 from app.models.payment import Payment
 from app.models.safety_log import SafetyLog

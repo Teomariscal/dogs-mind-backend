@@ -16,6 +16,7 @@ from app.api.routes import subscriptions as subscriptions_router
 from app.api.routes import puppy_school as puppy_school_router
 from app.api.routes import walks as walks_router
 from app.api.routes import corporates as corporates_router
+from app.api.routes import invites as invites_router
 from app.api.routes import training as training_router
 from app.api.routes import training_consult as training_consult_router
 from app.api.routes import app_config as app_config_router
@@ -321,6 +322,7 @@ app.include_router(subscriptions_router.router)
 app.include_router(puppy_school_router.router)
 app.include_router(walks_router.router)
 app.include_router(corporates_router.router)
+app.include_router(invites_router.router)
 
 
 @app.get("/", include_in_schema=False)

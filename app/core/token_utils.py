@@ -80,6 +80,38 @@ def deduct_token(
             except Exception as exc:  # noqa: BLE001
                 _log.exception("partner: fallo evaluando el cupo — sigo normal (%s)", exc)
 
+        # ── CORPORATE: bolsa de la institución (founder 2026-08-04) ─────────
+        # El afiliado (p. ej. alumno) gasta de la bolsa de su universidad, no
+        # de su bolsillo. Si agota su cupo o la bolsa se acaba, NO se le corta
+        # en seco: cae a la norma general y compra o espera.
+        # Fail-open: cualquier fallo aquí y sigue por el camino normal.
+        if getattr(user, "corporate_id", None) and \
+           (getattr(user, "corporate_status", "") or "") == "active":
+            try:
+                from app.models.corporate import Corporate
+
+                corp = db.query(Corporate).filter(
+                    Corporate.id == user.corporate_id).with_for_update().first()
+                if corp and corp.vigente():
+                    cupo = float(corp.member_cap_tokens or 0)
+                    usado = float(user.corporate_spent or 0)
+                    dentro_de_cupo = (cupo <= 0) or (usado + amount <= cupo)
+                    if dentro_de_cupo and corp.bolsa_restante() >= amount:
+                        corp.pool_spent = float(corp.pool_spent or 0) + amount
+                        user.corporate_spent = usado + amount
+                        db.commit()
+                        _log.info("corporate: %s −%.2f de %s (bolsa %.2f/%.2f)",
+                                  user.email, amount, corp.code,
+                                  float(corp.pool_spent), float(corp.pool_tokens))
+                        return float(user.tokens)
+                    _log.info("corporate: %s sin cupo o bolsa agotada en %s — pasa a su saldo",
+                              user.email, corp.code)
+                elif corp:
+                    _log.info("corporate: acuerdo %s caducado — %s pasa a su saldo",
+                              corp.code, user.email)
+            except Exception as exc:  # noqa: BLE001
+                _log.exception("corporate: fallo evaluando la bolsa — sigo normal (%s)", exc)
+
         # ── Muro de suscripción (10-ago-2026) ───────────────────────────────
         # Con SUBS_PAYWALL_ENABLED apagado esto no niega nada a nadie.
         # Reglas (prueba de 3 días, saldo heredado, exenciones): core/subscriptions.py

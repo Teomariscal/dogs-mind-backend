@@ -68,3 +68,14 @@ class User(Base):
     # (gasta sus créditos o espera al mes siguiente).
     partner_month            = Column(String(7), nullable=True)   # 'YYYY-MM'
     partner_spent            = Column(Numeric(10, 2), nullable=True, default=0)
+
+    # ── Afiliación corporativa (founder 2026-08-04) ─────────────────────────
+    # El alumno/empleado bebe de la bolsa de su institución. Estado:
+    #   'active'   → afiliado y consumiendo
+    #   'pending'  → esperando aceptación (solo si el acuerdo la exige)
+    #   'rejected' → solicitud denegada
+    #   NULL       → no afiliado
+    corporate_id     = Column(UUID(as_uuid=True), ForeignKey("corporates.id"),
+                              nullable=True, index=True)
+    corporate_status = Column(String(12), nullable=True)
+    corporate_spent  = Column(Numeric(10, 2), nullable=True, default=0)

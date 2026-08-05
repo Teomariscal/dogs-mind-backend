@@ -15,6 +15,7 @@ from app.api.routes import delegations as delegations_router
 from app.api.routes import subscriptions as subscriptions_router
 from app.api.routes import puppy_school as puppy_school_router
 from app.api.routes import walks as walks_router
+from app.api.routes import corporates as corporates_router
 from app.api.routes import training as training_router
 from app.api.routes import training_consult as training_consult_router
 from app.api.routes import app_config as app_config_router
@@ -58,6 +59,11 @@ async def lifespan(app: FastAPI):
             # Partner con tope mensual de coste (2026-08-04)
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS partner_month VARCHAR(7)",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS partner_spent NUMERIC(10,2) DEFAULT 0",
+            # Afiliación corporativa (2026-08-04): universidades y empresas
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS corporate_id UUID",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS corporate_status VARCHAR(12)",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS corporate_spent NUMERIC(10,2) DEFAULT 0",
+            "CREATE INDEX IF NOT EXISTS ix_users_corporate ON users(corporate_id, corporate_status)",
             # Permitir user_id NULL en payments para conservar historial fiscal tras delete del user
             "ALTER TABLE payments ALTER COLUMN user_id DROP NOT NULL",
             # Safety classifier shadow log (Apple Guideline 1.1.6 + IA risk mitigation)
@@ -314,6 +320,7 @@ app.include_router(app_config_router.router)
 app.include_router(subscriptions_router.router)
 app.include_router(puppy_school_router.router)
 app.include_router(walks_router.router)
+app.include_router(corporates_router.router)
 
 
 @app.get("/", include_in_schema=False)

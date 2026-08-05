@@ -172,3 +172,43 @@ def activate_subscription(
     cycle_key = f"{body.store}:{plan['id']}:{expires.strftime('%Y%m%d%H%M')}"
     status_value = "trialing" if body.is_trial else "active"
     return _grant_cycle(current_user, plan, db, cycle_key, status_value, body.store, expires)
+
+# ── POST /subscription/redeem-code ──────────────────────────────────────────
+class CodigoIn(BaseModel):
+    code: str = Field(..., min_length=3, max_length=64)
+
+
+@router.post("/redeem-code")
+def redeem_team_code(
+    body: CodigoIn,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Canjea el código de equipo: la cuenta queda EXENTA del muro para siempre,
+    sin suscripción y sin caducidad. Pensado para el equipo y los invitados
+    del founder (2026-08-04).
+
+    No regala créditos: quita el muro. Los créditos se siguen descontando
+    igual, así que el consumo se mide (regla: ningún uso es gratis).
+    """
+    esperado = subs.team_code()
+    if not esperado:
+        raise HTTPException(status_code=503, detail="No hay ningún código activo.")
+    if (body.code or "").strip().upper() != esperado:
+        raise HTTPException(status_code=400, detail="Ese código no es válido.")
+
+    if subs.is_exempt(current_user):
+        return {"ok": True, "ya_activo": True,
+                "message": "Tu cuenta ya tenía acceso de equipo."}
+
+    current_user.subscription_status = "exempt"
+    current_user.subscription_plan = "equipo"
+    current_user.subscription_store = "codigo"
+    current_user.subscription_expires_at = None
+    if not current_user.subscription_started_at:
+        current_user.subscription_started_at = datetime.utcnow()
+    db.commit()
+    _log.info("subscription: %s → EXENTO por código de equipo", current_user.email)
+    return {"ok": True, "ya_activo": False,
+            "message": "Listo. Tu cuenta tiene acceso de equipo, sin suscripción."}

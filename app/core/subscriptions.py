@@ -165,9 +165,21 @@ def exemption_codes() -> set:
     return {e.strip().lower() for e in raw.split(",") if e.strip()}
 
 
+def is_exempt(user) -> bool:
+    """Miembro del equipo con código canjeado: nunca ve el muro, no caduca."""
+    return (getattr(user, "subscription_status", None) or "").lower() == "exempt"
+
+
+def team_code() -> str:
+    """Código de equipo (env SUBS_TEAM_CODE en Railway). Vacío = desactivado."""
+    return os.environ.get("SUBS_TEAM_CODE", "").strip().upper()
+
+
 def subscription_active(user, now: Optional[datetime] = None) -> bool:
     now = now or datetime.utcnow()
     status = (getattr(user, "subscription_status", None) or "").lower()
+    if status == "exempt":
+        return True
     if status not in ("active", "trialing", "in_grace"):
         return False
     expires = getattr(user, "subscription_expires_at", None)
@@ -236,6 +248,8 @@ def access_state(user, now: Optional[datetime] = None) -> dict:
     if (getattr(user, "role", "user") or "user") in ("admin", "developer"):
         return out(True, "privileged")
     if (getattr(user, "email", "") or "").lower() in exemption_codes():
+        return out(True, "exempt")
+    if is_exempt(user):
         return out(True, "exempt")
     if subscription_active(user, now):
         return out(True, "subscription")

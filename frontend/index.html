@@ -8627,6 +8627,20 @@ button:not(:disabled):active{ transform:scale(0.98); }
         desde los ajustes de tu tienda (App Store o Google Play). Los créditos que compres
         no caducan.
       </div>
+      <!-- Código de equipo: acceso sin suscripción (founder 2026-08-04) -->
+      <div style="margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.10);">
+        <button id="planes-codigo-abrir" onclick="dmToggleCodigo()" style="width:100%;background:none;border:none;color:rgba(232,239,234,.62);font-family:inherit;font-size:13px;cursor:pointer;text-decoration:underline;" data-i18n="pw_have_code">¿Tienes un código de equipo?</button>
+        <div id="planes-codigo-caja" style="display:none;margin-top:12px;">
+          <div style="display:flex;gap:8px;">
+            <input id="planes-codigo" type="text" autocapitalize="characters" autocomplete="off" spellcheck="false"
+                   data-i18n-placeholder="pw_code_ph" placeholder="TDMTEAM-XXXXXX"
+                   style="flex:1;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);color:#fff;font-family:inherit;font-size:15px;outline:none;">
+            <button onclick="dmCanjearCodigo()" style="padding:12px 18px;border:none;border-radius:12px;background:linear-gradient(135deg,#7eb86a,#4a6741);color:#fff;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;" data-i18n="pw_code_send">Canjear</button>
+          </div>
+          <div id="planes-codigo-msg" style="display:none;margin-top:10px;font-size:13px;line-height:1.5;padding:10px 12px;border-radius:10px;"></div>
+        </div>
+      </div>
+
       <div style="margin-top:14px;text-align:center;">
         <button onclick="dmRestaurarCompras()" style="background:none;border:none;color:#80d6ee;font-family:inherit;font-size:13px;cursor:pointer;text-decoration:underline;" data-i18n="pw_restore">Restaurar compras</button>
       </div>
@@ -15047,7 +15061,9 @@ function dmRenderRemoteBanner() {
     var host = document.querySelector('.phone') || document.body;
     var bar = document.createElement('div');
     bar.id = 'dm-remote-banner';
-    bar.style.cssText = 'position:absolute;top:0;left:0;right:0;z-index:9500;' +
+    /* En bloque, no flotante (2026-08-04): flotando tapaba el hero de inicio
+   y le cortaba la cabeza al cachorro. Ahora empuja el contenido. */
+    bar.style.cssText = 'position:relative;z-index:9500;flex:none;' +
       'padding:calc(env(safe-area-inset-top, 0px) + 12px) 16px 12px 16px;' +
       'background:rgba(14,31,26,0.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);' +
       'border-bottom:2px solid ' + (warn ? '#e0a23c' : '#5ec8e6') + ';' +
@@ -16750,6 +16766,47 @@ function getVal(id, fallback) {
     }
     if (typeof fetchBalance === 'function') fetchBalance();
     dmCargarPlanes();
+  };
+
+  window.dmToggleCodigo = function() {
+    var caja = document.getElementById('planes-codigo-caja');
+    if (!caja) return;
+    var abierto = caja.style.display !== 'none';
+    caja.style.display = abierto ? 'none' : '';
+    if (!abierto) { try { document.getElementById('planes-codigo').focus(); } catch (e) {} }
+  };
+
+  window.dmCanjearCodigo = async function() {
+    var inp = document.getElementById('planes-codigo');
+    var msg = document.getElementById('planes-codigo-msg');
+    var codigo = ((inp && inp.value) || '').trim().toUpperCase();
+    if (!codigo) return;
+    function decir(texto, ok) {
+      if (!msg) return;
+      msg.textContent = texto;
+      msg.style.display = '';
+      msg.style.background = ok ? 'rgba(126,184,106,.14)' : 'rgba(224,189,140,.12)';
+      msg.style.border = '1px solid ' + (ok ? 'rgba(126,184,106,.45)' : 'rgba(224,189,140,.42)');
+      msg.style.color = ok ? '#a9d69a' : '#e0bd8c';
+    }
+    try {
+      var jwt = localStorage.getItem('dm_jwt') || '';
+      var r = await fetch(API_URL + '/subscription/redeem-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+        body: JSON.stringify({ code: codigo })
+      });
+      var d = {}; try { d = await r.json(); } catch (e) {}
+      if (r.ok) {
+        decir(d.message || 'Listo.', true);
+        if (inp) inp.value = '';
+        dmCargarPlanes();
+      } else {
+        decir(d.detail || 'Ese código no es válido.', false);
+      }
+    } catch (e) {
+      decir('No hay conexión. Inténtalo en un minuto.', false);
+    }
   };
 
   /* Muro: cualquier 402 del backend abre los planes en vez de dejar al usuario
@@ -20103,6 +20160,9 @@ function endTourIntro() {
       pw_balance: 'Tu saldo',
       pw_legal:   'Suscripción mensual con renovación automática. Puedes cancelarla cuando quieras desde los ajustes de tu tienda (App Store o Google Play). Los créditos que compres no caducan.',
       pw_restore: 'Restaurar compras',
+      pw_have_code: '¿Tienes un código de equipo?',
+      pw_code_ph: 'TDMTEAM-XXXXXX',
+      pw_code_send: 'Canjear',
       pw_cancel_free: 'Cancela tu suscripción cuando quieras. Total transparencia.',
       home_plans: 'Planes y créditos',
       tokens_sub:      'Saldo disponible · Dogs’ Mind',
@@ -21150,6 +21210,9 @@ function endTourIntro() {
       pw_balance: 'Your balance',
       pw_legal:   'Monthly auto-renewing subscription. You can cancel it any time from your store settings (App Store or Google Play). Credits you buy never expire.',
       pw_restore: 'Restore purchases',
+      pw_have_code: 'Do you have a team code?',
+      pw_code_ph: 'TDMTEAM-XXXXXX',
+      pw_code_send: 'Redeem',
       pw_cancel_free: 'Cancel your subscription whenever you want. Total transparency.',
       home_plans: 'Plans and credits',
       tokens_sub:      'Available balance · Dogs’ Mind',
@@ -22198,6 +22261,9 @@ function endTourIntro() {
           pw_balance: 'Il tuo saldo',
           pw_legal:   'Abbonamento mensile a rinnovo automatico. Puoi disdirlo quando vuoi dalle impostazioni del tuo store (App Store o Google Play). I crediti acquistati non scadono.',
           pw_restore: 'Ripristina acquisti',
+          pw_have_code: 'Hai un codice del team?',
+          pw_code_ph: 'TDMTEAM-XXXXXX',
+          pw_code_send: 'Riscatta',
           pw_cancel_free: 'Disdici il tuo abbonamento quando vuoi. Totale trasparenza.',
           home_plans: 'Piani e crediti',
           tokens_sub:      'Saldo disponibile · Dogs’ Mind',

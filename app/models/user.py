@@ -62,3 +62,9 @@ class User(Base):
     subscription_last_grant  = Column(String(64), nullable=True)
     # Arranque de la prueba de 3 días. NULL → se usa created_at.
     trial_started_at         = Column(DateTime, nullable=True)
+    # ── Partner (founder 2026-08-04) ────────────────────────────────────────
+    # Acceso libre con TOPE de coste para nosotros: 8 €/mes. No ve el muro y no
+    # gasta su saldo hasta agotar el cupo; pasado el cupo vuelve a la norma
+    # (gasta sus créditos o espera al mes siguiente).
+    partner_month            = Column(String(7), nullable=True)   # 'YYYY-MM'
+    partner_spent            = Column(Numeric(10, 2), nullable=True, default=0)

@@ -103,7 +103,32 @@ def subscription_status(
             "expires_at": _iso(state["subscription_expires_at"]),
             "active": subs.subscription_active(current_user),
         },
+        "partner": _partner_info(current_user),
         "plans": _public_plans(),
+    }
+
+
+def _partner_info(user) -> Optional[dict]:
+    """Cupo mensual del partner, para pintarlo en su cuenta. None si no lo es."""
+    if (getattr(user, "role", "user") or "user") != "partner":
+        return None
+    # Partner es obligatoriamente profesional: si por lo que sea no lo fuera,
+    # el estado lo dice igual para que la app le abra lo pro.
+    import os
+    from datetime import datetime as _dt
+
+    cupo = float(os.environ.get("PARTNER_MONTHLY_TOKENS", "380"))
+    mes = _dt.utcnow().strftime("%Y-%m")
+    gastado = float(user.partner_spent or 0) if (user.partner_month or "") == mes else 0.0
+    restante = max(0.0, cupo - gastado)
+    return {
+        "es_partner": True,
+        "credits_month": int(round(cupo * subs.CREDITS_PER_TOKEN)),
+        "credits_used": int(round(gastado * subs.CREDITS_PER_TOKEN)),
+        "credits_left": int(round(restante * subs.CREDITS_PER_TOKEN)),
+        "pct_used": round(min(100.0, (gastado / cupo) * 100)) if cupo else 0,
+        "month": mes,
+        "profesional": True,
     }
 
 
@@ -212,3 +237,45 @@ def redeem_team_code(
     _log.info("subscription: %s → EXENTO por código de equipo", current_user.email)
     return {"ok": True, "ya_activo": False,
             "message": "Listo. Tu cuenta tiene acceso de equipo, sin suscripción."}
+
+# ── POST /admin/partner ─────────────────────────────────────────────────────
+class PartnerIn(BaseModel):
+    email: str = Field(..., min_length=5, max_length=255)
+    activo: bool = True
+
+
+@router.post("/admin/partner")
+def set_partner(
+    body: PartnerIn,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Marca (o desmarca) una cuenta como PARTNER. Solo admin.
+
+    Partner es OBLIGATORIAMENTE profesional (founder 2026-08-04): al activarlo
+    se le pone account_type='professional' junto con el rol. Al desactivarlo se
+    le quita el rol pero NO se le retira lo profesional — quitarle funciones que
+    ya usaba sería una regresión para él; eso se decide aparte.
+    """
+    if (current_user.role or "user") != "admin":
+        raise HTTPException(status_code=403, detail="Solo admin.")
+
+    u = db.query(User).filter(User.email == body.email.strip().lower()).first()
+    if not u:
+        raise HTTPException(status_code=404, detail="No existe esa cuenta.")
+
+    if body.activo:
+        u.role = "partner"
+        u.account_type = "professional"   # partner ⇒ profesional, sin excepción
+        u.partner_month = None
+        u.partner_spent = 0
+    else:
+        if (u.role or "") == "partner":
+            u.role = "user"
+    db.commit()
+    _log.info("partner: %s → rol=%s account_type=%s", u.email, u.role, u.account_type)
+    return {"ok": True, "email": u.email, "role": u.role,
+            "account_type": u.account_type,
+            "message": ("Cuenta Partner activada, con perfil profesional."
+                        if body.activo else "Partner desactivado.")}

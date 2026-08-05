@@ -52,6 +52,34 @@ def deduct_token(
             _log.info("deduct_token: privileged role=%s — skipping deduction for %s", user.role, user.email)
             return float(user.tokens)
 
+        # ── PARTNER: acceso libre con tope de coste (founder 2026-08-04) ────
+        # Tope: 8 €/mes de coste NUESTRO = 380 tokens al mes (0,021 €/token).
+        # Mientras le quede cupo no gasta su saldo ni ve el muro. Agotado el
+        # cupo, cae a la norma general: gasta sus créditos o espera al mes que
+        # viene. El contador se reinicia solo al cambiar de mes natural.
+        # Fail-open: si algo falla aquí, el usuario sigue por el camino normal.
+        if (getattr(user, "role", "user") or "user") == "partner":
+            try:
+                from datetime import datetime as _dt
+                import os as _os
+
+                cupo = float(_os.environ.get("PARTNER_MONTHLY_TOKENS", "380"))
+                mes = _dt.utcnow().strftime("%Y-%m")
+                if (user.partner_month or "") != mes:
+                    user.partner_month = mes
+                    user.partner_spent = 0
+                gastado = float(user.partner_spent or 0)
+                if gastado + amount <= cupo:
+                    user.partner_spent = gastado + amount
+                    db.commit()
+                    _log.info("partner: %s −%.2f del cupo (%.2f/%.0f este mes)",
+                              user.email, amount, gastado + amount, cupo)
+                    return float(user.tokens)
+                _log.info("partner: %s AGOTÓ el cupo del mes (%.2f/%.0f) — pasa a saldo normal",
+                          user.email, gastado, cupo)
+            except Exception as exc:  # noqa: BLE001
+                _log.exception("partner: fallo evaluando el cupo — sigo normal (%s)", exc)
+
         # ── Muro de suscripción (10-ago-2026) ───────────────────────────────
         # Con SUBS_PAYWALL_ENABLED apagado esto no niega nada a nadie.
         # Reglas (prueba de 3 días, saldo heredado, exenciones): core/subscriptions.py

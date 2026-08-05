@@ -55,6 +55,9 @@ async def lifespan(app: FastAPI):
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_last_grant VARCHAR(64)",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS trial_started_at TIMESTAMP",
             "CREATE INDEX IF NOT EXISTS ix_users_subscription_status ON users(subscription_status)",
+            # Partner con tope mensual de coste (2026-08-04)
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS partner_month VARCHAR(7)",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS partner_spent NUMERIC(10,2) DEFAULT 0",
             # Permitir user_id NULL en payments para conservar historial fiscal tras delete del user
             "ALTER TABLE payments ALTER COLUMN user_id DROP NOT NULL",
             # Safety classifier shadow log (Apple Guideline 1.1.6 + IA risk mitigation)

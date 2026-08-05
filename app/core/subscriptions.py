@@ -251,6 +251,8 @@ def access_state(user, now: Optional[datetime] = None) -> dict:
         return out(True, "exempt")
     if is_exempt(user):
         return out(True, "exempt")
+    if (getattr(user, "role", "user") or "user") == "partner":
+        return out(True, "partner")
     if subscription_active(user, now):
         return out(True, "subscription")
     if is_legacy(user) and tokens >= ANALYSIS_TOKENS:

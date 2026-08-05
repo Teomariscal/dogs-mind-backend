@@ -8596,6 +8596,24 @@ button:not(:disabled):active{ transform:scale(0.98); }
          background:rgba(94,200,230,.10);border:1px solid rgba(94,200,230,.32);
          font-size:13.5px;line-height:1.55;color:#cfe9f2;"></div>
 
+    <!-- Cuenta Partner (founder 2026-08-04): visible para que sepa qué tiene -->
+    <div id="planes-partner" style="display:none;margin:0 16px 14px;padding:15px 16px;border-radius:16px;
+         background:linear-gradient(135deg,rgba(94,200,230,.12),rgba(126,184,106,.10));
+         border:1.5px solid rgba(94,200,230,.42);">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+        <div>
+          <div style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#5ec8e6;font-weight:700;" data-i18n="pw_partner_tag">Cuenta Partner</div>
+          <div id="planes-partner-tit" style="font-size:15.5px;font-weight:700;color:#fff;margin-top:3px;" data-i18n="pw_partner_title">Profesional con acceso incluido</div>
+        </div>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9ed08c" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <div id="planes-partner-barra" style="margin-top:12px;height:6px;border-radius:100px;background:rgba(255,255,255,.10);overflow:hidden;">
+        <div id="planes-partner-relleno" style="height:100%;width:0%;border-radius:100px;background:linear-gradient(90deg,#5ec8e6,#7eb86a);"></div>
+      </div>
+      <div id="planes-partner-txt" style="margin-top:8px;font-size:12.5px;color:rgba(232,239,234,.68);line-height:1.5;"></div>
+    </div>
+
     <!-- saldo actual -->
     <div id="planes-saldo" style="margin:0 16px 16px;padding:14px 16px;border-radius:16px;
          background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
@@ -16558,19 +16576,19 @@ function getVal(id, fallback) {
             trial_note:'3 días de prueba. Después {p}/mes. Cancela cuando quieras.',
             balance_locked:'Tus créditos de bienvenida se desbloquean al suscribirte.',
             balance_ok:'Los créditos comprados no caducan.',
-            wait:'Cargando planes…', err:'No se han podido cargar los planes. Inténtalo en un minuto.' },
+            partner_left:'disponibles este mes', partner_month:'al mes incluidos', wait:'Cargando planes…', err:'No se han podido cargar los planes. Inténtalo en un minuto.' },
       en: { credits:'credits', month:'/month', per:'credits per euro', save:'more credits per euro than Basic',
             consults:'full consultations', choose:'Choose', current:'Your current plan', trial_cta:'Start 3-day trial',
             trial_note:'3-day trial. Then {p}/month. Cancel anytime.',
             balance_locked:'Your welcome credits unlock as soon as you subscribe.',
             balance_ok:'Purchased credits never expire.',
-            wait:'Loading plans…', err:'Plans could not be loaded. Try again in a minute.' },
+            partner_left:'left this month', partner_month:'included per month', wait:'Loading plans…', err:'Plans could not be loaded. Try again in a minute.' },
       it: { credits:'crediti', month:'/mese', per:'crediti per euro', save:'più crediti per euro del piano Base',
             consults:'consulti completi', choose:'Scegli', current:'Il tuo piano attuale', trial_cta:'Inizia la prova di 3 giorni',
             trial_note:'3 giorni di prova. Poi {p}/mese. Disdici quando vuoi.',
             balance_locked:'I crediti di benvenuto si sbloccano appena ti abboni.',
             balance_ok:'I crediti acquistati non scadono.',
-            wait:'Caricamento piani…', err:'Impossibile caricare i piani. Riprova tra un minuto.' }
+            partner_left:'disponibili questo mese', partner_month:'al mese inclusi', wait:'Caricamento piani…', err:'Impossibile caricare i piani. Riprova tra un minuto.' }
     };
     return (D[L] || D.es)[k];
   }
@@ -16591,6 +16609,28 @@ function getVal(id, fallback) {
     _planesData = d;
     var lista = document.getElementById('planes-lista');
     if (!lista) return;
+
+    /* Cuenta Partner: cupo del mes */
+    var pw = document.getElementById('planes-partner');
+    if (pw) {
+      var pinfo = d.partner;
+      if (pinfo && pinfo.es_partner) {
+        pw.style.display = '';
+        var relleno = document.getElementById('planes-partner-relleno');
+        if (relleno) relleno.style.width = (pinfo.pct_used || 0) + '%';
+        var ptxt = document.getElementById('planes-partner-txt');
+        if (ptxt) {
+          ptxt.textContent = _cr(pinfo.credits_left) + ' ' + _txtPlanes('credits') + ' ' +
+                             _txtPlanes('partner_left') + ' · ' +
+                             _cr(pinfo.credits_month) + ' ' + _txtPlanes('partner_month');
+        }
+        /* Un partner no necesita ver la lista de planes ni el saldo normal. */
+        var saldoCaja = document.getElementById('planes-saldo');
+        if (saldoCaja) saldoCaja.style.display = 'none';
+      } else {
+        pw.style.display = 'none';
+      }
+    }
 
     /* saldo */
     var saldoNum = document.getElementById('planes-saldo-num');
@@ -18127,7 +18167,11 @@ window.renderHomeProBadge = renderHomeProBadge;
 // Profesional (y demás features pro) porque los gates comparaban solo
 // === 'professional'.
 function dmIsProAccount(acc) {
-  return !!(acc && (acc.account_type === 'professional' || acc.account_type === 'corporativo'));
+  /* Partner es OBLIGATORIAMENTE profesional (founder 2026-08-04): aunque su
+     account_type se hubiera quedado atrás, el rol manda y ve todo lo pro. */
+  var esPartner = false;
+  try { esPartner = (localStorage.getItem('dm_role') || '') === 'partner'; } catch (e) {}
+  return !!(esPartner || (acc && (acc.account_type === 'professional' || acc.account_type === 'corporativo')));
 }
 window.dmIsProAccount = dmIsProAccount;
 
@@ -20161,6 +20205,8 @@ function endTourIntro() {
       pw_legal:   'Suscripción mensual con renovación automática. Puedes cancelarla cuando quieras desde los ajustes de tu tienda (App Store o Google Play). Los créditos que compres no caducan.',
       pw_restore: 'Restaurar compras',
       pw_have_code: '¿Tienes un código de equipo?',
+      pw_partner_tag: 'Cuenta Partner',
+      pw_partner_title: 'Profesional con acceso incluido',
       pw_code_ph: 'TDMTEAM-XXXXXX',
       pw_code_send: 'Canjear',
       pw_cancel_free: 'Cancela tu suscripción cuando quieras. Total transparencia.',
@@ -21211,6 +21257,8 @@ function endTourIntro() {
       pw_legal:   'Monthly auto-renewing subscription. You can cancel it any time from your store settings (App Store or Google Play). Credits you buy never expire.',
       pw_restore: 'Restore purchases',
       pw_have_code: 'Do you have a team code?',
+      pw_partner_tag: 'Partner account',
+      pw_partner_title: 'Professional with access included',
       pw_code_ph: 'TDMTEAM-XXXXXX',
       pw_code_send: 'Redeem',
       pw_cancel_free: 'Cancel your subscription whenever you want. Total transparency.',
@@ -22262,6 +22310,8 @@ function endTourIntro() {
           pw_legal:   'Abbonamento mensile a rinnovo automatico. Puoi disdirlo quando vuoi dalle impostazioni del tuo store (App Store o Google Play). I crediti acquistati non scadono.',
           pw_restore: 'Ripristina acquisti',
           pw_have_code: 'Hai un codice del team?',
+          pw_partner_tag: 'Account Partner',
+          pw_partner_title: 'Professionale con accesso incluso',
           pw_code_ph: 'TDMTEAM-XXXXXX',
           pw_code_send: 'Riscatta',
           pw_cancel_free: 'Disdici il tuo abbonamento quando vuoi. Totale trasparenza.',

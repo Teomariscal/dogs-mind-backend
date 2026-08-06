@@ -520,7 +520,10 @@
   }
 
   async function generar(centro, etiqueta) {
-    if (!(await cobrarPaseo())) return;
+    /* El cobro va DESPUÉS de tener los datos (2026-08-06). Antes se cobraba
+       aquí arriba: si Overpass estaba caído —pasa a menudo, es un servicio
+       público gratuito— el usuario pagaba 10 créditos, veía "no se han podido
+       consultar los datos" y volvía a pagar en cada reintento. */
     estado.centro = centro;
     estadoTexto('Buscando zonas verdes y servicios…');
     capaRutas.clearLayers(); capaPois.clearLayers();
@@ -562,10 +565,15 @@
         });
       } catch (e) { /* esa distancia no sale: seguimos con las demás */ }
     }
+    /* Sin rutas no hay nada que entregar: no se cobra. */
+    if (!estado.rutas.length) {
+      estadoTexto('Sin rutas disponibles aquí. No te hemos cobrado nada.');
+      return;
+    }
+    /* Ya hay rutas de verdad: ahora sí se cobra. */
+    if (!(await cobrarPaseo())) return;
     pintarLista(document.getElementById('dmw-walk-lista'));
-    estadoTexto(estado.rutas.length
-      ? estado.rutas.length + ' rutas sobre datos reales de OpenStreetMap'
-      : 'Sin rutas disponibles aquí.');
+    estadoTexto(estado.rutas.length + ' rutas sobre datos reales de OpenStreetMap');
     if (estado.rutas.length) seleccionar(0);
   }
 

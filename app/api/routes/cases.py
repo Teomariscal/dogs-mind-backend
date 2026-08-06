@@ -235,9 +235,9 @@ class LegacyRecord(BaseModel):
     # Distinción de flujo: 'behavior' (ABC clínico, default) | 'training' (consulta
     # de Entrenamiento Específico). Optional; NULL/missing → default Case.case_type
     # ('behavior') y comportamiento idéntico al previo (cero regresión).
-    case_type: Optional[Literal["behavior", "training"]] = Field(
+    case_type: Optional[Literal["behavior", "training", "puppy"]] = Field(
         None,
-        description="'behavior' (ABC clínico) | 'training' (Adiestramiento Pro). NULL → 'behavior' (default).",
+        description="'behavior' (ABC clínico) | 'training' (Adiestramiento Pro) | 'puppy' (Escuela Cachorros). NULL → 'behavior'.",
     )
 
 

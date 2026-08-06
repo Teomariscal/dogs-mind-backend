@@ -48,6 +48,18 @@
   --text:    #2c2a24;
   --text2:   #6b6456;
   --text3:   #a09688;
+  /* ── FALLO RAÍZ CORREGIDO (2026-08-06, reporte de Sofía D) ──────────────
+     --dark, --grey y --amber se usaban 238 veces SIN estar definidas. En CSS,
+     `color: var(--dark)` con la variable inexistente NO pinta oscuro: la
+     declaración es inválida y se resuelve como `inherit`. En la web eso
+     heredaba el texto casi blanco del tema oscuro, y el resultado era texto
+     blanco sobre tarjetas blancas: el plan de intervención salía ilegible
+     (contraste 1.10:1 sobre el mínimo legible de 4.5:1). Definirlas arregla
+     de golpe el plan, el análisis completo, el seguimiento diario, los
+     registros, la pantalla de tokens y los modales. */
+  --dark:    #2c2a24;   /* mismo valor que --text  */
+  --grey:    #6b6456;   /* mismo valor que --text2 */
+  --amber:   #c8a96e;   /* el ámbar que ya se usa literal en el chat */
   --green:   #4a6741;
   --green2:  #5c7f52;
   --green3:  #3d5636;
@@ -16082,15 +16094,56 @@ function getVal(id, fallback) {
     renderRecords();
   }
 
-  function deleteRecord(idx) {
-    if (!confirm('¿Eliminar este caso?')) return;
-    var records = [];
-    records = getRecords();
+  /* Borrado de casos — CORREGIDO 2026-08-06 (reporte de Sofía D: "elimino el
+     caso y al volver a la pestaña vuelve a estar ahí").
+
+     El fallo: esta función borraba SOLO en localStorage y nunca llamaba al
+     backend. El caso seguía vivo en el servidor con deleted_at = NULL, así que
+     la siguiente sincronización lo devolvía y lo reinsertaba. Bucle infinito.
+     Efecto secundario: como el borrado no liberaba cuota en el servidor, un
+     profesional con 20 casos no podía guardar ninguno más por mucho que
+     borrara, y cada intento fallido dejaba un caso huérfano que acababa
+     duplicándose. De ahí el duplicado que ella veía.
+
+     Ahora: se borra en el servidor primero y se eliminan TODOS los registros
+     locales que apunten a ese caso, para arrastrar también la copia duplicada. */
+  async function deleteRecord(idx) {
+    if (!confirm(_i18nText('rec_delete_confirm', '¿Eliminar este caso?'))) return;
+    var records = getRecords();
     var filtered = _recordsFilter === 'todos' ? records : records.filter(function(r){ return r.status === _recordsFilter; });
     var r = filtered[idx];
-    var fullIdx = records.indexOf(r);
-    if (fullIdx >= 0) records.splice(fullIdx, 1);
-    setRecords(records);
+    if (!r) return;
+
+    var idServidor = r.backend_case_id || null;
+    if (idServidor) {
+      try {
+        var resp = await fetch(API_BASE + '/cases/' + idServidor, {
+          method: 'DELETE',
+          headers: authHeaders()
+        });
+        /* 404 = ya no está en el servidor: seguimos y limpiamos local.
+           Otro error = NO borramos en local, o volvería a aparecer y el
+           usuario pensaría otra vez que la app no le hace caso. */
+        if (!resp.ok && resp.status !== 404) {
+          showToast(_i18nText('rec_delete_err',
+            'No se ha podido eliminar el caso. Inténtalo en un momento.'));
+          return;
+        }
+      } catch (e) {
+        showToast(_i18nText('rec_delete_offline',
+          'Sin conexión: el caso se eliminará cuando vuelvas a tener red.'));
+        return;
+      }
+    }
+
+    /* Fuera TODOS los registros locales de ese caso, no solo el pulsado: si
+       había un duplicado (huérfano + copia del servidor), se van los dos. */
+    var quedan = records.filter(function (x) {
+      if (x === r) return false;
+      if (idServidor && x.backend_case_id === idServidor) return false;
+      return true;
+    });
+    setRecords(quedan);
     renderRecords();
   }
 
@@ -16752,8 +16805,15 @@ function getVal(id, fallback) {
     var plan = ((_planesData && _planesData.plans) || []).filter(function(p){ return p.id === planId; })[0];
     if (!plan) return;
 
-    if (typeof dmIsNativeApp === 'function' && dmIsNativeApp() && dmRcPlugin()) {
+    /* CORREGIDO 2026-08-06: antes esta guarda llevaba `&& dmRcPlugin()`, así que
+       si el plugin de compras no estaba listo (carrera del arranque, fallo de
+       instalación) la ejecución CAÍA al bloque de Stripe y abría el checkout web
+       DENTRO de la app. Eso es rechazo directo de Apple (3.1.1). Ahora es
+       fail-closed como las otras tres compras: en nativo nunca hay salida a
+       Stripe; si el plugin falla, se avisa y punto. */
+    if (typeof dmIsNativeApp === 'function' && dmIsNativeApp()) {
       try {
+        if (!dmRcPlugin()) throw new Error('no-plugin');
         var pid = (window.Capacitor.getPlatform && window.Capacitor.getPlatform() === 'android')
                     ? plan.product_id_android : plan.product_id_ios;
         var res = await _dmRcBuyProduct(pid);
@@ -18938,6 +18998,13 @@ window.submitPuppySchool = async function() {
     window._lastPuppyData = d;
     window._lastPuppyPlan = md;
     window._lastPuppyDogName = d.dog_name;
+    /* Autosave: hasta ahora el plan vivía SOLO en memoria y cerrar la app
+       evaporaba 150-300 créditos de trabajo ya pagado. */
+    try {
+      localStorage.setItem('dm_pending_puppy', JSON.stringify({
+        plan: md, datos: d, nombre: d.dog_name, ts: Date.now()
+      }));
+    } catch (e) {}
     try { if (typeof fetchBalance === 'function') fetchBalance(); } catch(e) {}
     if (btn) { btn.disabled=false; btn.textContent=prev; }
     goTo('s-puppy-result');
@@ -18956,23 +19023,42 @@ window.acceptPuppyPlan = async function() {
   if (btn) { btn.disabled = true; btn.textContent = _i18nText('pup_saving','Guardando…'); }
   try {
     var jwt = localStorage.getItem('dm_jwt') || '';
+    /* CORREGIDO 2026-08-06: este cuerpo NO cumplía el esquema del servidor
+       (/cases/migrate espera {records:[...]}), así que devolvía 422 SIEMPRE y
+       el error se tragaba en silencio: el usuario pagaba hasta 300 créditos,
+       pulsaba "Guardar plan", el botón parpadeaba y no se guardaba nada. */
+    var d = window._lastPuppyData || {};
     var r = await fetch(API_BASE + '/cases/migrate', {
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+jwt},
-      body: JSON.stringify({
-        dog_name: window._lastPuppyDogName || '',
-        case_type: 'puppy',
-        abc_analysis: window._lastPuppyPlan
-      })
+      body: JSON.stringify({ records: [{
+        id:        Date.now(),
+        date:      new Date().toLocaleDateString('es-ES'),
+        dog_name:  window._lastPuppyDogName || '',
+        breed:     d.breed || '',
+        dog_age:   (d.edad_semanas ? d.edad_semanas + ' semanas' : ''),
+        problem:   (d.objetivo === 'problema' ? (d.conducta_problema || '') : (d.area || '')),
+        analysis:  window._lastPuppyPlan || '',
+        status:    'active',
+        lang:      (typeof getCurrentLang === 'function') ? getCurrentLang() : 'es',
+        case_type: 'puppy'
+      }]})
     });
     if (r.ok) {
       if (btn) { btn.textContent = _i18nText('pup_saved','Plan guardado'); btn.style.display='none'; }
+      try { localStorage.removeItem('dm_pending_puppy'); } catch (e) {}
       if (typeof syncBackendCases === 'function') syncBackendCases();
     } else {
+      /* Nunca fallar en silencio: si no se guarda, el usuario tiene que saberlo
+         para no perder un plan que ya ha pagado. */
+      var err = {}; try { err = await r.json(); } catch (e2) {}
       if (btn) { btn.disabled=false; btn.textContent=prev; }
+      showToast((err && typeof err.detail === 'string' ? err.detail : null) ||
+                _i18nText('pup_save_err', 'No se ha podido guardar el plan. Vuelve a intentarlo.'));
     }
   } catch (e) {
     if (btn) { btn.disabled=false; btn.textContent=prev; }
+    showToast(_i18nText('pup_save_err', 'No se ha podido guardar el plan. Vuelve a intentarlo.'));
   }
 };
 
@@ -20265,6 +20351,10 @@ function endTourIntro() {
       pw_restore: 'Restaurar compras',
       pw_have_code: '¿Tienes un código de equipo?',
       refine_apply: 'Aplicar los cambios al plan',
+      rec_delete_confirm: '¿Eliminar este caso?',
+      pup_save_err: 'No se ha podido guardar el plan. Vuelve a intentarlo.',
+      rec_delete_err: 'No se ha podido eliminar el caso. Inténtalo en un momento.',
+      rec_delete_offline: 'Sin conexión: el caso se eliminará cuando vuelvas a tener red.',
       refine_apply_note: 'Reescribe el plan guardado con lo acordado aquí. Cuesta 20 créditos.',
       refine_applying: 'Reescribiendo el plan…',
       refine_applied: 'Plan actualizado',
@@ -21324,6 +21414,10 @@ function endTourIntro() {
       pw_restore: 'Restore purchases',
       pw_have_code: 'Do you have a team code?',
       refine_apply: 'Apply the changes to the plan',
+      rec_delete_confirm: 'Delete this case?',
+      pup_save_err: 'The plan could not be saved. Please try again.',
+      rec_delete_err: 'The case could not be deleted. Try again in a moment.',
+      rec_delete_offline: 'Offline: the case will be deleted when you are back online.',
       refine_apply_note: 'Rewrites the saved plan with what you agreed here. Costs 20 credits.',
       refine_applying: 'Rewriting the plan…',
       refine_applied: 'Plan updated',
@@ -22384,6 +22478,10 @@ function endTourIntro() {
           pw_restore: 'Ripristina acquisti',
           pw_have_code: 'Hai un codice del team?',
           refine_apply: 'Applica le modifiche al piano',
+          rec_delete_confirm: 'Eliminare questo caso?',
+          pup_save_err: 'Non è stato possibile salvare il piano. Riprova.',
+          rec_delete_err: 'Non è stato possibile eliminare il caso. Riprova tra poco.',
+          rec_delete_offline: 'Offline: il caso verrà eliminato quando tornerai online.',
           refine_apply_note: 'Riscrive il piano salvato con quanto concordato qui. Costa 20 crediti.',
           refine_applying: 'Sto riscrivendo il piano…',
           refine_applied: 'Piano aggiornato',

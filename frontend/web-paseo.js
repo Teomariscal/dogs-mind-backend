@@ -73,6 +73,10 @@
   +   'line-height:1.6;color:rgba(232,239,234,.72);}'
   + '.pf-challenge b{color:#80d6ee;font-weight:600;}'
   /* El planificador en móvil: mapa arriba, rutas debajo */
+  /* La altura del mapa va FUERA del media query (2026-08-06): dentro de la app,
+     en tablets o plegables de ancho >=1024, ninguna de las dos hojas casaba y
+     el mapa se quedaba con altura 0, es decir, planificador sin mapa. */
+  + '#paseo-full .dmw-walk-map{height:260px;min-height:260px;}'
   + '@media (max-width:1023px){'
   +   '#paseo-full .dmw-walk{border:1px solid rgba(94,200,230,.35);border-radius:18px;overflow:hidden;'
   +     'background:linear-gradient(180deg,rgba(20,48,42,.96),rgba(10,26,20,.96));}'

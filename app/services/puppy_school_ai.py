@@ -34,7 +34,11 @@ logger = logging.getLogger(__name__)
 
 # El plan cubre varias semanas y ocho bloques: necesita más aire que el de
 # entrenamiento (2000). Aun así, el prompt pide concreción, no relleno.
-MAX_OUTPUT_TOKENS = 3200
+# Subido de 3200 a 8000 (2026-08-06). El prompt exige 8 bloques y uno de ellos
+# se subdivide en 3-4 semanas x 3 subsecciones: unas 20 secciones. 3200 se
+# eligió por comparación con otro servicio, no midiendo la salida real, y no
+# había ninguna salvaguarda. Este endpoint cobra hasta 300 créditos.
+MAX_OUTPUT_TOKENS = 8000
 TEMPERATURE = 0.4
 RAG_TOP_K = 5
 
@@ -240,6 +244,29 @@ def generate_puppy_plan(*, datos: dict, lang: str = "es") -> PuppySchoolResult:
     for block in response.content:
         if getattr(block, "type", None) == "text":
             raw += block.text
+
+    # Salvaguarda anti-corte: el usuario ha pagado hasta 300 créditos, no puede
+    # recibir un plan cortado a mitad de la semana 3.
+    if getattr(response, "stop_reason", None) == "max_tokens":
+        try:
+            seguimiento = create_message_resilient(
+                model=settings.clinical_model,
+                fallback_model=settings.clinical_fallback_model,
+                max_tokens=MAX_OUTPUT_TOKENS,
+                temperature=TEMPERATURE,
+                system=[{"type": "text", "text": system_prompt,
+                         "cache_control": {"type": "ephemeral"}}],
+                messages=[{"role": "user", "content": user_text},
+                          {"role": "assistant", "content": raw},
+                          {"role": "user", "content":
+                              "Continúa EXACTAMENTE donde lo dejaste, sin repetir "
+                              "nada de lo ya escrito y sin introducción."}],
+            )
+            for block in seguimiento.content:
+                if getattr(block, "type", None) == "text":
+                    raw += "\n" + block.text
+        except Exception:
+            logger.warning("puppy_school: no se pudo completar el plan truncado")
 
     return PuppySchoolResult(
         plan_markdown=raw.strip(),

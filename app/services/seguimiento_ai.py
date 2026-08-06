@@ -120,7 +120,7 @@ def run_seguimiento(case_summary_full: Optional[str], form: SeguimientoFormData)
     # 3. Llamada Sonnet 4.6 con prompt caching del system prompt
     response = client.messages.create(
         model=settings.clinical_model,
-        max_tokens=2000,  # invariante: cap de output (ver doc de pricing)
+        max_tokens=4000,   # subido de 2000 (2026-08-06): cobra 150 créditos  # invariante: cap de output (ver doc de pricing)
         system=[
             {
                 "type": "text",

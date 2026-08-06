@@ -86,7 +86,11 @@ def chat(request: AvatarChatRequest) -> AvatarChatResponse:
         # 350 para Aigents sin web_search (calibración estricta del prompt).
         # 500 para Aigents con web_search (margen para listar resultados
         # concretos con nombre + ciudad/precio sin truncar).
-        "max_tokens": 500 if use_web_search else 350,
+        # Subido de 350/500 (2026-08-06): 350 es un tope duro para texto
+            # conversacional y en la rama de búsqueda web los bloques de
+            # herramienta consumen del mismo presupuesto, dejando la respuesta
+            # final cortada a media línea.
+            "max_tokens": 1200 if use_web_search else 800,
         "system": system_prompt,
         "messages": messages,
     }

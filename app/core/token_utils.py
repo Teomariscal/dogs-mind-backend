@@ -181,6 +181,31 @@ def refund_token(
         if getattr(user, "role", "user") in PRIVILEGED_ROLES:
             return float(user.tokens)
 
+        # Devolver a la MISMA caja de la que se cobró (2026-08-06). Antes esto
+        # sumaba siempre al saldo personal: al partner y al alumno corporativo
+        # se les descontaba del cupo o de la bolsa de su institución y nunca se
+        # les restituía, mientras se les regalaba saldo que no habían gastado.
+        if (getattr(user, "role", "user") or "user") == "partner" and \
+           float(getattr(user, "partner_spent", 0) or 0) >= amount:
+            user.partner_spent = float(user.partner_spent) - amount
+            db.commit()
+            _log.info("refund_token: +%.2f al CUPO de partner %s", amount, user.email)
+            return float(user.tokens)
+
+        if getattr(user, "corporate_id", None) and \
+           (getattr(user, "corporate_status", "") or "") == "active" and \
+           float(getattr(user, "corporate_spent", 0) or 0) >= amount:
+            from app.models.corporate import Corporate
+
+            corp = db.query(Corporate).filter(Corporate.id == user.corporate_id).first()
+            user.corporate_spent = float(user.corporate_spent) - amount
+            if corp:
+                corp.pool_spent = max(0.0, float(corp.pool_spent or 0) - amount)
+            db.commit()
+            _log.info("refund_token: +%.2f a la BOLSA de %s (%s)", amount,
+                      corp.code if corp else "?", user.email)
+            return float(user.tokens)
+
         user.tokens = float(user.tokens) + amount
         db.commit()
         _log.info("refund_token: +%.2f → %s (balance: %.2f)", amount, user.email, float(user.tokens))

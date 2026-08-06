@@ -354,7 +354,8 @@ def generate_training_session(
     # reglamento real en vez de inferir.
     response = client.messages.create(
         model=settings.clinical_model,  # Sonnet 4.6
-        max_tokens=1800,
+        max_tokens=3600,   # subido de 1800 (2026-08-06): el propio código dice que
+                           # Sonnet 4.6 desarrolla más cada ejercicio
         temperature=0.4,
         system=system,
         messages=[{"role": "user", "content": user_prompt}],

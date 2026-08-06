@@ -10583,6 +10583,18 @@ button:not(:disabled):active{ transform:scale(0.98); }
       </div>
     </div>
 
+    <!-- Aplicar al plan (reporte de Sofía D, 2026-08-06): el chat conversaba
+         sobre el plan pero no lo tocaba, así que el plan guardado quedaba
+         desactualizado y la usuaria acababa copiando trozos a un Word. -->
+    <div id="refine-aplicar-caja" style="display:none;padding:0 16px 10px;flex-shrink:0;">
+      <button id="refine-aplicar-btn" onclick="aplicarCambiosAlPlan()"
+        style="width:100%;padding:14px;border:none;border-radius:100px;font-family:inherit;font-size:15px;font-weight:700;color:#fff;cursor:pointer;background:linear-gradient(135deg,#7eb86a,#4a6741);box-shadow:0 4px 16px rgba(74,103,65,.3);"
+        data-i18n="refine_apply">Aplicar los cambios al plan</button>
+      <div style="margin-top:7px;font-size:11.5px;color:rgba(232,239,234,.55);text-align:center;line-height:1.45;" data-i18n="refine_apply_note">
+        Reescribe el plan guardado con lo acordado aquí. Cuesta 20 créditos.
+      </div>
+    </div>
+
     <!-- Input area -->
     <div style="padding:12px 16px calc(env(safe-area-inset-bottom, 0px) + 24px);background:#fff;border-top:1px solid rgba(0,0,0,0.08);flex-shrink:0;">
       <div style="display:flex;gap:10px;align-items:flex-end;">
@@ -16912,6 +16924,51 @@ function getVal(id, fallback) {
     goTo('s-refine');
   }
 
+  /* Aplicar al plan lo acordado en el refinamiento (reporte Sofía D 2026-08-06).
+     Antes esta conversación no tocaba el plan guardado: quedaba desactualizado
+     y la usuaria acababa copiando trozos a un Word. */
+  window.aplicarCambiosAlPlan = async function() {
+    var btn = document.getElementById('refine-aplicar-btn');
+    var plan = '';
+    try { plan = window._lastInterventionPlan || localStorage.getItem('dm_last_plan') || ''; } catch (e) {}
+    if (!plan) { showToast(_i18nText('refine_no_plan', 'No encuentro el plan al que aplicar los cambios.')); return; }
+    if (!(typeof _refineHistory !== 'undefined' && _refineHistory.length)) return;
+
+    var prev = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = _i18nText('refine_applying', 'Reescribiendo el plan…'); }
+    try {
+      var jwt = localStorage.getItem('dm_jwt') || '';
+      var r = await fetch(API_BASE + '/intervention/apply-refinement', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+        body: JSON.stringify({
+          plan_actual: plan,
+          conversacion: _refineHistory,
+          case_id: (window._currentCaseId || null),
+          lang: (typeof getCurrentLang === 'function') ? getCurrentLang() : 'es'
+        })
+      });
+      if (r.status === 402) { if (btn) { btn.disabled = false; btn.textContent = prev; } showRechargeNotice(0.2); return; }
+      var d = {}; try { d = await r.json(); } catch (e) {}
+      if (!r.ok || !d.plan) {
+        if (btn) { btn.disabled = false; btn.textContent = prev; }
+        showToast((d && d.detail) || _i18nText('refine_apply_err', 'No se ha podido actualizar el plan.'));
+        return;
+      }
+      window._lastInterventionPlan = d.plan;
+      try { localStorage.setItem('dm_last_plan', d.plan); } catch (e) {}
+      var cont = document.getElementById('interv-content') || document.getElementById('tracking-content');
+      if (cont && window._mdToHtml) cont.innerHTML = window._mdToHtml(d.plan);
+      if (typeof fetchBalance === 'function') fetchBalance();
+      if (btn) btn.textContent = _i18nText('refine_applied', 'Plan actualizado');
+      showToast(_i18nText('refine_applied_toast', 'El plan guardado ya incluye los cambios.'));
+      setTimeout(function () { goTo('s-tracking'); }, 900);
+    } catch (e) {
+      if (btn) { btn.disabled = false; btn.textContent = prev; }
+      showToast(_i18nText('refine_apply_err', 'No se ha podido actualizar el plan.'));
+    }
+  };
+
   async function sendRefineMessage() {
     var input = document.getElementById('refine-input');
     var text = (input && input.value.trim()) || '';
@@ -16927,6 +16984,8 @@ function getVal(id, fallback) {
 
     // Append user bubble
     _refineHistory.push({ role: 'user', content: text });
+    /* Con conversación ya hay algo que aplicar al plan (2026-08-06). */
+    try { var _ac = document.getElementById('refine-aplicar-caja'); if (_ac) _ac.style.display = ''; } catch (e) {}
     appendRefineBubble('user', text, msgs);
 
     // Typing indicator
@@ -20205,6 +20264,13 @@ function endTourIntro() {
       pw_legal:   'Suscripción mensual con renovación automática. Puedes cancelarla cuando quieras desde los ajustes de tu tienda (App Store o Google Play). Los créditos que compres no caducan.',
       pw_restore: 'Restaurar compras',
       pw_have_code: '¿Tienes un código de equipo?',
+      refine_apply: 'Aplicar los cambios al plan',
+      refine_apply_note: 'Reescribe el plan guardado con lo acordado aquí. Cuesta 20 créditos.',
+      refine_applying: 'Reescribiendo el plan…',
+      refine_applied: 'Plan actualizado',
+      refine_applied_toast: 'El plan guardado ya incluye los cambios.',
+      refine_apply_err: 'No se ha podido actualizar el plan.',
+      refine_no_plan: 'No encuentro el plan al que aplicar los cambios.',
       pw_partner_tag: 'Cuenta Partner',
       pw_partner_title: 'Profesional con acceso incluido',
       pw_code_ph: 'TDMTEAM-XXXXXX',
@@ -21257,6 +21323,13 @@ function endTourIntro() {
       pw_legal:   'Monthly auto-renewing subscription. You can cancel it any time from your store settings (App Store or Google Play). Credits you buy never expire.',
       pw_restore: 'Restore purchases',
       pw_have_code: 'Do you have a team code?',
+      refine_apply: 'Apply the changes to the plan',
+      refine_apply_note: 'Rewrites the saved plan with what you agreed here. Costs 20 credits.',
+      refine_applying: 'Rewriting the plan…',
+      refine_applied: 'Plan updated',
+      refine_applied_toast: 'The saved plan now includes the changes.',
+      refine_apply_err: 'The plan could not be updated.',
+      refine_no_plan: 'I cannot find the plan to apply the changes to.',
       pw_partner_tag: 'Partner account',
       pw_partner_title: 'Professional with access included',
       pw_code_ph: 'TDMTEAM-XXXXXX',
@@ -22310,6 +22383,13 @@ function endTourIntro() {
           pw_legal:   'Abbonamento mensile a rinnovo automatico. Puoi disdirlo quando vuoi dalle impostazioni del tuo store (App Store o Google Play). I crediti acquistati non scadono.',
           pw_restore: 'Ripristina acquisti',
           pw_have_code: 'Hai un codice del team?',
+          refine_apply: 'Applica le modifiche al piano',
+          refine_apply_note: 'Riscrive il piano salvato con quanto concordato qui. Costa 20 crediti.',
+          refine_applying: 'Sto riscrivendo il piano…',
+          refine_applied: 'Piano aggiornato',
+          refine_applied_toast: 'Il piano salvato include ora le modifiche.',
+          refine_apply_err: 'Non è stato possibile aggiornare il piano.',
+          refine_no_plan: 'Non trovo il piano a cui applicare le modifiche.',
           pw_partner_tag: 'Account Partner',
           pw_partner_title: 'Professionale con accesso incluso',
           pw_code_ph: 'TDMTEAM-XXXXXX',

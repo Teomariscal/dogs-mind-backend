@@ -1,6 +1,7 @@
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Header, Depends, Query, BackgroundTasks
 from sqlalchemy.orm import Session
+from pydantic import BaseModel, Field
 
 from app.models.intervention import InterventionRequest, InterventionResponse
 from app.services.intervention_ai import run_intervention_plan
@@ -87,4 +88,107 @@ def create_intervention(
             success="error",
             notes=str(e)[:200],
         )
+        raise_http_for_anthropic(e)
+
+# ── POST /intervention/apply-refinement ─────────────────────────────────────
+class AplicarRefinamientoIn(BaseModel):
+    plan_actual: str = Field(..., min_length=20)
+    conversacion: list = Field(..., description="[{role, content}] del chat de refinamiento")
+    case_id: Optional[str] = None
+    lang: str = "es"
+
+
+@router.post("/intervention/apply-refinement")
+def aplicar_refinamiento(
+    payload: AplicarRefinamientoIn,
+    background_tasks: BackgroundTasks,
+    authorization: Optional[str] = Header(None),
+    db: Session = Depends(get_db),
+):
+    """
+    Reescribe el plan guardado incorporando lo acordado en el chat de
+    refinamiento (reporte de Sofía D, 2026-08-06).
+
+    Antes el chat conversaba sobre el plan pero NO lo tocaba: el plan guardado
+    se quedaba desactualizado y el usuario acababa copiando trozos a un Word.
+
+    Cuesta 0,2 tokens = 20 créditos, el mismo precio que el plan de
+    intervención: es reescritura, no un plan nuevo desde cero.
+    """
+    COSTE = 0.2
+    deduct_token(authorization, db, amount=COSTE, require_auth=True)
+
+    dialogo = "\n".join(
+        f"{'TUTOR' if (m.get('role') == 'user') else 'CLINICO'}: {m.get('content', '')}"
+        for m in payload.conversacion if m.get("content")
+    )[:20000]
+
+    idioma = {"en": "Write the whole plan in ENGLISH.",
+              "it": "Scrivi tutto il piano in ITALIANO."}.get(
+        (payload.lang or "es").lower(), "Escribe todo el plan en ESPAÑOL.")
+
+    instruccion = (
+        f"{idioma}\n\n"
+        "Aquí tienes un PLAN DE INTERVENCIÓN ya entregado y, debajo, la conversación "
+        "posterior en la que se han acordado ajustes.\n\n"
+        "Reescribe el plan COMPLETO incorporando todo lo acordado. Reglas:\n"
+        "- Devuelve el plan entero, no un resumen ni una lista de cambios.\n"
+        "- Mantén intacto lo que no se ha discutido.\n"
+        "- Donde haya acuerdo de cambio, aplica el acuerdo, no la versión vieja.\n"
+        "- Conserva la estructura, el rigor y el blindaje LIMA del plan original.\n"
+        "- No inventes datos que no estén ni en el plan ni en la conversación.\n"
+        "- NO te cortes a mitad: si no cabe, sé más conciso, pero termina.\n\n"
+        f"<plan_actual>\n{payload.plan_actual}\n</plan_actual>\n\n"
+        f"<conversacion>\n{dialogo}\n</conversacion>"
+    )
+
+    try:
+        from app.core.anthropic_client import create_message_resilient
+        settings = get_settings()
+        r = create_message_resilient(
+            model=settings.clinical_model,
+            fallback_model=settings.clinical_fallback_model,
+            max_tokens=8000,
+            temperature=0.3,
+            messages=[{"role": "user", "content": instruccion}],
+        )
+        texto = "".join(b.text for b in r.content if getattr(b, "type", None) == "text").strip()
+
+        if getattr(r, "stop_reason", None) == "max_tokens":
+            seguimiento = create_message_resilient(
+                model=settings.clinical_model,
+                fallback_model=settings.clinical_fallback_model,
+                max_tokens=8000,
+                temperature=0.3,
+                messages=[{"role": "user", "content": instruccion},
+                          {"role": "assistant", "content": texto},
+                          {"role": "user", "content": "Continúa exactamente donde lo dejaste, sin repetir nada."}],
+            )
+            texto += "\n" + "".join(b.text for b in seguimiento.content
+                                    if getattr(b, "type", None) == "text").strip()
+
+        background_tasks.add_task(
+            log_usage, user_id=None, endpoint="/intervention/apply-refinement",
+            model=settings.clinical_model,
+            input_tokens=r.usage.input_tokens, output_tokens=r.usage.output_tokens,
+            tokens_charged=COSTE, success="ok")
+
+        if payload.case_id:
+            user = get_user_from_authorization(authorization, db)
+            if user:
+                persist_to_case_safely(
+                    payload.case_id, user, db, entry_type="intervention",
+                    content=texto,
+                    meta={"endpoint": "/intervention/apply-refinement",
+                          "origen": "refinamiento aplicado"},
+                    ai_model=settings.clinical_model,
+                    input_tokens=r.usage.input_tokens,
+                    output_tokens=r.usage.output_tokens,
+                    tokens_charged=COSTE)
+
+        return {"ok": True, "plan": texto}
+    except HTTPException:
+        raise
+    except Exception as e:
+        refund_token(authorization, db, amount=COSTE)
         raise_http_for_anthropic(e)

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Dogs' Mind — Integración de logo (preview)</title>
+<style>
+  :root{
+    --e0:#0a1a14; --e1:#122a23; --e2:#1a3b34; --e3:#4a6741;
+    --cyan:#5ec8e6; --cyanL:#80d6ee; --ink:#eafdff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    background:
+      radial-gradient(900px 600px at 50% 18%, rgba(94,200,230,.10), transparent 60%),
+      linear-gradient(160deg,#06090b 0%, #0a1a14 45%, #122a23 100%);
+    color:#dfe9e6; min-height:100vh; padding:48px 24px 80px;
+  }
+  .wrap{max-width:1180px;margin:0 auto}
+  h1{font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;
+     font-size:34px;color:#fff;text-align:center;letter-spacing:.5px}
+  .sub{text-align:center;color:var(--cyanL);font-size:12px;letter-spacing:3px;
+       text-transform:uppercase;margin:8px 0 6px;font-weight:600}
+  .note{text-align:center;color:#8aa39c;font-size:13px;margin-bottom:40px}
+  .stage{display:flex;gap:54px;justify-content:center;flex-wrap:wrap;align-items:flex-start}
+  .col{display:flex;flex-direction:column;align-items:center;gap:14px}
+  .caption{color:#9fb4ad;font-size:13px;letter-spacing:.4px}
+
+  /* iPhone frame */
+  .phone{
+    width:300px;height:620px;border-radius:54px;
+    background:#000;padding:11px;
+    box-shadow:0 30px 80px rgba(0,0,0,.55), 0 0 0 2px #1d2a27, inset 0 0 0 1px #2c3a36;
+    position:relative;
+  }
+  .screen{
+    width:100%;height:100%;border-radius:44px;overflow:hidden;position:relative;
+    background:linear-gradient(165deg,var(--e0),var(--e1) 45%,var(--e2) 78%,var(--e3));
+  }
+  .island{position:absolute;top:12px;left:50%;transform:translateX(-50%);
+    width:96px;height:28px;background:#000;border-radius:16px;z-index:9}
+  .statusbar{position:absolute;top:0;left:0;right:0;height:52px;display:flex;
+    align-items:center;justify-content:space-between;padding:0 26px;
+    font-size:13px;color:rgba(255,255,255,.92);font-weight:600;z-index:8}
+
+  /* Home screen */
+  .home{position:absolute;inset:0;padding:64px 22px 26px;
+    display:flex;flex-direction:column}
+  .home .halo{position:absolute;inset:0;background:
+    radial-gradient(420px 300px at 50% 22%, rgba(94,200,230,.16), transparent 65%);}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px 16px;
+    position:relative;z-index:2;margin-top:8px}
+  .app{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .ic{width:56px;height:56px;border-radius:14px;box-shadow:0 4px 10px rgba(0,0,0,.35)}
+  .ic.ph1{background:linear-gradient(135deg,#3a6df0,#7aa2ff)}
+  .ic.ph2{background:linear-gradient(135deg,#34c759,#8be79b)}
+  .ic.ph3{background:linear-gradient(135deg,#ff9f0a,#ffd479)}
+  .ic.ph4{background:linear-gradient(135deg,#ff375f,#ff8aa3)}
+  .ic.ph5{background:linear-gradient(135deg,#5e5ce6,#a39bff)}
+  .ic.ph6{background:linear-gradient(135deg,#8e8e93,#c7c7cc)}
+  .ic.ph7{background:linear-gradient(135deg,#30d5c8,#9af0e8)}
+  .ic img{width:100%;height:100%;display:block;border-radius:14px}
+  .app .lab{font-size:11px;color:rgba(255,255,255,.92);font-weight:500;
+    text-shadow:0 1px 2px rgba(0,0,0,.5)}
+  .app.ours .ic{box-shadow:0 6px 18px rgba(94,200,230,.45),0 0 0 1px rgba(128,214,238,.25)}
+  .dock{margin-top:auto;position:relative;z-index:2;height:74px;border-radius:26px;
+    background:rgba(255,255,255,.10);backdrop-filter:blur(14px);
+    display:flex;align-items:center;justify-content:space-around;padding:0 16px}
+  .dock .ic{width:50px;height:50px}
+
+  /* Splash screen */
+  .splash{position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;padding:40px 26px}
+  .splash .halo{position:absolute;inset:0;background:
+    radial-gradient(380px 320px at 50% 34%, rgba(94,200,230,.18), transparent 62%);}
+  .splash .lk{width:236px;position:relative;z-index:2;
+    filter:drop-shadow(0 10px 30px rgba(0,0,0,.4))}
+  .splash .cta{position:relative;z-index:2;margin-top:30px;width:100%;
+    display:flex;flex-direction:column;align-items:center;gap:12px}
+  .btn{width:200px;height:50px;border-radius:16px;border:none;cursor:pointer;
+    background:linear-gradient(135deg,var(--cyan),#3fa9cc);color:#04161c;
+    font-weight:700;font-size:15px;letter-spacing:.3px;
+    box-shadow:0 10px 26px rgba(94,200,230,.4)}
+  .ghost{color:rgba(255,255,255,.7);font-size:13px;letter-spacing:.5px}
+
+  /* asset rows */
+  .assets{margin-top:64px}
+  .arow{display:flex;gap:30px;justify-content:center;align-items:center;
+    flex-wrap:wrap;margin-bottom:14px}
+  .card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+    border-radius:18px;padding:18px;display:flex;flex-direction:column;
+    align-items:center;gap:12px}
+  .card img{display:block;border-radius:10px}
+  .iconbig{width:180px;height:180px;border-radius:40px;
+    box-shadow:0 14px 40px rgba(0,0,0,.5)}
+  .strip{max-width:760px;width:100%}
+  .lref{width:220px;border-radius:10px}
+  .hr{height:1px;background:rgba(255,255,255,.08);margin:54px 0 40px}
+  .legend{color:#8aa39c;font-size:12.5px;text-align:center;max-width:680px;
+    margin:10px auto 0;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>The Dogs' Mind</h1>
+  <div class="sub">Logo · Integración en la app</div>
+  <div class="note">v2_A vibrant — línea de energía cyan sobre esmeralda · preview, no producción</div>
+
+  <div class="stage">
+    <!-- HOME SCREEN -->
+    <div class="col">
+      <div class="phone"><div class="screen">
+        <div class="island"></div>
+        <div class="statusbar"><span>9:41</span><span>5G &nbsp; 100%</span></div>
+        <div class="home">
+          <div class="halo"></div>
+          <div class="grid">
+            <div class="app"><div class="ic ph1"></div><div class="lab">Mail</div></div>
+            <div class="app"><div class="ic ph2"></div><div class="lab">Salud</div></div>
+            <div class="app"><div class="ic ph3"></div><div class="lab">Notas</div></div>
+            <div class="app"><div class="ic ph4"></div><div class="lab">Fotos</div></div>
+            <div class="app ours"><div class="ic"><img src="decided/icon_1024_vibrant.png"></div><div class="lab">Dogs' Mind</div></div>
+            <div class="app"><div class="ic ph5"></div><div class="lab">Calend.</div></div>
+            <div class="app"><div class="ic ph7"></div><div class="lab">Música</div></div>
+            <div class="app"><div class="ic ph6"></div><div class="lab">Ajustes</div></div>
+          </div>
+          <div class="dock">
+            <div class="ic ph1"></div><div class="ic ph7"></div>
+            <div class="ic"><img src="decided/icon_1024_vibrant.png"></div><div class="ic ph4"></div>
+          </div>
+        </div>
+      </div></div>
+      <div class="caption">Home screen iOS — el icono entre apps reales</div>
+    </div>
+
+    <!-- SPLASH -->
+    <div class="col">
+      <div class="phone"><div class="screen">
+        <div class="island"></div>
+        <div class="statusbar"><span>9:41</span><span>5G &nbsp; 100%</span></div>
+        <div class="splash">
+          <div class="halo"></div>
+          <img class="lk" src="decided/lockup_vibrant.png">
+          <div class="cta">
+            <button class="btn">Log In</button>
+            <div class="ghost">Inicio · Tour</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="caption">Splash — lockup vibrant integrado</div>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <div class="assets">
+    <div class="sub" style="margin-bottom:26px">Assets generados</div>
+    <div class="arow">
+      <div class="card">
+        <img class="iconbig" src="decided/icon_1024_vibrant.png">
+        <div class="caption">Icono App Store 1024² (sin texto · sin alfa)</div>
+      </div>
+      <div class="card">
+        <img class="lref" src="decided/v2A_master_blackoncream.png">
+        <div class="caption">Master aprobado (b/n, referencia)</div>
+      </div>
+    </div>
+    <div class="arow">
+      <div class="card" style="width:100%;max-width:820px">
+        <img class="strip" src="decided/icon_sizes_strip.png">
+        <div class="caption">Prueba de legibilidad 1024 → 40px</div>
+      </div>
+    </div>
+    <div class="legend">
+      Nota técnica: a 40&nbsp;px el trazo neón se afina. Para el icono definitivo de App Store
+      se engrosará la línea (arte bespoke de Bokhua) manteniendo el glow cyan. La retícula áurea
+      se reserva para animación de carga / brand story, fuera del logo de producción.
+    </div>
+  </div>
+</div>
+</body>
+</html>

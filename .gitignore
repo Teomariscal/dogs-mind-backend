@@ -52,3 +52,4 @@ measure-screens.js
 frontend/*.bak-*.html
 frontend/button-proposals.html
 frontend/design-v2.html
+mobile/android/keystore.properties

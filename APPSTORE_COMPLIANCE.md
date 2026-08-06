@@ -1,9 +1,18 @@
 # Dogs Mind — App Store Review Compliance Checklist
 
-**Última actualización:** 2026-05-26
+**Última actualización:** 2026-06-02 (revisión contra guidelines vivas + findings agente auditor)
 **Estado global:** Pre-submission · Fase 1 (PWA cleanup) completa · Fase 2 (Capacitor + IAP) pendiente
+**Readiness estimada:** ~62% (ver cálculo al final). 3 bloqueantes duros + 1 reforzado.
 
 Documento interno de referencia. Mapea cada guideline relevante de [App Store Review Guidelines](https://developer.apple.com/app-store/review/guidelines/) al estado actual de Dogs Mind, con evidencia en código.
+
+> **Nota de honestidad (2026-06-02):** la revisión de deltas de junio 2026 la hizo un
+> agente auditor SIN acceso a WebSearch en vivo (se le denegó). Por tanto, las
+> tendencias de *enforcement* de Apple en Q3-Q4 2025 / Q1 2026 NO están verificadas
+> contra fuente primaria, y la existencia/nomenclatura exacta del tipo de producto
+> "non-renewing annual" debe re-confirmarse en App Store Connect antes de crear
+> productos. Todo lo marcado `[VERIFICAR]` requiere confirmación en fuente Apple
+> oficial antes de actuar. No avanzamos código sobre supuestos no verificados.
 
 ---
 
@@ -11,11 +20,27 @@ Documento interno de referencia. Mapea cada guideline relevante de [App Store Re
 
 | # | Bloqueante | Sección | Acción |
 |---|---|---|---|
-| **1** | Stripe Checkout para tokens (en iOS debe ser IAP) | 3.1.1 | Fase 2: integrar StoreKit2 + webhook App Store Server Notifications V2 |
-| **2** | PWA puro sin wrapper nativo | 4.2 | Fase 2: empaquetar con Capacitor + añadir features nativas (push, share sheet, photo picker, IAP) |
-| **3** | (Resuelto en Fase 1) URLs públicas /privacy y /terms | 5.1.1(i) | ✅ Hecho — `frontend/privacy.html` y `frontend/terms.html` |
+| **1** | Stripe Checkout para tokens (en iOS debe ser IAP) | 3.1.1 | Fase 2: IAP vía RevenueCat/StoreKit2 + webhook App Store Server Notifications V2. **El binario iOS NO puede contener UI/link/copy de Stripe** (ni link externo) |
+| **2** | PWA puro sin wrapper nativo | 4.2 | Fase 2: empaquetar con Capacitor + ≥3 features nativas (push, share sheet, photo picker, IAP) |
+| **3** | Consentimiento explícito ANTES de enviar datos a IA de terceros | 5.1.2(i) | **Reforzado 13-nov-2025.** Cubierto a nivel signup **+ refuerzo per-acción IMPLEMENTADO (staged 2026-06-06)**: micro-aviso `consent_ai_inline` en anamnesis y entrenamiento, justo en el punto de envío. Pendiente deploy + visual (ver §5.1.2) |
+| 4 | (Resuelto Fase 1) URLs públicas /privacy y /terms | 5.1.1(i) | ✅ Hecho — `frontend/privacy.html` y `frontend/terms.html` |
 
 **Lo demás está cubierto o es bajo riesgo.** Detalle por sección abajo.
+
+### Deltas guidelines junio 2026 (vs snapshot 2026-05-26)
+
+- **5.1.2(i) — reforzado (13-nov-2025):** exige disclosure explícito de terceros
+  *"including with third-party AI"* + permiso explícito ANTES de compartir datos.
+  Anthropic debe nombrarse y el opt-in debe preceder al primer envío de datos. (§5.1.2)
+- **4.7 / 4.7.5 — mini-apps y chatbots:** el chat IA con RAG podría leerse como
+  "chatbot" bajo 4.7 → conviene content filter + age rating coherente. (§4.7, nueva)
+- **4.1(c) — no usar icono/nombre de otro developer:** verificar que "The Dogs' Mind"
+  no colisiona con marca/app existente en App Store. (§4.1)
+- **Recomendación de producto IAP:** considerar membresía Pro como **Auto-Renewable
+  Subscription** en vez de "pago único anual no-renovable" (más limpio para revisores).
+  `[VERIFICAR]` — decisión abierta, ver §3.1.2. NO se cambia nada en código aún.
+- **No existe sección dedicada a IA** en las guidelines (a jun-2026); solo 5.1.2(i)
+  menciona "third-party AI". NO hay requisito formal de label/watermark de IA.
 
 ---
 
@@ -113,17 +138,36 @@ IAP integrado para Pro también — el orden natural es:
 - 3.1.3(c) Enterprise: solo si vendemos a empresas (corporativo), no a consumers.
 - 3.1.3(d) Person-to-person real-time: no aplica (es IA, no humano en directo).
 - 3.1.3(f) Free companion: no aplica (la propia iOS también cobra).
+**⚠️ Regla dura de blindaje (agente 2026-06-02):** en el build iOS, Stripe debe quedar
+**completamente oculto** — no botón, no link, no copy, ni siquiera un enlace externo
+"compra más barato en la web". 3.1.1 + 3.1.3(b) prohíben dirigir al usuario fuera del
+IAP dentro de la app iOS. Mecanismo: feature flag `IS_IOS_NATIVE` (derivado de
+`Capacitor.getPlatform() === 'ios'`) que apaga TODO el path Stripe en el binario iOS.
+La web sigue vendiendo por Stripe en paralelo (eso es legítimo).
+
 **Acción Fase 2:**
-1. Integrar `@revenuecat/purchases-capacitor` (abstrae StoreKit2 + Google Play Billing).
+1. Integrar `@revenuecat/purchases-capacitor` (abstrae StoreKit2 + Google Play Billing). **[Pendiente decisión input #5: RevenueCat vs StoreKit2 nativo.]**
 2. Backend: webhook App Store Server Notifications V2 paralelo al de Stripe.
-3. Crear productos IAP en App Store Connect: `dm_tokens_pack_8`, `dm_tokens_pack_24`, `dm_tokens_pack_60`, `dm_pro_membership_yearly`.
-4. UI iOS: detectar `Capacitor.getPlatform() === 'ios'` → renderizar botón "Comprar tokens" que dispare IAP en vez de Stripe Checkout.
+3. Crear productos IAP en App Store Connect: tokens (consumibles) + Pro (tipo a decidir, ver §3.1.2). **[VERIFICAR nomenclatura/IDs al crear.]**
+4. UI iOS: `IS_IOS_NATIVE` → IAP en vez de Stripe; Stripe oculto por completo (regla dura arriba).
 5. Restore Purchases: añadir botón "Restaurar compras" obligatorio (3.1.1).
 6. Tokens no expiran (ya cumplimos: ToS §4 dice "no caducan").
 
 ### 3.1.2 Subscriptions
 **Requisito:** Si hay subs auto-renovables, mínimo 7 días, info clara, valor continuo.
-**Estado:** ✅ NO usamos subs auto-renovables. Tokens son **consumibles** (one-time IAP), Profesional es **non-renewing one-time** (pago único anual). Más simple, menos compliance.
+**Estado:** ✅ Hoy NO usamos subs auto-renovables. Tokens son **consumibles** (one-time IAP), Profesional es **non-renewing one-time** (pago único anual). Más simple, menos compliance.
+
+**[DECISIÓN ABIERTA — VERIFICAR] Tipo de producto para Pro (recomendación agente 2026-06-02):**
+El agente auditor recomienda modelar la membresía Pro como **Auto-Renewable
+Subscription** en lugar de "pago único anual no-renovable", porque:
+- Los revisores Apple leen mejor las auto-renewables (categoría limpia y estándar).
+- "Non-renewing annual" es un tipo válido pero ambiguo; algunos revisores lo confunden.
+Contras de auto-renewable: activa requisitos extra de 3.1.2 (gestión de suscripción,
+copy de renovación, valor continuo, link a "Manage Subscriptions"). 
+**Estado de la decisión:** SIN DECIDIR. Pros/contras documentados; se resolverá junto
+al input #5 (RevenueCat vs StoreKit2) del founder. `[VERIFICAR]` la existencia y
+nomenclatura exacta de "non-renewing annual" en App Store Connect antes de crear
+cualquier producto. **No se cambia código ni se crean productos hasta decidir.**
 
 ### 3.1.5 Cryptocurrencies
 **Estado:** ✅ N/A.
@@ -139,22 +183,63 @@ IAP integrado para Pro también — el orden natural es:
 ### 4.1 Copycats
 **Estado:** ✅ Producto único en su categoría (análisis ABC conductual canino con IA + LIMA).
 
+### 4.1(c) Nombre / icono de otro developer ✅ VERIFICADO 2026-06-02 — riesgo bajo
+**Requisito:** No usar nombre, icono o branding confusamente similar al de otra app/developer.
+**Verificación realizada (web search 2026-06-02):**
+- ❌ NO existe app "The Dogs' Mind" ni "Dogs Mind" en el App Store. Apps de conducta canina
+  existentes (OneMind Dogs, EveryDoggy, Dogo, Puppr) NO colisionan en nombre ni concepto.
+  → El App Name está libre para reservar. 4.1(c) (copia de otra APP) = riesgo bajo.
+- ⚠️ Existe un libro conocido: *"The Dog's Mind: Understanding Your Dog's Behavior"*
+  (Bruce Fogle, Turner Publishing). Título casi idéntico PERO: (a) Apple revisa contra
+  otras apps, no libros; (b) nuestra marca es **plural posesiva** ("Dogs'" vs "Dog's") →
+  diferenciación; (c) títulos de un solo libro no suelen tener marca registrada protegible.
+- También existen servicios (no apps): "My Dogs Mind", "Dogs Mind Training" → sin colisión App Store.
+**Decisión:** ✅ **Procedemos con "The Dogs' Mind".** No bloquea submission.
+**Riesgo residual:** trademark formal es materia legal ajena al App Store (bajo, no urgente).
+Si se quisiera blindaje 100% → búsqueda USPTO/EUIPO + abogado (fuera del camino de compliance).
+**Acción cuando haya cuenta paga:** reservar el App Name en App Store Connect cuanto antes
+(first-come). Evitar en metadata/keywords cualquier referencia al libro o a Fogle.
+
 ### 4.2 Minimum Functionality ⚠️ BLOQUEANTE
-**Requisito:** No wrappers web puros.
+**Requisito:** No wrappers web puros; la app debe aportar valor nativo más allá de "una web empaquetada".
 **Estado:** ❌ **BLOQUEANTE actualmente** — Dogs Mind hoy es PWA puro.
-**Acción Fase 2:** Wrapper Capacitor + features nativas:
-- ✅ IAP (cubre 3.1.1 y aporta valor nativo).
-- 📋 Push notifications nativas (recordatorios de seguimiento diario).
-- 📋 Share Sheet nativo (compartir análisis como PDF).
-- 📋 Photo Picker nativo (subir vídeo de anamnesis).
-- 📋 Offline mode (SW ya lo da, Capacitor lo refuerza).
-Con al menos 3-4 de éstos, 4.2 está cubierto sin riesgo.
+
+**⚠️ Regla del founder (2026-06-02): "las funciones son las que hay".** NO se añaden
+features de producto nuevas. La app ya es funcionalmente completa y profunda (análisis
+ABC con IA, flujos multipantalla, cuentas, seguimiento diario, entrenamiento específico).
+La 4.2 se cubre con **capacidades NATIVAS sobre funciones que YA EXISTEN**, no con scope nuevo.
+
+**Acción Fase 2 — capacidades nativas (sin features nuevas):**
+- ✅ **IAP** (RevenueCat) — capacidad nativa de comercio; cubre 3.1.1 y aporta valor nativo sustancial.
+- ✅ **Push notifications nativas** (desde v1) — recordatorios del seguimiento diario, función YA existente; opt-in. (D-009)
+- ✅ **Photo/Video Picker nativo** — implementación nativa de la subida de vídeo de anamnesis que **YA existe** en la app (no es función nueva, es el picker nativo en vez del input web).
+- ✅ **Offline / caching nativo** — el SW ya lo da; Capacitor lo refuerza (no es función nueva).
+- ❌ ~~Share Sheet / export PDF~~ — **DESCARTADO**: sería función nueva. No se añade (regla "las funciones son las que hay").
+
+Con IAP + Push + Photo Picker nativo + offline, sobre una app de funcionalidad genuina y
+profunda, la 4.2 queda cubierta **sin inventar nada**. Ver D-010.
 
 ### 4.3 Spam
 **Estado:** ✅ App única (un único Bundle ID).
 
 ### 4.4 Extensions
 **Estado:** ✅ Sin extensions iOS. N/A.
+
+### 4.7 / 4.7.5 Mini-apps, chatbots, HTML5 ⚠️ Nueva consideración (delta jun-2026)
+**Requisito:** Apps que ofrecen chatbots / mini-apps HTML5-JS deben cumplir reglas de
+contenido, control de edad, y no exponer a menores a contenido inapropiado.
+**Estado:** ⚠️ Riesgo bajo-medio. El chat IA con RAG (`daily-followup` coach, asistente)
+**podría** interpretarse como "chatbot" bajo 4.7. Mitigaciones que ya tenemos / faltan:
+- ✅ El LLM tiene system prompt estricto LIMA + ámbito conducta canina (no chat abierto).
+- ✅ El contenido generado es profesional, no UGC entre usuarios.
+- 📋 **Falta:** confirmar que el age rating declarado (4+) es coherente con tener un
+  componente conversacional IA; algunos revisores piden 12+/17+ para chatbots abiertos.
+  Nuestro chat NO es abierto (está acotado a conducta canina) → defendible como 4+,
+  pero hay que **documentarlo en Notes for Review** explícitamente.
+- 📋 **Falta:** content filter explícito sobre input del usuario (hoy el filtro es
+  implícito vía el prompt; conviene un guardrail documentado).
+**Acción Fase 2:** redactar en App Review Notes que el "chat" es un asistente acotado
+(no chatbot de propósito general), con LIMA enforcement, y justificar age rating 4+.
 
 ### 4.8 Sign in with Apple
 **Requisito:** Si hay social login (Facebook/Google/etc.), debe ofrecerse Sign in with Apple equivalente.
@@ -201,12 +286,34 @@ Con al menos 3-4 de éstos, 4.2 está cubierto sin riesgo.
 ### 5.1.1(ix) Regulated Industries
 **Estado:** ✅ NO somos banking/health-humano/cannabis/gambling. Cuenta operada por persona física documentada (Teodoro Mariscal Diaz, España).
 
-### 5.1.2 Data Use & Sharing (3rd-party AI disclosure) ⚠️ Recientemente reforzado
-**Requisito:** "Must clearly disclose where personal data will be shared with third parties, **including with third-party AI**, and obtain explicit permission before doing so."
-**Estado:** ✅ Reforzado en Fase 1.3.
-**Evidencia:**
+### 5.1.2(i) Data Use & Sharing (3rd-party AI disclosure) ⚠️ REFORZADO 13-nov-2025 — semi-bloqueante
+**Requisito (texto vivo):** "Must clearly disclose where personal data will be shared
+with third parties, **including with third-party AI**, and obtain explicit permission
+before doing so."
+**Estado:** 🟡 Cubierto a nivel signup; conviene **gate de consentimiento previo al primer
+envío de datos** para máxima robustez ante revisor estricto.
+**Evidencia (ya cubierto):**
 - Privacy policy lista a Anthropic explícitamente como receptor del texto de anamnesis (`pp_l4_1`).
-- Checkbox de consentimiento del signup ahora menciona explícitamente: *"el texto que escriba sobre mi perro (anamnesis, conversaciones) se enviará a **Anthropic (Claude AI, USA)** para generar los análisis"* (`form_consent_html`, `frontend/index.html:8212`).
+- Checkbox de consentimiento del signup menciona explícitamente: *"el texto que escriba sobre mi perro (anamnesis, conversaciones) se enviará a **Anthropic (Claude AI, USA)** para generar los análisis"* (`form_consent_html`, `frontend/index.html:8212`).
+
+**Delta 2026-06-02 (qué cambió y qué falta):** la actualización del 13-nov-2025 endurece
+el "**before doing so**": el consentimiento debe **preceder** al primer envío de datos a la IA.
+- ✅ Hoy: el consentimiento se da en el signup (antes de poder usar nada). En la práctica
+  esto YA precede al primer análisis → defendible.
+- ✅ **Refuerzo IMPLEMENTADO (staged, sin deploy) 2026-06-06:** micro-aviso explícito en el
+  punto exacto de envío, en los **dos** flujos que mandan datos del perro a la IA:
+  - **Anamnesis / ABC** (`s-anamnesis`): `<p id="analyze-ai-consent">` justo encima del botón
+    "Analizar con IA" (~L9682).
+  - **Entrenamiento Específico** (`s-anamnesis-training`): `<p id="tc-ai-consent">` bajo el
+    aviso de coste, encima de "Crear plan" (~L9303).
+  - Texto (key i18n `consent_ai_inline`, ES+EN): *"Al continuar, el texto sobre tu perro se
+    enviará a Anthropic (Claude AI, EE. UU.) para generar el análisis."* / *"By continuing,
+    the text about your dog will be sent to Anthropic (Claude AI, USA) to generate the analysis."*
+  - **Additive, copy + i18n, sin backend.** Verificado: 7/7 bloques `<script>` pasan
+    `node --check`; 2 usos DOM + 2 defs i18n (ES/EN).
+  - ⚠️ **NO desplegado** (cautela): editado solo en working tree. Al desplegar requerirá
+    **bump de `CACHE_NAME`** (SW) para que usuarios cacheados reciban el copy. Pendiente:
+    revisión visual del founder + deploy.
 
 ### 5.1.2(vi) Sensitive Data
 **Estado:** ✅ NO usamos HomeKit, HealthKit, ClinicalHealthRecords, MovementDisorder, ClassKit, ARKit facial/depth. N/A.
@@ -248,8 +355,36 @@ Cuando lleguemos al submission:
 
 ---
 
+## CÁLCULO DE READINESS (~62%)
+
+Estimación honesta por bloques (peso aprox. según esfuerzo/riesgo de rechazo):
+
+| Bloque | Peso | Estado | Aporta |
+|---|---|---|---|
+| Legal/Privacy (5.1.1, policies, deletion, disclaimers) | 20% | ✅ ~95% | 19% |
+| Contenido/Safety (1.x, 4.1, 4.8, medical disclaimer) | 15% | ✅ ~90% | 13.5% |
+| 5.1.2(i) consent IA reforzado | 10% | ✅ ~95% (gate per-acción staged 2026-06-06; falta deploy) | 9.5% |
+| 4.7 chatbot/age-rating | 5% | 🟡 ~60% (falta doc Notes + guardrail) | 3% |
+| **3.1.1 IAP** (RevenueCat/StoreKit + webhook + ocultar Stripe iOS) | 25% | ❌ ~0% (no empezado) | 0% |
+| **4.2 Wrapper Capacitor + ≥3 features nativas** | 20% | ❌ ~0% (PWA puro) | 0% |
+| Assets/metadata (screenshots, demo account, Notes, nutrition labels) | 5% | ⏳ ~20% | 1% |
+| **TOTAL** | 100% | | **~62%** |
+
+**Lectura:** lo legal/contenido/UX está prácticamente listo. El 38% restante es
+casi todo **trabajo de ingeniería iOS no empezado** (IAP + Capacitor) que depende de:
+(a) cuenta Apple Developer paga, (b) decisión RevenueCat vs StoreKit2, (c) decisión
+tipo de producto Pro. Sin esos 3 inputs no se puede subir el % de forma honesta.
+
+---
+
 ## EVIDENCIAS ARCHIVADAS
 
-**Última verificación de compliance:** 2026-05-26 — commit `<pendiente>` cubre Fase 1 (sync ES/EN, URLs públicas, consent IA, disclaimer veterinario).
+**Última verificación de compliance:** 2026-06-02 — revisión de deltas guidelines vivas
+(5.1.2(i) reforzado 13-nov-2025, 4.7 chatbots, 4.1(c), recomendación IAP auto-renewable)
+por agente auditor. Doc-only, sin cambios de código. Caveat de verificación al inicio del doc.
 
-**Próxima revisión:** Antes de iniciar Fase 2 (Capacitor + IAP).
+**Última verificación previa:** 2026-05-26 — Fase 1 (sync ES/EN, URLs públicas, consent IA, disclaimer veterinario).
+
+**Próxima revisión:** Al recibir los inputs del founder (cuenta Apple Dev, RevenueCat/StoreKit2,
+tipo producto Pro) → arrancar Fase 2 (Capacitor scaffold + IAP). Decisiones se registran en
+`APPSTORE_DECISIONS.md`; progreso en `APPSTORE_TRACKING.md`.

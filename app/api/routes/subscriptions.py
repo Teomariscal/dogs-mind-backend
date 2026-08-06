@@ -66,6 +66,8 @@ def _public_plans() -> list:
             # el escalón se mide contra el Básico, no contra el plan anterior).
             "savings_vs_basic_pct": max(0, ahorro),
             "full_consults": round(credits / 320, 1),
+            "professional": bool(p.get("professional", False)),
+            "note": p.get("note", {}),
         })
     return out
 
@@ -104,6 +106,15 @@ def subscription_status(
             "active": subs.subscription_active(current_user),
         },
         "partner": _partner_info(current_user),
+        "professional": {
+            **subs.professional_allowed(current_user),
+            "account_type": getattr(current_user, "account_type", "particular"),
+            "message": (
+                "El plan Básico es para propietarios particulares. Si eres profesional "
+                "de la conducta y quieres respuestas muy técnicas y elaboradas, tu plan "
+                "empieza en Medio."
+            ),
+        },
         "plans": _public_plans(),
     }
 
@@ -279,3 +290,43 @@ def set_partner(
             "account_type": u.account_type,
             "message": ("Cuenta Partner activada, con perfil profesional."
                         if body.activo else "Partner desactivado.")}
+
+
+# ── POST /subscription/professional ─────────────────────────────────────────
+@router.post("/professional")
+def activar_profesional(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Convierte la cuenta en profesional apoyándose en el plan ya contratado.
+
+    Regla del founder (2026-08-06): el Básico es para propietarios
+    particulares; lo profesional arranca en el SEGUNDO escalón (Medio). Quien
+    ya tiene Medio o superior no vuelve a pagar nada aquí — el plan ya lo
+    incluye. Quien está en Básico recibe un 402 que le dice exactamente a qué
+    plan tiene que subir.
+
+    La membresía anual de 20 € sigue existiendo y sigue funcionando: esta ruta
+    es un camino más, no un reemplazo.
+    """
+    estado = subs.professional_allowed(current_user)
+    if not estado["allowed"]:
+        raise HTTPException(
+            status_code=402,
+            detail=("El plan Básico es para propietarios particulares. Para trabajar "
+                    "con perros de cliente y recibir informes técnicos, sube al plan "
+                    "Medio o superior."),
+        )
+
+    if (current_user.account_type or "particular") == "professional":
+        return {"ok": True, "ya_activo": True, "account_type": "professional",
+                "message": "Tu cuenta ya es profesional."}
+
+    current_user.account_type = "professional"
+    db.commit()
+    _log.info("professional: %s → profesional por plan (%s, motivo=%s)",
+              current_user.email, estado["current_plan"], estado["reason"])
+    return {"ok": True, "ya_activo": False, "account_type": "professional",
+            "plan": estado["current_plan"],
+            "message": "Listo. Tu cuenta ya es profesional."}

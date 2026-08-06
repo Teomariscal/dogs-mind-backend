@@ -57,6 +57,15 @@ DEFAULT_PLANS = [
         "trial_days": TRIAL_DAYS,
         "badge": {"es": "", "en": "", "it": ""},
         "audience": "particular",
+        "professional": False,
+        "note": {
+            "es": "Para propietarios particulares. Si eres profesional de la conducta "
+                  "y quieres respuestas muy técnicas y elaboradas, tu plan empieza en Medio.",
+            "en": "For private owners. If you are a behaviour professional and want highly "
+                  "technical, in-depth answers, your plan starts at Plus.",
+            "it": "Per proprietari privati. Se sei un professionista del comportamento e "
+                  "vuoi risposte molto tecniche e approfondite, il tuo piano parte da Medio.",
+        },
     },
     {
         "id": "medio",
@@ -69,7 +78,13 @@ DEFAULT_PLANS = [
         "stripe_price_env": "STRIPE_PRICE_MEDIO",
         "trial_days": 0,
         "badge": {"es": "El más elegido", "en": "Most chosen", "it": "Il più scelto"},
-        "audience": "particular",
+        "audience": "profesional",
+        "professional": True,
+        "note": {
+            "es": "Primer plan profesional: informes técnicos, perros de cliente y perfil de entidad.",
+            "en": "First professional plan: technical reports, client dogs and company profile.",
+            "it": "Primo piano professionale: referti tecnici, cani di clienti e profilo aziendale.",
+        },
     },
     {
         "id": "pro",
@@ -82,7 +97,13 @@ DEFAULT_PLANS = [
         "stripe_price_env": "STRIPE_PRICE_PRO",
         "trial_days": 0,
         "badge": {"es": "", "en": "", "it": ""},
-        "audience": "particular",
+        "audience": "profesional",
+        "professional": True,
+        "note": {
+            "es": "Profesional con volumen de casos.",
+            "en": "Professional with a steady case load.",
+            "it": "Professionista con volume di casi.",
+        },
     },
     {
         "id": "max",
@@ -96,8 +117,21 @@ DEFAULT_PLANS = [
         "trial_days": 0,
         "badge": {"es": "Clínicas y centros", "en": "Clinics & centres", "it": "Cliniche e centri"},
         "audience": "profesional",
+        "professional": True,
+        "note": {
+            "es": "Clínicas, centros y equipos.",
+            "en": "Clinics, centres and teams.",
+            "it": "Cliniche, centri e team.",
+        },
     },
 ]
+
+
+# ── Profesional por escalón de plan (founder 2026-08-06) ────────────────────
+# El Básico es para propietarios particulares. Quien quiere respuestas técnicas
+# y elaboradas (profesional de la conducta) arranca en el SEGUNDO escalón.
+# Se puede mover con SUBS_PRO_MIN_PLAN sin tocar código.
+PLAN_RANK = {"basico": 1, "medio": 2, "pro": 3, "max": 4}
 
 
 def _env_bool(name: str, default: bool = False) -> bool:
@@ -119,6 +153,56 @@ def paywall_enabled(user=None) -> bool:
         if pruebas and (getattr(user, "email", "") or "").lower() in pruebas:
             return True
     return False
+
+
+def professional_min_plan() -> str:
+    """Escalón mínimo que abre lo profesional. Por defecto 'medio'."""
+    val = os.environ.get("SUBS_PRO_MIN_PLAN", "medio").strip().lower()
+    return val if val in PLAN_RANK else "medio"
+
+
+def plan_rank(plan_id: Optional[str]) -> int:
+    return PLAN_RANK.get((plan_id or "").strip().lower(), 0)
+
+
+def professional_allowed(user, now: Optional[datetime] = None) -> dict:
+    """
+    ¿Puede esta cuenta usar las funciones profesionales (perros de cliente,
+    perfil de entidad, informe técnico)?
+
+    Nadie pierde lo que ya tenía: quien YA es profesional antes del corte
+    (los que pagaron la membresía de 20 €, los invitados, los de cortesía)
+    lo conserva. La regla del escalón solo aplica de aquí en adelante.
+    """
+    now = now or datetime.utcnow()
+    minimo = professional_min_plan()
+
+    def out(allowed, reason):
+        return {
+            "allowed": bool(allowed),
+            "reason": reason,
+            "min_plan": minimo,
+            "min_plan_rank": PLAN_RANK.get(minimo, 2),
+            "current_plan": getattr(user, "subscription_plan", None),
+            "current_rank": plan_rank(getattr(user, "subscription_plan", None)),
+        }
+
+    if not paywall_enabled(user):
+        return out(True, "paywall_off")
+    if (getattr(user, "role", "user") or "user") in ("admin", "developer", "partner"):
+        return out(True, "privileged")
+    if is_exempt(user) or (getattr(user, "email", "") or "").lower() in exemption_codes():
+        return out(True, "exempt")
+    if getattr(user, "corporate_id", None) and \
+       (getattr(user, "corporate_status", "") or "") == "active":
+        return out(True, "corporate")
+    # Derecho adquirido: ya era profesional antes de que existiera esta regla.
+    if (getattr(user, "account_type", "") or "") == "professional" and is_legacy(user):
+        return out(True, "grandfathered")
+    if subscription_active(user, now) and \
+       plan_rank(getattr(user, "subscription_plan", None)) >= PLAN_RANK.get(minimo, 2):
+        return out(True, "subscription")
+    return out(False, "needs_higher_plan")
 
 
 def cutover_date() -> datetime:

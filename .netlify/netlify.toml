@@ -50,6 +50,18 @@ for = "/teo-mariscal-v3.html"
 Cache-Control = "no-cache, must-revalidate"
 
 [[headers]]
+for = "/privacy.html"
+
+[headers.values]
+Cache-Control = "no-cache, must-revalidate"
+
+[[headers]]
+for = "/terms.html"
+
+[headers.values]
+Cache-Control = "no-cache, must-revalidate"
+
+[[headers]]
 for = "/service-worker.js"
 
 [headers.values]

@@ -17017,7 +17017,10 @@ function getVal(id, fallback) {
       }
       window._lastInterventionPlan = d.plan;
       try { localStorage.setItem('dm_last_plan', d.plan); } catch (e) {}
-      var cont = document.getElementById('interv-content') || document.getElementById('tracking-content');
+      /* El contenedor real es #interv-body: los ids que puse antes
+         (interv-content / tracking-content) no existen, así que el plan
+         refinado no se repintaba y solo aparecía tras el salto de pantalla. */
+      var cont = document.getElementById('interv-body');
       if (cont && window._mdToHtml) cont.innerHTML = window._mdToHtml(d.plan);
       if (typeof fetchBalance === 'function') fetchBalance();
       if (btn) btn.textContent = _i18nText('refine_applied', 'Plan actualizado');
@@ -17790,6 +17793,36 @@ function splitAnalysisParts(text) {
 //   "## BLOQUE B — CONDUCTA"   "## B — CONDUCTA"
 //   "## B - Conducta"           "## SECTION B — BEHAVIOR"
 //   "## B: Behavior"            "## B"  (solo letra)
+/**
+ * Secciones `## Título` en orden de aparición. Devuelve [{title, body}].
+ *
+ * Sirve para el formato PET OWNER: el prompt de particular no emite
+ * "## BLOQUE A/B/C" sino encabezados en llano (QUÉ LA DISPARA / QUÉ HACE Y QUÉ
+ * CONSIGUE / EN RESUMEN), y Sonnet los traduce al idioma del usuario. Al leer
+ * las secciones por posición en vez de por palabra, funciona en ES, EN e IT.
+ *
+ * Sin esto, extractSectionByLetter no casaba nada y la pantalla del análisis
+ * salía con las tres tarjetas VACÍAS para todos los particulares.
+ */
+function extractH2Sections(text) {
+  if (!text || typeof text !== 'string') return [];
+  var lines = text.split('\n');
+  var out = [], cur = null;
+  for (var i = 0; i < lines.length; i++) {
+    var m = /^[ \t]*##[ \t]*([^#].*?)[ \t]*$/.exec(lines[i]);
+    if (m) {
+      if (cur) out.push(cur);
+      cur = { title: m[1].replace(/^[\-—–:\s]+|[\-—–:\s]+$/g, ''), body: [] };
+      continue;
+    }
+    if (cur) cur.body.push(lines[i]);
+  }
+  if (cur) out.push(cur);
+  return out.map(function (s) {
+    return { title: s.title, body: s.body.join('\n').trim() };
+  }).filter(function (s) { return s.body; });
+}
+
 function extractSectionByLetter(text, letter) {
   if (!text) return '';
   // Acepta: ## [BLOQUE/BLOCK/SECTION ]?LETTER[separator|EOL]
@@ -17923,6 +17956,55 @@ function renderItems(containerId, sectionText) {
 }
 
 // ── FILL ABC SCREEN WITH ANALYSIS RESULT ─────────────
+/**
+ * Pinta la pantalla del análisis cuando el texto viene en formato PET OWNER.
+ *
+ * El particular no recibe bloques A/B/C, así que aquí no se traducen letras:
+ * cada tarjeta se titula con el encabezado que el propio análisis trae. Los
+ * dos subtítulos técnicos del bloque A (Estímulos condicionados / Estímulo
+ * discriminativo) no tienen contenido en este formato y se ocultan, en vez de
+ * quedarse en pantalla encima de un guion.
+ */
+function _abcPetOwnerLayout(secs) {
+  window._abcPetOwnerSummary = (secs[secs.length - 1] || {}).body || '';
+
+  // El aviso por defecto ("documento altamente técnico de carácter profesional")
+  // es FALSO aquí: este texto ya viene en llano. Texto del founder (2026-08-06).
+  var intro = document.querySelector('[data-i18n="abc_intro_text"]');
+  if (intro) {
+    var _l = (window._lang || document.documentElement.lang || 'es').slice(0, 2);
+    intro.textContent = _i18nText('abc_intro_petowner', ({
+      es: 'Estás en la versión Pet Owner: recibes un análisis de calidad altamente '
+        + 'profesional, pero reducido y explicado con un lenguaje accesible. Si deseas '
+        + 'un análisis más técnico, solo tienes que darte de alta en la versión profesional.',
+      en: 'You are on the Pet Owner version: you get a highly professional analysis, '
+        + 'shortened and explained in plain language. If you want a more technical '
+        + 'analysis, just sign up for the professional version.',
+      it: 'Sei nella versione Pet Owner: ricevi un\'analisi di qualità altamente '
+        + 'professionale, ma ridotta e spiegata con un linguaggio accessibile. Se '
+        + 'desideri un\'analisi più tecnica, ti basta passare alla versione professionale.',
+    })[_l] || '');
+  }
+
+  var titulos = ['abc_a_title', 'abc_b_title', 'abc_c_title'];
+  var destinos = ['abc-a-vars', 'abc-b-items', 'abc-c-items'];
+  for (var i = 0; i < 3; i++) {
+    var sec = secs[i];
+    var tEl = document.querySelector('[data-i18n="' + titulos[i] + '"]');
+    if (tEl && sec && sec.title) tEl.textContent = sec.title;
+    renderItems(destinos[i], sec ? sec.body : '');
+  }
+
+  ['abc_a_vars', 'abc_a_ec', 'abc_a_ed'].forEach(function (k, idx) {
+    var el = document.querySelector('[data-i18n="' + k + '"]');
+    if (el) el.style.display = 'none';          // subtítulos técnicos fuera
+    if (idx > 0) {
+      var box = document.getElementById(idx === 1 ? 'abc-a-ec' : 'abc-a-ed');
+      if (box) box.style.display = 'none';
+    }
+  });
+}
+
 function fillABCScreen(dogName, analysisText, sources) {
   window._lastAnalysisText = analysisText;
   window._lastDogName      = dogName;
@@ -17937,9 +18019,30 @@ function fillABCScreen(dogName, analysisText, sources) {
     // específicas — sobrevive a "BLOQUE B", "B — CONDUCTA", "B - Behavior",
     // "SECTION B", "B:" o cualquier variación que Sonnet emita.
     var bloqueA   = extractSectionByLetter(sintesis, 'A');
+
+    // ── Formato PET OWNER (particular) ──────────────────────────────────
+    // Su análisis no trae bloques A/B/C, así que hasta hoy las tres tarjetas
+    // salían vacías y los encabezados técnicos se quedaban colgando sobre la
+    // nada. Si no hay bloques por letra pero sí hay secciones, se mapean por
+    // orden (1→A, 2→B, 3→C) y cada tarjeta se titula con el encabezado que el
+    // propio análisis trae, en el idioma en que venga.
+    var secsPO = null;
+    if (!bloqueA && !extractSectionByLetter(sintesis, 'B')) {
+      var _s = extractH2Sections(sintesis);
+      if (_s.length >= 2) secsPO = _s;
+    }
+
+    if (secsPO) {
+      _abcPetOwnerLayout(secsPO);
+    } else {
     var aVars     = extractSubSection(bloqueA || sintesis, 'Variables disposicionales');
     var aEc       = extractSubSection(bloqueA || sintesis, 'Estímulos condicionados|Estimulos condicionados|EC[^a-z]');
-    var aEd       = extractSubSection(bloqueA || sintesis, 'ED[\s\-—–]|Estímulo [Dd]iscriminativo|Estimulo [Dd]iscriminativo');
+    // extractSubSection compara SUBCADENAS LITERALES (indexOf), no regex. Los
+    // patrones 'ED[\s...]' y '[Dd]iscriminativo' nunca podían coincidir con
+    // "### ED — Estímulo Discriminativo (detonador)", así que la tarjeta del ED
+    // salía SIEMPRE vacía en la versión profesional — justo la que el prompt
+    // declara obligatoria. Aquí van subcadenas de verdad, en minúsculas.
+    var aEd       = extractSubSection(bloqueA || sintesis, 'estímulo discriminativo|estimulo discriminativo|ed —|ed –|ed -|detonador');
     // Fallback: if sub-sections not parsed, put full bloque A in vars
     if (!aVars && !aEc && !aEd && bloqueA) aVars = bloqueA;
     renderItems('abc-a-vars',  aVars);
@@ -17947,6 +18050,7 @@ function fillABCScreen(dogName, analysisText, sources) {
     renderItems('abc-a-ed',    aEd);
     renderItems('abc-b-items', extractSectionByLetter(sintesis, 'B'));
     renderItems('abc-c-items', extractSectionByLetter(sintesis, 'C'));
+    }
   } else {
     // ── Formato antiguo: mapear secciones al diseño ABC ──
     var oldA = extractSection(sintesis, 'A\s*[—–-]+\s*ANTECEDENT');
@@ -17962,6 +18066,9 @@ function fillABCScreen(dogName, analysisText, sources) {
 
   // ── Summary: hipótesis funcional ──
   var hypothesis = extractSection(completo, 'HIPÓTESIS FUNCIONAL|HIPOTESIS FUNCIONAL|FUNCTIONAL HYPOTHESIS');
+  // Pet Owner: la última sección ES el resumen. Antes caía al fallback de la
+  // primera línea y pintaba el título del documento como si fuera la hipótesis.
+  if (!hypothesis && window._abcPetOwnerSummary) hypothesis = window._abcPetOwnerSummary;
   if (!hypothesis) hypothesis = completo.split('\n\n')[0].replace(/#+\s*/g, '').trim();
   var summaryEl = document.getElementById('abc-summary-text');
   if (summaryEl) summaryEl.textContent = hypothesis;

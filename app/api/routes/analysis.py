@@ -423,13 +423,39 @@ def analysis_chat(
         system_prompt_localized, str(req.anamnesis), req.original_analysis
     )
     try:
+        # Límite subido de 1024 a 8000 (2026-08-06, reporte de Sofía D):
+        # el chat de refinamiento del plan se cortaba SIEMPRE a media frase y la
+        # usuaria gastaba créditos pidiendo "repíteme desde el punto X". Es la
+        # misma regla dura que ya se aplicó al análisis (6000) y al plan (8000):
+        # un plan NUNCA debe cortarse. El coste extra solo se paga si la
+        # respuesta de verdad lo necesita.
         response = client.messages.create(
             model=chat_model,
-            max_tokens=1024,
+            max_tokens=8000,
             system=system_prompt_localized,
             messages=messages,
         )
         reply = _strip_markdown(response.content[0].text)
+
+        # Salvaguarda: si aun así llega al tope, se PIDE LA CONTINUACIÓN y se
+        # une, en vez de devolver el texto mutilado y que el usuario pague otra
+        # consulta para recuperarlo.
+        if getattr(response, "stop_reason", None) == "max_tokens":
+            try:
+                seguimiento = client.messages.create(
+                    model=chat_model,
+                    max_tokens=8000,
+                    system=system_prompt_localized,
+                    messages=messages + [
+                        {"role": "assistant", "content": response.content[0].text},
+                        {"role": "user", "content":
+                            "Continúa EXACTAMENTE donde lo dejaste, sin repetir nada "
+                            "de lo ya escrito y sin introducción."},
+                    ],
+                )
+                reply = reply + "\n" + _strip_markdown(seguimiento.content[0].text)
+            except Exception:
+                pass   # si la continuación falla, al menos va lo que había
         # Cost tracking — fire-and-forget
         background_tasks.add_task(
             log_usage,

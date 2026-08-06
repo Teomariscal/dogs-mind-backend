@@ -98,7 +98,7 @@ class AplicarRefinamientoIn(BaseModel):
     lang: str = "es"
 
 
-@router.post("/intervention/apply-refinement")
+@router.post("/apply-refinement")   # el router ya lleva prefijo /intervention
 def aplicar_refinamiento(
     payload: AplicarRefinamientoIn,
     background_tasks: BackgroundTasks,

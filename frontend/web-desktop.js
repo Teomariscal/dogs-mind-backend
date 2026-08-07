@@ -441,7 +441,10 @@
   /* Solo pantalla grande: en la web desde el móvil el usuario debe ver la app
      tal cual, no la barra ni el hero de escritorio (que dependen de un CSS
      que allí no se activa). Se construye al cruzar el umbral, no antes. */
-  var GRANDE = window.matchMedia('(min-width: 700px) and (hover: hover) and (pointer: fine)');
+  /* Sin gate de ANCHO (regla dura del founder 2026-08-07: la web nunca vuelve
+   al layout de la app). Se conserva el de puntero para que un iPhone en el
+   navegador siga viendo la maqueta movil. */
+  var GRANDE = window.matchMedia('(hover: hover) and (pointer: fine)');
 
   function init() {
     if (!GRANDE.matches) return;

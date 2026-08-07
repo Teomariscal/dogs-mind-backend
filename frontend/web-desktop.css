@@ -28,7 +28,15 @@
    EL PUENTE con la app sigue triple y no depende de esto: 1º dmIsNativeApp()
    sale antes de inyectar nada en iOS/Android; 2º todo va scoped a body.dm-web;
    3º este media query. */
-@media (min-width: 700px) and (hover: hover) and (pointer: fine) {
+/* REGLA DURA DEL FOUNDER (2026-08-07): en la web NUNCA se vuelve al layout
+   de la app. El gate de ancho hacía que por debajo de 700px (por ejemplo
+   con un panel lateral abierto en el navegador) la capa web se apagara y
+   saliera la maqueta antigua de móvil. Se elimina SOLO el gate de ancho y se conserva el de puntero: un
+   iPhone en el navegador (hover:none, pointer:coarse) sigue viendo la
+   maqueta movil, que es lo correcto. Todas las
+   reglas siguen acotadas a body.dm-web, clase que SOLO existe fuera de la
+   app nativa, así que la app no se ve afectada. */
+@media (hover: hover) and (pointer: fine) {
 
   body.dm-web {
     /* ── Tokens ─────────────────────────────────────────────────────────── */

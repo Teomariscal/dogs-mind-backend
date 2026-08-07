@@ -149,3 +149,39 @@ Distinguir:
   Pet Owner emite "QUÉ LA DISPARA/QUÉ HACE Y QUÉ CONSIGUE/EN RESUMEN", no
   "BLOQUE A/B/C") y tarjeta ED vacía para profesionales (`extractSubSection`
   compara subcadenas literales, no regex).
+
+## Cuenta de prueba PARTICULAR (para ver el formato de particular)
+
+Creada 2026-08-06 en producción. `account_type: particular`.
+
+```
+email:    prueba.lenguaje.83943@thedogsmind.net
+password: PruebaLenguaje2026!
+```
+
+Sirve para ver la rama Pet Owner sin crear otra cuenta ni gastar créditos de
+nadie. Login: `POST /auth/login` en
+`https://dogs-mind-backend-production.up.railway.app` — la respuesta trae el
+campo `token` (NO `access_token`, ese error costó una llamada).
+
+Para verla en el navegador sin tocar la sesión del founder: **perfil de Chrome
+aparte**, no incógnito (en incógnito la extensión suele estar desactivada y
+otra sesión de Code no podría pilotar la pestaña).
+
+## Capa web: gate de ancho eliminado (2026-08-07)
+
+REGLA DURA DEL FOUNDER: "nunca nunca vuelvas en la web a ese modelo" (el
+layout de la app con hamburguesa y barra inferior).
+
+Causa: `web-desktop.css` y `web-desktop.js` se activaban con
+`(min-width:700px) and (hover:hover) and (pointer:fine)`. Con un panel lateral
+abierto en el navegador la ventana baja de 700px, la capa web se apagaba y
+salía la maqueta antigua.
+
+Arreglo: se quita SOLO el gate de ancho y se conserva el de puntero
+(`(hover:hover) and (pointer:fine)`), para que un iPhone en el navegador siga
+viendo la maqueta movil. La app nativa no se ve afectada: `dmInitWebLayer()`
+(index.html:15224) sale antes de anadir `body.dm-web` y antes de inyectar los
+dos archivos, asi que en la app ni se descargan.
+
+Verificado en borrador a 560px: barra presente (86px) y `.phone` reservando 86.

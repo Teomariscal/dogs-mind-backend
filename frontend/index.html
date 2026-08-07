@@ -17816,7 +17816,12 @@ function extractH2Sections(text) {
   var lines = text.split('\n');
   var out = [], cur = null;
   for (var i = 0; i < lines.length; i++) {
-    var m = /^[ \t]*##[ \t]*([^#].*?)[ \t]*$/.exec(lines[i]);
+    // Encabezado en '## Título' O en '**Título**' a línea completa. El prompt
+    // de particular pide "cero markdown" y el modelo resuelve casi siempre con
+    // negritas, no con almohadillas: buscar solo '##' dejaba el análisis sin
+    // secciones y la pantalla caía a las etiquetas técnicas A/B/C.
+    var m = /^[ \t]*##[ \t]*([^#].*?)[ \t]*$/.exec(lines[i])
+         || /^[ \t]*\*\*([^*]{3,80})\*\*[ \t]*:?[ \t]*$/.exec(lines[i]);
     if (m) {
       if (cur) out.push(cur);
       cur = { title: m[1].replace(/^[\-—–:\s]+|[\-—–:\s]+$/g, ''), body: [] };
@@ -17826,8 +17831,11 @@ function extractH2Sections(text) {
   }
   if (cur) out.push(cur);
   return out.map(function (s) {
-    return { title: s.title, body: s.body.join('\n').trim() };
-  }).filter(function (s) { return s.body; });
+    // Fuera separadores sueltos: el título del documento va seguido de '---' y
+    // se colaba como una sección más, desplazando las tres reales.
+    var cuerpo = s.body.join('\n').replace(/^[ \t]*[-—–_*]{3,}[ \t]*$/gm, '').trim();
+    return { title: s.title, body: cuerpo };
+  }).filter(function (s) { return s.body && s.body.split(/\s+/).length >= 5; });
 }
 
 function extractSectionByLetter(text, letter) {
@@ -17972,7 +17980,23 @@ function renderItems(containerId, sectionText) {
  * discriminativo) no tienen contenido en este formato y se ocultan, en vez de
  * quedarse en pantalla encima de un guion.
  */
+/* Copia de seguridad de los rótulos originales de la pantalla ABC. Se toma una
+   sola vez, ANTES de que la vista Pet Owner los reescriba, para poder devolver
+   la pantalla a su estado profesional. Sin esto, un profesional que abriera un
+   análisis después de ver uno de particular en la misma sesión se encontraba
+   "QUÉ LA DISPARA" encima de sus bloques A/B/C. */
+function _abcGuardarRotulos() {
+  if (window._abcRotulos) return;
+  window._abcRotulos = {};
+  ['abc_a_title','abc_b_title','abc_c_title','abc_a_vars','abc_a_ec','abc_a_ed','abc_intro_text']
+    .forEach(function (k) {
+      var el = document.querySelector('[data-i18n="' + k + '"]');
+      if (el) window._abcRotulos[k] = el.innerHTML;
+    });
+}
+
 function _abcPetOwnerLayout(secs) {
+  _abcGuardarRotulos();
   window._abcPetOwnerSummary = (secs[secs.length - 1] || {}).body || '';
 
   // El aviso por defecto ("documento altamente técnico de carácter profesional")
@@ -17998,8 +18022,16 @@ function _abcPetOwnerLayout(secs) {
   for (var i = 0; i < 3; i++) {
     var sec = secs[i];
     var tEl = document.querySelector('[data-i18n="' + titulos[i] + '"]');
-    if (tEl && sec && sec.title) tEl.textContent = sec.title;
+    if (tEl) {
+      if (sec && sec.title) { tEl.textContent = sec.title; tEl.style.display = ''; }
+      else { tEl.style.display = 'none'; }      // sin título propio → sin encabezado
+    }
     renderItems(destinos[i], sec ? sec.body : '');
+    // Sin contenido para esta sección, la tarjeta entera se oculta: si no,
+    // quedaban dos tarjetas con un guion debajo del análisis.
+    var caja = document.getElementById(destinos[i]);
+    var tarjeta = caja ? caja.closest('.abc-section-card') : null;
+    if (tarjeta) tarjeta.style.display = (sec && sec.body) ? '' : 'none';
   }
 
   ['abc_a_vars', 'abc_a_ec', 'abc_a_ed'].forEach(function (k, idx) {
@@ -18007,7 +18039,9 @@ function _abcPetOwnerLayout(secs) {
     if (el) el.style.display = 'none';          // subtítulos técnicos fuera
     if (idx > 0) {
       var box = document.getElementById(idx === 1 ? 'abc-a-ec' : 'abc-a-ed');
-      if (box) box.style.display = 'none';
+      // Se ocultan Y se vacían: si no, tras ver un informe profesional el texto
+      // técnico se quedaba dentro de la caja escondida y reaparecía al volver.
+      if (box) { box.style.display = 'none'; box.innerHTML = ''; }
     }
   });
 }
@@ -18033,15 +18067,48 @@ function fillABCScreen(dogName, analysisText, sources) {
     // nada. Si no hay bloques por letra pero sí hay secciones, se mapean por
     // orden (1→A, 2→B, 3→C) y cada tarjeta se titula con el encabezado que el
     // propio análisis trae, en el idioma en que venga.
+    // ── Detección del formato PET OWNER ────────────────────────────────
+    // Se detecta por AUSENCIA de los marcadores del formato profesional, no
+    // por presencia de encabezados: el prompt de particular pide "cero
+    // markdown", así que unas veces emite "## QUÉ LA DISPARA" y otras devuelve
+    // prosa limpia sin un solo '##'. Mi primera versión exigía 2+ secciones y
+    // en los análisis sin markdown caía a la rama profesional, dejando en
+    // pantalla "Variables disposicionales / EC / ED" sobre un texto llano.
     var secsPO = null;
-    if (!bloqueA && !extractSectionByLetter(sintesis, 'B')) {
+    if (!bloqueA && !extractSectionByLetter(sintesis, 'B') && sintesis.trim()) {
       var _s = extractH2Sections(sintesis);
-      if (_s.length >= 2) secsPO = _s;
+      if (_s.length >= 2) {
+        secsPO = _s;
+      } else {
+        // Prosa sin encabezados: el análisis entero en una sola tarjeta.
+        secsPO = [{ title: '', body: sintesis.replace(/^#+\s*.*$/m, '').trim() }];
+      }
     }
 
     if (secsPO) {
       _abcPetOwnerLayout(secsPO);
     } else {
+    // Restaurar lo que la vista Pet Owner oculta: si en la misma sesión se ha
+    // visto antes un análisis de particular, estas tarjetas y epígrafes se
+    // quedaron en display:none y el informe profesional saldría mutilado.
+    ['abc_a_title','abc_b_title','abc_c_title','abc_a_vars','abc_a_ec','abc_a_ed','abc_intro_text']
+      .forEach(function (k) {
+        var el = document.querySelector('[data-i18n="' + k + '"]');
+        if (!el) return;
+        el.style.display = '';
+        if (window._abcRotulos && window._abcRotulos[k] !== undefined) {
+          el.innerHTML = window._abcRotulos[k];   // rótulo profesional original
+        }
+      });
+    ['abc-a-vars','abc-a-ec','abc-a-ed','abc-b-items','abc-c-items']
+      .forEach(function (id) {
+        var caja = document.getElementById(id);
+        if (caja) {
+          caja.style.display = '';
+          var t = caja.closest('.abc-section-card');
+          if (t) t.style.display = '';
+        }
+      });
     var aVars     = extractSubSection(bloqueA || sintesis, 'Variables disposicionales');
     var aEc       = extractSubSection(bloqueA || sintesis, 'Estímulos condicionados|Estimulos condicionados|EC[^a-z]');
     // extractSubSection compara SUBCADENAS LITERALES (indexOf), no regex. Los

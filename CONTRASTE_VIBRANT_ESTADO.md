@@ -185,3 +185,64 @@ viendo la maqueta movil. La app nativa no se ve afectada: `dmInitWebLayer()`
 dos archivos, asi que en la app ni se descargan.
 
 Verificado en borrador a 560px: barra presente (86px) y `.phone` reservando 86.
+
+---
+
+# SESIÓN DEL 7-AGO (madrugada) — dónde se quedó
+
+**PRODUCCIÓN ESTÁ EN SW v249 Y ES BUENA.** Todo lo del contraste vive en
+deploys de BORRADOR y en el repo sin desplegar. Verificado: producción no
+contiene el bloque "TOKENS DE TEMA CLARO SOBRE PANTALLAS OSCURAS".
+
+## Números medidos
+
+| momento | fallos |
+|---|---|
+| partida | 173 |
+| bloque CSS global (intento 1) | 242 — peor, revertido |
+| exclusión de controles (intento 2) | 234 — peor, revertido |
+| superficies y campos en línea a vibrant | **184** |
+| remapeo de tokens en pantallas oscuras | **SIN MEDIR** ← empezar aquí |
+
+## Lección que costó dos intentos
+
+Las 108 declaraciones de fondo claro que hay **en atributos `style=`** ganan a
+cualquier hoja de estilos. Por eso los bloques CSS globales no bajaban los
+fallos: se veía bien la pantalla que uno miraba y quedaban decenas de
+superficies blancas intactas. Y al remapear los tokens de texto a claro sin
+haber convertido esas superficies, el texto se volvía invisible sobre ellas
+(51 casos nuevos de golpe).
+
+**Regla:** fondo y texto se cambian SIEMPRE en el mismo sitio y a la vez.
+
+## Los 5 pares que explican 97 de los 184
+
+| casos | texto | fondo | ratio | estado |
+|---|---|---|---|---|
+| 32 | `#5ec8e6` cyan | `#4a6741` verde | 3.29 | **PENDIENTE** — usar `#ade3f2` (4,56) donde el cyan va sobre verde |
+| 31 | `#6b6456` | `#203a35` | 2.08 | remapeado, **sin medir** |
+| 18 | `#a09688` | `#faf8f4` | 2.74 | hecho → `#7a7061` (4,59) |
+| 11 | `rgba(255,250,240,.45)` | oscuro | 3.32 | hecho → alfa 0,62 |
+| 9 | `#0891b2` | blanco | 3.68 | hecho → `#07819e` (4,51) |
+
+Otros pendientes: `#5ec8e6` sobre blanco (1,93), crema `#f4efe2` sobre el verde
+claro `#7eb86a` de los CTA (2,04 — aquí lo correcto es **oscurecer el botón**,
+no el texto, o saldría marrón), `#80d6ee` sobre `#5c7f52` (2,77).
+
+## Al retomar, en este orden
+
+1. Abrir el último borrador, reconstruir el auditor (`window.__audit`) y
+   **medir**. Si el número no ha bajado de 184, revertir el remapeo antes de
+   seguir: es señal de que alguna de esas cuatro pantallas conserva superficie
+   clara.
+2. Atacar el par del cyan sobre verde (32 casos, 6 pantallas).
+3. Repetir: cambio → medir → si sube, revertir ese cambio.
+4. Solo promover a producción con **0** y tras mirar capturas de las pantallas
+   tocadas.
+
+## Aviso sobre el navegador
+
+El panel se quedó colgado dos veces al ejecutar el auditor completo (38
+pantallas × ~730 elementos). Si vuelve a pasar: `preview_start` con la URL del
+borrador para reiniciarlo, y definir los helpers y el auditor en **llamadas
+separadas** en vez de en un solo bloque grande.

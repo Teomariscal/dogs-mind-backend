@@ -1,0 +1,150 @@
+# Checklist: 146 superficies claras a convertir
+
+SUPERFICIE = a vibrant · CAMPO = input vibrant translúcido · CONTROL = se queda claro (texto oscuro) · INLINE = revisar a mano
+
+- [ ] **SUPERFICIE** L336 `#faf8f4` — `#global-nav`
+- [ ] **SUPERFICIE** L1292 `#fff` — `#s-abc-translated .pp-card`
+- [ ] **SUPERFICIE** L6546 `#fff` — `.df-greeting`
+- [ ] **SUPERFICIE** L6564 `#fff` — `.df-exercise`
+- [ ] **SUPERFICIE** L6641 `#fff` — `.df-theory`
+- [ ] **SUPERFICIE** L6662 `#f5f4ed` — `.df-option`
+- [ ] **SUPERFICIE** L6680 `#e8f0e8` — `.df-option-active`
+- [ ] **SUPERFICIE** L6811 `#fff` — `.df-invite-card`
+- [ ] **SUPERFICIE** L7095 `#fff` — `#s-tracking #interv-body`
+- [ ] **SUPERFICIE** L7165 `#fff` — `#s-full-analysis #full-analysis-body`
+- [ ] **SUPERFICIE** L7253 `#fff` — `#s-anamnesis h3, #s-anamnesis h4`
+- [ ] **SUPERFICIE** L7380 `#c8d8bf` — `#s-home .insight-row`
+- [ ] **SUPERFICIE** L7385 `#ffffff` — `#s-home .teo-card`
+- [ ] **SUPERFICIE** L7601 `#fff` — `#s-abc-explained .ae-content`
+- [ ] **SUPERFICIE** L7826 `#fff` — `#s-terms > div:nth-of-type(2)`
+- [ ] **SUPERFICIE** L10575 `#fff` — `/cases/`
+- [ ] **SUPERFICIE** L17064 `#fff` — `try { var _ac = document.getElementById('refine-aplicar-caja'); if (_a`
+- [ ] **SUPERFICIE** L17131 `#fff` — `function appendRefineBubble(role, text, container)`
+- [ ] **SUPERFICIE** L17287 `#fff` — `function _ivIntroHtml()`
+- [ ] **CAMPO** L1549 `#fff` — `#s-pro-company .pc-field select`
+- [ ] **CAMPO** L6630 `#f5f4ed` — `.df-textarea`
+- [ ] **CAMPO** L6637 `#fff` — `.df-textarea:focus`
+- [ ] **CAMPO** L7281 `#fff` — `#s-anamnesis select:focus`
+- [ ] **CONTROL** L386 `#ffffff` — `.home-menu`
+- [ ] **CONTROL** L415 `#fff0f0` — `.home-menu-item--danger:hover`
+- [ ] **CONTROL** L1106 `#ffffff` — `.cm-btn-secondary`
+- [ ] **CONTROL** L1121 `#ffffff` — `.cm-btn-cyan-outline`
+- [ ] **CONTROL** L1146 `#fff` — `#s-plan-simple .pp-back, #s-abc-translated .pp-back`
+- [ ] **CONTROL** L1340 `#fff` — `#s-abc-explained .ae-back:hover`
+- [ ] **CONTROL** L1412 `#fff` — `#s-pro-company .pc-back`
+- [ ] **CONTROL** L1503 `#fff` — `#s-pro-company .pc-logo-actions .pc-btn-upload`
+- [ ] **CONTROL** L4953 `#c8cdd0` — `#s-pro-area .pro-card--corporate .pro-card-features li::before`
+- [ ] **CONTROL** L5515 `#c2d8e0` — `#s-pro-login .ps-pay-btn:disabled`
+- [ ] **CONTROL** L5542 `#fff` — `#s-pro-activate .pa-back`
+- [ ] **CONTROL** L6508 `#fff` — `.df-back`
+- [ ] **CONTROL** L6615 `#f5f4ed` — `.df-chip`
+- [ ] **CONTROL** L6621 `#ecebe2` — `.df-chip:hover`
+- [ ] **CONTROL** L7357 `#f3f1ea` — `#s-home .menu-line`
+- [ ] **INLINE** L8139 `#fff` — `} catch(e)`
+- [ ] **INLINE** L8144 `#fff` — `} catch(e)`
+- [ ] **INLINE** L8155 `#fff` — `} catch(e)`
+- [ ] **INLINE** L8160 `#fff` — `} catch(e)`
+- [ ] **INLINE** L8171 `#dce6d8` — `} catch(e)`
+- [ ] **INLINE** L8175 `#dce6d8` — `} catch(e)`
+- [ ] **INLINE** L8425 `#fff` — `} catch(e)`
+- [ ] **INLINE** L8488 `#fff` — `} catch(e)`
+- [ ] **INLINE** L8490 `#f5f5ef` — `} catch(e)`
+- [ ] **INLINE** L8505 `#fff` — `} catch(e)`
+- [ ] **INLINE** L8521 `#fff` — `} catch(e)`
+- [ ] **INLINE** L8523 `#f5f5ef` — `} catch(e)`
+- [ ] **INLINE** L8537 `#fff` — `} catch(e)`
+- [ ] **INLINE** L8543 `#fff` — `} catch(e)`
+- [ ] **INLINE** L8550 `#fff` — `} catch(e)`
+- [ ] **INLINE** L8555 `#fff` — `} catch(e)`
+- [ ] **INLINE** L8556 `#f5f5ef` — `} catch(e)`
+- [ ] **INLINE** L8563 `#fff` — `} catch(e)`
+- [ ] **INLINE** L8564 `#f5f5ef` — `} catch(e)`
+- [ ] **INLINE** L8571 `#fff` — `} catch(e)`
+- [ ] **INLINE** L8572 `#f5f5ef` — `} catch(e)`
+- [ ] **INLINE** L8579 `#fff` — `} catch(e)`
+- [ ] **INLINE** L8690 `#fff` — `} catch(e)`
+- [ ] **INLINE** L8706 `#f5f5ef` — `} catch(e)`
+- [ ] **INLINE** L8714 `#fff` — `} catch(e)`
+- [ ] **INLINE** L8725 `#f5f5ef` — `} catch(e)`
+- [ ] **INLINE** L8870 `#fff` — `@keyframes dmLsPl { 50%`
+- [ ] **INLINE** L8903 `#fff` — `@keyframes dmLsPl { 50%`
+- [ ] **INLINE** L9961 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L9974 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L9979 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10012 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10017 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10024 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10031 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10037 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10038 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10045 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10046 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10054 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10057 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10065 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10066 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10074 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10075 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10082 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10083 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10084 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10085 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10091 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10102 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10105 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10107 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10115 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10124 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10127 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10138 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10144 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10145 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10148 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10155 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10156 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10157 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10158 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10169 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10175 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10181 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10186 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10192 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10193 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10194 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10195 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10203 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10206 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10212 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10217 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10260 `#fff5f5` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10263 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10271 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10292 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10312 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10325 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10326 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10327 `#fff` — `onkeydown="if(event.key==='Enter'&&!event.shiftKey)`
+- [ ] **INLINE** L10382 `#dce6d8` — `La foto se sube por separado (PUT /dogs/`
+- [ ] **INLINE** L10576 `#f0f4ff` — `/cases/`
+- [ ] **INLINE** L10581 `#e8eeff` — `/cases/`
+- [ ] **INLINE** L10598 `#fff` — `/cases/`
+- [ ] **INLINE** L10618 `#fff` — `/cases/`
+- [ ] **INLINE** L10621 `#f8f9ff` — `/cases/`
+- [ ] **INLINE** L11406 `#e8eee5` — `.pro-map #FI, .pro-map #GR, .pro-map #AE, .pro-map #JP, .pro-map #AU`
+- [ ] **INLINE** L16013 `#fff` — `if (r.lang && r.lang !== _uiLang)`
+- [ ] **INLINE** L16016 `#e8f0e8` — `if (r.lang && r.lang !== _uiLang)`
+- [ ] **INLINE** L16045 `#fafafa` — `if (r.lang && r.lang !== _uiLang)`
+- [ ] **INLINE** L16046 `#fff5f5` — `if (r.lang && r.lang !== _uiLang)`
+- [ ] **INLINE** L16220 `#fff` — `if (!t) t =`
+- [ ] **INLINE** L16988 `#fff` — `} else`
+- [ ] **INLINE** L17308 `#f7f9f5` — `function renderInterventionPlan(planText, dogName)`
+- [ ] **INLINE** L17311 `#fff` — `function renderInterventionPlan(planText, dogName)`
+- [ ] **INLINE** L17415 `#f7f9f5` — `errMsg = errMsg.map(function(e)`
+- [ ] **INLINE** L17419 `#fff` — `errMsg = errMsg.map(function(e)`
+- [ ] **INLINE** L17446 `#fdf0f0` — `if (body)`
+- [ ] **INLINE** L23281 `#fff` — `function showUpdateBanner(reg)`
+- [ ] **INLINE** L23302 `#fff` — `document.getElementById('sw-update-btn-close').addEventListener('click`
+- [ ] **INLINE** L23309 `#fff` — `document.getElementById('sw-update-btn-close').addEventListener('click`
+- [ ] **INLINE** L23384 `#fff` — `document.getElementById('sw-update-btn-close').addEventListener('click`
+- [ ] **INLINE** L23391 `#fff` — `document.getElementById('sw-update-btn-close').addEventListener('click`
+- [ ] **INLINE** L23422 `#fff` — `document.getElementById('sw-update-btn-close').addEventListener('click`

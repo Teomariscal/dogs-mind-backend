@@ -102,6 +102,20 @@ distintos**:
   1x #fdf0f0
 ```
 
+Clasificadas ya en `CONTRASTE_VIBRANT_CHECKLIST.md` (146 entradas con línea,
+color y selector):
+
+| tipo | n | qué hacer |
+|---|---|---|
+| SUPERFICIE | 19 | a vibrant (panel `#1f3934` / tarjeta `#26403a`) |
+| CAMPO | 4 | input translúcido `rgba(255,255,255,.06)` + borde cyan |
+| CONTROL | 15 | se quedan claros, PERO deben conservar texto oscuro |
+| INLINE | 108 | `style="..."` en el HTML — hay que revisarlas a mano |
+
+Las 108 inline son el grueso y la razón de que los bloques CSS globales no
+funcionen: el estilo en línea gana a cualquier hoja, así que un `.screen{...}`
+no las toca. Hay que editarlas en el HTML.
+
 Hay que convertirlas **una a una**, no en bloque (el bloque ya falló dos veces).
 Distinguir:
 - **Superficies** (pantallas, paneles, tarjetas, formularios) → van a vibrant.

@@ -456,7 +456,14 @@
       var _fija = function () {
         var h = _bar.offsetHeight;
         if (!h) return;
+        /* --w-bar la define web-desktop.css sobre `body.dm-web`, no sobre
+           :root. Para .phone manda el ancestro más cercano que la declare, o
+           sea el body: escribirla solo en :root no cambiaba nada. Se escribe
+           en los dos, y en el body como estilo inline, que gana siempre. */
         var css = document.documentElement.style;
+        var cssBody = document.body.style;
+        cssBody.setProperty('--w-bar-total', h + 'px');
+        cssBody.setProperty('--w-bar', h + 'px');
         /* --w-bar-total lo usa la portada; --w-bar, el hueco de las pantallas
            de la app (.phone). Antes solo se actualizaba el primero y el
            segundo se quedaba en los 118px fijos de web-desktop.css: en cuanto

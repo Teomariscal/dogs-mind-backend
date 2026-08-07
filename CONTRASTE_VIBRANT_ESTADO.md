@@ -246,3 +246,64 @@ El panel se quedó colgado dos veces al ejecutar el auditor completo (38
 pantallas × ~730 elementos). Si vuelve a pasar: `preview_start` con la URL del
 borrador para reiniciarlo, y definir los helpers y el auditor en **llamadas
 separadas** en vez de en un solo bloque grande.
+
+---
+
+# AVANCE MEDIDO (7-ago, madrugada)
+
+Producción sigue en **SW v249**. Nada de esto está desplegado.
+
+## Por pantalla, medido en borrador
+
+| pantalla | antes | después | |
+|---|---|---|---|
+| s-anamnesis | 37 | **6** | ✔ |
+| s-anamnesis-puppy | 18 | **2** | ✔ |
+| s-anamnesis-training | 13 | **3** | ✔ |
+| s-seguimiento | 12 | **0** | ✔ |
+| s-dog-profile | 6 | **0** | ✔ |
+| s-tour-intro | 26 | **15** | parcial |
+| s-abc | 6 | 6 | sin tocar |
+| s-avatars | 8 | 8 | sin tocar |
+| s-pro-signup | 15 | **31** | ✘ empeoró → corregido, SIN MEDIR |
+| s-pro-login | 3 | **7** | ✘ empeoró → corregido, SIN MEDIR |
+
+## Qué se hizo y por qué funcionó
+
+1. **Superficies y campos en línea a vibrant** (24 + 18), cambiando fondo y
+   texto en el MISMO atributo `style`. Esto por sí solo no bajó el total (173 →
+   184), pero era el requisito para poder remapear tokens sin romper nada.
+2. **Remapeo de tokens de tema claro** en s-anamnesis, s-anamnesis-puppy,
+   s-anamnesis-training y s-tour-intro. Aquí está el salto grande: s-anamnesis
+   pasó de 37 a 6.
+3. **`--text3` #a09688 → #7a7061**, que se llevó s-seguimiento y s-dog-profile
+   a cero de golpe.
+4. **Cyan de texto unificado a `#ade3f2`** (32 usos). Antes `#5ec8e6` daba 3,29
+   sobre verde. Para poder tener un solo cyan hubo que convertir las dos
+   últimas pantallas claras (s-pro-login, s-pro-signup): mientras existieran,
+   el cyan tenía que ser oscuro allí y claro en el resto.
+5. Esa conversión **empeoró** esas dos pantallas (su paleta `--ps-*` era
+   oscura-sobre-claro). Corregido invirtiendo las cuatro variables:
+   `--ps-text` → `#f3f1ea` (10,82), `--ps-text-muted` → alfa 0,86 (8,45),
+   `--ps-text-soft` → alfa 0,70 (6,18), `--ps-cyan` → `#ade3f2` (8,76).
+   **Calculado, no medido en navegador.**
+
+## Lo PRIMERO al retomar
+
+Medir el último borrador. Si s-pro-signup y s-pro-login no han bajado de 31 y
+7, revertir el punto 5 antes de seguir.
+
+Pendientes conocidos después de eso:
+- `s-tour-intro`: 15, casi todo ámbar `#c8a96e` sobre oliva (3,61–4,41).
+  Subirlo a `#d8b98a` (6,61 sobre panel).
+- `s-abc`: 6 · `s-avatars`: 8 · resto de pantallas sin revisar en esta tanda.
+- Crema `#f4efe2` sobre el verde claro `#7eb86a` de los CTA (2,04): aquí lo
+  correcto es **oscurecer el botón**, no aclarar el texto.
+
+## Aviso: el panel del navegador se cuelga
+
+Se colgó tres veces. Patrón observado: navegar con `location.href` y ejecutar
+JS inmediatamente después lo mata. Método que sí aguantó: `preview_start` con
+la URL del borrador, y definir helpers y auditor en **dos llamadas separadas y
+cortas**, midiendo **pantalla a pantalla** con `__una(id)` en vez de las 38 de
+golpe.

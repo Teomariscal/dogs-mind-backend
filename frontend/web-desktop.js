@@ -454,10 +454,25 @@
     try {
       var _bar = document.querySelector('.dmw-bar');
       var _fija = function () {
-        document.documentElement.style.setProperty('--w-bar-total', _bar.offsetHeight + 'px');
+        var h = _bar.offsetHeight;
+        if (!h) return;
+        var css = document.documentElement.style;
+        /* --w-bar-total lo usa la portada; --w-bar, el hueco de las pantallas
+           de la app (.phone). Antes solo se actualizaba el primero y el
+           segundo se quedaba en los 118px fijos de web-desktop.css: en cuanto
+           un botón de la barra saltaba de línea, la barra crecía a 162px y se
+           comía 44px de la cabecera de TODAS las pantallas. */
+        css.setProperty('--w-bar-total', h + 'px');
+        css.setProperty('--w-bar', h + 'px');
       };
       _fija();
       window.addEventListener('resize', _fija);
+      /* La primera medición cae antes de que las fuentes asienten y los
+         botones envuelvan, así que se quedaba corta (151 en vez de 162).
+         Se remide cuando la barra cambia de tamaño por lo que sea. */
+      if (window.ResizeObserver) new ResizeObserver(_fija).observe(_bar);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(_fija);
+      window.addEventListener('load', _fija);
     } catch (e) {}
   }
 

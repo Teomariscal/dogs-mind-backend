@@ -41,9 +41,16 @@
 <style>
 :root {
   color-scheme: light; /* iOS dark mode NO debe invertir inputs (texto blanco invisible) */
-  --cream:   #f0ece3;
-  --cream2:  #e8e2d6;
-  --cream3:  #ddd5c4;
+  /* Vibrant, sin crema (founder 2026-08-06: "dejalo todo en vibrant").
+     Se conserva el NOMBRE del token para que las 19 declaraciones que ya lo
+     usan cambien de golpe, y se conserva la LUMINOSIDAD exacta de cada tono:
+     estas tres superficies son fondos claros con texto oscuro encima, así que
+     oscurecerlas habría repetido el problema de contraste que acabamos de
+     cerrar. Solo se sustituye el tinte beige por el de la familia esmeralda
+     (--green-bg). Contraste con --text: 12,17→12,16 · 11,12→11,17 · 9,83→9,85. */
+  --cream:   #e8eee5;
+  --cream2:  #dce6d8;
+  --cream3:  #ccdac7;
   --white:   #faf8f4;
   --text:    #2c2a24;
   --text2:   #6b6456;
@@ -8161,11 +8168,11 @@ button:not(:disabled):active{ transform:scale(0.98); }
         <div class="dogs-row" id="home-dogs-row" role="list" aria-label="Mis perros">
           <!-- Skeleton inicial; se sustituye al cargar /dogs -->
           <div class="dog-item" aria-hidden="true">
-            <div class="dog-circle" style="background:#e8e2d6;"></div>
+            <div class="dog-circle" style="background:#dce6d8;"></div>
             <div class="dog-name">…</div>
           </div>
           <div class="dog-item" aria-hidden="true">
-            <div class="dog-circle inactive" style="background:#e8e2d6;"></div>
+            <div class="dog-circle inactive" style="background:#dce6d8;"></div>
             <div class="dog-name">…</div>
           </div>
         </div>
@@ -10372,7 +10379,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
 
         <!-- Foto del perro -->
         <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:24px;">
-          <div id="dog-photo-wrap" style="width:140px;height:140px;border-radius:50%;overflow:hidden;background:#e8e2d6;border:3px solid var(--green);display:flex;align-items:center;justify-content:center;position:relative;">
+          <div id="dog-photo-wrap" style="width:140px;height:140px;border-radius:50%;overflow:hidden;background:#dce6d8;border:3px solid var(--green);display:flex;align-items:center;justify-content:center;position:relative;">
             <img id="dog-photo-img" src="" style="width:100%;height:100%;object-fit:cover;display:none;">
             <div id="dog-photo-placeholder" style="">&nbsp;</div>
           </div>
@@ -11396,7 +11403,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
   <!-- ══ GLOBAL BOTTOM NAV ══ -->
   <div id="global-nav">
     <div style="display:flex;width:100%;">
-      <button id="n-home"     class="n-btn" onclick="goTo('s-home')"    ><div class="n-ico" style="padding:0;overflow:hidden;border-radius:50%;background:#f0ece3;"><img src="assets/images/icons/icon-home-with-dog.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div><span data-i18n="nav_home">Inicio</span></button>
+      <button id="n-home"     class="n-btn" onclick="goTo('s-home')"    ><div class="n-ico" style="padding:0;overflow:hidden;border-radius:50%;background:#e8eee5;"><img src="assets/images/icons/icon-home-with-dog.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"></div><span data-i18n="nav_home">Inicio</span></button>
       <button id="n-trainer"  class="n-btn" onclick="goTo('s-avatars')" ><div class="n-ico" style="padding:0;overflow:hidden;border-radius:50%;background:#1a1a1a;"><img src="aig-niaz-pixar.webp" alt="" style="width:140%;height:140%;object-fit:cover;object-position:center 18%;display:block;margin:-20% 0 0 -20%;"></div><span data-i18n="nav_trainer">Trainer</span></button>
       <button id="n-progress" class="n-btn" onclick="goTo('s-tracking')"><div class="n-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/></svg></div><span data-i18n="nav_progress">Progreso</span></button>
       <button id="n-teo"      class="n-btn" onclick="goTo('s-profile')" ><div class="n-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></div><span data-i18n="nav_teo">Teo</span></button>

@@ -54,7 +54,7 @@
   --white:   #faf8f4;
   --text:    #2c2a24;
   --text2:   #6b6456;
-  --text3:   #a09688;
+  --text3:   #7a7061;
   /* ── FALLO RAÍZ CORREGIDO (2026-08-06, reporte de Sofía D) ──────────────
      --dark, --grey y --amber se usaban 238 veces SIN estar definidas. En CSS,
      `color: var(--dark)` con la variable inexistente NO pinta oscuro: la
@@ -2058,7 +2058,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
 .ti-pipeline-sub {
   font-family: 'Jost', sans-serif;
   font-size: 9px;
-  color: rgba(255,250,240,0.45);
+  color: rgba(255,250,240,0.62);
   margin: 1px 0 0;
 }
 .ti-pipeline-arrow {
@@ -2134,7 +2134,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
   font-family: 'Jost', sans-serif;
   font-size: 9px;
   font-weight: 500;
-  color: rgba(255,250,240,0.45);
+  color: rgba(255,250,240,0.62);
 }
 .ti-avatar-mini-active span { color: var(--amber); font-weight: 600; }
 
@@ -2203,7 +2203,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
 .ti-feature-sub {
   font-family: 'Jost', sans-serif;
   font-size: 10px;
-  color: rgba(255,250,240,0.45);
+  color: rgba(255,250,240,0.62);
   line-height: 1.4;
   margin: 0;
 }
@@ -2275,7 +2275,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
 .ti-cta-stat-lbl {
   font-family: 'Jost', sans-serif;
   font-size: 10px;
-  color: rgba(255,250,240,0.45);
+  color: rgba(255,250,240,0.62);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-top: 2px;
@@ -2329,7 +2329,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
 }
 .ti-btn-outline-soft {
   border-color: rgba(255,250,240,0.18);
-  color: rgba(255,250,240,0.55);
+  color: rgba(255,250,240,0.66);
 }
 
 /* Dots */
@@ -2412,7 +2412,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
   border-top: 1px solid rgba(255,250,240,0.08);
   backdrop-filter: blur(10px);
 }
-#s-profile .nav-item { color: rgba(255,250,240,0.55); }
+#s-profile .nav-item { color: rgba(255,250,240,0.66); }
 #s-profile .nav-item.active { color: var(--amber); }
 /* CTA wrap deja espacio para la nav abajo */
 #s-profile .cv-cta-wrap { bottom: var(--nav-height, 78px); }
@@ -2581,7 +2581,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
   font-weight: 600;
   letter-spacing: 0.10em;
   text-transform: uppercase;
-  color: rgba(255,250,240,0.55);
+  color: rgba(255,250,240,0.66);
   margin-top: 2px;
 }
 
@@ -3177,7 +3177,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
   font-family: 'Jost', sans-serif;
   font-size: 13px;
   font-weight: 300;
-  color: rgba(255,250,240,0.55);
+  color: rgba(255,250,240,0.66);
   line-height: 1.6;
   max-width: 320px;
   margin-bottom: 0;
@@ -3830,7 +3830,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
   border: none !important;
   box-shadow: 0 6px 16px rgba(74,103,65,0.40);
 }
-#s-chat .msg-t { color: rgba(255,250,240,0.45) !important; }
+#s-chat .msg-t { color: rgba(255,250,240,0.62) !important; }
 #s-chat .chat-bar {
   background: linear-gradient(180deg, rgba(10,14,8,0) 0%, rgba(10,14,8,0.85) 35%, rgba(10,14,8,0.97) 100%) !important;
   border-top: none !important;
@@ -3964,7 +3964,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
 #global-nav .n-btn {
   background: transparent;
   border: none;
-  color: rgba(255,250,240,0.55);
+  color: rgba(255,250,240,0.66);
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -5184,7 +5184,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
 #s-pro-login {
   --ps-bg: #f4fafd;
   --ps-surface: #ffffff;
-  --ps-cyan: #0891b2;
+  --ps-cyan: #07819e;
   --ps-cyan-hover: #0e7e9b;
   --ps-cyan-soft: #e0f6fb;
   --ps-text: #0f1f29;
@@ -5222,7 +5222,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
   /* Variables locales cyan profesional — tono más vivo para que se note el accent */
   --ps-bg: #e6f2f6;
   --ps-surface: #ffffff;
-  --ps-cyan: #0891b2;
+  --ps-cyan: #07819e;
   --ps-cyan-hover: #0e7e9b;
   --ps-cyan-soft: #d1eaf2;
   --ps-text: #0f1f29;
@@ -8136,7 +8136,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
            texto en s-abc SIN llamar a /analysis (no se vuelve a cobrar).
            Se distingue del borrador de anamnesis (Part A, en #s-anamnesis): aquí
            el análisis YA está pagado y generado; allí solo es el formulario. -->
-      <div id="pending-analysis-card" style="display:none;background:#fff;border:1px solid rgba(74,103,65,0.28);border-radius:14px;padding:14px 16px;box-shadow:0 2px 10px rgba(74,103,65,0.08);margin:14px 16px 0;">
+      <div id="pending-analysis-card" style="display:none;background:rgba(255,255,255,0.05);border:1px solid rgba(74,103,65,0.28);border-radius:14px;padding:14px 16px;box-shadow:0 2px 10px rgba(74,103,65,0.08);margin:14px 16px 0;color:#f3f1ea">
         <div style="font-size:13.5px;font-weight:600;color:var(--dark);line-height:1.4;" data-i18n="pending_analysis_title">Tienes un análisis sin terminar.</div>
         <div id="pending-analysis-sub" style="font-size:12px;color:var(--grey);margin-top:3px;line-height:1.4;" data-i18n="pending_analysis_sub">Lo recuperamos en este dispositivo, sin volver a cobrar.</div>
         <div style="display:flex;gap:8px;margin-top:12px;">
@@ -8152,7 +8152,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
            maybeShowPendingTrainingCard() la muestra al entrar a s-home si hay
            un plan generado pero sin guardar. "Ver" rehidrata s-training-result
            sin volver a llamar al endpoint (no se vuelve a cobrar 3 tokens). -->
-      <div id="pending-training-card" style="display:none;background:#fff;border:1px solid rgba(94,200,230,0.42);border-radius:14px;padding:14px 16px;box-shadow:0 2px 10px rgba(94,200,230,0.10);margin:14px 16px 0;">
+      <div id="pending-training-card" style="display:none;background:rgba(255,255,255,0.05);border:1px solid rgba(94,200,230,0.42);border-radius:14px;padding:14px 16px;box-shadow:0 2px 10px rgba(94,200,230,0.10);margin:14px 16px 0;color:#f3f1ea">
         <div style="font-size:13.5px;font-weight:600;color:var(--dark);line-height:1.4;" data-i18n="pending_training_title">Tienes un plan de entrenamiento sin guardar.</div>
         <div style="font-size:12px;color:var(--grey);margin-top:3px;line-height:1.4;" data-i18n="pending_training_sub">Lo recuperamos en este dispositivo, sin volver a cobrar.</div>
         <div style="display:flex;gap:8px;margin-top:12px;">
@@ -8502,7 +8502,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
 
       <!-- pack 20 — destacado -->
       <div onclick="recargar(20)" style="display:flex;align-items:center;justify-content:space-between;background:var(--green);border:1.5px solid var(--green);border-radius:14px;padding:16px;margin-bottom:10px;cursor:pointer;position:relative;overflow:hidden;">
-        <div style="position:absolute;top:8px;right:12px;background:#fff;color:var(--green);font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;letter-spacing:.05em;" data-i18n="tokens_popular">ELECCIÓN PREFERIDA</div>
+        <div style="position:absolute;top:8px;right:12px;background:rgba(255,255,255,0.05);color:var(--green);font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;letter-spacing:.05em;" data-i18n="tokens_popular">ELECCIÓN PREFERIDA</div>
         <div style="display:flex;align-items:center;gap:12px;">
           <div style="width:44px;height:44px;border-radius:10px;overflow:hidden;flex-shrink:0;background:rgba(255,255,255,0.2);border:1.5px solid rgba(255,255,255,0.35);">
             <img src="aig-mario-pixar.webp" alt="Mario" style="width:100%;height:100%;object-fit:cover;display:block;">
@@ -8534,7 +8534,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
       </div>
 
       <!-- métodos de pago -->
-      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;padding:12px;background:#fff;border-radius:12px;border:1px solid rgba(0,0,0,0.06);">
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;padding:12px;background:rgba(255,255,255,0.05);border-radius:12px;border:1px solid rgba(94,200,230,0.18);color:#f3f1ea">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#4a6741" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><line x1="3" y1="11" x2="21" y2="11"/></svg>
         <span style="font-size:12px;color:var(--text2);font-weight:500;" data-i18n="tokens_secure_payment">Pago seguro con tarjeta</span>
       </div>
@@ -8547,7 +8547,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
     <div style="padding:0 16px 32px;">
       <div style="font-size:10px;font-weight:700;color:var(--grey);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;" data-i18n="account_section">Mi cuenta y privacidad</div>
 
-      <div id="account-email-display" style="background:#fff;border:1.5px solid rgba(0,0,0,0.08);border-radius:14px;padding:14px 16px;margin-bottom:10px;font-size:13px;color:var(--text2);line-height:1.4;">
+      <div id="account-email-display" style="background:rgba(255,255,255,0.05);border:1.5px solid rgba(94,200,230,0.18);border-radius:14px;padding:14px 16px;margin-bottom:10px;font-size:13px;color:var(--text2);line-height:1.4;">
         <div style="font-size:10px;color:var(--grey);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;" data-i18n="account_email_label">Email de la cuenta</div>
         <div id="account-email-value" style="color:var(--dark);font-weight:600;">—</div>
       </div>
@@ -8687,7 +8687,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
 
   <!-- ══ Modal cambiar contraseña ══ -->
   <div id="change-password-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center;padding:20px;">
-    <div style="background:#fff;border-radius:16px;max-width:380px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="background:rgba(255,255,255,0.05);border-radius:16px;max-width:380px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.3);color:#f3f1ea">
       <div style="font-size:18px;font-weight:700;color:var(--dark);margin-bottom:8px;" data-i18n="cp_modal_title">Cambiar contraseña</div>
       <div style="font-size:13px;line-height:1.6;color:var(--text2);margin-bottom:16px;" data-i18n="cp_modal_body">Por seguridad, necesitamos verificar tu contraseña actual antes de establecer una nueva.</div>
 
@@ -8711,7 +8711,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
 
   <!-- ══ Modal confirmar eliminación de cuenta ══ -->
   <div id="delete-account-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center;padding:20px;">
-    <div style="background:#fff;border-radius:16px;max-width:380px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="background:rgba(255,255,255,0.05);border-radius:16px;max-width:380px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.3);color:#f3f1ea">
       <div style="font-size:18px;font-weight:700;color:#dc2626;margin-bottom:8px;" data-i18n="del_modal_title">Eliminar tu cuenta</div>
       <div style="font-size:13px;line-height:1.6;color:var(--text2);margin-bottom:16px;" data-i18n="del_modal_body">
         Tu email, contraseña y teléfono se eliminarán permanentemente. Los registros de pago se conservan anonimizados durante 4 años por requisito fiscal (España). <strong>Esta acción no se puede deshacer.</strong>
@@ -9229,7 +9229,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
     </div>
 
     <!-- App Store 4.7: aviso discreto de IA (transparencia chatbot generativo). Cero emojis. -->
-    <div class="chat-ai-note" data-i18n="chat_ai_note" style="font-size:11px;line-height:1.4;text-align:center;padding:5px 16px;color:rgba(255,250,240,0.55);background:rgba(10,14,8,0.30);flex-shrink:0;">Avatar de IA · no es una persona real</div>
+    <div class="chat-ai-note" data-i18n="chat_ai_note" style="font-size:11px;line-height:1.4;text-align:center;padding:5px 16px;color:rgba(255,250,240,0.66);background:rgba(10,14,8,0.30);flex-shrink:0;">Avatar de IA · no es una persona real</div>
 
     <div class="msgs" id="msgs">
       <div class="msg niaz">
@@ -9971,7 +9971,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
            Discreta, inline, scopeada a #s-anamnesis. Oculta por defecto;
            maybeShowAnamResumeCard() la muestra al entrar si hay borrador con
            contenido real. NO autorestaura: el usuario decide Continuar/Descartar. -->
-      <div id="anam-resume-card" style="display:none;background:#fff;border:1px solid rgba(74,103,65,0.28);border-radius:14px;padding:14px 16px;box-shadow:0 2px 10px rgba(74,103,65,0.08);">
+      <div id="anam-resume-card" style="display:none;background:rgba(255,255,255,0.05);border:1px solid rgba(74,103,65,0.28);border-radius:14px;padding:14px 16px;box-shadow:0 2px 10px rgba(74,103,65,0.08);color:#f3f1ea">
         <div style="font-size:13.5px;font-weight:600;color:var(--dark);line-height:1.4;" data-i18n="anam_resume_title">Tienes una consulta sin terminar.</div>
         <div style="font-size:12px;color:var(--grey);margin-top:3px;line-height:1.4;" data-i18n="anam_resume_sub">Guardamos lo que escribiste en este dispositivo.</div>
         <div style="display:flex;gap:8px;margin-top:12px;">
@@ -10009,26 +10009,26 @@ button:not(:disabled):active{ transform:scale(0.98); }
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
           <div>
             <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;"><span data-i18n="anam_lbl_name">Nombre</span><span class="req-star" aria-hidden="true">*</span></div>
-            <input id="inp-dog-name" type="text" data-i18n-placeholder="ph_dog_name" placeholder="Nombre del perro" aria-required="true" data-required="true" onblur="_anamRequiredCheck(this)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+            <input id="inp-dog-name" type="text" data-i18n-placeholder="ph_dog_name" placeholder="Nombre del perro" aria-required="true" data-required="true" onblur="_anamRequiredCheck(this)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;" />
             <div class="req-error" aria-live="polite"></div>
           </div>
           <div>
             <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;"><span data-i18n="anam_lbl_age">Edad</span><span class="req-star" aria-hidden="true">*</span></div>
-            <input id="inp-dog-age" type="text" data-i18n-placeholder="ph_dog_age" placeholder="Ej: 3 a&ntilde;os" aria-required="true" data-required="true" onblur="_anamRequiredCheck(this)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+            <input id="inp-dog-age" type="text" data-i18n-placeholder="ph_dog_age" placeholder="Ej: 3 a&ntilde;os" aria-required="true" data-required="true" onblur="_anamRequiredCheck(this)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;" />
             <div class="req-error" aria-live="polite"></div>
           </div>
         </div>
 
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;"><span data-i18n="anam_lbl_breed">Tipolog&iacute;a racial</span><span class="req-star" aria-hidden="true">*</span></div>
-          <input id="inp-breed" type="text" data-i18n-placeholder="ph_breed" placeholder="Raza o raza a la que se parece m&aacute;s..." aria-required="true" data-required="true" onblur="_anamRequiredCheck(this)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+          <input id="inp-breed" type="text" data-i18n-placeholder="ph_breed" placeholder="Raza o raza a la que se parece m&aacute;s..." aria-required="true" data-required="true" onblur="_anamRequiredCheck(this)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;" />
           <div class="req-error" aria-live="polite"></div>
         </div>
 
         <!-- #1 (feedback tester): perro adoptado — tiempo con el tutor, distinto de la edad -->
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_adopted">Si es adoptado, &iquest;cu&aacute;nto tiempo lleva contigo? (opcional)</div>
-          <input id="inp-adopted-time" type="text" data-i18n-placeholder="ph_adopted" placeholder="Ej: 6 meses, 2 a&ntilde;os... (d&eacute;jalo vac&iacute;o si no es adoptado)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+          <input id="inp-adopted-time" type="text" data-i18n-placeholder="ph_adopted" placeholder="Ej: 6 meses, 2 a&ntilde;os... (d&eacute;jalo vac&iacute;o si no es adoptado)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;" />
         </div>
 
         <div style="margin-bottom:12px;">
@@ -10054,7 +10054,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
             <button id="dolencia-si" onclick="anam_toggle_cond('dolencia-si','dolencia-no','inp-dolencia-wrap')" data-i18n="btn_yes" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
           </div>
           <div id="inp-dolencia-wrap" style="display:none;margin-top:8px;">
-            <input id="inp-dolencia-detail" type="text" data-i18n-placeholder="ph_dolencia" placeholder="¿Cuál dolencia? (ej: displasia, epilepsia...)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+            <input id="inp-dolencia-detail" type="text" data-i18n-placeholder="ph_dolencia" placeholder="¿Cuál dolencia? (ej: displasia, epilepsia...)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;" />
           </div>
         </div>
 
@@ -10088,7 +10088,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
 
         <div>
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_weaning">&iquest;Con cu&aacute;ntos meses sali&oacute; de la camada?</div>
-          <input id="inp-weaning" type="text" data-i18n-placeholder="ph_weaning" placeholder="Ej: 2 meses, 8 semanas..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+          <input id="inp-weaning" type="text" data-i18n-placeholder="ph_weaning" placeholder="Ej: 2 meses, 8 semanas..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;" />
         </div>
       </div>
 
@@ -10099,7 +10099,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px;align-items:start;">
           <div>
             <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_members">Miembros de la familia</div>
-            <div style="border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;background:#fff;display:flex;align-items:center;padding:8px 12px;gap:8px;">
+            <div style="border:1.5px solid rgba(94,200,230,0.18);border-radius:10px;background:rgba(255,255,255,0.05);display:flex;align-items:center;padding:8px 12px;gap:8px;color:#f3f1ea">
               <span style="flex:1;font-size:13px;color:#aaa;">N&ordm; personas</span>
               <div style="display:flex;align-items:center;gap:6px;">
                 <button onclick="anam_step('miembros',-1)" aria-label="Disminuir" style="width:44px;height:44px;border-radius:50%;border:1px solid rgba(0,0,0,0.15);background:#fff;cursor:pointer;font-size:18px;font-weight:600;line-height:1;display:flex;align-items:center;justify-content:center;font-family:inherit;color:var(--dark);">-</button>
@@ -10124,7 +10124,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
             <button id="convive-si" onclick="anam_toggle_cond('convive-si','convive-no','inp-convive-wrap')" data-i18n="btn_yes" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
           </div>
           <div id="inp-convive-wrap" style="display:none;margin-top:8px;">
-            <input id="inp-convive-detail" type="text" data-i18n-placeholder="ph_convive" placeholder="¿Cuántos y de qué raza? (ej: 2 labradores)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+            <input id="inp-convive-detail" type="text" data-i18n-placeholder="ph_convive" placeholder="¿Cuántos y de qué raza? (ej: 2 labradores)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;" />
           </div>
         </div>
       </div>
@@ -10135,7 +10135,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
 
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_other_problems">¿Qué otros problemas de conducta has tenido con él?</div>
-          <textarea id="inp-other-problems" data-i18n-placeholder="ph_other_problems" placeholder="Describe el problema o escribe 'ninguno'" rows="3" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;resize:vertical;"></textarea>
+          <textarea id="inp-other-problems" data-i18n-placeholder="ph_other_problems" placeholder="Describe el problema o escribe 'ninguno'" rows="3" style="width:100%;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;resize:vertical;"></textarea>
         </div>
 
         <div style="margin-bottom:12px;">
@@ -10145,7 +10145,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
             <button id="escuela-si" onclick="anam_choose_training(true)" data-i18n="btn_yes" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
           </div>
           <div id="escuela-result-wrap" style="display:none;margin-top:8px;">
-            <textarea id="inp-training-result" data-i18n-placeholder="ph_training_result" placeholder="Describe el resultado (ej: mejoró pero recayó, no notamos cambios, mejoró notablemente...)" rows="2" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;resize:vertical;"></textarea>
+            <textarea id="inp-training-result" data-i18n-placeholder="ph_training_result" placeholder="Describe el resultado (ej: mejoró pero recayó, no notamos cambios, mejoró notablemente...)" rows="2" style="width:100%;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;resize:vertical;"></textarea>
           </div>
         </div>
 
@@ -10166,24 +10166,24 @@ button:not(:disabled):active{ transform:scale(0.98); }
 
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;"><span data-i18n="anam_lbl_describe">Describe la conducta problema</span><span class="req-star" aria-hidden="true">*</span></div>
-          <textarea id="inp-problem" data-i18n-placeholder="ph_problem" placeholder="Describe con detalle el comportamiento que preocupa..." aria-required="true" data-required="true" onblur="_anamRequiredCheck(this)" style="width:100%;min-height:90px;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;resize:none;"></textarea>
+          <textarea id="inp-problem" data-i18n-placeholder="ph_problem" placeholder="Describe con detalle el comportamiento que preocupa..." aria-required="true" data-required="true" onblur="_anamRequiredCheck(this)" style="width:100%;min-height:90px;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;resize:none;"></textarea>
           <div class="req-error" aria-live="polite"></div>
         </div>
 
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;"><span data-i18n="anam_lbl_since">&iquest;Desde cu&aacute;ndo ocurre?</span><span class="req-star" aria-hidden="true">*</span></div>
-          <input id="inp-since" type="text" data-i18n-placeholder="ph_since" placeholder="Ej: hace 6 meses, desde cachorro..." aria-required="true" data-required="true" onblur="_anamRequiredCheck(this)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+          <input id="inp-since" type="text" data-i18n-placeholder="ph_since" placeholder="Ej: hace 6 meses, desde cachorro..." aria-required="true" data-required="true" onblur="_anamRequiredCheck(this)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;" />
           <div class="req-error" aria-live="polite"></div>
         </div>
 
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_where">&iquest;D&oacute;nde ocurre?</div>
-          <input id="inp-where" type="text" data-i18n-placeholder="ph_where" placeholder="Ej: en casa, en la calle, en el parque..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+          <input id="inp-where" type="text" data-i18n-placeholder="ph_where" placeholder="Ej: en casa, en la calle, en el parque..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;" />
         </div>
 
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_who">&iquest;Qui&eacute;n est&aacute; presente?</div>
-          <input id="inp-who" type="text" data-i18n-placeholder="ph_who" placeholder="Ej: toda la familia, solo yo, extraños..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+          <input id="inp-who" type="text" data-i18n-placeholder="ph_who" placeholder="Ej: toda la familia, solo yo, extraños..." style="width:100%;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;" />
         </div>
 
         <div style="margin-bottom:12px;">
@@ -10203,18 +10203,18 @@ button:not(:disabled):active{ transform:scale(0.98); }
             <button id="agresion-si" onclick="anam_toggle_cond('agresion-si','agresion-no','agresion-dist-wrap')" data-i18n="btn_yes" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
           </div>
           <div id="agresion-dist-wrap" style="display:none;margin-top:8px;">
-            <input id="inp-agresion-dist" type="number" data-i18n-placeholder="ph_agresion_dist" placeholder="Distancia a la que empieza la agresión (cm)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;" />
+            <input id="inp-agresion-dist" type="number" data-i18n-placeholder="ph_agresion_dist" placeholder="Distancia a la que empieza la agresión (cm)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;" />
           </div>
         </div>
 
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_history">&iquest;Qu&eacute; has intentado hasta ahora? (opcional)</div>
-          <textarea id="inp-history" data-i18n-placeholder="ph_history" placeholder="Ej: castigo, ignorar, acudir al veterinario..." style="width:100%;min-height:70px;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;resize:none;"></textarea>
+          <textarea id="inp-history" data-i18n-placeholder="ph_history" placeholder="Ej: castigo, ignorar, acudir al veterinario..." style="width:100%;min-height:70px;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;resize:none;"></textarea>
         </div>
 
         <div>
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_theory">&iquest;Cu&aacute;l crees t&uacute; que es la causa? (opcional)</div>
-          <textarea id="inp-theory" data-i18n-placeholder="ph_theory" placeholder="Tu hipótesis sobre por qué ocurre este comportamiento..." style="width:100%;min-height:70px;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;resize:none;"></textarea>
+          <textarea id="inp-theory" data-i18n-placeholder="ph_theory" placeholder="Tu hipótesis sobre por qué ocurre este comportamiento..." style="width:100%;min-height:70px;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;resize:none;"></textarea>
         </div>
       </div>
 
@@ -10260,7 +10260,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
               <button type="button" onclick="event.stopPropagation(); removeVideo();" style="font-size:11px; padding:8px 14px; border-radius:8px; border:1px solid rgba(220,80,80,0.3); background:#fff5f5; color:#c03030; cursor:pointer; font-family:inherit; font-weight:600; min-height:44px; flex-shrink:0;" data-i18n="anam_video_remove">Quitar vídeo</button>
             </div>
             <!-- #2 (feedback tester): describir el vídeo para contextualizar a la IA -->
-            <textarea id="inp-video-caption" rows="2" data-i18n-placeholder="ph_video_caption" placeholder="Describe brevemente qué se ve en el vídeo (opcional)" onclick="event.stopPropagation();" style="width:100%; margin-top:10px; padding:10px 12px; border:1.5px solid rgba(0,0,0,0.12); border-radius:10px; font-size:16px; font-family:inherit; background:#fff; color:var(--dark); box-sizing:border-box; outline:none; resize:vertical;"></textarea>
+            <textarea id="inp-video-caption" rows="2" data-i18n-placeholder="ph_video_caption" placeholder="Describe brevemente qué se ve en el vídeo (opcional)" onclick="event.stopPropagation();" style="width:100%; margin-top:10px; padding:10px 12px; border:1.5px solid rgba(94,200,230,0.22); border-radius:10px; font-size:16px; font-family:inherit; background:rgba(255,255,255,0.06); color:var(--dark); box-sizing:border-box; outline:none; resize:vertical;"></textarea>
           </div>
         </div>
       </div>
@@ -10268,7 +10268,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
       <!-- Cambio o evento importante antes del problema -->
       <div style="margin-bottom:12px;">
         <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_prior_event">Antes de que comenzase el problema, ¿recuerdas algún cambio o evento importante que resaltar?</div>
-        <textarea id="inp-evento-previo" data-i18n-placeholder="ph_evento_previo" placeholder="Contesta brevemente (mudanza, llegada de un bebé, fallecimiento, viaje, cambio de horario, etc.)" rows="3" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.12);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--dark);box-sizing:border-box;outline:none;resize:vertical;"></textarea>
+        <textarea id="inp-evento-previo" data-i18n-placeholder="ph_evento_previo" placeholder="Contesta brevemente (mudanza, llegada de un bebé, fallecimiento, viaje, cambio de horario, etc.)" rows="3" style="width:100%;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;resize:vertical;"></textarea>
       </div>
 
       <!-- submit -->
@@ -10289,7 +10289,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
          · texto modal: "10 tokens" stale → "4 tokens" (coste actual del análisis
            con vídeo según ANALYSIS_VIDEO_TOKEN_COST en backend) -->
     <div id="video-token-modal" style="display:none;position:absolute;inset:0;z-index:9998;background:rgba(0,0,0,0.55);backdrop-filter:blur(2px);align-items:flex-end;justify-content:center;">
-      <div style="background:#fff;border-radius:20px 20px 0 0;padding:24px 20px max(32px, env(safe-area-inset-bottom, 32px));width:100%;box-sizing:border-box;">
+      <div style="background:rgba(255,255,255,0.05);border-radius:20px 20px 0 0;padding:24px 20px max(32px, env(safe-area-inset-bottom, 32px));width:100%;box-sizing:border-box;color:#f3f1ea">
         <div style="width:36px;height:4px;background:rgba(0,0,0,0.12);border-radius:2px;margin:0 auto 20px;"></div>
         <div style="margin-bottom:12px;text-align:center;">
           <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="var(--green2)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
@@ -10572,13 +10572,13 @@ button:not(:disabled):active{ transform:scale(0.98); }
   <div id="s-refine" class="screen" style="background:linear-gradient(180deg, #0e1f1a 0%, #14302a 100%);flex-direction:column;">
 
     <!-- Header -->
-    <div style="display:flex;align-items:center;gap:12px;padding:calc(env(safe-area-inset-top, 0px) + 18px) 16px 14px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;background:#fff;position:sticky;top:0;z-index:10;">
+    <div style="display:flex;align-items:center;gap:12px;padding:calc(env(safe-area-inset-top, 0px) + 18px) 16px 14px;border-bottom:1px solid rgba(94,200,230,0.18);flex-shrink:0;background:rgba(255,255,255,0.05);position:sticky;top:0;z-index:10;color:#f3f1ea">
       <button onclick="goTo('s-tracking')" style="width:44px;height:44px;border-radius:50%;background:#f0f4ff;border:1.5px solid rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0;">&#8592;</button>
       <div style="flex:1;">
         <div style="font-size:16px;font-weight:700;color:#1a1a2e;letter-spacing:-0.3px;" data-i18n="refine_title">IA Analítica</div>
         <div style="font-size:11px;color:#888;margin-top:1px;" data-i18n="refine_sub">by Teo Mariscal · Refinamiento del plan</div>
       </div>
-      <div style="display:flex;align-items:center;gap:7px;background:#e8eeff;border-radius:100px;padding:5px 12px 5px 8px;">
+      <div style="display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.05);border-radius:100px;padding:5px 12px 5px 8px;color:#f3f1ea">
         <svg width="22" height="22" viewBox="0 0 22 22" style="flex-shrink:0;">
           <circle cx="11" cy="11" r="7" fill="none" stroke="#c5d3f5" stroke-width="3"/>
           <circle cx="11" cy="11" r="7" fill="none" stroke="#2a4a8a" stroke-width="3"
@@ -10595,7 +10595,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
     <!-- Chat messages -->
     <div id="refine-messages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;">
       <!-- Mensaje inicial de bienvenida -->
-      <div class="refine-msg refine-ai" style="background:#fff;border-radius:16px 16px 16px 4px;padding:14px 16px;max-width:85%;align-self:flex-start;box-shadow:0 2px 8px rgba(0,0,0,0.06);font-size:14px;line-height:1.6;color:#1a1a2e;">
+      <div class="refine-msg refine-ai" style="background:rgba(255,255,255,0.05);border-radius:16px 16px 16px 4px;padding:14px 16px;max-width:85%;align-self:flex-start;box-shadow:0 2px 8px rgba(0,0,0,0.06);font-size:14px;line-height:1.6;color:#1a1a2e;">
         Hola. He revisado el análisis y el plan de intervención de este caso.<br><br>
         Cuéntame qué parte no encaja con la situación real del cliente o qué datos quieres añadir. Ajustaré el plan en consecuencia.
         <div style="font-size:11px;color:#aaa;margin-top:6px;">−0.25 tokens por mensaje</div>
@@ -10615,7 +10615,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
     </div>
 
     <!-- Input area -->
-    <div style="padding:12px 16px calc(env(safe-area-inset-bottom, 0px) + 24px);background:#fff;border-top:1px solid rgba(0,0,0,0.08);flex-shrink:0;">
+    <div style="padding:12px 16px calc(env(safe-area-inset-bottom, 0px) + 24px);background:rgba(255,255,255,0.05);border-top:1px solid rgba(94,200,230,0.18);flex-shrink:0;color:#f3f1ea">
       <div style="display:flex;gap:10px;align-items:flex-end;">
         <textarea id="refine-input" placeholder="Ej: Los perros no pueden separarse porque conviven en casa…" rows="2"
           style="flex:1;border:1.5px solid #d0d8ee;border-radius:14px;padding:12px 14px;font-family:inherit;font-size:16px;resize:none;outline:none;background:#f8f9ff;color:#1a1a2e;line-height:1.5;"
@@ -10714,7 +10714,30 @@ button:not(:disabled):active{ transform:scale(0.98); }
         animation: none;
       }
     }
-  </style>
+  
+/* ── TOKENS DE TEMA CLARO SOBRE PANTALLAS OSCURAS ─────────────────────────
+   --text2/--text3/--grey/--dark son del diseño ORIGINAL, que era claro. En las
+   pantallas ya migradas a vibrant seguían pintando gris oscuro sobre verde
+   oscuro (ratio 2,08 medido: ilegible). Se remapean SOLO en las pantallas
+   donde no queda ninguna superficie clara — si se hiciera en bloque, el texto
+   dentro de las tarjetas y botones claros se volvería invisible, que es
+   exactamente lo que me pasó en los dos primeros intentos. */
+#s-anamnesis, #s-anamnesis-puppy, #s-anamnesis-training, #s-tour-intro {
+  --text2: rgba(243,241,234,0.86);
+  --text3: rgba(243,241,234,0.66);
+  --grey:  rgba(243,241,234,0.86);
+  --dark:  #f3f1ea;
+  --text:  #f3f1ea;
+}
+/* …salvo dentro de los controles que siguen siendo claros, que recuperan el
+   texto oscuro (si no, heredan el claro sobre su propio fondo blanco). */
+#s-anamnesis button:not([style*="rgba(255,255,255"]),
+#s-anamnesis-puppy button:not([style*="rgba(255,255,255"]),
+#s-anamnesis-training button:not([style*="rgba(255,255,255"]),
+#s-tour-intro button:not([style*="rgba(255,255,255"]) {
+  --text2: #5f594c; --text3: #6f6858; --grey: #5f594c; --dark: #2c2a24; --text: #2c2a24;
+}
+</style>
   <g id="countries">
 <path id="AE" d="M619.874,393.722L620.373,393.573L620.477,394.411L622.671,393.93L624.99,394.009L626.684,394.1L628.604,392.028L630.695,390.054L632.467,388.146L633.001,389.202L633.382,391.639L631.949,391.651L631.72,393.648L632.216,394.073L630.947,394.674L630.939,395.919L630.122,397.175L630.049,398.394L629.484,399.032L621.056,397.508L619.981,394.428z"/>
 		<path id="AF" d="M646.879,356.901L649.738,358.201L651.853,357.745L652.438,356.188L654.651,355.669L656.231,354.617L656.791,351.832L659.154,351.154L659.594,349.902L660.917,350.843L661.762,350.952L663.323,350.975L665.438,351.716L666.295,352.143L668.324,351.017L669.27,351.694L670.174,350.085L671.85,350.159L672.281,349.641L672.578,348.213L673.785,346.975L675.303,347.785L674.998,348.869L675.846,349.038L675.585,351.994L676.694,353.137L677.672,352.404L678.916,352.057L680.663,350.486L682.594,350.745L685.486,350.751L685.985,351.758L684.353,352.15L682.928,352.795L679.71,353.2L676.699,353.931L675.063,355.439L675.725,356.899L676.046,358.603L674.649,360.033L674.766,361.335L673.995,362.549L671.328,362.444L672.43,364.663L670.646,365.507L669.455,367.511L669.609,369.491L668.514,370.415L667.477,370.109L665.334,370.537L665.027,371.451L662.939,371.446L661.377,373.289L661.278,376.039L657.635,377.374L655.682,377.092L655.114,377.794L653.438,377.386L650.634,377.865L645.936,376.228L648.479,373.298L648.249,371.202L646.125,370.65L645.905,368.565L644.987,365.921L646.187,364.094L644.966,363.599L645.736,361.148z"/>
@@ -16217,7 +16240,7 @@ function getVal(id, fallback) {
       ov.id = 'dm-recharge-notice';
       ov.style.cssText = 'position:absolute;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:28px;background:rgba(10,26,20,0.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);';
       ov.innerHTML =
-        '<div style="width:100%;max-width:330px;background:#fff;border-radius:22px;padding:26px 22px 20px;box-shadow:0 24px 64px rgba(0,0,0,0.35);text-align:center;">' +
+        '<div style="width:100%;max-width:330px;background:rgba(255,255,255,0.05);border-radius:22px;padding:26px 22px 20px;box-shadow:0 24px 64px rgba(0,0,0,0.35);text-align:center;color:#f3f1ea">' +
           '<div style="width:52px;height:52px;margin:0 auto 14px;border-radius:50%;background:linear-gradient(135deg,rgba(94,200,230,0.16),rgba(74,103,65,0.14));display:flex;align-items:center;justify-content:center;">' +
             '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#4a6741" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4.5"></circle></svg>' +
           '</div>' +
@@ -16985,7 +17008,7 @@ function getVal(id, fallback) {
         introText = 'Hola. He revisado el análisis y el plan de intervención de este caso.<br><br>Cuéntame qué parte no encaja con la situación real del cliente o qué datos quieres añadir. Ajustaré el plan en consecuencia.';
         tokenLine = '−0.25 tokens por mensaje';
       }
-      msgs.innerHTML = '<div class="refine-msg refine-ai" style="background:#fff;border-radius:16px 16px 16px 4px;padding:14px 16px;max-width:85%;align-self:flex-start;box-shadow:0 2px 8px rgba(0,0,0,0.06);font-size:14px;line-height:1.6;color:#1a1a2e;">' + introText + '<div style="font-size:11px;color:#aaa;margin-top:6px;">' + tokenLine + '</div></div>';
+      msgs.innerHTML = '<div class="refine-msg refine-ai" style="background:rgba(255,255,255,0.05);border-radius:16px 16px 16px 4px;padding:14px 16px;max-width:85%;align-self:flex-start;box-shadow:0 2px 8px rgba(0,0,0,0.06);font-size:14px;line-height:1.6;color:#1a1a2e;">' + introText + '<div style="font-size:11px;color:#aaa;margin-top:6px;">' + tokenLine + '</div></div>';
     }
     updateTokensScreen();
     goTo('s-refine');
@@ -17284,7 +17307,7 @@ function getVal(id, fallback) {
       : (L === 'it')
       ? 'Di seguito, sulla base dell\'analisi funzionale realizzata dall\'IA addestrata da Teo Mariscal e da un team dei migliori etologi al mondo che partecipa a questo progetto, la nostra raccomandazione è:'
       : 'A continuación, y en función del análisis funcional realizado por la IA entrenada por Teo Mariscal y un equipo de los mejores etólogos mundiales que participa de este proyecto, nuestra recomendación es:';
-    return '<div style="font-size:14px;line-height:1.75;color:var(--dark);margin-bottom:20px;padding:18px;border-radius:14px;border:1px solid rgba(0,0,0,0.07);position:relative;overflow:hidden;background:#fff;">' +
+    return '<div style="font-size:14px;line-height:1.75;color:var(--dark);margin-bottom:20px;padding:18px;border-radius:14px;border:1px solid rgba(94,200,230,0.18);position:relative;overflow:hidden;background:rgba(255,255,255,0.05);">' +
         '<div style="position:absolute;inset:0;background-image:url(assets/images/img-21.webp);background-size:cover;background-position:center 30%;opacity:0.25;border-radius:14px;"></div>' +
         '<div style="position:relative;z-index:1;">' + txt + '</div>' +
       '</div>';
@@ -17305,10 +17328,10 @@ function getVal(id, fallback) {
 
     var fullHtml =
       _ivIntroHtml() +
-      '<div style="background:#f7f9f5;border-left:4px solid #4a6741;border-radius:0 14px 14px 0;padding:20px 18px;margin-bottom:20px;">' +
+      '<div style="background:rgba(255,255,255,0.05);border-left:4px solid #4a6741;border-radius:0 14px 14px 0;padding:20px 18px;margin-bottom:20px;color:#f3f1ea">' +
         planHtml +
       '</div>' +
-      '<div style="font-size:13px;line-height:1.75;color:#555;padding:18px;background:#fff;border-radius:14px;border:1px solid rgba(0,0,0,0.07);margin-bottom:8px;">' +
+      '<div style="font-size:13px;line-height:1.75;color:#f3f1ea;padding:18px;background:rgba(255,255,255,0.05);border-radius:14px;border:1px solid rgba(94,200,230,0.18);margin-bottom:8px;">' +
         'Si aceptas, tu caso quedará registrado en el registro de datos de conducta. Puedes volver a realizar tantas consultas como quieras sobre el mismo caso; cada vez que realices una nueva consulta estarás pidiendo una segunda opinión al equipo de expertos.' +
         '<br><br>' +
         'Nuestro porcentaje de acierto en los análisis funcionales y planes de intervención es muy alto, pero nunca está de más pedir una segunda opinión si algo no te convence.' +
@@ -17412,11 +17435,11 @@ function getVal(id, fallback) {
       var fullHtml =
         _ivIntroHtml() +
 
-        '<div style="background:#f7f9f5;border-left:4px solid #4a6741;border-radius:0 14px 14px 0;padding:20px 18px;margin-bottom:20px;">' +
+        '<div style="background:rgba(255,255,255,0.05);border-left:4px solid #4a6741;border-radius:0 14px 14px 0;padding:20px 18px;margin-bottom:20px;color:#f3f1ea">' +
           planHtml +
         '</div>' +
 
-        '<div style="font-size:13px;line-height:1.75;color:#555;padding:18px;background:#fff;border-radius:14px;border:1px solid rgba(0,0,0,0.07);margin-bottom:8px;">' +
+        '<div style="font-size:13px;line-height:1.75;color:#f3f1ea;padding:18px;background:rgba(255,255,255,0.05);border-radius:14px;border:1px solid rgba(94,200,230,0.18);margin-bottom:8px;">' +
           'Si aceptas, tu caso quedará registrado en el registro de datos de conducta. Puedes volver a realizar tantas consultas como quieras sobre el mismo caso; cada vez que realices una nueva consulta estarás pidiendo una segunda opinión al equipo de expertos.' +
           '<br><br>' +
           'Nuestro porcentaje de acierto en los análisis funcionales y planes de intervención es muy alto, pero nunca está de más pedir una segunda opinión si algo no te convence.' +
@@ -23373,7 +23396,7 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
       </div>
     </div>
 
-    <div style="padding:24px 20px 60px;font-size:14px;color:var(--text);line-height:1.75;max-width:640px;margin:16px auto;background:#fff;border-radius:16px;">
+    <div style="padding:24px 20px 60px;font-size:14px;color:var(--text);line-height:1.75;max-width:640px;margin:16px auto;background:rgba(255,255,255,0.05);border-radius:16px;">
 
       <p style="color:var(--text2);margin-bottom:24px;" data-i18n="pp_intro">Esta política explica qué datos recogemos, cómo los usamos y cómo los protegemos cuando usas Dogs’ Mind.</p>
 
@@ -23455,7 +23478,7 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
       </div>
     </div>
 
-    <div style="padding:24px 20px 60px;font-size:14px;color:var(--text);line-height:1.75;max-width:640px;margin:16px auto;background:#fff;border-radius:16px;">
+    <div style="padding:24px 20px 60px;font-size:14px;color:var(--text);line-height:1.75;max-width:640px;margin:16px auto;background:rgba(255,255,255,0.05);border-radius:16px;">
 
       <p style="color:var(--text2);margin-bottom:24px;" data-i18n="tos_intro">Al usar The Dogs’ Mind aceptas estos términos. Léelos con atención antes de crear tu cuenta.</p>
 
@@ -23486,7 +23509,7 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
       <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="tos_h9">9. Ley aplicable y jurisdicción</h3>
       <p style="margin:0 0 20px;" data-i18n="tos_p9">Estos términos se rigen por la ley española. Cualquier disputa se someterá a los juzgados de Madrid (España), salvo que la legislación de protección al consumidor de tu país establezca un foro distinto.</p>
 
-      <div style="background:#fff;border:1.5px solid rgba(74,103,65,0.15);border-radius:14px;padding:18px;margin-top:28px;">
+      <div style="background:rgba(255,255,255,0.05);border:1.5px solid rgba(74,103,65,0.15);border-radius:14px;padding:18px;margin-top:28px;color:#f3f1ea">
         <div style="font-size:11px;color:var(--green);font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;" data-i18n="tos_box_label">Contacto</div>
         <div style="font-size:13px;color:var(--text2);" data-i18n="tos_box_text">¿Dudas sobre estos términos? Escríbenos a <a href="mailto:info@thedogsmind.net" style="color:var(--green);font-weight:600;">info@thedogsmind.net</a>.</div>
       </div>

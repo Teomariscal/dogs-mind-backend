@@ -307,3 +307,36 @@ JS inmediatamente después lo mata. Método que sí aguantó: `preview_start` co
 la URL del borrador, y definir helpers y auditor en **dos llamadas separadas y
 cortas**, midiendo **pantalla a pantalla** con `__una(id)` en vez de las 38 de
 golpe.
+
+
+---
+
+# PROGRESO MEDIDO (7-ago, continuación)
+
+| momento | fallos | |
+|---|---|---|
+| partida | 173 | |
+| tras superficies en línea | 184 | peor, pero necesario |
+| tras remapeo de tokens + cyan unificado + paleta ps-* | **75** | medido |
+| tras ámbar `#c8a96e`→`#d8b98a` y CTA verde oscurecido | **59** | medido |
+| tras verdes oscurecidos y alfas subidos | ? | **SIN MEDIR** |
+
+## Última tanda (sin medir)
+
+- `--green2` `#5c7f52` → `#4a6642` (el cyan encima daba 3,26)
+- `color: rgba(0,0,0,.55)` → `rgba(243,241,234,.72)` — 15 usos. Era **texto
+  negro sobre fondo oscuro** (1,14): el descargo del análisis.
+- Alfas subidos: blanco .55→.74 (12), crema .62→.74 (7), blanco .78→.88 (4),
+  verde claro .55→.74 (6)
+- `#5e8154` → `#5b7c51` (5) · `#6b9b62` → `#54803f` (2)
+
+## Pendientes conocidos tras esa tanda
+
+- `#5ec8e6` sobre blanco (1,93) en "Solo profesionales" y sobre `#e2e4e4`
+  (1,51) en "Variables disposicionales": quedan superficies claras en
+  s-pro-company y s-abc que hay que pasar a vibrant.
+- `var(--green)` `#4a6741` como TEXTO sobre fondo profundo (2,21–2,23):
+  los enlaces "Política de Privacidad". Aclarar a `#739e66` (4,58) solo donde
+  va como color, no como fondo.
+- Crema `#f4efe2` sobre el CTA ya oscurecido `#50833e`: 3,93. Pasar ese texto
+  a blanco puro (4,52).

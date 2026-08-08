@@ -378,5 +378,9 @@ Tres bloques seguidos subieron a 47, 103 y 104. Se revirtieron con
   epígrafes en arena, chips con borde cyan, campos y botones legibles.
 - `s-abc`: la cabecera es una **foto real con fondo blanco** ("A – Antecedent /
   B – Behavior / C – Consequence"). El contraste ahí es correcto (texto oscuro
-  sobre blanco) pero **es una superficie clara**, y además está en inglés.
-  Decisión del founder: cambiar la imagen o superponerla. No la toco.
+  sobre blanco); lo único señalable es que **es una superficie clara** en medio
+  del vibrant. Decisión del founder: cambiar la imagen o superponerla. No la toco.
+
+  **NO es un fallo de idioma.** ABC / Antecedent-Behavior-Consequence es la
+  terminología canónica del análisis de conducta y en inglés es lo correcto
+  (founder, 2026-08-07). No proponer traducirla.

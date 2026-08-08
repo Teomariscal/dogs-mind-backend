@@ -10809,8 +10809,9 @@ button:not(:disabled):active{ transform:scale(0.98); }
 /* "ELECCIÓN PREFERIDA": verde sobre verde, 1,13 */
 /* "ELECCIÓN PREFERIDA" va sobre rgb(83,111,75), verde medio: con texto oscuro
    da 3,1 y con blanco 5,5. Blanco. El div no tiene clase, se ataja por texto. */
-#s-tokens [data-i18n*="preferid"], #s-tokens [data-i18n*="preferred"],
-#s-tokens .pack-badge, #s-tokens [class*="badge"] { color: #ffffff !important; }
+/* El gancho real es data-i18n="tokens_popular" (no "preferid"): lleva
+   color:var(--green) en línea sobre una tarjeta verde -> 1,13. Blanco da 5,5. */
+[data-i18n="tokens_popular"] { color: #ffffff !important; }
 /* Botón del inicio: blanco sobre verde claro, 2,35 -> se oscurece el botón */
 #s-home .dmw-cta-1, #s-home button[style*="#7eb86a"],
 #s-home button[style*="126,184,106"] {

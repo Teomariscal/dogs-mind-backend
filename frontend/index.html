@@ -8,12 +8,12 @@
   <meta name="description" content="Dogs’ Mind — Análisis de conducta canina con IA. Consulta con Teo Mariscal y los Dogs Aigents para entender y mejorar el comportamiento de tu perro.">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
 <!-- Forzar esquema claro: evita que el modo oscuro de iOS invierta inputs (texto blanco invisible). App es light-themed. -->
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="dark">
 <title>The Dogs’ Mind · AI for Canine Behavior</title>
 <!-- PWA manifest -->
 <link rel="manifest" href="/manifest.json">
 <!-- Theme color -->
-<meta name="theme-color" content="#4a6741">
+<meta name="theme-color" content="#0e1f1a">
 <!-- Apple PWA -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -40,7 +40,13 @@
 </script>
 <style>
 :root {
-  color-scheme: light; /* iOS dark mode NO debe invertir inputs (texto blanco invisible) */
+  /* La app es OSCURA desde el paso a vibrant (ago-2026). Declararla 'light'
+     hacía que iOS pintara los controles nativos —desplegables, selectores de
+     fecha, barras de scroll— en su versión clara sobre nuestro fondo oscuro.
+     El motivo original (que el modo oscuro de iOS invirtiera los inputs y
+     dejara texto blanco invisible) ya no aplica: los inputs son translúcidos
+     oscuros con texto claro declarado explícitamente. */
+  color-scheme: dark;
   /* Vibrant, sin crema (founder 2026-08-06: "dejalo todo en vibrant").
      Se conserva el NOMBRE del token para que las 19 declaraciones que ya lo
      usan cambien de golpe, y se conserva la LUMINOSIDAD exacta de cada tono:
@@ -10832,6 +10838,13 @@ button:not(:disabled):active{ transform:scale(0.98); }
 #s-tokens #tokens-donut text { fill: #f3f1ea !important; }
 /* Los epígrafes del ABC son cyan sobre la tarjeta clara de cabecera, 1,51 */
 #s-abc .abc-section-card .cm-eyebrow { color: #1a6a82 !important; }
+
+/* Sin esto, el navegador espera ~300ms por si el toque es un doble-tap para
+   hacer zoom, y cada botón se siente lento en móvil. */
+button, a, [onclick], input, select, textarea, .n-btn, .cm-btn-primary,
+.cm-btn-secondary, .teo-btn, .btn-orange {
+  touch-action: manipulation;
+}
 </style>
   <g id="countries">
 <path id="AE" d="M619.874,393.722L620.373,393.573L620.477,394.411L622.671,393.93L624.99,394.009L626.684,394.1L628.604,392.028L630.695,390.054L632.467,388.146L633.001,389.202L633.382,391.639L631.949,391.651L631.72,393.648L632.216,394.073L630.947,394.674L630.939,395.919L630.122,397.175L630.049,398.394L629.484,399.032L621.056,397.508L619.981,394.428z"/>

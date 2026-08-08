@@ -340,3 +340,43 @@ golpe.
   va como color, no como fondo.
 - Crema `#f4efe2` sobre el CTA ya oscurecido `#50833e`: 3,93. Pasar ese texto
   a blanco puro (4,52).
+
+---
+
+# CORRECCIÓN DEL MEDIDOR (importante)
+
+`__S` extraía las paradas de los degradados **solo en formato `rgb()`**. Media
+app los declara en **hexadecimal**, así que en esas pantallas el auditor no
+encontraba fondo, caía al blanco por defecto e inventaba fallos.
+
+Arreglado: ahora parsea `rgb()/rgba()` **y** `#rrggbb`/`#rgb`.
+
+**Consecuencia: los números anteriores no eran fiables.** Con el medidor
+corregido, el estado real es:
+
+| | fallos |
+|---|---|
+| partida | **173** |
+| estado actual (medido con el medidor corregido) | **40** |
+
+Reducción del 77%. El "28" que llegué a anunciar era del medidor viejo.
+
+## Tandas revertidas (empeoraban)
+
+Tres bloques seguidos subieron a 47, 103 y 104. Se revirtieron con
+`git checkout frontend/index.html`. Qué los rompía:
+1. `color: var(--green)` cambiado en bloque (116 usos): metió 16 fallos en
+   `s-privacy`/`s-terms`, donde esos enlaces van sobre blanco.
+2. Convertir tarjetas cambiando solo `background` y `color` del contenedor:
+   los hijos traen su color de los tokens y se quedaron oscuros sobre oscuro.
+3. Aplanar `s-privacy`/`s-terms` con `* { background-color: transparent }`:
+   el contenedor blanco está más adentro y la regla no llegó.
+
+## Verificación visual hecha
+
+- `s-anamnesis`: correcta y fiel a la referencia del founder — fondo esmeralda,
+  epígrafes en arena, chips con borde cyan, campos y botones legibles.
+- `s-abc`: la cabecera es una **foto real con fondo blanco** ("A – Antecedent /
+  B – Behavior / C – Consequence"). El contraste ahí es correcto (texto oscuro
+  sobre blanco) pero **es una superficie clara**, y además está en inglés.
+  Decisión del founder: cambiar la imagen o superponerla. No la toco.

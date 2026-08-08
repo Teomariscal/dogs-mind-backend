@@ -44,8 +44,19 @@ Ver [[feedback-ningun-uso-es-gratis]].
 
 ## Decisiones que siguen abiertas (del founder)
 
-- **Katja vs Cecilia.** Cecilia es hoy quien explica y acompaña. Si Katja hace
-  lo mismo en otra pantalla hay solape. Hay que definir qué hace cada una.
+- ~~Katja vs Cecilia~~ **RESUELTO por el founder (2026-08-08):**
+  > "Katja es más organizada y pragmática, es perfecta para estar en el día a
+  > día y luego puede ser la que lleve las nuevas features de gráficas de
+  > conducta."
+
+  Reparto: **Cecilia explica y acompaña** (pedagógica, traduce lo clínico).
+  **Katja organiza y ejecuta** (pragmática, día a día, y en el futuro las
+  gráficas de conducta). No se solapan.
+
+  Consecuencia de diseño: el tono de Katja es OPERATIVO, no didáctico. Ante una
+  duda, responde con **qué hacer hoy**, no con el porqué — para eso está
+  Cecilia. Y como las gráficas de conducta serán suyas, el seguimiento diario
+  es justo donde se generan esos datos: la decisión es coherente.
 - **Idioma/tono de Katja**: no inventar. El copy lo da el founder
   ([[feedback-no-inventar-copy-publico]]).
 

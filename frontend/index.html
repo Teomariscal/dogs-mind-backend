@@ -10799,6 +10799,38 @@ button:not(:disabled):active{ transform:scale(0.98); }
 #s-tokens > h2, #s-tokens > p { color: #f3f1ea !important; }
 /* Alfas que se quedaban cortos. */
 #s-tour-intro .ti-chat-cost { color: rgba(255,250,240,0.78) !important; }
+
+/* ── ÚLTIMOS 5 GRAVES (< 3) ───────────────────────────────────────────── */
+/* Claro sobre claro en las dos tarjetas que siguen siendo blancas: 1,09 */
+#s-pro-company .pc-toggle-row, #s-pro-company .pc-toggle-row *,
+#s-pro-signup .ps-logo-locked, #s-pro-signup .ps-logo-locked * {
+  color: #2c2a24 !important;
+}
+/* "ELECCIÓN PREFERIDA": verde sobre verde, 1,13 */
+/* "ELECCIÓN PREFERIDA" va sobre rgb(83,111,75), verde medio: con texto oscuro
+   da 3,1 y con blanco 5,5. Blanco. El div no tiene clase, se ataja por texto. */
+#s-tokens [data-i18n*="preferid"], #s-tokens [data-i18n*="preferred"],
+#s-tokens .pack-badge, #s-tokens [class*="badge"] { color: #ffffff !important; }
+/* Botón del inicio: blanco sobre verde claro, 2,35 -> se oscurece el botón */
+#s-home .dmw-cta-1, #s-home button[style*="#7eb86a"],
+#s-home button[style*="126,184,106"] {
+  background: linear-gradient(135deg,#50833e 0%,#3d5636 100%) !important;
+}
+/* "(opcional)" en login: gris de tema claro sobre oscuro, 2,40 */
+#s-login [data-i18n*="optional"], #s-login .opcional,
+#s-login label span, #s-login small { color: rgba(243,241,234,0.78) !important; }
+
+/* ── CIERRE DE GRAVES: selectores reales, sacados del DOM ─────────────── */
+/* "Email de la cuenta": gris de tema claro sobre la tarjeta oscura, 2,08 */
+/* Medido: el fondo de esta tarjeta es rgb(26,42,37) — OSCURO. Mi versión
+   anterior la dio por clara y puso texto oscuro: 2,08 -> 1,04. Va en claro. */
+#s-tokens #account-email-display, #s-tokens #account-email-display * {
+  color: rgba(243,241,234,0.90) !important;
+}
+/* El donut de tokens dibuja su texto en SVG con negro por defecto, 1,23 */
+#s-tokens #tokens-donut text { fill: #f3f1ea !important; }
+/* Los epígrafes del ABC son cyan sobre la tarjeta clara de cabecera, 1,51 */
+#s-abc .abc-section-card .cm-eyebrow { color: #1a6a82 !important; }
 </style>
   <g id="countries">
 <path id="AE" d="M619.874,393.722L620.373,393.573L620.477,394.411L622.671,393.93L624.99,394.009L626.684,394.1L628.604,392.028L630.695,390.054L632.467,388.146L633.001,389.202L633.382,391.639L631.949,391.651L631.72,393.648L632.216,394.073L630.947,394.674L630.939,395.919L630.122,397.175L630.049,398.394L629.484,399.032L621.056,397.508L619.981,394.428z"/>

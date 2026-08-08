@@ -384,3 +384,47 @@ Tres bloques seguidos subieron a 47, 103 y 104. Se revirtieron con
   **NO es un fallo de idioma.** ABC / Antecedent-Behavior-Consequence es la
   terminología canónica del análisis de conducta y en inglés es lo correcto
   (founder, 2026-08-07). No proponer traducirla.
+
+---
+
+# CORTE ACORDADO CON EL FOUNDER (8-ago)
+
+> "vamos a la web y distingamos entre mejoras de diseño y fallos graves como
+> el del contraste imposible de leer" · "con los demás, aunque hay que
+> mejorarlos, se puede convivir de momento"
+
+**Umbral acordado:**
+- **GRAVE (ratio < 3)** → se arregla. Ilegible de verdad.
+- **MEJORA (3 ≤ ratio < 4,5)** → se documenta y se convive. Se lee.
+
+El founder validó visualmente una muestra con casos reales: confirmó que 3,1 /
+3,3 / 3,5 se leen, y señaló como problema el botón "Iniciar sesión" (blanco
+sobre cyan, 1,40) y "Solo profesionales" (cyan sobre blanco, 1,93). **Ambos ya
+corregidos**: el botón de pago pasó a texto oscuro sobre cyan (11,4 — el mismo
+nivel que el 10,9 que aprobó como referencia).
+
+## Reparto medido en la web (43 fallos)
+
+- **23 graves** (< 3)
+- **20 mejoras** (3 – 4,5) → se dejan
+
+## AVISO: 17 de esos 23 graves los introduje yo
+
+El bloque "tramo final" contenía dos reglas demasiado amplias:
+1. `button[style*="#ade3f2"], .cm-btn-cyan` → cazaba botones de fondo OSCURO y
+   les ponía texto oscuro (1,05). Acotado a `#s-pro-login/.ps-pay-btn`.
+2. `#s-tokens, #s-tokens *` remapeo de tokens → `s-tokens` **conserva tarjetas
+   blancas**, y el texto se volvió crema sobre blanco (1,11, 14 casos).
+   Acotado a los elementos que van sobre el fondo oscuro.
+
+Ambas corregidas en el borrador `6a769ad4` — **PENDIENTE DE MEDIR**, el panel
+del navegador se colgó. Esperado: graves de 23 → ~6.
+
+## Graves que quedarían tras eso
+
+- `s-abc` "Variables disposicionales" / "Estímulos condicionados (EC)" (1,51):
+  cyan sobre la tarjeta clara de la cabecera ABC.
+- `s-home` "Análisis Problema de Conducta" (2,35): blanco sobre verde claro.
+- `s-login` "(opcional)" (2,40): gris del tema claro sobre oscuro.
+- `s-pro-company` "¿Te gustaría colaborar…" (1,09) y `s-pro-signup`
+  "Disponible tras el pago" (1,09): claro sobre claro.

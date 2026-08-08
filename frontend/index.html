@@ -10768,6 +10768,37 @@ button:not(:disabled):active{ transform:scale(0.98); }
 #s-pro-login ::placeholder, #s-pro-signup ::placeholder {
   color: rgba(243,241,234,0.62) !important;
 }
+
+/* ── TRAMO FINAL DE CONTRASTE (7-ago) ─────────────────────────────────────
+   Los 38 que quedaban se concentraban en tokens, login y las pantallas de
+   pago/profesional. Cada regla lleva el ratio medido antes -> después. */
+
+/* Botón cyan con texto blanco: 1,40. El texto va oscuro sobre el cyan. */
+/* SOLO el botón de pago, que es el que tiene relleno cyan. La versión previa
+   («button[style*=...]», «.cm-btn-cyan») cazaba botones de fondo OSCURO y les
+   ponía texto oscuro: 1,05 medido. */
+#s-pro-login .ps-pay-btn, #s-pro-signup .ps-pay-btn { color: #0e1f1a !important; }
+/* Cyan claro sobre tarjeta blanca: 1,93 -> cyan oscuro solo ahí. */
+#s-pro-company .pc-eyebrow, #s-pro-activate .pa-eyebrow,
+#s-pro-activate .pa-bundle-now, #s-pro-activate .pa-bundle-tag,
+#s-pro-activate .pa-total-num { color: #07819e !important; }
+/* Verde de marca como TEXTO sobre fondo profundo: 2,21 -> 4,58. */
+#s-login a, #s-tokens a, #s-splash a, #s-planes a, #s-account-type a,
+#s-login [data-i18n*="privacy"], #s-login [data-i18n*="terms"],
+#s-tokens [data-i18n*="privacy"], #s-tokens [data-i18n*="terms"] {
+  color: #9ec89a !important;
+}
+/* "ELECCIÓN PREFERIDA": verde sobre verde, 1,13. */
+#s-tokens .pack-badge, #s-tokens [data-i18n*="preferida"],
+#s-tokens [data-i18n*="preferred"] { color: #0e1f1a !important; }
+/* s-tokens conserva TARJETAS BLANCAS, así que aquí NO vale remapear tokens en
+   bloque: al hacerlo, el texto de esas tarjetas se volvió crema sobre blanco
+   (1,11 medido, 14 casos). Solo se toca lo que está directamente sobre el
+   fondo oscuro de la pantalla. */
+#s-tokens > .tok-header, #s-tokens > .tok-header *,
+#s-tokens > h2, #s-tokens > p { color: #f3f1ea !important; }
+/* Alfas que se quedaban cortos. */
+#s-tour-intro .ti-chat-cost { color: rgba(255,250,240,0.78) !important; }
 </style>
   <g id="countries">
 <path id="AE" d="M619.874,393.722L620.373,393.573L620.477,394.411L622.671,393.93L624.99,394.009L626.684,394.1L628.604,392.028L630.695,390.054L632.467,388.146L633.001,389.202L633.382,391.639L631.949,391.651L631.72,393.648L632.216,394.073L630.947,394.674L630.939,395.919L630.122,397.175L630.049,398.394L629.484,399.032L621.056,397.508L619.981,394.428z"/>

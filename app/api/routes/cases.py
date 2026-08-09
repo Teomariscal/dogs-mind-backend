@@ -777,6 +777,93 @@ def export_plan_simple_pdf(
     )
 
 
+@router.get("/{case_id}/training/pdf")
+def export_training_pdf(
+    case_id: str,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """
+    PDF del plan de Entrenamiento Específico (`case_type='training'`).
+
+    Sin coste en tokens: solo formatea el plan ya generado y persistido, que
+    en estos casos se guarda como `CaseEntry.type='intervention'`.
+
+    Cabecera idéntica al resto de informes: logo TDM y, si el usuario es
+    profesional con logo de empresa subido, el suyo en el margen opuesto.
+    """
+    from app.services.pdf_export import (
+        build_training_pdf, build_simple_pdf_filename,
+    )
+
+    case = _get_owned_case(case_id, user, db)
+
+    cached = (
+        db.query(CaseEntry)
+        .filter(CaseEntry.case_id == case.id, CaseEntry.type == "intervention")
+        .order_by(CaseEntry.created_at.desc())
+        .first()
+    )
+    if not cached or not cached.content:
+        raise HTTPException(
+            status_code=404,
+            detail="Aún no has guardado el plan de entrenamiento de este caso.",
+        )
+
+    pdf_bytes = build_training_pdf(case, user, db)
+    filename = build_simple_pdf_filename(case, db, kind="training")
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Length": str(len(pdf_bytes)),
+            "Cache-Control": "private, max-age=0, must-revalidate",
+        },
+    )
+
+
+@router.get("/{case_id}/puppy/pdf")
+def export_puppy_pdf(
+    case_id: str,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """PDF del plan de Escuela de Cachorros (`case_type='puppy'`)."""
+    from app.services.pdf_export import (
+        build_puppy_pdf, build_simple_pdf_filename,
+    )
+
+    case = _get_owned_case(case_id, user, db)
+
+    cached = (
+        db.query(CaseEntry)
+        .filter(CaseEntry.case_id == case.id,
+                CaseEntry.type.in_(("puppy", "intervention")))
+        .order_by(CaseEntry.created_at.desc())
+        .first()
+    )
+    if not cached or not cached.content:
+        raise HTTPException(
+            status_code=404,
+            detail="Aún no has guardado el plan de cachorros de este caso.",
+        )
+
+    pdf_bytes = build_puppy_pdf(case, user, db)
+    filename = build_simple_pdf_filename(case, db, kind="puppy")
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Length": str(len(pdf_bytes)),
+            "Cache-Control": "private, max-age=0, must-revalidate",
+        },
+    )
+
+
 @router.get("/{case_id}/abc-explained/pdf")
 def export_abc_explained_pdf(
     case_id: str,

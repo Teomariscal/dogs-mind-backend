@@ -588,6 +588,39 @@ def build_abc_explained_pdf(case: Case, user: User, db: Session) -> bytes:
     )
 
 
+def build_training_pdf(case: Case, user: User, db: Session) -> bytes:
+    """PDF del plan de Entrenamiento Específico.
+
+    El plan se guarda como entrada `intervention` dentro de un caso con
+    `case_type='training'` (verificado en producción: 44 casos, con entradas
+    anamnesis + intervention). Reutiliza el mismo constructor que el plan
+    sencillo y el ABC explicado.
+    """
+    body = _latest_entry_content(case.id, "intervention", db)
+    if not body:
+        raise ValueError("El caso no tiene aún plan de entrenamiento generado.")
+    return _build_simple_pdf(
+        case, user, db,
+        section_title="Plan de entrenamiento",
+        body_md=body,
+        pdf_title_prefix="Plan de entrenamiento",
+    )
+
+
+def build_puppy_pdf(case: Case, user: User, db: Session) -> bytes:
+    """PDF del plan de Escuela de Cachorros (`case_type='puppy'`)."""
+    body = _latest_entry_content(case.id, "puppy", db) \
+        or _latest_entry_content(case.id, "intervention", db)
+    if not body:
+        raise ValueError("El caso no tiene aún plan de cachorros generado.")
+    return _build_simple_pdf(
+        case, user, db,
+        section_title="Escuela de Cachorros",
+        body_md=body,
+        pdf_title_prefix="Escuela de Cachorros",
+    )
+
+
 def build_simple_pdf_filename(case: Case, db: Session, *, kind: str) -> str:
     """Filename para los PDFs accesibles. kind ∈ {'plan-simple','abc-explained'}."""
     dog_label = _resolve_dog_label(case, db)
@@ -595,5 +628,7 @@ def build_simple_pdf_filename(case: Case, db: Session, *, kind: str) -> str:
     prefix = {
         "plan-simple": "plan_sencillo",
         "abc-explained": "analisis_explicado",
+        "training": "plan_entrenamiento",
+        "puppy": "escuela_cachorros",
     }.get(kind, "informe")
     return f"{prefix}_{slug}_{datetime.utcnow().strftime('%Y%m%d')}.pdf"

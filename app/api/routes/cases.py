@@ -840,7 +840,9 @@ def export_puppy_pdf(
     cached = (
         db.query(CaseEntry)
         .filter(CaseEntry.case_id == case.id,
-                CaseEntry.type.in_(("puppy", "intervention")))
+                # 'abc' incluido a propósito: los casos de cachorros guardados
+                # antes del arreglo del 2026-08-10 tienen ahí su plan.
+                CaseEntry.type.in_(("puppy", "intervention", "abc")))
         .order_by(CaseEntry.created_at.desc())
         .first()
     )
@@ -1504,10 +1506,17 @@ def migrate_legacy_records(
         # 4. Crear Case
         # case_type opcional desde el record (NULL → 'behavior', preserva legacy).
         _ctype = (rec.case_type or "behavior").strip().lower()
-        if _ctype not in ("behavior", "training"):
+        # 'puppy' FALTABA aquí (2026-08-10): el esquema lo acepta en el Literal,
+        # pero esta lista lo degradaba a 'behavior'. Resultado: los planes de
+        # Escuela de Cachorros se guardaban como caso clínico, su entrada como
+        # 'abc', y no había NINGÚN caso 'puppy' en producción — lo que hacía
+        # imposible exportarlos en PDF y los mezclaba con los casos de conducta.
+        if _ctype not in ("behavior", "training", "puppy"):
             _ctype = "behavior"
         # Título por defecto distingue tipo cuando no hay problem/dog_name.
-        _default_title = "Plan de entrenamiento" if _ctype == "training" else "Caso clínico"
+        _default_title = ("Plan de entrenamiento" if _ctype == "training"
+                          else "Escuela de Cachorros" if _ctype == "puppy"
+                          else "Caso clínico")
         title = (rec.problem or rec.dog_name or _default_title).strip()[:150]
         case_status = "archived" if (rec.status or "").lower() in {"archived", "closed", "resolved"} else "open"
         case = Case(
@@ -1550,8 +1559,12 @@ def migrate_legacy_records(
         db.add(anam)
 
         if rec.analysis:
+            # El tipo de entrada sigue al tipo de caso: un plan de cachorros no
+            # es un ABC clínico y guardarlo como 'abc' lo mezclaba con los casos
+            # de conducta y lo dejaba fuera de su propio PDF.
+            _etype = "puppy" if _ctype == "puppy" else "abc"
             db.add(CaseEntry(
-                case_id=case.id, type="abc",
+                case_id=case.id, type=_etype,
                 content=rec.analysis,
                 meta={"migrated": True},
             ))

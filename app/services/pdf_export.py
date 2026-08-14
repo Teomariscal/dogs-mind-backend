@@ -609,8 +609,9 @@ def build_training_pdf(case: Case, user: User, db: Session) -> bytes:
 
 def build_puppy_pdf(case: Case, user: User, db: Session) -> bytes:
     """PDF del plan de Escuela de Cachorros (`case_type='puppy'`)."""
-    body = _latest_entry_content(case.id, "puppy", db) \
-        or _latest_entry_content(case.id, "intervention", db)
+    body = (_latest_entry_content(case.id, "puppy", db)
+            or _latest_entry_content(case.id, "intervention", db)
+            or _latest_entry_content(case.id, "abc", db))
     if not body:
         raise ValueError("El caso no tiene aún plan de cachorros generado.")
     return _build_simple_pdf(

@@ -1,3 +1,4 @@
+// v252 (PDF de Entrenamiento y Escuela de Cachorros descargable desde el propio resultado + los casos de cachorro guardados vuelven a abrirse como plan de cachorro, no como ABC vacío. Tag "Escuela Cachorros" en Registros. 2026-08-14)
 // v245 (hero web, cambio pedido por el founder: botón 1 renombrado a "Análisis Problema de Conducta", botón 2 igual, botón 3 NUEVO "Escuela de Cachorros" → anamnesis de cachorros (s-anamnesis-puppy). Incluye además, ya probado en local: portada recolocada bajo la barra (los bloques ya no se estiran a todo lo ancho) y modo compacto 700-1100 px. Base = diseño aprobado v229. css v20 · js v23. 2026-08-02)
 // v244 (modo compacto 700-1100 px para la capa de escritorio: el diseño estaba dimensionado para ≥1024 y al abrirse en anchos menores —ventana estrecha o zoom del navegador— la barra se amontonaba en tres filas (founder: "se te ha mezclado todo"). Ahora en ese rango todo encoge y las filas hacen scroll horizontal en vez de romperse. css v19. 2026-08-02)
 // v243 (dos cambios para que el founder VEA por fin la web: [1] formato escritorio en cualquier ordenador — pointer:fine + hover + min-width 700, con lo que el zoom del navegador ya no lo desactiva; [2] el service worker nuevo se activa SOLO (skipWaiting) en vez de esperar al botón Actualizar, que es lo que le ha tenido viendo versiones viejas todo el día. css v18 · js v21. 2026-08-02)
@@ -52,7 +53,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v251';
+const CACHE_NAME = 'dogs-mind-v252';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

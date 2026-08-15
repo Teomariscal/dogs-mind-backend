@@ -9783,6 +9783,12 @@ button:not(:disabled):active{ transform:scale(0.98); }
          aparece en s-records. -->
     <div class="tr-actions" style="display:flex;flex-direction:column;gap:10px;">
       <button id="tr-save-btn" class="tc-submit-btn" onclick="acceptTrainingPlan()" data-i18n="tr_save_plan">Guardar plan</button>
+      <!-- PDF del plan de entrenamiento (founder 2026-08-10: "debería estar siempre
+           en cualquier resultado"). Solo visible cuando el caso ya está en backend
+           — el endpoint formatea el entry persistido, no hay nada que exportar antes
+           de guardar. Sin coste de tokens. -->
+      <button id="tr-pdf-btn" class="tc-submit-btn" onclick="trDownloadPdf()" data-i18n="tr_btn_pdf"
+              style="display:none;">Descargar PDF</button>
       <button class="tc-submit-btn" onclick="goToConsultType()" data-i18n="tr_new_consult"
               style="background:transparent;color:var(--cyan, #5ec8e6);border:1.5px solid rgba(94,200,230,0.5);">Nueva consulta</button>
     </div>
@@ -9952,6 +9958,10 @@ button:not(:disabled):active{ transform:scale(0.98); }
     <article id="pupr-content" class="tr-content"></article>
     <div class="tr-actions" style="display:flex;flex-direction:column;gap:10px;">
       <button id="pupr-save-btn" class="tc-submit-btn" onclick="acceptPuppyPlan()" data-i18n="pupr_save">Guardar plan</button>
+      <!-- Mismo criterio que en Entrenamiento: PDF solo cuando el plan ya está
+           guardado en backend (endpoint /cases/{id}/puppy/pdf, sin coste). -->
+      <button id="pupr-pdf-btn" class="tc-submit-btn" onclick="pupDownloadPdf()" data-i18n="pupr_btn_pdf"
+              style="display:none;">Descargar PDF</button>
       <button class="tc-submit-btn" onclick="goTo('s-home')" data-i18n="pupr_home"
               style="background:transparent;color:var(--cyan, #5ec8e6);border:1.5px solid rgba(94,200,230,0.5);">Volver al inicio</button>
     </div>
@@ -12608,6 +12618,39 @@ async function ppDownloadFullPdf() {
 }
 window.ppDownloadFullPdf = ppDownloadFullPdf;
 
+// ── PDF de Entrenamiento y de Escuela de Cachorros ──────────────────────────
+// Endpoints /cases/{id}/training/pdf y /cases/{id}/puppy/pdf: formatean el entry
+// ya persistido (logo TDM + logo de empresa si el usuario es profesional). Sin
+// coste de tokens. El caseId lo publican acceptTrainingPlan / acceptPuppyPlan al
+// migrar, y openRecord al abrir un caso archivado.
+function _tdmToggleResultPdfBtn(btnId, caseId) {
+  var b = document.getElementById(btnId);
+  if (b) b.style.display = caseId ? '' : 'none';
+}
+window._tdmToggleResultPdfBtn = _tdmToggleResultPdfBtn;
+
+async function trDownloadPdf() {
+  var caseId = window._lastTrainingCaseId || null;
+  if (!caseId) { showToast(_i18nText('pdf_err_404', 'No hay contenido para exportar.')); return; }
+  await _downloadAccessiblePdf({
+    caseId: caseId,
+    endpoint: 'training',
+    fallbackFilename: 'plan_entrenamiento.pdf',
+  });
+}
+window.trDownloadPdf = trDownloadPdf;
+
+async function pupDownloadPdf() {
+  var caseId = window._lastPuppyCaseId || null;
+  if (!caseId) { showToast(_i18nText('pdf_err_404', 'No hay contenido para exportar.')); return; }
+  await _downloadAccessiblePdf({
+    caseId: caseId,
+    endpoint: 'puppy',
+    fallbackFilename: 'escuela_cachorros.pdf',
+  });
+}
+window.pupDownloadPdf = pupDownloadPdf;
+
 // Descarga directa del PDF completo (análisis ABC + plan, logos TDM + empresa)
 // desde las pantallas profesionales (s-full-analysis y s-tracking), sin pasar
 // por Plan Sencillo. Resuelve el record activo y hace lazy migration si el
@@ -15127,6 +15170,9 @@ async function acceptTrainingPlan() {
         var mdata = await mres.json();
         var mresult = (mdata.results && mdata.results[0]) || null;
         if (mresult && mresult.case_id) {
+          // Publicar el caseId para el botón "Descargar PDF" de s-training-result.
+          window._lastTrainingCaseId = mresult.case_id;
+          _tdmToggleResultPdfBtn('tr-pdf-btn', mresult.case_id);
           try {
             var recsU = getRecords();
             var idxU = recsU.findIndex(function(r){ return r.id === record.id; });
@@ -15987,7 +16033,38 @@ function getVal(id, fallback) {
       // Ya está guardado (viene de records) → ocultar "Guardar plan" (evita duplicado).
       var _saveBtn = document.getElementById('tr-save-btn');
       if (_saveBtn) _saveBtn.style.display = 'none';
+      // Guardado y con caso en backend → se puede exportar a PDF.
+      window._lastTrainingCaseId = r.backend_case_id || null;
+      if (typeof window._tdmToggleResultPdfBtn === 'function') {
+        window._tdmToggleResultPdfBtn('tr-pdf-btn', window._lastTrainingCaseId);
+      }
       goTo('s-training-result');
+      return;
+    }
+
+    // ESCUELA DE CACHORROS: mismo problema que training — no tiene ABC. El plan
+    // viaja en r.analysis (así lo migra acceptPuppyPlan). Sin esta rama el caso
+    // caía al ABC clínico y se veía un análisis vacío (2026-08-14).
+    if (r.case_type === 'puppy') {
+      window._lastPuppyPlan    = r.analysis || r.plan || '';
+      window._lastPuppyDogName = r.dog_name || '';
+      window._lastPuppyData    = {
+        dog_name: r.dog_name || '', breed: r.breed || '',
+        objetivo: '', area: r.problem || '',
+        lang: r.lang || (window.getCurrentLang ? window.getCurrentLang() : 'es'),
+      };
+      window._loadedFromArchive = true;
+      try {
+        var pupEl = document.getElementById('pupr-content');
+        if (pupEl && typeof window._mdToHtml === 'function') pupEl.innerHTML = window._mdToHtml(window._lastPuppyPlan);
+      } catch (e) {}
+      var _pupSave = document.getElementById('pupr-save-btn');
+      if (_pupSave) _pupSave.style.display = 'none';
+      window._lastPuppyCaseId = r.backend_case_id || null;
+      if (typeof window._tdmToggleResultPdfBtn === 'function') {
+        window._tdmToggleResultPdfBtn('pupr-pdf-btn', window._lastPuppyCaseId);
+      }
+      goTo('s-puppy-result');
       return;
     }
 
@@ -16165,6 +16242,8 @@ function getVal(id, fallback) {
             // muestra "Adiestramiento" en vez de "ABC Análisis".
             (r.case_type === 'training'
               ? '<span style="font-size:10px;background:rgba(94,200,230,0.12);color:#2a6f88;padding:3px 8px;border-radius:6px;font-weight:600;">' + _i18nText('rec_tag_training','Adiestramiento') + '</span>'
+              : r.case_type === 'puppy'
+              ? '<span style="font-size:10px;background:rgba(94,200,230,0.12);color:#2a6f88;padding:3px 8px;border-radius:6px;font-weight:600;">' + _i18nText('rec_tag_puppy','Escuela Cachorros') + '</span>'
               : '<span style="font-size:10px;background:rgba(42,90,42,0.07);color:var(--green2);padding:3px 8px;border-radius:6px;">' + _i18nText('rec_tag_abc','ABC Análisis') + '</span>'
               + (r.plan ? '<span style="font-size:10px;background:rgba(42,90,42,0.07);color:var(--green2);padding:3px 8px;border-radius:6px;">' + _i18nText('rec_tag_plan_lima','Plan LIMA') + '</span>' : '')
             ) +
@@ -16187,7 +16266,9 @@ function getVal(id, fallback) {
       // pasarlo a /init si el backend no tiene CaseEntry intervention.
       if (r.backend_case_id && r.case_type !== 'training') {
         var bcid = String(r.backend_case_id).replace(/'/g, "\\'");
-        try { window._dfPlanCache = window._dfPlanCache || {}; window._dfPlanCache[r.backend_case_id] = r.plan || ''; } catch(e){}
+        // En los casos de cachorro el plan viaja en r.analysis (no en r.plan): sin
+        // este fallback el seguimiento diario arrancaba con el plan vacío.
+        try { window._dfPlanCache = window._dfPlanCache || {}; window._dfPlanCache[r.backend_case_id] = (r.case_type === 'puppy' ? (r.plan || r.analysis) : r.plan) || ''; } catch(e){}
         html += '<button type="button" class="rec-df-cta" onclick="event.stopPropagation();_dfOpenFromBtn(\'' + bcid + '\')" style="border-top-left-radius:0;border-top-right-radius:0;border-top:none;">' +
           '<div class="rec-df-cta-icon">' +
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">' +
@@ -19359,6 +19440,21 @@ window.acceptPuppyPlan = async function() {
     if (r.ok) {
       if (btn) { btn.textContent = _i18nText('pup_saved','Plan guardado'); btn.style.display='none'; }
       try { localStorage.removeItem('dm_pending_puppy'); } catch (e) {}
+      /* Hasta ahora la respuesta se descartaba. El case_id es lo que habilita
+         "Descargar PDF" sin salir de la pantalla. Si el cupo de casos está lleno
+         el backend devuelve 200 con status='skipped_quota' y sin case_id: hay que
+         decirlo, no dar el guardado por bueno. */
+      try {
+        var pdata = await r.json();
+        var presult = (pdata.results && pdata.results[0]) || null;
+        if (presult && presult.case_id) {
+          window._lastPuppyCaseId = presult.case_id;
+          _tdmToggleResultPdfBtn('pupr-pdf-btn', presult.case_id);
+        } else if (presult && presult.status === 'skipped_quota') {
+          showToast(presult.detail || _i18nText('case_quota_full', 'Has alcanzado tu límite de casos. Borra o cierra uno para guardar este.'));
+          if (btn) { btn.disabled = false; btn.textContent = prev; btn.style.display = ''; }
+        }
+      } catch (eJson) { /* respuesta sin JSON: el caso se guardó igual */ }
       if (typeof syncBackendCases === 'function') syncBackendCases();
     } else {
       /* Nunca fallar en silencio: si no se guarda, el usuario tiene que saberlo
@@ -20572,10 +20668,12 @@ function endTourIntro() {
       tr_eyebrow:               'Plan de entrenamiento',
       tr_title:                 'Tu plan está listo',
       tr_new_consult:           'Nueva consulta',
+      tr_btn_pdf:               'Descargar PDF',
       tr_save_plan:             'Guardar plan',
       tr_saved_toast:           'Plan de entrenamiento guardado',
       tr_err_no_plan:           'No hay plan que guardar.',
       rec_tag_training:         'Adiestramiento',
+      rec_tag_puppy:            'Escuela Cachorros',
       pending_training_title:   'Tienes un plan de entrenamiento sin guardar.',
       pending_training_sub:     'Lo recuperamos en este dispositivo, sin volver a cobrar.',
       pending_training_view:    'Ver',
@@ -20655,6 +20753,7 @@ function endTourIntro() {
       pup_submitting:  'Creando el plan…',
       pupr_eyebrow:    'Escuela Cachorros',
       pupr_save:       'Guardar',
+      pupr_btn_pdf:    'Descargar PDF',
       pupr_home:       'Volver al inicio',
       pw_title:   'Elige tu plan',
       pw_sub:     'Créditos que se renuevan cada mes',
@@ -21635,10 +21734,12 @@ function endTourIntro() {
       tr_eyebrow:               'Training plan',
       tr_title:                 'Your plan is ready',
       tr_new_consult:           'New consultation',
+      tr_btn_pdf:               'Download PDF',
       tr_save_plan:             'Save plan',
       tr_saved_toast:           'Training plan saved',
       tr_err_no_plan:           'No plan to save.',
       rec_tag_training:         'Training',
+      rec_tag_puppy:            'Puppy School',
       pending_training_title:   'You have an unsaved training plan.',
       pending_training_sub:     'We recover it on this device, without charging again.',
       pending_training_view:    'View',
@@ -21718,6 +21819,7 @@ function endTourIntro() {
       pup_submitting:  'Creating the plan…',
       pupr_eyebrow:    'Puppy School',
       pupr_save:       'Save',
+      pupr_btn_pdf:    'Download PDF',
       pupr_home:       'Back to home',
       pw_title:   'Choose your plan',
       pw_sub:     'Credits that renew every month',
@@ -22699,10 +22801,12 @@ function endTourIntro() {
           tr_eyebrow:               'Piano di addestramento',
           tr_title:                 'Il tuo piano è pronto',
           tr_new_consult:           'Nuovo consulto',
+          tr_btn_pdf:               'Scarica PDF',
           tr_save_plan:             'Salva piano',
           tr_saved_toast:           'Piano di addestramento salvato',
           tr_err_no_plan:           'Non c’è alcun piano da salvare.',
           rec_tag_training:         'Addestramento',
+          rec_tag_puppy:            'Scuola Cuccioli',
           pending_training_title:   'Hai un piano di addestramento non salvato.',
           pending_training_sub:     'Lo recuperiamo su questo dispositivo, senza addebitare di nuovo.',
           pending_training_view:    'Vedi',
@@ -22782,6 +22886,7 @@ function endTourIntro() {
           pup_submitting:  'Sto creando il piano…',
           pupr_eyebrow:    'Scuola Cuccioli',
           pupr_save:       'Salva',
+          pupr_btn_pdf:    'Scarica PDF',
           pupr_home:       'Torna alla home',
           pw_title:   'Scegli il tuo piano',
           pw_sub:     'Crediti che si rinnovano ogni mese',

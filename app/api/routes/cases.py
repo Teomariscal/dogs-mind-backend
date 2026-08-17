@@ -64,6 +64,15 @@ def _max_cases_for(user) -> int:
 # Ver dogsmind-modelo-negocio-pricing.md y memoria CFO.
 SEGUIMIENTO_TOKEN_COST = 1.5  # plantilla + respuesta IA Sonnet 4.6 + RAG
 
+# Los 3 primeros seguimientos de CADA usuario cuestan 0,3 en vez de 1,5.
+# Motivo (founder, 2026-08-17): el seguimiento diario es la pieza que construye
+# el hábito, y el hábito es lo que retiene. Con el saldo de bienvenida, un
+# análisis (3,0) + plan (0,20) + un check-in (1,5) dejaba al usuario nuevo
+# bloqueado en el día 2, justo cuando estaba empezando. Nunca es gratis: 0,3 es
+# el mismo precio que el apoyo de Katja en el día a día.
+SEGUIMIENTO_ONBOARDING_COST  = 0.3
+SEGUIMIENTO_ONBOARDING_COUNT = 3
+
 # Plan Sencillo / Pet Owners — INVARIANTE FINANCIERA (CFO 2026-05-04).
 # Haiku 4.5 reformula el plan técnico en formato receta. 96 % margen alineado
 # con mensaje Aigent. Persistencia obligatoria (solo 1ª generación cobra) +
@@ -377,6 +386,27 @@ def _count_active_cases(user: User, db: Session) -> int:
 
 def _count_case_entries(case_id: str, db: Session) -> int:
     return db.query(CaseEntry).filter(CaseEntry.case_id == case_id).count()
+
+
+def _seguimiento_cost_for(user: User, db: Session) -> float:
+    """Precio del seguimiento diario para ESTE usuario.
+
+    Los `SEGUIMIENTO_ONBOARDING_COUNT` primeros de su vida cuestan
+    `SEGUIMIENTO_ONBOARDING_COST`; a partir de ahí, el precio normal. Se cuenta
+    sobre todos sus casos, no por caso, para que no se pueda reiniciar el
+    descuento abriendo casos nuevos.
+    """
+    previos = (
+        db.query(CaseEntry)
+        .join(Case, Case.id == CaseEntry.case_id)
+        .filter(Case.user_id == user.id, CaseEntry.type == "seguimiento")
+        .count()
+    )
+    return (
+        SEGUIMIENTO_ONBOARDING_COST
+        if previos < SEGUIMIENTO_ONBOARDING_COUNT
+        else SEGUIMIENTO_TOKEN_COST
+    )
 
 
 def _to_case_response(case: Case) -> CaseResponse:
@@ -992,7 +1022,8 @@ def post_seguimiento(
         )
 
     # ─── Invariante financiera: cobrar ANTES de invocar IA ─────────────────
-    new_balance = _charge_user_tokens(user, SEGUIMIENTO_TOKEN_COST, db)
+    _seg_cost = _seguimiento_cost_for(user, db)
+    new_balance = _charge_user_tokens(user, _seg_cost, db)
 
     # ─── Llamada IA Teo (Sonnet 4.6 + RAG) ─────────────────────────────────
     form_data = SeguimientoFormData(**payload.model_dump())
@@ -1001,7 +1032,7 @@ def post_seguimiento(
     except Exception as e:
         # IA falló — refund tokens y propagar 500.
         # Esto preserva la invariante "no se cobra al usuario por errores nuestros".
-        user.tokens = float(user.tokens) + SEGUIMIENTO_TOKEN_COST
+        user.tokens = float(user.tokens) + _seg_cost
         db.commit()
         raise HTTPException(
             status_code=500,
@@ -1018,7 +1049,7 @@ def post_seguimiento(
         ai_model=settings.clinical_model,
         input_tokens=ai_result.input_tokens,
         output_tokens=ai_result.output_tokens,
-        tokens_charged=SEGUIMIENTO_TOKEN_COST,
+        tokens_charged=_seg_cost,
     )
     db.add(entry)
     case.updated_at = datetime.utcnow()
@@ -1039,7 +1070,7 @@ def post_seguimiento(
             model=settings.clinical_model,
             input_tokens=ai_result.input_tokens,
             output_tokens=ai_result.output_tokens,
-            tokens_charged=SEGUIMIENTO_TOKEN_COST,
+            tokens_charged=_seg_cost,
             success="ok",
         )
     except Exception:

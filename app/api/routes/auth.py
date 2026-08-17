@@ -45,7 +45,8 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # ── Schemas ───────────────────────────────────────────────────────────────────
 AMBASSADOR_CODE    = os.environ.get("AMBASSADOR_CODE", "").strip()
 AMBASSADOR_TOKENS  = 8
-DEFAULT_TOKENS     = 5
+DEFAULT_TOKENS     = 8   # 5 -> 8 (founder 2026-08-17): el saldo de bienvenida tenia que cubrir
+                         # analisis (3,0) + plan (0,20) + varios dias de seguimiento.
 
 class RegisterRequest(BaseModel):
     email: EmailStr
@@ -308,7 +309,17 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
 
 
 @router.get("/me")
-def me(current_user: User = Depends(get_current_user)):
+def me(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    # `seguimiento_cost` va aquí y no en un endpoint propio porque la app ya
+    # llama a /auth/me al arrancar y tras cada cobro: es el precio real para
+    # ESTE usuario (los primeros check-ins valen menos), y la UI lo necesita
+    # para no anunciar 1,5 cuando va a cobrar 0,3.
+    try:
+        from app.api.routes.cases import _seguimiento_cost_for
+        seg_cost = _seguimiento_cost_for(current_user, db)
+    except Exception:
+        from app.api.routes.cases import SEGUIMIENTO_TOKEN_COST
+        seg_cost = SEGUIMIENTO_TOKEN_COST
     return {
         "user_id":      str(current_user.id),
         "email":        current_user.email,
@@ -316,6 +327,7 @@ def me(current_user: User = Depends(get_current_user)):
         "tokens":       float(current_user.tokens),
         "role":         current_user.role,
         "account_type": current_user.account_type,
+        "seguimiento_cost": seg_cost,
     }
 
 

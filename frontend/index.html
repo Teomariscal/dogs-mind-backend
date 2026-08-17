@@ -10563,7 +10563,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
 
         <button id="seg-submit-btn" type="button" onclick="submitSeguimiento()" style="margin-top:18px;width:100%;padding:14px;border:none;border-radius:100px;background:var(--green);color:#fff;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;" data-i18n="seg_submit_btn">Enviar seguimiento (1,5 tokens)</button>
 
-        <div style="margin-top:10px;font-size:11px;color:var(--text3);text-align:center;" data-i18n="seg_cost_hint">Coste: 1,5 tokens · Teo procesará tu informe con tu historial.</div>
+        <div id="seg-cost-hint" style="margin-top:10px;font-size:11px;color:var(--text3);text-align:center;" data-i18n="seg_cost_hint">Coste: 1,5 tokens · Teo procesará tu informe con tu historial.</div>
       </div>
 
       <!-- Pantalla de respuesta IA (oculta hasta que se envíe correctamente) -->
@@ -16586,10 +16586,32 @@ function getVal(id, fallback) {
         // Pintar email en sección "Mi cuenta y privacidad"
         var emailEl = document.getElementById('account-email-value');
         if (emailEl && d.email) emailEl.textContent = d.email;
+        // Precio real del seguimiento para ESTE usuario: los primeros valen
+        // menos, y la pantalla anunciaba 1,5 fijo (founder 2026-08-17).
+        if (d.seguimiento_cost !== undefined && d.seguimiento_cost !== null) {
+          window._segCost = Number(d.seguimiento_cost);
+          try { dmPintarCosteSeguimiento(); } catch (e) {}
+        }
       }
     })
     .catch(function() {});
   }
+
+  /* Repinta el precio del seguimiento con el que de verdad se va a cobrar.
+     Sustituye el número dentro del texto traducido en vez de reescribir la
+     frase, para no tener que duplicar el copy en los tres idiomas. */
+  function dmPintarCosteSeguimiento() {
+    var c = window._segCost;
+    if (c === undefined || c === null) return;
+    var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+    var txt  = (lang === 'en') ? String(c) : String(c).replace('.', ',');
+    ['seg-submit-btn', 'seg-cost-hint'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = el.textContent.replace(/\d+[.,]\d+/, txt);
+    });
+  }
+  window.dmPintarCosteSeguimiento = dmPintarCosteSeguimiento;
 
   // ── Pago con Stripe Checkout (automático, <30 seg) ────────────────────────
   function recargar(pack) {
@@ -19966,6 +19988,7 @@ function openSeguimiento(caseId) {
   }
   window._seguimientoState = { caseId: String(caseId) };
   _resetSeguimientoForm();
+  try { if (typeof dmPintarCosteSeguimiento === 'function') dmPintarCosteSeguimiento(); } catch (e) {}
   goTo('s-seguimiento');
 }
 window.openSeguimiento = openSeguimiento;
@@ -23449,6 +23472,10 @@ function endTourIntro() {
       var key = el.getAttribute('data-i18n');
       if (t[key] !== undefined) el.innerHTML = t[key];
     });
+
+    /* La traduccion deja el precio del seguimiento en 1,5 (el del diccionario).
+       Repintamos con el real de este usuario, que puede ser menor. */
+    try { if (typeof dmPintarCosteSeguimiento === 'function') dmPintarCosteSeguimiento(); } catch (e) {}
 
     // Translate placeholder attributes
     document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {

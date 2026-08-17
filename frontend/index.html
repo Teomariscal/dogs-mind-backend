@@ -8899,6 +8899,43 @@ button:not(:disabled):active{ transform:scale(0.98); }
   font-family: inherit; cursor: pointer; touch-action: manipulation;
 }
 
+
+.guided-escape {
+  display: block; width: 100%; margin-top: 10px; padding: 11px;
+  background: transparent; border: none; color: rgba(255,255,255,0.60);
+  font-size: 13.5px; font-family: inherit; cursor: pointer;
+  text-decoration: underline; touch-action: manipulation;
+}
+
+
+/* ── Bienvenida coral: los ocho Aigents ───────────────────────────────────
+   La foto manda arriba y el texto cae sobre un degradado, para que no haya
+   corte duro entre imagen y fondo. */
+#s-aigents-welcome { display: none; }
+#s-aigents-welcome.active { display: block; }
+.aw-wrap {
+  min-height: 100%; display: flex; flex-direction: column;
+  background: #0a1a14;
+}
+.aw-foto {
+  width: 100%; aspect-ratio: 1376 / 774; object-fit: cover;
+  object-position: center 42%; display: block;
+}
+.aw-txt {
+  position: relative; margin-top: -58px; padding: 0 26px
+    calc(30px + env(safe-area-inset-bottom, 0px));
+  text-align: center;
+  background: linear-gradient(to bottom, rgba(10,26,20,0) 0%, #0a1a14 58px, #0a1a14 100%);
+}
+.aw-title {
+  font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 600;
+  color: #fff; margin: 0 0 12px; line-height: 1.14; padding-top: 62px;
+}
+.aw-body {
+  font-size: 16px; line-height: 1.6; color: rgba(255,255,255,0.88);
+  margin: 0 auto 30px; max-width: 26em;
+}
+
   </style>
 
   <div id="s-abc" class="screen" style="background:linear-gradient(180deg, #0e1f1a 0%, #14302a 100%);">
@@ -9729,6 +9766,20 @@ button:not(:disabled):active{ transform:scale(0.98); }
        El backend adapta el tono del plan por account_type (llano Pet Owner /
        técnico Pro). Coste: 1,5 tokens.
   -->
+  <!-- ══ BIENVENIDA CORAL (founder 2026-08-17) ═══════════════════════════════
+       Va ANTES de la de Katja. Con Katja sola la entrada quedaba sosa: aquí
+       aparecen los ocho Aigents y luego uno de ellos da el paso al frente. -->
+  <div id="s-aigents-welcome" class="screen">
+    <div class="aw-wrap">
+      <img class="aw-foto" src="aigents-final.webp" alt="Los Dog Aigents" loading="eager">
+      <div class="aw-txt">
+        <h1 class="aw-title" data-i18n="aw_title">Bienvenido a The Dogs&rsquo; Mind</h1>
+        <p class="aw-body" data-i18n="aw_body">Uno de nosotros te va a acompa&ntilde;ar en tu primera consulta.</p>
+        <button class="gw-cta" type="button" onclick="goTo('s-guided-welcome')" data-i18n="aw_cta">Adelante</button>
+      </div>
+    </div>
+  </div><!-- /s-aigents-welcome -->
+
   <!-- ══ VISITA GUIADA — bienvenida (founder 2026-08-17) ═════════════════════
        Tras el registro, en vez de soltar al usuario en el home, Katja le
        propone hacer la primera consulta juntos. Puede decir que no: entonces
@@ -16790,6 +16841,23 @@ function getVal(id, fallback) {
         'Ahora lo que importa. Qué hace, cuándo, y delante de quién. Cuanto más concreto seas, mejor sale el análisis.'
       ]
     },
+    /* El alta. Es la pantalla más delicada de la app: si se rompe, nadie
+       entra. Por eso aquí NO se toca el HTML — los bloques se marcan en
+       caliente por posición, y cualquier fallo devuelve el formulario entero
+       (ver dmGuidedMarcarAlta). El recuadro de iniciar sesión, que vive encima
+       en la misma pantalla, no se toca en ningún caso. */
+    signup: {
+      pantalla:  's-login',
+      envio:     [],            /* el botón lo maneja el propio marcado */
+      escape:    true,          /* ofrece "ver el formulario entero" */
+      grupos:    { 1: [0, 1, 4], 2: [2, 3], 3: [5, 6, 7, 8, 9, 10, 11] },
+      claves:    ['guided_r1', 'guided_r2', 'guided_r3'],
+      textos:    [
+        'Soy Katja y te acompaño desde aquí. Empecemos por ti: quién eres y desde dónde nos escribes.',
+        'Ahora tu perro. Con el nombre y la raza me basta para empezar; lo demás te lo pregunto cuando haga falta.',
+        'Y ya está: los datos de tu cuenta y entramos.'
+      ]
+    },
     training: {
       pantalla: 's-anamnesis-training',
       envio:    ['tc-submit'],
@@ -16816,7 +16884,10 @@ function getVal(id, fallback) {
      rechazado. Devuelve true si ya ha navegado a la bienvenida. */
   function dmGuidedOfrecer() {
     try { if (localStorage.getItem(DM_GUIDED_KEY)) return false; } catch (e) {}
-    goTo('s-guided-welcome');
+    /* Primero la bienvenida coral (los ocho), después Katja da el paso al
+       frente. Si por lo que sea no existiera esa pantalla, se entra directo a
+       la de Katja y no se rompe nada. */
+    goTo(document.getElementById('s-aigents-welcome') ? 's-aigents-welcome' : 's-guided-welcome');
     return true;
   }
   window.dmGuidedOfrecer = dmGuidedOfrecer;
@@ -16865,14 +16936,62 @@ function getVal(id, fallback) {
   /* Los textos de paso los escribió el founder. No inventar aquí: si falta uno,
      el paso sale sin rótulo antes que con copy improvisado. */
   var _guidedState = null;
+  var _guidedContenedor = null;
 
   function dmGuidedActivo() { return !!_guidedState; }
   window.dmGuidedActivo = dmGuidedActivo;
 
   /* Arranca la visita en la pantalla de anamnesis clínica. */
+  /* Marca en caliente los bloques del alta. Devuelve el contenedor o null.
+     No edita el HTML del fichero: si mañana cambia el formulario, esto deja de
+     encontrar los campos y la visita simplemente no arranca — el usuario ve el
+     alta de siempre, que es el fallo correcto en esta pantalla. */
+  function dmGuidedMarcarAlta(plan) {
+    var refs = ['reg-type', 'reg-name', 'reg-dog1-name', 'reg-country',
+                'reg-email', 'reg-password', 'reg-accept'];
+    var cadenas = [];
+    for (var i = 0; i < refs.length; i++) {
+      var el = document.getElementById(refs[i]);
+      if (!el) return null;                       /* formulario cambiado */
+      var c = [], p = el;
+      while (p && p.id !== 's-login') { c.push(p); p = p.parentElement; }
+      if (!p) return null;
+      cadenas.push(c);
+    }
+    var comun = null, base = cadenas[0];
+    for (var j = 0; j < base.length && !comun; j++) {
+      var cand = base[j], todos = true;
+      for (var k = 1; k < cadenas.length; k++) {
+        if (cadenas[k].indexOf(cand) < 0) { todos = false; break; }
+      }
+      if (todos) comun = cand;
+    }
+    if (!comun) return null;
+    var hijos = comun.children;
+    /* Si el formulario ya no tiene la forma que esperamos, no tocamos nada. */
+    var maxIdx = 0;
+    for (var g in plan.grupos) {
+      plan.grupos[g].forEach(function (n) { if (n > maxIdx) maxIdx = n; });
+    }
+    if (hijos.length <= maxIdx) return null;
+    for (var g2 in plan.grupos) {
+      plan.grupos[g2].forEach(function (n) {
+        hijos[n].setAttribute('data-guided-step', g2);
+      });
+    }
+    return comun;
+  }
+
   function dmGuidedStart(camino) {
     var plan = DM_GUIDED_PLANES[camino || 'behavior'];
     if (!plan) return false;
+    if (plan.grupos) {
+      /* Cualquier fallo marcando = alta normal, entera, sin pasos. */
+      var ok = null;
+      try { ok = dmGuidedMarcarAlta(plan); } catch (e) { ok = null; }
+      if (!ok) return false;
+      _guidedContenedor = ok;
+    }
     var secs = document.querySelectorAll('#' + plan.pantalla + ' [data-guided-step]');
     if (!secs.length) return false;            /* sin marcas: modo normal */
     var total = 0;
@@ -16881,7 +17000,15 @@ function getVal(id, fallback) {
       if (n > total) total = n;
     });
     _guidedState = { plan: plan, paso: 1, total: total };
-    _guidedPintar();
+    try {
+      _guidedPintar();
+    } catch (e) {
+      /* Nunca dejar una ficha a medio ocultar: se deshace todo y el usuario ve
+         el formulario completo, que es el fallo correcto. */
+      console.error('visita guiada:', e);
+      try { dmGuidedSalir(); } catch (e2) {}
+      return false;
+    }
     return true;
   }
   window.dmGuidedStart = dmGuidedStart;
@@ -16903,6 +17030,8 @@ function getVal(id, fallback) {
     if (barra) barra.remove();
     var nav = document.getElementById('guided-nav');
     if (nav) nav.remove();
+    var esc = document.getElementById('guided-escape');
+    if (esc) esc.remove();
   }
   window.dmGuidedSalir = dmGuidedSalir;
 
@@ -16966,8 +17095,16 @@ function getVal(id, fallback) {
       nav = document.createElement('div');
       nav.id = 'guided-nav';
       nav.className = 'guided-nav';
-      var ref = document.getElementById(plan.envio[0]);
+      var ref = (plan.envio && plan.envio.length)
+        ? document.getElementById(plan.envio[0]) : null;
       if (ref && ref.parentNode) ref.parentNode.insertBefore(nav, ref);
+      else {
+        /* Sin botón de envío declarado (el alta): la barra va al final del
+           bloque que estamos conduciendo. */
+        var cont = _guidedContenedor || document.getElementById(plan.pantalla);
+        if (cont) cont.appendChild(nav);
+        else return;
+      }
     }
     var ultimo = (paso >= _guidedState.total);
     nav.innerHTML =
@@ -16979,6 +17116,22 @@ function getVal(id, fallback) {
         ? ''
         : '<button type="button" class="guided-sigue" onclick="dmGuidedSiguiente()">' +
             _i18nText('guided_next', 'Continuar') + '</button>');
+
+    /* En el alta, siempre una salida: quien prefiera el formulario entero lo
+       tiene a un toque. En una pantalla de registro nunca hay que dejar a
+       nadie encerrado en un carril. */
+    if (plan.escape) {
+      var esc = document.getElementById('guided-escape');
+      if (!esc) {
+        esc = document.createElement('button');
+        esc.id = 'guided-escape';
+        esc.type = 'button';
+        esc.className = 'guided-escape';
+        esc.onclick = function () { dmGuidedSalir(); };
+        nav.parentNode.insertBefore(esc, nav.nextSibling);
+      }
+      esc.textContent = _i18nText('guided_escape', 'Ver el formulario entero');
+    }
 
     _guidedMostrarSellos(false, plan);
     _guidedMostrarEnvio(ultimo, plan);
@@ -20847,6 +21000,10 @@ function endTourIntro() {
       desc_pdfpro_t: 'Que se lo lleve por escrito',
       desc_pdfpro_b: 'El análisis y el plan en PDF, con tu logo junto al nuestro. Tu cliente sale de la consulta con algo en la mano.',
       desc_pdfpro_c: 'Descargar el informe',
+      guided_r1: 'Soy Katja y te acompaño desde aquí. Empecemos por ti: quién eres y desde dónde nos escribes.',
+      guided_r2: 'Ahora tu perro. Con el nombre y la raza me basta para empezar; lo demás te lo pregunto cuando haga falta.',
+      guided_r3: 'Y ya está: los datos de tu cuenta y entramos.',
+      guided_escape: 'Ver el formulario entero',
       guided_t1: 'Empezamos por él: nombre, raza y edad.',
       guided_t2: 'Ahora por dónde andáis los dos: su nivel, el tuyo, y con qué le pagas el trabajo bien hecho.',
       guided_t3: 'Y lo que quieres enseñarle. Dilo como si se lo explicaras a alguien que no conoce a tu perro: "que venga cuando le llamo aunque haya otros perros" es un objetivo; "que obedezca" no lo es.',
@@ -21234,6 +21391,9 @@ function endTourIntro() {
       ct_a_pitch:               'Análisis funcional ABC + plan de intervención LIMA para resolver un problema de conducta (ansiedad, reactividad, miedos, agresividad…).',
       ct_b_tag:                 'Entrenamiento',
       ct_b_title:               'Entrenamiento específico',
+      aw_title:                 'Bienvenido a The Dogs’ Mind',
+      aw_body:                  'Uno de nosotros te va a acompañar en tu primera consulta.',
+      aw_cta:                   'Adelante',
       gw_eyebrow:               'Tu primera consulta',
       gw_title:                 'Soy Katja',
       gw_body:                  'Me ocupo de que esto salga bien desde el primer caso. Hacemos tu primera consulta juntos: yo te voy pidiendo lo que hace falta, en orden, y tú solo respondes.',
@@ -21962,6 +22122,10 @@ function endTourIntro() {
       desc_pdfpro_t: 'Let them take it in writing',
       desc_pdfpro_b: 'The analysis and the plan as a PDF, with your logo next to ours. Your client leaves the consultation with something in hand.',
       desc_pdfpro_c: 'Download the report',
+      guided_r1: 'I am Katja and I will be with you from here on. Let’s start with you: who you are and where you are writing from.',
+      guided_r2: 'Now your dog. Name and breed are enough to start; I will ask for the rest when it matters.',
+      guided_r3: 'And that is it: your account details and we are in.',
+      guided_escape: 'Show the whole form',
       guided_t1: 'Let’s start with him: name, breed and age.',
       guided_t2: 'Now where you two are: his level, yours, and what you pay him with for a job well done.',
       guided_t3: 'And what you want to teach him. Say it as if you were explaining it to someone who does not know your dog: "come when I call even with other dogs around" is a goal; "behave" is not.',
@@ -22348,6 +22512,9 @@ function endTourIntro() {
       ct_a_pitch:               'Functional ABC analysis + LIMA intervention plan to resolve a behavior problem (anxiety, reactivity, fears, aggression…).',
       ct_b_tag:                 'Training',
       ct_b_title:               'Specific training',
+      aw_title:                 'Welcome to The Dogs’ Mind',
+      aw_body:                  'One of us is going to be with you through your first consultation.',
+      aw_cta:                   'Let’s go',
       gw_eyebrow:               'Your first consultation',
       gw_title:                 'I am Katja',
       gw_body:                  'I make sure this goes well from the very first case. We will do your first consultation together: I ask for what is needed, in order, and you just answer.',
@@ -23074,6 +23241,10 @@ function endTourIntro() {
           desc_pdfpro_t: 'Che se lo porti per iscritto',
           desc_pdfpro_b: 'L’analisi e il piano in PDF, con il tuo logo accanto al nostro. Il tuo cliente esce dal consulto con qualcosa in mano.',
           desc_pdfpro_c: 'Scarica il referto',
+          guided_r1: 'Sono Katja e da qui in poi ti accompagno io. Partiamo da te: chi sei e da dove ci scrivi.',
+          guided_r2: 'Ora il tuo cane. Nome e razza mi bastano per cominciare; il resto te lo chiedo quando serve.',
+          guided_r3: 'E siamo alla fine: i dati del tuo account ed entriamo.',
+          guided_escape: 'Vedi tutto il modulo',
           guided_t1: 'Cominciamo da lui: nome, razza ed età.',
           guided_t2: 'Ora a che punto siete voi due: il suo livello, il tuo, e con che cosa lo ripaghi quando lavora bene.',
           guided_t3: 'E che cosa vuoi insegnargli. Dillo come lo spiegheresti a chi non conosce il tuo cane: "che venga quando lo chiamo anche con altri cani" è un obiettivo; "che ubbidisca" no.',
@@ -23461,6 +23632,9 @@ function endTourIntro() {
           ct_a_pitch:               "Analisi funzionale ABC + piano d'intervento LIMA per risolvere un problema di comportamento (ansia, reattività, paure, aggressività…).",
           ct_b_tag:                 'Addestramento',
           ct_b_title:               'Addestramento specifico',
+          aw_title:                 'Benvenuto in The Dogs’ Mind',
+          aw_body:                  'Uno di noi ti accompagnerà nel tuo primo consulto.',
+          aw_cta:                   'Avanti',
           gw_eyebrow:               'Il tuo primo consulto',
           gw_title:                 'Sono Katja',
           gw_body:                  'Mi occupo io che vada bene fin dal primo caso. Facciamo insieme il tuo primo consulto: ti chiedo quello che serve, in ordine, e tu rispondi.',

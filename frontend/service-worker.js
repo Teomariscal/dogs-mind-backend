@@ -1,3 +1,4 @@
+// v254 (bienvenida coral con los ocho Aigents antes de Katja + alta guiada en 3 pasos, con salida al formulario entero y recuperacion si algo falla. 2026-08-17)
 // v253 (visita guiada de primera consulta conducida por Katja en los tres caminos + tarjetas de descubrimiento de funciones al terminar un caso. 2026-08-17)
 // v252 (PDF de Entrenamiento y Escuela de Cachorros descargable desde el propio resultado + los casos de cachorro guardados vuelven a abrirse como plan de cachorro, no como ABC vacío. Tag "Escuela Cachorros" en Registros. 2026-08-14)
 // v245 (hero web, cambio pedido por el founder: botón 1 renombrado a "Análisis Problema de Conducta", botón 2 igual, botón 3 NUEVO "Escuela de Cachorros" → anamnesis de cachorros (s-anamnesis-puppy). Incluye además, ya probado en local: portada recolocada bajo la barra (los bloques ya no se estiran a todo lo ancho) y modo compacto 700-1100 px. Base = diseño aprobado v229. css v20 · js v23. 2026-08-02)
@@ -54,7 +55,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v253';
+const CACHE_NAME = 'dogs-mind-v254';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

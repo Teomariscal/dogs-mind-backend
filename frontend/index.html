@@ -8854,6 +8854,51 @@ button:not(:disabled):active{ transform:scale(0.98); }
   cursor: pointer; padding: 10px 16px; touch-action: manipulation;
 }
 
+
+/* ── Tarjeta de descubrimiento de funciones ───────────────────────────────
+   Hoja inferior, no modal a pantalla completa: se ve de dónde ha salido y se
+   cierra de un toque fuera. Vibrant, misma paleta que el resto. */
+.desc-sheet {
+  position: fixed; inset: 0; z-index: 9500;
+  display: flex; align-items: flex-end; justify-content: center;
+  background: rgba(0,0,0,0.52);
+  padding: 0 12px calc(12px + env(safe-area-inset-bottom, 0px));
+  animation: descIn 0.18s ease-out;
+}
+@keyframes descIn { from { opacity: 0; } to { opacity: 1; } }
+.desc-card {
+  position: relative; width: 100%; max-width: 30em;
+  background: #14312a;
+  border: 1.5px solid rgba(94,200,230,0.30);
+  border-radius: 20px; padding: 26px 22px 20px;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.45);
+}
+.desc-x {
+  position: absolute; top: 12px; right: 12px;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(255,255,255,0.08); border: none;
+  color: rgba(255,255,255,0.72); font-size: 14px; cursor: pointer;
+  touch-action: manipulation;
+}
+.desc-t {
+  font-family: 'Cormorant Garamond', serif; font-size: 27px; font-weight: 600;
+  color: #fff; margin: 0 34px 10px 0; line-height: 1.18;
+}
+.desc-b {
+  font-size: 14.5px; line-height: 1.6; color: rgba(255,255,255,0.86);
+  margin: 0 0 20px;
+}
+.desc-cta {
+  width: 100%; padding: 14px 20px; border: none; border-radius: 100px;
+  background: var(--green2); color: #fff; font-size: 15px; font-weight: 700;
+  font-family: inherit; cursor: pointer; touch-action: manipulation;
+}
+.desc-no {
+  width: 100%; margin-top: 8px; padding: 11px; background: transparent;
+  border: none; color: rgba(255,255,255,0.60); font-size: 14px;
+  font-family: inherit; cursor: pointer; touch-action: manipulation;
+}
+
   </style>
 
   <div id="s-abc" class="screen" style="background:linear-gradient(180deg, #0e1f1a 0%, #14302a 100%);">
@@ -12097,6 +12142,13 @@ function goTo(id) {
       if (_pej && _jwt) id = 's-anamnesis-training';
     }
   } catch(e) {}
+  /* Registro de pantallas visitadas: es la señal con la que el módulo de
+     descubrimiento sabe qué NO ha probado el usuario todavía. Barato y local;
+     nunca sale del dispositivo. */
+  try {
+    var _vis = JSON.parse(localStorage.getItem('dm_vistas') || '{}');
+    if (!_vis[id]) { _vis[id] = 1; localStorage.setItem('dm_vistas', JSON.stringify(_vis)); }
+  } catch (e) {}
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if (id === 's-records') { renderRecords(); syncBackendCases(); if (typeof reconcileOrphanCases === 'function') reconcileOrphanCases(); }
@@ -15303,6 +15355,9 @@ async function acceptTrainingPlan() {
   setTimeout(function() {
     var toast = document.createElement('div');
     toast.textContent = _i18nText('tr_saved_toast', 'Plan de entrenamiento guardado');
+    /* Al TERMINAR algo es cuando una propuesta se lee como consejo y no como
+       anuncio. Con retraso para no pisar el toast de guardado. */
+    try { setTimeout(function () { dmDescubreQuiza(); }, 2600); } catch (e) {}
     toast.style.cssText = 'position:absolute;bottom:80px;left:50%;transform:translateX(-50%);background:#4a6741;color:#fff;padding:12px 24px;border-radius:100px;font-size:14px;font-weight:600;z-index:9999;font-family:inherit;box-shadow:0 4px 16px rgba(0,0,0,0.2);white-space:nowrap;';
     document.querySelector('.phone').appendChild(toast);
     setTimeout(function(){ toast.style.opacity='0'; toast.style.transition='opacity 0.4s'; setTimeout(function(){ toast.remove(); }, 400); }, 2500);
@@ -16963,6 +17018,153 @@ function getVal(id, fallback) {
   }
   window.dmGuidedPedirBono = dmGuidedPedirBono;
 
+  /* ══════════════════════════════════════════════════════════════════════
+     DESCUBRIMIENTO DE FUNCIONES
+     ══════════════════════════════════════════════════════════════════════
+     Encargo del founder (2026-08-17): tras la primera consulta, ir
+     proponiendo el resto de funciones. Su idea era "en cualquier momento";
+     una tarjeta que salta sin venir a cuento se lee como un anuncio y se
+     cierra como un anuncio, así que sale SOLO al terminar algo, nunca al
+     abrir la app y nunca a media ficha.
+
+     Reglas de aparición (para que ayude en vez de molestar):
+       · una por sesión como mucho
+       · dos por semana como mucho
+       · cada función se enseña dos veces y no vuelve
+       · si la usa, desaparece para siempre
+     La condición de cada tarjeta mira lo que el usuario NO ha probado.
+     Copy del founder. */
+  var DM_DESC_KEY = 'dm_desc_estado';
+  var DM_DESC_MAX_VECES   = 2;
+  var DM_DESC_MAX_SEMANA  = 2;
+  var _descMostradaYa = false;   /* una por sesión */
+
+  function _descEstado() {
+    try { return JSON.parse(localStorage.getItem(DM_DESC_KEY) || '{}'); }
+    catch (e) { return {}; }
+  }
+  function _descGuardar(e) {
+    try { localStorage.setItem(DM_DESC_KEY, JSON.stringify(e)); } catch (err) {}
+  }
+  function _visto(pantalla) {
+    try { return !!JSON.parse(localStorage.getItem('dm_vistas') || '{}')[pantalla]; }
+    catch (e) { return false; }
+  }
+
+  var DM_DESC_FICHAS = [
+    { clave: 'paseos',
+      cuando: function () { return !_visto('__paseo'); },
+      accion: function () {
+        goTo('s-home');
+        setTimeout(function () {
+          var c = document.getElementById('paseo-card');
+          if (c) c.click();
+        }, 120);
+      } },
+    { clave: 'seguimiento',
+      cuando: function () { return !_visto('s-seguimiento') && !_visto('s-daily-followup'); },
+      accion: function () { goTo('s-records'); } },
+    { clave: 'cecilia',
+      cuando: function () { return _visto('s-abc') && !_visto('s-abc-explained'); },
+      accion: function () { goTo('s-records'); } },
+    { clave: 'cachorro',
+      cuando: function () { return !_visto('s-anamnesis-puppy'); },
+      accion: function () { goTo('s-anamnesis-puppy'); } },
+    { clave: 'entrena',
+      cuando: function () { return !_visto('s-anamnesis-training'); },
+      accion: function () { goTo('s-anamnesis-training'); } },
+    { clave: 'aigents',
+      cuando: function () { return !_visto('s-avatars') && !_visto('s-chat'); },
+      accion: function () { goTo('s-avatars'); } },
+    { clave: 'ficha',
+      cuando: function () { return !_visto('s-dog-profile'); },
+      accion: function () { goTo('s-dog-profile'); } },
+    { clave: 'pdfpro',
+      cuando: function () {
+        var t = ''; try { t = localStorage.getItem('dm_account_type') || ''; } catch (e) {}
+        return t === 'professional';
+      },
+      accion: function () { goTo('s-records'); } }
+  ];
+
+  /* Elige qué enseñar hoy, o null si no toca nada. */
+  function _descElegir() {
+    if (_descMostradaYa) return null;
+    if (!getJWT()) return null;
+    var est = _descEstado();
+    var f = est.f || {};
+    var ahora = Date.now();
+    var semana = (est.semana || []).filter(function (t) { return ahora - t < 7 * 864e5; });
+    if (semana.length >= DM_DESC_MAX_SEMANA) return null;
+
+    for (var i = 0; i < DM_DESC_FICHAS.length; i++) {
+      var d = DM_DESC_FICHAS[i];
+      var st = f[d.clave] || {};
+      if (st.usada) continue;
+      if ((st.visto || 0) >= DM_DESC_MAX_VECES) continue;
+      var ok = false;
+      try { ok = d.cuando(); } catch (e) { ok = false; }
+      if (ok) return d;
+    }
+    return null;
+  }
+
+  /* Punto de entrada: se llama al TERMINAR algo (plan guardado, check-in
+     hecho). Si no toca nada, no hace nada y no molesta. */
+  function dmDescubreQuiza() {
+    var d = _descElegir();
+    if (!d) return false;
+    _descPintar(d);
+    return true;
+  }
+  window.dmDescubreQuiza = dmDescubreQuiza;
+
+  function _descCerrar() {
+    var el = document.getElementById('desc-sheet');
+    if (el) el.remove();
+  }
+  window._descCerrar = _descCerrar;
+
+  function _descAceptar(clave) {
+    var est = _descEstado();
+    est.f = est.f || {};
+    est.f[clave] = est.f[clave] || {};
+    est.f[clave].usada = true;      /* la usó: no volver a ofrecerla nunca */
+    _descGuardar(est);
+    _descCerrar();
+    var d = DM_DESC_FICHAS.filter(function (x) { return x.clave === clave; })[0];
+    if (d) { try { d.accion(); } catch (e) {} }
+  }
+  window._descAceptar = _descAceptar;
+
+  function _descPintar(d) {
+    _descCerrar();
+    _descMostradaYa = true;
+    var est = _descEstado();
+    est.f = est.f || {};
+    est.f[d.clave] = est.f[d.clave] || {};
+    est.f[d.clave].visto = (est.f[d.clave].visto || 0) + 1;
+    est.semana = (est.semana || []).filter(function (t) { return Date.now() - t < 7 * 864e5; });
+    est.semana.push(Date.now());
+    _descGuardar(est);
+
+    var el = document.createElement('div');
+    el.id = 'desc-sheet';
+    el.className = 'desc-sheet';
+    el.innerHTML =
+      '<div class="desc-card" role="dialog" aria-modal="true">' +
+        '<button class="desc-x" type="button" onclick="_descCerrar()" aria-label="' +
+          _i18nText('desc_close', 'Cerrar') + '">&#10005;</button>' +
+        '<h3 class="desc-t">' + _i18nText('desc_' + d.clave + '_t', '') + '</h3>' +
+        '<p class="desc-b">' + _i18nText('desc_' + d.clave + '_b', '') + '</p>' +
+        '<button class="desc-cta" type="button" onclick="_descAceptar(\'' + d.clave + '\')">' +
+          _i18nText('desc_' + d.clave + '_c', '') + '</button>' +
+        '<button class="desc-no" type="button" onclick="_descCerrar()">' +
+          _i18nText('desc_later', 'Ahora no') + '</button>' +
+      '</div>';
+    document.body.appendChild(el);
+  }
+
   // ── Pago con Stripe Checkout (automático, <30 seg) ────────────────────────
   function recargar(pack) {
     // D-002: en iOS la compra de tokens va por IAP (RevenueCat), nunca por Stripe.
@@ -17728,6 +17930,9 @@ function getVal(id, fallback) {
     window._acceptInFlight = true;
     try { await _acceptInterventionInner(); }
     finally { window._acceptInFlight = false; }
+    /* El caso queda guardado: es el momento en que una propuesta se lee como
+       consejo y no como anuncio. Con retraso para no pisar el toast. */
+    try { setTimeout(function () { dmDescubreQuiza(); }, 2600); } catch (e) {}
   }
 
   async function _acceptInterventionInner() {
@@ -19811,6 +20016,7 @@ window.acceptPuppyPlan = async function() {
     });
     if (r.ok) {
       if (btn) { btn.textContent = _i18nText('pup_saved','Plan guardado'); btn.style.display='none'; }
+      try { setTimeout(function () { dmDescubreQuiza(); }, 2200); } catch (e) {}
       try { localStorage.removeItem('dm_pending_puppy'); } catch (e) {}
       /* Hasta ahora la respuesta se descartaba. El case_id es lo que habilita
          "Descargar PDF" sin salir de la pantalla. Si el cupo de casos está lleno
@@ -20615,6 +20821,32 @@ function endTourIntro() {
       anam_video_warn_t:       'Análisis de video usa más tokens',
       anam_video_warn_b:       'El análisis por video requiere procesar muchos más datos que texto. Cada minuto de video consume aproximadamente <strong>10 tokens</strong>. Valóra si te compensa según el caso.',
       anam_video_add:          'Añadir video a la anamnesis',
+      desc_close: 'Cerrar',
+      desc_later: 'Ahora no',
+      desc_paseos_t: 'Hoy sacadle partido al paseo',
+      desc_paseos_b: 'Dime dónde estás y te propongo tres rutas: dónde puede oler, dónde soltarle, cuánto tiempo según su edad. Vale en tu barrio y donde estéis de viaje. 10 créditos.',
+      desc_paseos_c: 'Ver mis tres rutas',
+      desc_seguimiento_t: 'Mañana es donde se nota',
+      desc_seguimiento_b: 'El plan ya lo tienes. Cada día te digo qué toca y apuntas cómo ha ido; en dos semanas vas a tener por escrito lo que ha cambiado.',
+      desc_seguimiento_c: 'Empezar el seguimiento',
+      desc_cecilia_t: '¿Y esto qué significa exactamente?',
+      desc_cecilia_b: 'Cecilia coge tu análisis y te lo cuenta como si estuvierais sentados a la misma mesa. Sin tecnicismos. 0,1 tokens.',
+      desc_cecilia_c: 'Que me lo explique',
+      desc_cachorro_t: 'Con un cachorro, las semanas no vuelven',
+      desc_cachorro_b: 'Lo que toca a su edad exacta, no lo que le tocaba hace un mes. Dime sus semanas y el plan sale de ahí.',
+      desc_cachorro_c: 'Empezar con mi cachorro',
+      desc_entrena_t: 'Enséñale algo que hoy no sabe hacer',
+      desc_entrena_b: 'Eliges la conducta y te la parto en fases, con criterios claros para saber cuándo puede pasar a la siguiente. Sin adivinar.',
+      desc_entrena_c: 'Elegir una conducta',
+      desc_aigents_t: 'Todavía no has descubierto a los Dog Aigents',
+      desc_aigents_b: 'Son tu compañero perfecto para los asuntos del día a día. Te los presento a todos.',
+      desc_aigents_c: 'Comenzar a hablar con un Aigent',
+      desc_ficha_t: 'Te falta lo más tuyo: él',
+      desc_ficha_b: 'No has puesto sus datos ni su foto. Con la ficha completa, todo lo que te propongo se ajusta a su edad, su raza y su historia.',
+      desc_ficha_c: 'Completar su ficha',
+      desc_pdfpro_t: 'Que se lo lleve por escrito',
+      desc_pdfpro_b: 'El análisis y el plan en PDF, con tu logo junto al nuestro. Tu cliente sale de la consulta con algo en la mano.',
+      desc_pdfpro_c: 'Descargar el informe',
       guided_t1: 'Empezamos por él: nombre, raza y edad.',
       guided_t2: 'Ahora por dónde andáis los dos: su nivel, el tuyo, y con qué le pagas el trabajo bien hecho.',
       guided_t3: 'Y lo que quieres enseñarle. Dilo como si se lo explicaras a alguien que no conoce a tu perro: "que venga cuando le llamo aunque haya otros perros" es un objetivo; "que obedezca" no lo es.',
@@ -21704,6 +21936,32 @@ function endTourIntro() {
       anam_video_warn_t:       'Video analysis uses more tokens',
       anam_video_warn_b:       'Video analysis requires processing far more data than text. Each minute of video consumes approximately <strong>10 tokens</strong>. Decide if it\'s worth it for your case.',
       anam_video_add:          'Add video to the anamnesis',
+      desc_close: 'Close',
+      desc_later: 'Not now',
+      desc_paseos_t: 'Make today’s walk count',
+      desc_paseos_b: 'Tell me where you are and I will suggest three routes: where he can sniff, where you can let him off, how long for his age. Works in your neighbourhood and wherever you are travelling. 10 credits.',
+      desc_paseos_c: 'See my three routes',
+      desc_seguimiento_t: 'Tomorrow is where it shows',
+      desc_seguimiento_b: 'You already have the plan. Every day I tell you what is due and you note how it went; in two weeks you will have in writing what has changed.',
+      desc_seguimiento_c: 'Start the follow-up',
+      desc_cecilia_t: 'And what does this actually mean?',
+      desc_cecilia_b: 'Cecilia takes your analysis and tells it to you as if you were sitting at the same table. No jargon. 0.1 tokens.',
+      desc_cecilia_c: 'Have her explain it',
+      desc_cachorro_t: 'With a puppy, the weeks do not come back',
+      desc_cachorro_b: 'What fits his exact age, not what fitted a month ago. Tell me his weeks and the plan comes from there.',
+      desc_cachorro_c: 'Start with my puppy',
+      desc_entrena_t: 'Teach him something he cannot do today',
+      desc_entrena_b: 'You pick the behaviour and I break it into phases, with clear criteria to know when he can move on. No guessing.',
+      desc_entrena_c: 'Pick a behaviour',
+      desc_aigents_t: 'You have not discovered the Dog Aigents yet',
+      desc_aigents_b: 'They are your perfect companion for day-to-day matters. Let me introduce them all.',
+      desc_aigents_c: 'Start talking to an Aigent',
+      desc_ficha_t: 'The most yours of all is missing: him',
+      desc_ficha_b: 'You have not added his details or his photo. With the profile complete, everything I suggest fits his age, his breed and his history.',
+      desc_ficha_c: 'Complete his profile',
+      desc_pdfpro_t: 'Let them take it in writing',
+      desc_pdfpro_b: 'The analysis and the plan as a PDF, with your logo next to ours. Your client leaves the consultation with something in hand.',
+      desc_pdfpro_c: 'Download the report',
       guided_t1: 'Let’s start with him: name, breed and age.',
       guided_t2: 'Now where you two are: his level, yours, and what you pay him with for a job well done.',
       guided_t3: 'And what you want to teach him. Say it as if you were explaining it to someone who does not know your dog: "come when I call even with other dogs around" is a goal; "behave" is not.',
@@ -22790,6 +23048,32 @@ function endTourIntro() {
           anam_video_warn_t:       "L'analisi video usa più tokens",
           anam_video_warn_b:       "L'analisi tramite video richiede di elaborare molti più dati del testo. Ogni minuto di video consuma circa <strong>10 tokens</strong>. Valuta se ti conviene a seconda del caso.",
           anam_video_add:          "Aggiungere video all'anamnesi",
+          desc_close: 'Chiudi',
+          desc_later: 'Non ora',
+          desc_paseos_t: 'Fai rendere la passeggiata di oggi',
+          desc_paseos_b: 'Dimmi dove sei e ti propongo tre percorsi: dove può annusare, dove lasciarlo libero, quanto secondo la sua età. Vale nel tuo quartiere e ovunque siate in viaggio. 10 crediti.',
+          desc_paseos_c: 'Vedi i miei tre percorsi',
+          desc_seguimiento_t: 'È domani che si vede',
+          desc_seguimiento_b: 'Il piano ce l’hai già. Ogni giorno ti dico che cosa tocca e tu annoti com’è andata; in due settimane avrai per iscritto quello che è cambiato.',
+          desc_seguimiento_c: 'Inizia il monitoraggio',
+          desc_cecilia_t: 'E questo che cosa significa esattamente?',
+          desc_cecilia_b: 'Cecilia prende la tua analisi e te la racconta come se foste seduti allo stesso tavolo. Senza tecnicismi. 0,1 token.',
+          desc_cecilia_c: 'Fammelo spiegare',
+          desc_cachorro_t: 'Con un cucciolo, le settimane non tornano',
+          desc_cachorro_b: 'Quello che serve alla sua età esatta, non quello di un mese fa. Dimmi le sue settimane e il piano nasce da lì.',
+          desc_cachorro_c: 'Inizia con il mio cucciolo',
+          desc_entrena_t: 'Insegnagli qualcosa che oggi non sa fare',
+          desc_entrena_b: 'Scegli il comportamento e io lo divido in fasi, con criteri chiari per sapere quando può passare alla successiva. Senza indovinare.',
+          desc_entrena_c: 'Scegli un comportamento',
+          desc_aigents_t: 'Non hai ancora scoperto i Dog Aigents',
+          desc_aigents_b: 'Sono il tuo compagno perfetto per le cose di tutti i giorni. Te li presento tutti.',
+          desc_aigents_c: 'Inizia a parlare con un Aigent',
+          desc_ficha_t: 'Manca la cosa più tua: lui',
+          desc_ficha_b: 'Non hai messo i suoi dati né la sua foto. Con la scheda completa, tutto quello che ti propongo si adatta alla sua età, alla sua razza e alla sua storia.',
+          desc_ficha_c: 'Completa la sua scheda',
+          desc_pdfpro_t: 'Che se lo porti per iscritto',
+          desc_pdfpro_b: 'L’analisi e il piano in PDF, con il tuo logo accanto al nostro. Il tuo cliente esce dal consulto con qualcosa in mano.',
+          desc_pdfpro_c: 'Scarica il referto',
           guided_t1: 'Cominciamo da lui: nome, razza ed età.',
           guided_t2: 'Ora a che punto siete voi due: il suo livello, il tuo, e con che cosa lo ripaghi quando lavora bene.',
           guided_t3: 'E che cosa vuoi insegnargli. Dillo come lo spiegheresti a chi non conosce il tuo cane: "che venga quando lo chiamo anche con altri cani" è un obiettivo; "che ubbidisca" no.',

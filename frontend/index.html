@@ -5968,6 +5968,10 @@ button:not(:disabled):active{ transform:scale(0.98); }
   --ct-accent: rgba(94,200,230,0.55);
   --ct-glow: rgba(94,200,230,0.24);
 }
+.ct-card--puppy {
+  --ct-accent: rgba(216,185,138,0.55);
+  --ct-glow: rgba(216,185,138,0.22);
+}
 .ct-card-tag {
   display: inline-block;
   font-family: 'Jost', sans-serif;
@@ -5988,6 +5992,13 @@ button:not(:disabled):active{ transform:scale(0.98); }
   color:#ade3f2;
   background: rgba(94,200,230,0.14);
   border: 1px solid rgba(94,200,230,0.32);
+}
+/* Escuela de Cachorros: ámbar del vibrant (el mismo #d8b98a ya verificado en
+   contraste), para que los tres caminos se distingan de un vistazo. */
+.ct-card--puppy .ct-card-tag {
+  color:#e8cfa6;
+  background: rgba(216,185,138,0.14);
+  border: 1px solid rgba(216,185,138,0.34);
 }
 .ct-card-title {
   font-family: 'Cormorant Garamond', serif;
@@ -8800,6 +8811,49 @@ button:not(:disabled):active{ transform:scale(0.98); }
   border: 1.5px solid rgba(94,200,230,0.45); flex: 0 0 34%;
 }
 
+
+/* ── Visita guiada: pantalla de bienvenida ────────────────────────────────── */
+#s-guided-welcome { display: none; }
+#s-guided-welcome.active { display: block; }
+.gw-wrap {
+  min-height: 100%; display: flex; flex-direction: column;
+  justify-content: center; align-items: center; text-align: center;
+  padding: 32px 26px calc(32px + env(safe-area-inset-bottom, 0px));
+}
+.gw-cara {
+  width: 108px; height: 108px; border-radius: 50%; object-fit: cover;
+  border: 2px solid rgba(94,200,230,0.35); margin-bottom: 22px;
+  background: rgba(255,255,255,0.06);
+}
+.gw-eyebrow {
+  font-family: 'Jost', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.18em; text-transform: uppercase; color: #ade3f2;
+  margin: 0 0 8px;
+}
+.gw-title {
+  font-family: 'Cormorant Garamond', serif; font-size: 38px; font-weight: 600;
+  color: #fff; margin: 0 0 14px; line-height: 1.1;
+}
+.gw-body {
+  font-size: 15px; line-height: 1.6; color: rgba(255,255,255,0.88);
+  margin: 0 0 14px; max-width: 30em;
+}
+.gw-bonus {
+  font-size: 14px; line-height: 1.55; color: #ade3f2; font-weight: 600;
+  margin: 0 0 28px; max-width: 30em;
+}
+.gw-cta {
+  width: 100%; max-width: 22em; padding: 15px 24px; border: none;
+  border-radius: 100px; background: var(--green2); color: #fff;
+  font-size: 16px; font-weight: 700; font-family: inherit; cursor: pointer;
+  touch-action: manipulation;
+}
+.gw-skip {
+  margin-top: 14px; background: transparent; border: none;
+  color: rgba(255,255,255,0.62); font-size: 14px; font-family: inherit;
+  cursor: pointer; padding: 10px 16px; touch-action: manipulation;
+}
+
   </style>
 
   <div id="s-abc" class="screen" style="background:linear-gradient(180deg, #0e1f1a 0%, #14302a 100%);">
@@ -9630,25 +9684,47 @@ button:not(:disabled):active{ transform:scale(0.98); }
        El backend adapta el tono del plan por account_type (llano Pet Owner /
        técnico Pro). Coste: 1,5 tokens.
   -->
+  <!-- ══ VISITA GUIADA — bienvenida (founder 2026-08-17) ═════════════════════
+       Tras el registro, en vez de soltar al usuario en el home, Katja le
+       propone hacer la primera consulta juntos. Puede decir que no: entonces
+       va al home de siempre y no se le da ningún token extra. -->
+  <div id="s-guided-welcome" class="screen">
+    <div class="gw-wrap">
+      <img class="gw-cara" src="aig-katja-pixar.webp" alt="Katja">
+      <p class="gw-eyebrow" data-i18n="gw_eyebrow">Tu primera consulta</p>
+      <h1 class="gw-title" data-i18n="gw_title">Soy Katja</h1>
+      <p class="gw-body" data-i18n="gw_body">Me ocupo de que esto salga bien desde el primer caso. Hacemos tu primera consulta juntos: yo te voy pidiendo lo que hace falta, en orden, y tú solo respondes.</p>
+      <p class="gw-bonus" data-i18n="gw_bonus">Y te pongo los tokens que cuesta, así que esta primera va por mi cuenta.</p>
+      <button class="gw-cta" type="button" onclick="dmGuidedAceptar()" data-i18n="gw_cta">Empezar</button>
+      <button class="gw-skip" type="button" onclick="dmGuidedRechazar()" data-i18n="gw_skip">Ahora no</button>
+    </div>
+  </div><!-- /s-guided-welcome -->
+
   <div id="s-consult-type" class="screen">
     <button class="ct-back" onclick="goTo(window._consultTypeReturnTo || 's-home')" aria-label="Volver">&#8592;</button>
     <div class="ct-hero">
       <p class="ct-eyebrow" data-i18n="ct_eyebrow">Nueva consulta</p>
       <h1 class="ct-headline" data-i18n="ct_headline">¿Qué necesitas hoy?</h1>
-      <p class="ct-tagline" data-i18n="ct_tagline">Dos rutas distintas según el caso. Elige la que mejor se ajuste.</p>
+      <p class="ct-tagline" data-i18n="ct_tagline">Tres caminos según el caso. Elige el que mejor se ajuste.</p>
     </div>
     <div class="ct-cards">
-      <button class="ct-card ct-card--clinical" type="button" onclick="goTo('s-anamnesis')">
+      <button class="ct-card ct-card--clinical" type="button" onclick="dmConsultPath('behavior')">
         <span class="ct-card-arrow" aria-hidden="true">&#8594;</span>
         <span class="ct-card-tag" data-i18n="ct_a_tag">Etología clínica</span>
         <h3 class="ct-card-title" data-i18n="ct_a_title">Problema de conducta</h3>
         <p class="ct-card-pitch" data-i18n="ct_a_pitch">Análisis funcional ABC + plan de intervención LIMA para resolver un problema de conducta (ansiedad, reactividad, miedos, agresividad…).</p>
       </button>
-      <button class="ct-card ct-card--pro" type="button" onclick="goToTrainingConsult()">
+      <button class="ct-card ct-card--pro" type="button" onclick="dmConsultPath('training')">
         <span class="ct-card-arrow" aria-hidden="true">&#8594;</span>
         <span class="ct-card-tag" data-i18n="ct_b_tag">Entrenamiento</span>
         <h3 class="ct-card-title" data-i18n="ct_b_title">Entrenamiento específico</h3>
         <p class="ct-card-pitch" data-i18n="ct_b_pitch">Análisis + plan operante por fases para enseñar UN ejercicio o habilidad concreta (recall, leave-it, contacto visual…). Protocolo LIMA estricto, sin métodos aversivos.</p>
+      </button>
+      <button class="ct-card ct-card--puppy" type="button" onclick="dmConsultPath('puppy')">
+        <span class="ct-card-arrow" aria-hidden="true">&#8594;</span>
+        <span class="ct-card-tag" data-i18n="ct_c_tag">Escuela Cachorros</span>
+        <h3 class="ct-card-title" data-i18n="ct_c_title">Tengo un cachorro</h3>
+        <p class="ct-card-pitch" data-i18n="ct_c_pitch">Lo que toca a su edad exacta, no lo que le tocaba hace un mes. Con un cachorro las semanas mandan: lo de las 9 no es lo de las 20.</p>
       </button>
     </div>
   </div><!-- /s-consult-type -->
@@ -12208,6 +12284,8 @@ function registerUser() {
     // automáticamente (registro → datos empresa → checkout). Si no, home.
     if (window._pendingActivatePro && typeof _consumePendingActivatePro === 'function') {
       _consumePendingActivatePro();
+    } else if (typeof dmGuidedOfrecer === 'function' && dmGuidedOfrecer()) {
+      /* dmGuidedOfrecer() ya ha navegado a la bienvenida de la visita guiada. */
     } else {
       goTo('s-home');
     }
@@ -16641,6 +16719,54 @@ function getVal(id, fallback) {
      Fuera de la visita guiada este módulo no toca absolutamente nada. */
   var DM_GUIDED_KEY = 'dm_guided_done';
 
+  /* ¿Toca ofrecer la visita guiada? Solo a quien nunca la ha hecho ni la ha
+     rechazado. Devuelve true si ya ha navegado a la bienvenida. */
+  function dmGuidedOfrecer() {
+    try { if (localStorage.getItem(DM_GUIDED_KEY)) return false; } catch (e) {}
+    goTo('s-guided-welcome');
+    return true;
+  }
+  window.dmGuidedOfrecer = dmGuidedOfrecer;
+
+  /* Acepta: arma la visita y le lleva a elegir camino. El bono NO se pide aquí
+     sino al elegir camino — así "arrancar la visita guiada" significa haber
+     entrado de verdad en una consulta, no haber pulsado un botón. */
+  function dmGuidedAceptar() {
+    window._guidedArmada = true;
+    try { localStorage.setItem(DM_GUIDED_KEY, '1'); } catch (e) {}
+    goTo('s-consult-type');
+  }
+  window.dmGuidedAceptar = dmGuidedAceptar;
+
+  /* Rechaza: al home de siempre. Sin tokens extra: no ha hecho la visita. */
+  function dmGuidedRechazar() {
+    window._guidedArmada = false;
+    try { localStorage.setItem(DM_GUIDED_KEY, '1'); } catch (e) {}
+    goTo('s-home');
+  }
+  window.dmGuidedRechazar = dmGuidedRechazar;
+
+  /* Enrutador de los tres caminos. Fuera de la visita guiada se comporta
+     exactamente igual que los onclick que había antes. */
+  function dmConsultPath(camino) {
+    var armada = !!window._guidedArmada;
+    if (armada) { window._guidedArmada = false; dmGuidedPedirBono(); }
+
+    if (camino === 'training') {
+      if (typeof goToTrainingConsult === 'function') goToTrainingConsult();
+      else goTo('s-anamnesis-training');
+      return;
+    }
+    if (camino === 'puppy') { goTo('s-anamnesis-puppy'); return; }
+
+    goTo('s-anamnesis');
+    /* La conducción por pasos, de momento, solo está montada sobre la
+       anamnesis clínica; los otros dos caminos entran sin pasos hasta que se
+       marquen sus secciones. */
+    if (armada) { try { dmGuidedStart(); } catch (e) {} }
+  }
+  window.dmConsultPath = dmConsultPath;
+
   /* Los textos de paso los escribió el founder. No inventar aquí: si falta uno,
      el paso sale sin rótulo antes que con copy improvisado. */
   function _guidedPasos() {
@@ -20813,12 +20939,21 @@ function endTourIntro() {
       // ── Selector "Nueva consulta" (Fase 2 Entrenamiento Específico) ──
       ct_eyebrow:               'Nueva consulta',
       ct_headline:              '¿Qué necesitas hoy?',
-      ct_tagline:               'Dos rutas distintas según el caso. Elige la que mejor se ajuste.',
+      ct_tagline:               'Tres caminos según el caso. Elige el que mejor se ajuste.',
       ct_a_tag:                 'Etología clínica',
       ct_a_title:               'Problema de conducta',
       ct_a_pitch:               'Análisis funcional ABC + plan de intervención LIMA para resolver un problema de conducta (ansiedad, reactividad, miedos, agresividad…).',
       ct_b_tag:                 'Entrenamiento',
       ct_b_title:               'Entrenamiento específico',
+      gw_eyebrow:               'Tu primera consulta',
+      gw_title:                 'Soy Katja',
+      gw_body:                  'Me ocupo de que esto salga bien desde el primer caso. Hacemos tu primera consulta juntos: yo te voy pidiendo lo que hace falta, en orden, y tú solo respondes.',
+      gw_bonus:                 'Y te pongo los tokens que cuesta, así que esta primera va por mi cuenta.',
+      gw_cta:                   'Empezar',
+      gw_skip:                  'Ahora no',
+      ct_c_tag:                 'Escuela Cachorros',
+      ct_c_title:               'Tengo un cachorro',
+      ct_c_pitch:               'Lo que toca a su edad exacta, no lo que le tocaba hace un mes. Con un cachorro las semanas mandan: lo de las 9 no es lo de las 20.',
       ct_b_pitch:               'Análisis + plan operante por fases para enseñar UN ejercicio o habilidad concreta (recall, leave-it, contacto visual…). Protocolo LIMA estricto, sin métodos aversivos.',
       // ── Formulario Entrenamiento Específico (9 campos) ──
       tc_eyebrow:               'Entrenamiento específico',
@@ -21886,12 +22021,21 @@ function endTourIntro() {
       rec_btn_new_consult:  '+ New Consultation',
       ct_eyebrow:               'New consultation',
       ct_headline:              'What do you need today?',
-      ct_tagline:               'Two different paths depending on the case. Choose the one that fits best.',
+      ct_tagline:               'Three paths depending on the case. Choose the one that fits best.',
       ct_a_tag:                 'Clinical ethology',
       ct_a_title:               'Behavior problem',
       ct_a_pitch:               'Functional ABC analysis + LIMA intervention plan to resolve a behavior problem (anxiety, reactivity, fears, aggression…).',
       ct_b_tag:                 'Training',
       ct_b_title:               'Specific training',
+      gw_eyebrow:               'Your first consultation',
+      gw_title:                 'I am Katja',
+      gw_body:                  'I make sure this goes well from the very first case. We will do your first consultation together: I ask for what is needed, in order, and you just answer.',
+      gw_bonus:                 'And I am covering the tokens it costs, so this first one is on me.',
+      gw_cta:                   'Start',
+      gw_skip:                  'Not now',
+      ct_c_tag:                 'Puppy School',
+      ct_c_title:               'I have a puppy',
+      ct_c_pitch:               'What fits his exact age, not what fitted a month ago. With a puppy the weeks rule: week 9 is not week 20.',
       ct_b_pitch:               'Analysis + operant plan by phases to teach ONE specific skill or exercise (recall, leave-it, sustained eye contact…). Strict LIMA protocol, no aversive methods.',
       tc_eyebrow:               'Specific training',
       tc_title:                 'Tell us about the exercise',
@@ -22958,12 +23102,21 @@ function endTourIntro() {
           // ── Selettore "Nuovo consulto" (Fase 2 Addestramento Specifico) ──
           ct_eyebrow:               'Nuovo consulto',
           ct_headline:              'Di cosa hai bisogno oggi?',
-          ct_tagline:               'Due percorsi diversi a seconda del caso. Scegli quello più adatto.',
+          ct_tagline:               'Tre percorsi a seconda del caso. Scegli quello più adatto.',
           ct_a_tag:                 'Etologia clinica',
           ct_a_title:               'Problema di comportamento',
           ct_a_pitch:               "Analisi funzionale ABC + piano d'intervento LIMA per risolvere un problema di comportamento (ansia, reattività, paure, aggressività…).",
           ct_b_tag:                 'Addestramento',
           ct_b_title:               'Addestramento specifico',
+          gw_eyebrow:               'Il tuo primo consulto',
+          gw_title:                 'Sono Katja',
+          gw_body:                  'Mi occupo io che vada bene fin dal primo caso. Facciamo insieme il tuo primo consulto: ti chiedo quello che serve, in ordine, e tu rispondi.',
+          gw_bonus:                 'E i token che costa te li metto io: questo primo è offerto.',
+          gw_cta:                   'Iniziamo',
+          gw_skip:                  'Non ora',
+          ct_c_tag:                 'Scuola Cuccioli',
+          ct_c_title:               'Ho un cucciolo',
+          ct_c_pitch:               'Quello che serve alla sua età esatta, non quello di un mese fa. Con un cucciolo contano le settimane: la nona non è la ventesima.',
           ct_b_pitch:               'Analisi + piano operante per fasi per insegnare UN esercizio o una abilità concreta (recall, leave-it, contatto visivo…). Protocollo LIMA rigoroso, senza metodi avversivi.',
           // ── Modulo Addestramento Specifico (9 campi) ──
           tc_eyebrow:               'Addestramento specifico',

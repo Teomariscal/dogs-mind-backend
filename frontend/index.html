@@ -8766,6 +8766,40 @@ button:not(:disabled):active{ transform:scale(0.98); }
     .dm-ls-step.doing span.dm-ls-pulse{display:inline-block;}
     .dm-ls-step .dm-ls-dog{display:inline !important;}
     @keyframes dmLsPl { 50%{opacity:.25;} }
+
+/* ── Visita guiada (Katja conduce la primera consulta) ────────────────────
+   Vibrant sobre el fondo esmeralda de la anamnesis. Contraste medido: texto
+   #e8efea sobre rgba oscura = 12:1; el contador cyan #ade3f2 = 8,9:1. */
+.guided-bar {
+  display: flex; gap: 12px; align-items: flex-start;
+  background: rgba(94,200,230,0.10);
+  border: 1.5px solid rgba(94,200,230,0.28);
+  border-radius: 14px; padding: 14px; margin-bottom: 18px;
+}
+.guided-cara {
+  width: 44px; height: 44px; border-radius: 50%; flex: 0 0 44px;
+  object-fit: cover; background: rgba(255,255,255,0.06);
+}
+.guided-txt { flex: 1 1 auto; min-width: 0; }
+.guided-pasos {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+  text-transform: uppercase; color: #ade3f2; margin-bottom: 5px;
+}
+.guided-txt p {
+  margin: 0; font-size: 14px; line-height: 1.55; color: #e8efea;
+}
+.guided-nav { display: flex; gap: 10px; margin-top: 18px; }
+.guided-nav button {
+  flex: 1 1 auto; padding: 14px 20px; border-radius: 100px;
+  font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer;
+  touch-action: manipulation;
+}
+.guided-sigue { background: var(--green2); color: #fff; border: none; }
+.guided-atras {
+  background: transparent; color: #ade3f2;
+  border: 1.5px solid rgba(94,200,230,0.45); flex: 0 0 34%;
+}
+
   </style>
 
   <div id="s-abc" class="screen" style="background:linear-gradient(180deg, #0e1f1a 0%, #14302a 100%);">
@@ -10007,7 +10041,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
       </div>
 
       <!-- analisis basado en -->
-      <div>
+      <div id="anam-basedon-block">
         <div style="font-size:10px;font-weight:700;color:var(--grey);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px;" data-i18n="anam_basedon">An&aacute;lisis basado en</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;">
           <span style="font-size:11px;border:1.5px solid var(--green2);color:var(--green2);border-radius:100px;padding:4px 12px;">Applied Animal Behaviour Science</span>
@@ -10019,7 +10053,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
 
 
       <!-- el perro -->
-      <div>
+      <div data-guided-step="1">
         <div style="font-size:10px;font-weight:700;color:var(--green2);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;" data-i18n="anam_sec_dog">El perro</div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
@@ -10109,7 +10143,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
       </div>
 
       <!-- entorno familiar -->
-      <div>
+      <div data-guided-step="2">
         <div style="font-size:10px;font-weight:700;color:var(--green2);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;" data-i18n="anam_sec_family">Entorno familiar</div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px;align-items:start;">
@@ -10146,7 +10180,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
       </div>
 
       <!-- historial y refuerzos (anti-invención: sin defaults ocultos) -->
-      <div>
+      <div data-guided-step="3">
         <div style="font-size:10px;font-weight:700;color:var(--green2);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;" data-i18n="anam_sec_history">Historial y refuerzos</div>
 
         <div style="margin-bottom:12px;">
@@ -10177,7 +10211,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
       </div>
 
       <!-- conducta problema -->
-      <div>
+      <div data-guided-step="4">
         <div style="font-size:10px;font-weight:700;color:#E8A020;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;" data-i18n="anam_sec_problem">&#9888;&#65039; La conducta problema</div>
 
         <div style="margin-bottom:12px;">
@@ -16591,6 +16625,167 @@ function getVal(id, fallback) {
     .catch(function() {});
   }
 
+  /* ══════════════════════════════════════════════════════════════════════
+     VISITA GUIADA — primera consulta conducida por Katja
+     ══════════════════════════════════════════════════════════════════════
+     Encargo del founder (2026-08-17): la anamnesis es larga y clínica, y ese
+     muro es donde se cae el dueño que no es profesional. En vez de reescribir
+     el formulario (que funciona y está validado), lo CONDUCIMOS: se enseña una
+     sección cada vez, con Katja diciendo qué toca y por qué. Mismos campos,
+     misma validación, mismo envío — solo cambia la puerta.
+
+     Las secciones vienen marcadas en el HTML con data-guided-step. Si algún
+     día se añade una sección nueva sin marcarla, no se rompe nada: aparecería
+     siempre visible, que es el comportamiento de antes.
+
+     Fuera de la visita guiada este módulo no toca absolutamente nada. */
+  var DM_GUIDED_KEY = 'dm_guided_done';
+
+  /* Los textos de paso los escribió el founder. No inventar aquí: si falta uno,
+     el paso sale sin rótulo antes que con copy improvisado. */
+  function _guidedPasos() {
+    return [
+      { n: 1, txt: _i18nText('guided_s1', 'Empezamos por él: nombre, raza y edad. Treinta segundos.') },
+      { n: 2, txt: _i18nText('guided_s2', 'Ahora su casa: con quién vive y cómo es su día.') },
+      { n: 3, txt: _i18nText('guided_s3', 'Qué habéis probado ya. Esto evita que te proponga algo que no funcionó.') },
+      { n: 4, txt: _i18nText('guided_s4', 'Ahora lo que importa. Qué hace, cuándo, y delante de quién. Cuanto más concreto seas, mejor sale el análisis.') }
+    ];
+  }
+
+  var _guidedState = null;
+
+  function dmGuidedActivo() { return !!_guidedState; }
+  window.dmGuidedActivo = dmGuidedActivo;
+
+  /* Arranca la visita en la pantalla de anamnesis clínica. */
+  function dmGuidedStart() {
+    var secs = document.querySelectorAll('#s-anamnesis [data-guided-step]');
+    if (!secs.length) return false;            /* sin marcas: modo normal */
+    _guidedState = { paso: 1, total: secs.length };
+    _guidedPintar();
+    return true;
+  }
+  window.dmGuidedStart = dmGuidedStart;
+
+  /* Sale de la visita y deja el formulario como estaba (todo visible). */
+  function dmGuidedSalir() {
+    _guidedState = null;
+    document.querySelectorAll('#s-anamnesis [data-guided-step]').forEach(function (el) {
+      el.style.display = '';
+    });
+    var barra = document.getElementById('guided-bar');
+    if (barra) barra.remove();
+    var nav = document.getElementById('guided-nav');
+    if (nav) nav.remove();
+    _guidedMostrarSellos(true);
+    _guidedMostrarEnvio(true);
+  }
+  window.dmGuidedSalir = dmGuidedSalir;
+
+  /* El botón de analizar y sus avisos solo se enseñan en el último paso: antes
+     de tener la conducta descrita no hay nada que analizar. */
+  /* Los sellos académicos (Applied Animal Behaviour Science, Skinner…) dan
+     credibilidad al profesional, pero al dueño lego le dicen "esto te supera"
+     justo en la puerta. Durante la visita guiada estorban: se ocultan y vuelven
+     al salir. */
+  function _guidedMostrarSellos(visible) {
+    var el = document.getElementById('anam-basedon-block');
+    if (el) el.style.display = visible ? '' : 'none';
+  }
+
+  function _guidedMostrarEnvio(visible) {
+    ['analyze-cost-notice', 'analyze-ai-consent', 'btn-analyze'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.style.display = visible ? '' : 'none';
+    });
+  }
+
+  function _guidedPintar() {
+    if (!_guidedState) return;
+    var paso  = _guidedState.paso;
+    var pasos = _guidedPasos();
+
+    document.querySelectorAll('#s-anamnesis [data-guided-step]').forEach(function (el) {
+      var n = parseInt(el.getAttribute('data-guided-step'), 10);
+      el.style.display = (n === paso) ? '' : 'none';
+    });
+
+    var cont = document.querySelector('#s-anamnesis .anam-body') ||
+               document.querySelector('#s-anamnesis');
+    var barra = document.getElementById('guided-bar');
+    if (!barra) {
+      barra = document.createElement('div');
+      barra.id = 'guided-bar';
+      barra.className = 'guided-bar';
+      var primera = document.querySelector('#s-anamnesis [data-guided-step]');
+      if (primera && primera.parentNode) primera.parentNode.insertBefore(barra, primera);
+      else cont.insertBefore(barra, cont.firstChild);
+    }
+    var actual = pasos[paso - 1] || { txt: '' };
+    barra.innerHTML =
+      '<img class="guided-cara" src="aig-katja-pixar.webp" alt="Katja">' +
+      '<div class="guided-txt">' +
+        '<div class="guided-pasos">' + paso + '/' + _guidedState.total + '</div>' +
+        '<p>' + actual.txt + '</p>' +
+      '</div>';
+
+    var nav = document.getElementById('guided-nav');
+    if (!nav) {
+      nav = document.createElement('div');
+      nav.id = 'guided-nav';
+      nav.className = 'guided-nav';
+      var envio = document.getElementById('analyze-cost-notice');
+      if (envio && envio.parentNode) envio.parentNode.insertBefore(nav, envio);
+    }
+    var ultimo = (paso >= _guidedState.total);
+    nav.innerHTML =
+      (paso > 1
+        ? '<button type="button" class="guided-atras" onclick="dmGuidedAtras()">' +
+            _i18nText('guided_back', 'Atrás') + '</button>'
+        : '') +
+      (ultimo
+        ? ''
+        : '<button type="button" class="guided-sigue" onclick="dmGuidedSiguiente()">' +
+            _i18nText('guided_next', 'Continuar') + '</button>');
+
+    _guidedMostrarSellos(false);
+    _guidedMostrarEnvio(ultimo);
+    try { document.getElementById('s-anamnesis').scrollTop = 0; } catch (e) {}
+  }
+
+  function dmGuidedSiguiente() {
+    if (!_guidedState) return;
+    if (_guidedState.paso < _guidedState.total) { _guidedState.paso++; _guidedPintar(); }
+  }
+  window.dmGuidedSiguiente = dmGuidedSiguiente;
+
+  function dmGuidedAtras() {
+    if (!_guidedState) return;
+    if (_guidedState.paso > 1) { _guidedState.paso--; _guidedPintar(); }
+  }
+  window.dmGuidedAtras = dmGuidedAtras;
+
+  /* Bono: tokens EXTRA por arrancar la visita guiada (founder 2026-08-17).
+     No es una devolución — son tokens que el usuario no tenía. Se piden al
+     empezar, así que da igual si luego guarda el caso o lo deja a medias.
+     El servidor decide: es idempotente y solo entrega una vez en la vida. */
+  async function dmGuidedPedirBono() {
+    if (!getJWT()) return null;
+    try {
+      var r = await fetch(API_URL + '/auth/guided-bonus', {
+        method: 'POST', headers: authHeaders()
+      });
+      if (!r.ok) return null;
+      var d = await r.json();
+      if (d && d.tokens !== undefined) setTokens(d.tokens);
+      return d;
+    } catch (e) {
+      /* Sin red no se bloquea la visita: el usuario entra igual con su saldo. */
+      return null;
+    }
+  }
+  window.dmGuidedPedirBono = dmGuidedPedirBono;
+
   // ── Pago con Stripe Checkout (automático, <30 seg) ────────────────────────
   function recargar(pack) {
     // D-002: en iOS la compra de tokens va por IAP (RevenueCat), nunca por Stripe.
@@ -20243,6 +20438,12 @@ function endTourIntro() {
       anam_video_warn_t:       'Análisis de video usa más tokens',
       anam_video_warn_b:       'El análisis por video requiere procesar muchos más datos que texto. Cada minuto de video consume aproximadamente <strong>10 tokens</strong>. Valóra si te compensa según el caso.',
       anam_video_add:          'Añadir video a la anamnesis',
+      guided_s1: 'Empezamos por él: nombre, raza y edad. Treinta segundos.',
+      guided_s2: 'Ahora su casa: con quién vive y cómo es su día.',
+      guided_s3: 'Qué habéis probado ya. Esto evita que te proponga algo que ya no funcionó.',
+      guided_s4: 'Ahora lo que importa. Qué hace, cuándo, y delante de quién. Cuanto más concreto seas, mejor sale el análisis.',
+      guided_next: 'Continuar',
+      guided_back: 'Atrás',
       anam_sec_dog:            'El perro',
       anam_sec_family:         'Entorno familiar',
       anam_sec_problem:        'La conducta problema',
@@ -21311,6 +21512,12 @@ function endTourIntro() {
       anam_video_warn_t:       'Video analysis uses more tokens',
       anam_video_warn_b:       'Video analysis requires processing far more data than text. Each minute of video consumes approximately <strong>10 tokens</strong>. Decide if it\'s worth it for your case.',
       anam_video_add:          'Add video to the anamnesis',
+      guided_s1: 'Let’s start with him: name, breed and age. Thirty seconds.',
+      guided_s2: 'Now his home: who he lives with and what his day looks like.',
+      guided_s3: 'What you have already tried. This keeps me from suggesting something that did not work.',
+      guided_s4: 'Now the part that matters. What he does, when, and in front of whom. The more specific you are, the better the analysis.',
+      guided_next: 'Continue',
+      guided_back: 'Back',
       anam_sec_dog:            'The dog',
       anam_sec_family:         'Family environment',
       anam_sec_problem:        'The problem behavior',
@@ -22376,6 +22583,12 @@ function endTourIntro() {
           anam_video_warn_t:       "L'analisi video usa più tokens",
           anam_video_warn_b:       "L'analisi tramite video richiede di elaborare molti più dati del testo. Ogni minuto di video consuma circa <strong>10 tokens</strong>. Valuta se ti conviene a seconda del caso.",
           anam_video_add:          "Aggiungere video all'anamnesi",
+          guided_s1: 'Cominciamo da lui: nome, razza ed età. Trenta secondi.',
+          guided_s2: 'Ora casa sua: con chi vive e com’è la sua giornata.',
+          guided_s3: 'Che cosa avete già provato. Così non ti propongo qualcosa che non ha funzionato.',
+          guided_s4: 'Ora quello che conta. Che cosa fa, quando e davanti a chi. Più sei preciso, migliore sarà l’analisi.',
+          guided_next: 'Continua',
+          guided_back: 'Indietro',
           anam_sec_dog:            'Il cane',
           anam_sec_family:         'Ambiente familiare',
           anam_sec_problem:        'Il comportamento problema',

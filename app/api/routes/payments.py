@@ -200,7 +200,14 @@ def create_plan_checkout(
             mode="subscription",
             line_items=[{"price": price_id, "quantity": 1}],
             metadata={"user_id": str(current_user.id), "plan_id": plan["id"]},
-            subscription_data={"metadata": {"user_id": str(current_user.id), "plan_id": plan["id"]}},
+            subscription_data={
+                "metadata": {"user_id": str(current_user.id), "plan_id": plan["id"]},
+                # Los mismos 3 días que dan Apple y Google de forma nativa
+                # (founder 2026-08-17: "todos dan los 3 días de prueba, todos
+                # cuestan igual"). Sin esto, quien se suscribía desde la web
+                # pagaba desde el primer día y desde el móvil no.
+                "trial_period_days": _subs.TRIAL_DAYS,
+            },
             customer_email=current_user.email,
             success_url=f"{_return_base(origin)}?sub=ok&plan={plan['id']}",
             cancel_url=f"{_return_base(origin)}?sub=cancelled",

@@ -14,6 +14,7 @@ from pydantic import BaseModel, EmailStr
 from app.database import get_db
 from app.models.user import User
 from app.models.delegation import Delegation
+from app.models.usage_log import UsageLog
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -48,6 +49,24 @@ AMBASSADOR_TOKENS  = 8
 DEFAULT_TOKENS     = 5   # NO subir esto para pagar la consulta guiada: el extra se GANA
                          # haciendo la visita guiada, no se regala por registrarse
                          # (founder 2026-08-17). Ver bono guiado en build 28.
+
+# ── Bono de la visita guiada (founder 2026-08-17) ────────────────────────────
+# Tokens EXTRA por arrancar la visita guiada de primera consulta. No es una
+# devolución: son tokens que el usuario no tenía, y solo los recibe si arranca
+# la visita. Se dan al empezarla, así que da igual si luego guarda el caso o
+# lo abandona a medias.
+#
+# 3,2 = el camino guiado más caro (análisis 3,00 + plan 0,20). Quien elija
+# cachorros o entrenamiento (1,50) se queda con algo de sobra: preferimos un
+# número único a tres que nadie recuerde.
+#
+# Una sola vez por usuario. El "ya cobrado" NO se guarda con una columna nueva
+# en users porque este proyecto no tiene migraciones (el esquema se crea con
+# create_all y una columna añadida no llegaría a la tabla de producción). Se
+# apunta en usage_log, que ya existe, es de solo inserción y además deja el
+# rastro contable de cada bono entregado.
+GUIDED_BONUS_TOKENS   = 3.2
+GUIDED_BONUS_ENDPOINT = "/auth/guided-bonus"
 
 class RegisterRequest(BaseModel):
     email: EmailStr
@@ -307,6 +326,64 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
         role=user.role,
         account_type=user.account_type,
     )
+
+
+@router.post("/guided-bonus")
+def guided_bonus(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Entrega los tokens extra de la visita guiada. Idempotente.
+
+    La app la llama UNA vez, al arrancar la visita guiada. Si el usuario ya la
+    cobró antes, no vuelve a dar nada y responde `already: true` para que la
+    pantalla no prometa un bono que no va a llegar.
+    """
+    # Bloqueo de la fila del usuario: sin esto, dos llamadas simultáneas (doble
+    # toque, reintento de red) pasarían las dos el chequeo y cobrarían el bono
+    # dos veces. Con el lock, la segunda espera y ve el apunte de la primera.
+    user = (
+        db.query(User)
+        .filter(User.id == current_user.id)
+        .with_for_update()
+        .first()
+    )
+    if user is None:
+        raise HTTPException(status_code=401, detail="Usuario no encontrado")
+
+    ya_cobrado = (
+        db.query(UsageLog)
+        .filter(
+            UsageLog.user_id == user.id,
+            UsageLog.endpoint == GUIDED_BONUS_ENDPOINT,
+        )
+        .first()
+    )
+    if ya_cobrado is not None:
+        db.rollback()
+        return {
+            "granted": 0.0,
+            "tokens": float(user.tokens),
+            "already": True,
+        }
+
+    user.tokens = float(user.tokens) + GUIDED_BONUS_TOKENS
+    # tokens_charged en negativo = entrega, no cobro. Así el bono resta en
+    # cualquier suma de ingresos por usuario en vez de inflarla.
+    db.add(UsageLog(
+        user_id=user.id,
+        endpoint=GUIDED_BONUS_ENDPOINT,
+        model="bono-guiado",
+        tokens_charged=-GUIDED_BONUS_TOKENS,
+        success="ok",
+        notes="bono visita guiada primera consulta",
+    ))
+    db.commit()
+    return {
+        "granted": GUIDED_BONUS_TOKENS,
+        "tokens": float(user.tokens),
+        "already": False,
+    }
 
 
 @router.get("/me")

@@ -41,7 +41,16 @@
     dog_park:     { n: 'Zona de perros',    c: '#7eb86a' },
     veterinary:   { n: 'Veterinario',       c: '#5ec8e6' },
     drinking_water:{ n: 'Fuente de agua',   c: '#5ec8e6' },
-    pet:          { n: 'Tienda de animales',c: '#80d6ee' }
+    pet:          { n: 'Tienda de animales',c: '#80d6ee' },
+    /* Founder 2026-08-17: "no solo buscar parques sino caminos, rutas de
+       montaña o naturaleza". En un pueblo no hay parques etiquetados pero sí
+       decenas de pistas y bosque — comprobado en Villamantilla: 0 parques,
+       47 pistas, 5 senderos y 8 zonas de bosque en 2,5 km. */
+    path:         { n: 'Sendero',           c: '#b6dca0' },
+    track:        { n: 'Pista / camino',    c: '#b6dca0' },
+    wood:         { n: 'Bosque',            c: '#7eb86a' },
+    nature:       { n: 'Espacio natural',   c: '#7eb86a' },
+    meadow:       { n: 'Prado',             c: '#9ecf86' }
   };
 
   var mapa = null, capaRutas = null, capaPois = null, marcadorYo = null;
@@ -69,14 +78,21 @@
 
   /* ── Datos ─────────────────────────────────────────────────────────────── */
   async function buscarPois(lat, lon, radio) {
-    var q = '[out:json][timeout:25];(' +
-      'node["amenity"="veterinary"](around:' + radio + ',' + lat + ',' + lon + ');' +
-      'node["amenity"="drinking_water"](around:' + radio + ',' + lat + ',' + lon + ');' +
-      'node["shop"="pet"](around:' + radio + ',' + lat + ',' + lon + ');' +
-      'node["leisure"="dog_park"](around:' + radio + ',' + lat + ',' + lon + ');' +
-      'way["leisure"="dog_park"](around:' + radio + ',' + lat + ',' + lon + ');' +
-      'way["leisure"="park"](around:' + radio + ',' + lat + ',' + lon + ');' +
-      ');out center 80;';
+    var a = '(around:' + radio + ',' + lat + ',' + lon + ');';
+    var q = '[out:json][timeout:30];(' +
+      'node["amenity"="veterinary"]' + a +
+      'node["amenity"="drinking_water"]' + a +
+      'node["shop"="pet"]' + a +
+      'node["leisure"="dog_park"]' + a +
+      'way["leisure"="dog_park"]' + a +
+      'way["leisure"="park"]' + a +
+      /* Campo y monte: sin esto, un pueblo se quedaba sin ninguna ruta. */
+      'way["highway"~"^(path|track|footway|bridleway)$"]' + a +
+      'way["natural"="wood"]' + a +
+      'way["landuse"="forest"]' + a +
+      'way["landuse"="meadow"]' + a +
+      'way["leisure"="nature_reserve"]' + a +
+      ');out center 120;';
     /* El servidor público de Overpass limita peticiones: si contesta con error
        o va saturado, reintentamos en el espejo antes de rendirnos. */
     var servidores = [OVERPASS, 'https://overpass.kumi.systems/api/interpreter'];
@@ -102,7 +118,13 @@
                : t.leisure === 'park' ? 'park'
                : t.amenity === 'veterinary' ? 'veterinary'
                : t.amenity === 'drinking_water' ? 'drinking_water'
-               : t.shop === 'pet' ? 'pet' : null;
+               : t.shop === 'pet' ? 'pet'
+               : t.leisure === 'nature_reserve' ? 'nature'
+               : (t.natural === 'wood' || t.landuse === 'forest') ? 'wood'
+               : t.landuse === 'meadow' ? 'meadow'
+               : t.highway === 'track' ? 'track'
+               : (t.highway === 'path' || t.highway === 'footway' || t.highway === 'bridleway') ? 'path'
+               : null;
       if (!tipo) return null;
       return { lat: la, lon: lo, tipo: tipo, nombre: t.name || TIPOS[tipo].n };
     }).filter(Boolean);
@@ -146,12 +168,40 @@
     };
   }
 
-  function elegirDestinos(pois, centro, objetivoM) {
-    var r = objetivoM / 3.2;                       // radio aproximado del bucle
+  /* Mueve un punto `m` metros en el rumbo `grados`. */
+  function mover(lat, lon, m, grados) {
+    var R = 6371000, t = Math.PI / 180, d = m / R, b = grados * t;
+    var la = lat * t, lo = lon * t;
+    var la2 = Math.asin(Math.sin(la) * Math.cos(d) + Math.cos(la) * Math.sin(d) * Math.cos(b));
+    var lo2 = lo + Math.atan2(Math.sin(b) * Math.sin(d) * Math.cos(la),
+                              Math.cos(d) - Math.sin(la) * Math.sin(la2));
+    return [la2 / t, lo2 / t];
+  }
+
+  /* Destinos cuando NO hay puntos de interés mapeados. En un pueblo puede no
+     haber ni un parque ni una fuente en OpenStreetMap (comprobado: cero en
+     1600 m alrededor de Villamantilla), y antes eso dejaba al usuario sin
+     ninguna ruta. Aquí trazamos el bucle contra el callejero: dos puntos a
+     distancia del objetivo en rumbos separados, y que OSRM los una por calles
+     reales. Se prueban varias orientaciones porque en un sitio puede no haber
+     camino hacia el norte y sí hacia el este. */
+  function destinosPorRumbo(centro, objetivoM, intento) {
+    var r = objetivoM / 3.2;
+    var giro = (intento || 0) * 55;
+    var a = mover(centro.lat, centro.lon, r, giro);
+    var b = mover(centro.lat, centro.lon, r, giro + 110);
+    return [[centro.lat, centro.lon], a, b];
+  }
+
+  function elegirDestinos(pois, centro, objetivoM, escala) {
+    var r = (objetivoM / 3.2) * (escala || 1);                       // radio aproximado del bucle
     var conD = pois.map(function (p) {
       return { p: p, d: dist([centro.lat, centro.lon], [p.lat, p.lon]) };
     }).filter(function (x) { return x.d > r * 0.35; });
-    var verdes = conD.filter(function (x) { return x.p.tipo === 'park' || x.p.tipo === 'dog_park'; });
+    /* "Verde" ya no es solo un parque urbano: en el campo lo verde es la pista,
+       el sendero y el bosque. */
+    var VERDE = { park:1, dog_park:1, path:1, track:1, wood:1, nature:1, meadow:1 };
+    var verdes = conD.filter(function (x) { return VERDE[x.p.tipo]; });
     var pool = (verdes.length ? verdes : conD).slice().sort(function (a, b) {
       return Math.abs(a.d - r) - Math.abs(b.d - r);
     });
@@ -534,9 +584,22 @@
       radius: 8, color: '#fff', weight: 3, fillColor: '#5ec8e6', fillOpacity: 1
     }).addTo(mapa).bindTooltip(etiqueta || 'Estáis aquí');
 
-    var pois;
-    try { pois = await buscarPois(centro.lat, centro.lon, 1600); }
-    catch (e) { estadoTexto('No se han podido consultar los datos del mapa. Inténtalo en un minuto.'); return; }
+    /* Radio creciente: en ciudad sobra con 1,6 km; en campo abierto hay que
+       abrirse para encontrar las pistas. Nos paramos en cuanto hay material. */
+    var pois = [];
+    var radios = [1600, 3000, 5000];
+    var falloMapa = null;
+    for (var ri = 0; ri < radios.length; ri++) {
+      try {
+        pois = await buscarPois(centro.lat, centro.lon, radios[ri]);
+        falloMapa = null;
+      } catch (e) { falloMapa = e; continue; }
+      if (pois.length >= 6) break;
+    }
+    if (falloMapa && !pois.length) {
+      estadoTexto('No se han podido consultar los datos del mapa. Inténtalo en un minuto.');
+      return;
+    }
     estado.pois = pois;
 
     pois.forEach(function (p) {
@@ -553,10 +616,34 @@
     ];
     for (var k = 0; k < objetivos.length; k++) {
       var o = objetivos[k];
-      var pts = elegirDestinos(pois, centro, o.m);
-      if (!pts) continue;
+      /* Primero con puntos de interés (la ruta "buena": pasa por zonas verdes).
+         Si no hay, se cae al callejero para que igualmente haya paseo. */
+      /* En campo abierto los anclajes quedan lejos y las pistas no van rectas:
+         pedir 1,5 km devolvía 4,3 km reales, que para un cachorro o un perro
+         mayor no sirve. Tanteamos varias escalas y nos quedamos con la que más
+         se acerca a la distancia pedida. */
+      var candidatos = [];
+      [0.45, 0.7, 1].forEach(function (esc) {
+        var cp = elegirDestinos(pois, centro, o.m, esc);
+        if (cp) candidatos.push(cp);
+      });
+      candidatos.push(destinosPorRumbo(centro, o.m, 0));
+      candidatos.push(destinosPorRumbo(centro, o.m, 1));
+
+      var res = null, mejorDif = Infinity;
+      for (var c = 0; c < candidatos.length; c++) {
+        var cand = null;
+        try { cand = await ruta(candidatos[c]); } catch (e) { continue; }
+        var dif = Math.abs(cand.metros - o.m);
+        if (dif < mejorDif) { mejorDif = dif; res = cand; }
+        /* Suficientemente cerca: no gastamos más llamadas. */
+        if (dif <= o.m * 0.3) break;
+      }
+      if (!res) continue;
+      /* El nombre promete una distancia; si la real se aleja mucho, lo decimos
+         en vez de llamar "vuelta corta" a 4 km. */
+      o = { nombre: o.nombre, por: o.por, m: o.m };
       try {
-        var res = await ruta(pts);
         var capa = L.polyline(res.linea, { color: '#e8efea', weight: 3, opacity: .25 }).addTo(capaRutas);
         estado.rutas.push({
           nombre: o.nombre, por: o.por, metros: res.metros, linea: res.linea,
@@ -568,6 +655,10 @@
     /* Sin rutas no hay nada que entregar: no se cobra. */
     if (!estado.rutas.length) {
       estadoTexto('Sin rutas disponibles aquí. No te hemos cobrado nada.');
+      var vac = document.getElementById('dmw-walk-lista');
+      if (vac) vac.innerHTML = '<div class="dmw-walk-vacio">No hemos podido trazar rutas ' +
+        'a pie aquí: por esta zona no hay caminos suficientes en el mapa. ' +
+        'Prueba a escribir un pueblo o ciudad cercana. No te hemos cobrado nada.</div>';
       return;
     }
     /* Ya hay rutas de verdad: ahora sí se cobra. */
@@ -587,6 +678,7 @@
           '<input class="dmw-walk-in" id="dmw-walk-q" placeholder="Escribe una ciudad o dirección…">' +
           '<button class="dmw-walk-btn alt" id="dmw-walk-go">Buscar</button>' +
         '</div>' +
+        '<button class="dmw-walk-cta" id="dmw-walk-rutas">Buscar mis tres rutas</button>' +
         '<div class="dmw-walk-body">' +
           '<div id="dmw-walk-map" class="dmw-walk-map"></div>' +
           '<div class="dmw-rutas" id="dmw-walk-lista">' +
@@ -671,6 +763,14 @@
       } catch (e) { estadoTexto('No se ha podido buscar ese sitio.'); }
     };
     document.getElementById('dmw-walk-go').onclick = buscar;
+    /* El botón grande: si ya sabemos dónde está, recalcula ahí; si no, pide la
+       ubicación. Antes la única forma de lanzarlo era "Usar mi ubicación", que
+       parece que solo centra el mapa (founder 2026-08-17: "no encuentro el
+       botón para pedir que te dé rutas"). */
+    document.getElementById('dmw-walk-rutas').onclick = function () {
+      if (estado.centro) { generar(estado.centro, 'Estáis aquí'); return; }
+      document.getElementById('dmw-walk-geo').click();
+    };
     document.getElementById('dmw-walk-q').addEventListener('keydown', function (e) {
       if (e.key === 'Enter') buscar();
     });

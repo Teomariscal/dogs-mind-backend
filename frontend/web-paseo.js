@@ -77,6 +77,9 @@
      en tablets o plegables de ancho >=1024, ninguna de las dos hojas casaba y
      el mapa se quedaba con altura 0, es decir, planificador sin mapa. */
   + '#paseo-full .dmw-walk-map{height:260px;min-height:260px;}'
+  + '#paseo-full .dmw-walk-cta{display:block;width:calc(100% - 24px);margin:0 12px 14px;'
+  +   'padding:15px;border:none;border-radius:100px;background:#4a6741;color:#fff;'
+  +   'font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;}'
   + '@media (max-width:1023px){'
   +   '#paseo-full .dmw-walk{border:1px solid rgba(94,200,230,.35);border-radius:18px;overflow:hidden;'
   +     'background:linear-gradient(180deg,rgba(20,48,42,.96),rgba(10,26,20,.96));}'
@@ -187,7 +190,7 @@
     host.appendChild(caja);
     if (window.dmwWalkMontar) { window.dmwWalkMontar(caja); return; }
     var s = document.createElement('script');
-    s.src = 'web-walk.js?v=9';
+    s.src = 'web-walk.js?v=10';
     s.onload = function () { if (window.dmwWalkMontar) window.dmwWalkMontar(caja); };
     document.head.appendChild(s);
   }

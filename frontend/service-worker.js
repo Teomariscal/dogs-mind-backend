@@ -1,3 +1,4 @@
+// v255 (paseos: busca tambien caminos, pistas, bosque y prados -no solo parques-, radio creciente, boton explicito "Buscar mis tres rutas" y calibrado de distancia; + area segura arriba en Adiestramiento Avanzado, Privacidad y Terminos, donde el boton de volver quedaba bajo la barra de estado. 2026-08-17)
 // v254 (bienvenida coral con los ocho Aigents antes de Katja + alta guiada en 3 pasos, con salida al formulario entero y recuperacion si algo falla. 2026-08-17)
 // v253 (visita guiada de primera consulta conducida por Katja en los tres caminos + tarjetas de descubrimiento de funciones al terminar un caso. 2026-08-17)
 // v252 (PDF de Entrenamiento y Escuela de Cachorros descargable desde el propio resultado + los casos de cachorro guardados vuelven a abrirse como plan de cachorro, no como ABC vacío. Tag "Escuela Cachorros" en Registros. 2026-08-14)
@@ -55,7 +56,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v254';
+const CACHE_NAME = 'dogs-mind-v255';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

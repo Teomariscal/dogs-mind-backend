@@ -771,7 +771,11 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
 #s-training .tr-form{flex:1 0 auto;display:flex;flex-direction:column;}
 /* Hero con vídeo */
 #s-training .tr-hero{
-  background:#22302a;color:#fff;padding:18px 20px 30px;
+  /* Área segura arriba: sin esto el botón de volver queda DEBAJO de la barra
+     de estado en cualquier iPhone con isla, y el usuario se queda encerrado en
+     la pantalla (founder 2026-08-17: "no puedo volver atrás"). */
+  background:#22302a;color:#fff;
+  padding:calc(env(safe-area-inset-top, 0px) + 18px) 20px 30px;
   position:relative;overflow:hidden;min-height:360px;
   display:flex;flex-direction:column;
 }
@@ -9042,7 +9046,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
   <!-- ══ S-FULL-ANALYSIS: Análisis completo ══ -->
   <div id="s-full-analysis" class="screen" style="overflow-y:auto;">
     <!-- header -->
-    <div style="display:flex;align-items:center;gap:12px;padding:18px 16px 14px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;position:sticky;top:0;z-index:10;">
+    <div style="display:flex;align-items:center;gap:12px;padding:calc(env(safe-area-inset-top, 0px) + 18px) 16px 14px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;position:sticky;top:0;z-index:10;">
       <button onclick="goTo(window._tdmStance==='cognitive' ? 's-home' : 's-abc')" style="width:44px;height:44px;border-radius:50%;background:#fff;border:1.5px solid rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0;">&#8592;</button>
       <div style="flex:1;">
         <div id="full-analysis-title" style="font-size:17px;font-weight:700;color:var(--dark);letter-spacing:-0.3px;" data-i18n="full_title">Análisis funcional completo</div>
@@ -9075,7 +9079,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
   <div id="s-tracking" class="screen" style="overflow-y:auto;">
 
     <!-- Sticky header -->
-    <div style="display:flex;align-items:center;gap:12px;padding:18px 16px 14px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;position:sticky;top:0;z-index:10;">
+    <div style="display:flex;align-items:center;gap:12px;padding:calc(env(safe-area-inset-top, 0px) + 18px) 16px 14px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;position:sticky;top:0;z-index:10;">
       <button onclick="goTo('s-full-analysis')" style="width:44px;height:44px;border-radius:50%;background:#fff;border:1.5px solid rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0;">&#8592;</button>
       <div style="flex:1;">
         <div id="interv-title" style="font-size:17px;font-weight:700;color:var(--dark);letter-spacing:-0.3px;" data-i18n="tracking_title">Plan de Intervención</div>
@@ -15633,7 +15637,7 @@ function dmInitWebLayer() {
        completa. Sin límite de ancho — en móvil web se ve como se vería en
        la app, que es lo que queremos validar. */
     var sp = document.createElement('script');
-    sp.src = 'web-paseo.js?v=16';
+    sp.src = 'web-paseo.js?v=17';
     sp.defer = true;
     document.head.appendChild(sp);
   } catch (e) { /* ante la duda, no hacer nada */ }
@@ -15657,7 +15661,7 @@ function dmInitPaseoNativo() {
        abre "El paseo de hoy". Cargarlo aquí eran 34 KB de más en cada
        arranque, sin ganar nada. */
     var sp = document.createElement('script');
-    sp.src = 'web-paseo.js';
+    sp.src = 'web-paseo.js?v=17';
     sp.defer = true;
     document.head.appendChild(sp);
   } catch (e) { /* nunca romper el arranque de la app por el paseo */ }
@@ -24494,7 +24498,7 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
 
   <!-- ══ S-PRIVACY: Política de Privacidad ══ -->
   <div id="s-privacy" class="screen" style="overflow-y:auto;background:linear-gradient(180deg, #0e1f1a 0%, #14302a 100%);">
-    <div style="display:flex;align-items:center;gap:12px;padding:18px 16px 14px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;position:sticky;top:0;z-index:10;">
+    <div style="display:flex;align-items:center;gap:12px;padding:calc(env(safe-area-inset-top, 0px) + 18px) 16px 14px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;position:sticky;top:0;z-index:10;">
       <button onclick="history.back()||goTo('s-splash')" style="width:44px;height:44px;border-radius:50%;background:#fff;border:1.5px solid rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0;">&#8592;</button>
       <div>
         <div style="font-size:17px;font-weight:700;color:#f3f1ea;letter-spacing:-0.3px;" data-i18n="pp_title">Política de Privacidad</div>
@@ -24576,7 +24580,7 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
 
   <!-- ══ S-TERMS: Términos de Servicio ══ -->
   <div id="s-terms" class="screen" style="overflow-y:auto;background:linear-gradient(180deg, #0e1f1a 0%, #14302a 100%);">
-    <div style="display:flex;align-items:center;gap:12px;padding:18px 16px 14px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;position:sticky;top:0;z-index:10;">
+    <div style="display:flex;align-items:center;gap:12px;padding:calc(env(safe-area-inset-top, 0px) + 18px) 16px 14px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;position:sticky;top:0;z-index:10;">
       <button onclick="history.back()||goTo('s-splash')" style="width:44px;height:44px;border-radius:50%;background:#fff;border:1.5px solid rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0;">&#8592;</button>
       <div>
         <div style="font-size:17px;font-weight:700;color:#f3f1ea;letter-spacing:-0.3px;" data-i18n="tos_title">Términos de Servicio</div>

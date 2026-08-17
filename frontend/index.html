@@ -8228,7 +8228,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
       <div class="insight-row">
         <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.7.6 1 1.5 1 2.3v1h6v-1c0-.8.3-1.7 1-2.3A7 7 0 0 0 12 2z"/></svg></div>
         <div class="insight-text" data-i18n="tip_of_day">Consejo del día: El refuerzo positivo consistente es clave para el cambio conductual a largo plazo. Recompensa las acciones deseadas de inmediato.</div>
-        <button class="token-slot" onclick="goTo('s-tokens')" type="button" aria-label="Comprar tokens" title="Comprar tokens">
+        <button class="token-slot" onclick="goTo('s-planes')" type="button" aria-label="Planes y créditos" title="Planes y créditos">
           <div class="token-ring">
             <div class="token-inner">
               <div class="token-num" id="tok-home">5</div>
@@ -8422,7 +8422,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
         </span>
         <span class="nav-label">Aigents</span>
       </button>
-      <button class="nav-item" onclick="goTo('s-tokens')">
+      <button class="nav-item" onclick="goTo('s-planes')">
         <span class="nav-icon nav-icon-tokens" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.5"/><path d="M12 8v8M8.5 12h7"/></svg>
         </span>
@@ -8685,6 +8685,13 @@ button:not(:disabled):active{ transform:scale(0.98); }
         desde los ajustes de tu tienda (App Store o Google Play). Los créditos que compres
         no caducan.
       </div>
+      <!-- Tokens sueltos: comprar empieza por PLANES, pero quien no quiera
+           subir de plan tiene la puerta aquí (founder 2026-08-17). -->
+      <div style="margin-top:20px;padding-top:18px;border-top:1px solid rgba(255,255,255,.10);text-align:center;">
+        <div style="font-size:13px;color:rgba(232,239,234,.72);line-height:1.55;margin-bottom:12px;" data-i18n="pw_tokens_q">&iquest;Quieres comprar cr&eacute;ditos sueltos sin cambiar de plan?</div>
+        <button onclick="goTo('s-tokens')" style="width:100%;padding:14px 20px;border-radius:100px;background:transparent;border:1.5px solid rgba(94,200,230,0.45);color:#ade3f2;font-size:14.5px;font-weight:700;font-family:inherit;cursor:pointer;touch-action:manipulation;" data-i18n="pw_tokens_cta">Ver precios de cr&eacute;ditos sueltos</button>
+      </div>
+
       <!-- Código de equipo: acceso sin suscripción (founder 2026-08-04) -->
       <div style="margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.10);">
         <button id="planes-codigo-abrir" onclick="dmToggleCodigo()" style="width:100%;background:none;border:none;color:rgba(232,239,234,.62);font-family:inherit;font-size:13px;cursor:pointer;text-decoration:underline;" data-i18n="pw_have_code">¿Tienes un código de equipo?</button>
@@ -15630,7 +15637,7 @@ function dmInitWebLayer() {
     l.href = 'web-desktop.css?v=21';
     document.head.appendChild(l);
     var s = document.createElement('script');
-    s.src = 'web-desktop.js?v=26';
+    s.src = 'web-desktop.js?v=27';
     s.defer = true;
     document.head.appendChild(s);
     /* "El paseo de hoy": tarjeta en el inicio + planificador a pantalla
@@ -16662,11 +16669,11 @@ function getVal(id, fallback) {
         '</div>';
       var host = document.querySelector('.phone') || document.body;
       host.appendChild(ov);
-      document.getElementById('dm-rn-go').onclick = function() { ov.remove(); goTo('s-tokens'); };
+      document.getElementById('dm-rn-go').onclick = function() { ov.remove(); goTo('s-planes'); };
       document.getElementById('dm-rn-later').onclick = function() { ov.remove(); };
     } catch(e) {
       // Fallback ultra-defensivo: comportamiento anterior (toast + pantalla tokens).
-      try { showToast(_fmtInsufTokens(needed)); goTo('s-tokens'); } catch(_) {}
+      try { showToast(_fmtInsufTokens(needed)); goTo('s-planes'); } catch(_) {}
     }
   }
   window.showRechargeNotice = showRechargeNotice;
@@ -18647,7 +18654,7 @@ async function analyzeWithAI() {
       // /analysis: 3 tokens texto-only, 4 con vídeo adjuntado
       var _cost = window._attachedVideo ? 4 : 3;
       showRechargeNotice(_cost);
-      goTo('s-tokens');
+      goTo('s-planes');
       btn.textContent = 'Analizar con IA →';
       btn.disabled = false;
       return;
@@ -21398,6 +21405,8 @@ function endTourIntro() {
       aw_title:                 'Bienvenido a The Dogs’ Mind',
       aw_body:                  'Uno de nosotros te va a acompañar en tu primera consulta.',
       aw_cta:                   'Adelante',
+      pw_tokens_q:              '¿Quieres comprar créditos sueltos sin cambiar de plan?',
+      pw_tokens_cta:            'Ver precios de créditos sueltos',
       gw_eyebrow:               'Tu primera consulta',
       gw_title:                 'Soy Katja',
       gw_body:                  'Me ocupo de que esto salga bien desde el primer caso. Hacemos tu primera consulta juntos: yo te voy pidiendo lo que hace falta, en orden, y tú solo respondes.',
@@ -22519,6 +22528,8 @@ function endTourIntro() {
       aw_title:                 'Welcome to The Dogs’ Mind',
       aw_body:                  'One of us is going to be with you through your first consultation.',
       aw_cta:                   'Let’s go',
+      pw_tokens_q:              'Want to buy credits on their own without changing plan?',
+      pw_tokens_cta:            'See prices for single credits',
       gw_eyebrow:               'Your first consultation',
       gw_title:                 'I am Katja',
       gw_body:                  'I make sure this goes well from the very first case. We will do your first consultation together: I ask for what is needed, in order, and you just answer.',
@@ -23639,6 +23650,8 @@ function endTourIntro() {
           aw_title:                 'Benvenuto in The Dogs’ Mind',
           aw_body:                  'Uno di noi ti accompagnerà nel tuo primo consulto.',
           aw_cta:                   'Avanti',
+          pw_tokens_q:              'Vuoi comprare crediti singoli senza cambiare piano?',
+          pw_tokens_cta:            'Vedi i prezzi dei crediti singoli',
           gw_eyebrow:               'Il tuo primo consulto',
           gw_title:                 'Sono Katja',
           gw_body:                  'Mi occupo io che vada bene fin dal primo caso. Facciamo insieme il tuo primo consulto: ti chiedo quello che serve, in ordine, e tu rispondi.',

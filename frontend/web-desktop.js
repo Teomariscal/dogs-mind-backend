@@ -123,7 +123,10 @@
     /* Saldo: sustituye al anillo de tokens de la home móvil (que en escritorio
        se oculta). Se refresca solo leyendo el contador que ya mantiene la app. */
     var saldo = el('button', 'dmw-saldo', '<b id="dmw-saldo-n">–</b><span>créditos</span>');
-    saldo.onclick = function () { irA('s-tokens'); };
+    /* Founder 2026-08-17: comprar empieza por PLANES; los tokens sueltos
+       quedan a un toque desde ahí. La web tiene dos formatos y este es el de
+       escritorio, con su propia barra: sin esto seguiría entrando por tokens. */
+    saldo.onclick = function () { irA('s-planes'); };
     inner.appendChild(saldo);
     var pinta = function () {
       var src = document.getElementById('tok-home');

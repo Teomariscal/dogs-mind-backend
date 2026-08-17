@@ -380,7 +380,6 @@ def _count_case_entries(case_id: str, db: Session) -> int:
     return db.query(CaseEntry).filter(CaseEntry.case_id == case_id).count()
 
 
-
 def _to_case_response(case: Case) -> CaseResponse:
     return CaseResponse(
         id=str(case.id),

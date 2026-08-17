@@ -9922,28 +9922,28 @@ button:not(:disabled):active{ transform:scale(0.98); }
 
     <form id="pup-form" class="tc-form" onsubmit="event.preventDefault(); submitPuppySchool();" novalidate>
 
-      <div class="tc-field">
+      <div class="tc-field" data-guided-step="1">
         <label for="pup-name" data-i18n="pup_f_name">Nombre</label>
         <input id="pup-name" type="text" maxlength="80" required>
       </div>
 
-      <div class="tc-field">
+      <div class="tc-field" data-guided-step="1">
         <label for="pup-dob" data-i18n="pup_f_dob">Fecha de nacimiento</label>
         <input id="pup-dob" type="date" onchange="pupCalcEdad()" required>
       </div>
 
-      <div class="tc-field">
+      <div class="tc-field" data-guided-step="1">
         <label for="pup-weeks" data-i18n="pup_f_age">Edad actual, en semanas</label>
         <input id="pup-weeks" type="number" min="0" max="104" inputmode="numeric" required>
         <div id="pup-weeks-hint" style="font-size:12px;color:rgba(232,239,234,0.74);margin-top:6px;line-height:1.45;" data-i18n="pup_age_hint">La calculamos desde la fecha de nacimiento. Si es adoptado y la fecha es aproximada, corrígela aquí. Esta edad queda guardada en el registro tal cual, para saber siempre qué edad tenía al empezar.</div>
       </div>
 
-      <div class="tc-field">
+      <div class="tc-field" data-guided-step="1">
         <label for="pup-breed" data-i18n="pup_f_breed">Tipología racial</label>
         <input id="pup-breed" type="text" maxlength="120" required>
       </div>
 
-      <div class="tc-field">
+      <div class="tc-field" data-guided-step="1">
         <label data-i18n="pup_f_origin">¿Adoptado o de criadero?</label>
         <div class="tc-radio-row" role="radiogroup">
           <label class="tc-radio-pill"><input type="radio" name="pup-origin" value="adoptado" required><span data-i18n="pup_o_adopted">Adoptado</span></label>
@@ -9951,7 +9951,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
         </div>
       </div>
 
-      <div class="tc-field">
+      <div class="tc-field" data-guided-step="1">
         <label data-i18n="pup_f_wean">¿A qué edad se separó de su madre y sus hermanos?</label>
         <div class="tc-radio-row" role="radiogroup">
           <label class="tc-radio-pill"><input type="radio" name="pup-wean" value="antes_7" required><span data-i18n="pup_wn_early">Antes de las 7 semanas</span></label>
@@ -9961,12 +9961,12 @@ button:not(:disabled):active{ transform:scale(0.98); }
         </div>
       </div>
 
-      <div class="tc-field">
+      <div class="tc-field" data-guided-step="2">
         <label for="pup-athome" data-i18n="pup_f_athome">¿Cuántas semanas lleva en casa?</label>
         <input id="pup-athome" type="number" min="0" max="104" inputmode="numeric" required>
       </div>
 
-      <div class="tc-field">
+      <div class="tc-field" data-guided-step="2">
         <label data-i18n="pup_f_dogs">¿Convive con otros perros?</label>
         <div class="tc-radio-row" role="radiogroup">
           <label class="tc-radio-pill"><input type="radio" name="pup-dogs" value="si" onchange="pupToggleDogs()" required><span data-i18n="pup_yes">Sí</span></label>
@@ -9974,12 +9974,12 @@ button:not(:disabled):active{ transform:scale(0.98); }
         </div>
       </div>
 
-      <div class="tc-field" id="pup-dogs-ages-wrap" style="display:none;">
+      <div class="tc-field" data-guided-step="2" data-guided-cond="1" id="pup-dogs-ages-wrap" style="display:none;">
         <label for="pup-dogs-ages" data-i18n="pup_f_dogs_ages">Edades de los otros perros</label>
         <input id="pup-dogs-ages" type="text" maxlength="200" data-i18n-placeholder="pup_dogs_ages_ph" placeholder="Por ejemplo: 4 años y 9 meses">
       </div>
 
-      <div class="tc-field">
+      <div class="tc-field" data-guided-step="2">
         <label data-i18n="pup_f_kids">¿Hay niños en casa?</label>
         <div class="tc-radio-row" role="radiogroup">
           <label class="tc-radio-pill"><input type="radio" name="pup-kids" value="si" onchange="pupToggleKids()" required><span data-i18n="pup_yes">Sí</span></label>
@@ -9987,22 +9987,22 @@ button:not(:disabled):active{ transform:scale(0.98); }
         </div>
       </div>
 
-      <div class="tc-field" id="pup-kids-ages-wrap" style="display:none;">
+      <div class="tc-field" data-guided-step="2" data-guided-cond="1" id="pup-kids-ages-wrap" style="display:none;">
         <label for="pup-kids-ages" data-i18n="pup_f_kids_ages">Edades de los niños</label>
         <input id="pup-kids-ages" type="text" maxlength="200" data-i18n-placeholder="pup_kids_ages_ph" placeholder="Por ejemplo: 4 y 9 años">
       </div>
 
-      <div class="tc-field">
+      <div class="tc-field" data-guided-step="2">
         <label for="pup-alone" data-i18n="pup_f_alone">Horas que pasa solo al día</label>
         <input id="pup-alone" type="number" min="0" max="16" inputmode="numeric" required>
       </div>
 
-      <div class="tc-field">
+      <div class="tc-field" data-guided-step="2">
         <label for="pup-walks" data-i18n="pup_f_walks">Paseos al día</label>
         <input id="pup-walks" type="number" min="0" max="12" inputmode="numeric" required>
       </div>
 
-      <div class="tc-field">
+      <div class="tc-field" data-guided-step="2">
         <label data-i18n="pup_f_sleep">¿Dónde duerme?</label>
         <div class="tc-radio-row" role="radiogroup">
           <label class="tc-radio-pill"><input type="radio" name="pup-sleep" value="zona_propia" required><span data-i18n="pup_s_own">En su cama o zona propia</span></label>
@@ -10014,7 +10014,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
         </div>
       </div>
 
-      <div class="tc-field">
+      <div class="tc-field" data-guided-step="3">
         <label data-i18n="pup_f_want">¿Qué buscas?</label>
         <div class="tc-radio-row" role="radiogroup">
           <label class="tc-radio-pill"><input type="radio" name="pup-want" value="prevenir" onchange="pupToggleProblema()" required><span data-i18n="pup_w_prevent">Prevenir y educar</span></label>
@@ -10022,7 +10022,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
         </div>
       </div>
 
-      <div class="tc-field">
+      <div class="tc-field" data-guided-step="3">
         <label data-i18n="pup_f_area">¿Sobre qué quieres que trabajemos?</label>
         <div style="font-size:12px;color:rgba(232,239,234,0.74);margin:-2px 0 10px;line-height:1.45;" data-i18n="pup_area_hint">Empieza por una y ya trabajaremos las otras.</div>
         <div class="tc-radio-row" role="radiogroup">
@@ -10037,12 +10037,12 @@ button:not(:disabled):active{ transform:scale(0.98); }
         </div>
       </div>
 
-      <div class="tc-field" id="pup-problema-wrap" style="display:none;">
+      <div class="tc-field" data-guided-step="3" data-guided-cond="1" id="pup-problema-wrap" style="display:none;">
         <label for="pup-problema" data-i18n="pup_f_problem">Describe la conducta problema lo más precisa y claramente que puedas</label>
         <textarea id="pup-problema" rows="4" maxlength="1500" data-i18n-placeholder="pup_problem_ph" placeholder="Qué hace exactamente, cuándo empezó, en qué situaciones aparece y qué hacéis vosotros cuando ocurre"></textarea>
       </div>
 
-      <div class="tc-field">
+      <div class="tc-field" data-guided-step="3">
         <label data-i18n="pup_f_vax">Calendario de vacunación completo (heptavalente hace más de una semana)</label>
         <div class="tc-radio-row" role="radiogroup">
           <label class="tc-radio-pill"><input type="radio" name="pup-vax" value="si" required><span data-i18n="pup_yes">Sí</span></label>
@@ -16719,6 +16719,34 @@ function getVal(id, fallback) {
      Fuera de la visita guiada este módulo no toca absolutamente nada. */
   var DM_GUIDED_KEY = 'dm_guided_done';
 
+  /* Un plan por camino. `pantalla` es dónde vive la ficha, `envio` los
+     elementos que solo deben verse en el último paso, y `sellos` el bloque de
+     credibilidad académica que estorba durante la visita (puede faltar). */
+  var DM_GUIDED_PLANES = {
+    behavior: {
+      pantalla: 's-anamnesis',
+      envio:    ['analyze-cost-notice', 'analyze-ai-consent', 'btn-analyze'],
+      sellos:   'anam-basedon-block',
+      claves:   ['guided_s1', 'guided_s2', 'guided_s3', 'guided_s4'],
+      textos:   [
+        'Empezamos por él: nombre, raza y edad. Treinta segundos.',
+        'Ahora su casa: con quién vive y cómo es su día.',
+        'Qué habéis probado ya. Esto evita que te proponga algo que ya no funcionó.',
+        'Ahora lo que importa. Qué hace, cuándo, y delante de quién. Cuanto más concreto seas, mejor sale el análisis.'
+      ]
+    },
+    puppy: {
+      pantalla: 's-anamnesis-puppy',
+      envio:    ['pup-submit'],
+      claves:   ['guided_p1', 'guided_p2', 'guided_p3'],
+      textos:   [
+        'Empezamos por él. Con un cachorro la edad manda, así que la fecha y las semanas son lo que más pesa de toda la ficha.',
+        'Ahora su casa: con quién vive, cuánto tiempo pasa solo y dónde duerme.',
+        'Y por último, qué quieres trabajar. De aquí sale el plan.'
+      ]
+    }
+  };
+
   /* ¿Toca ofrecer la visita guiada? Solo a quien nunca la ha hecho ni la ha
      rechazado. Devuelve true si ya ha navegado a la bienvenida. */
   function dmGuidedOfrecer() {
@@ -16757,37 +16785,36 @@ function getVal(id, fallback) {
       else goTo('s-anamnesis-training');
       return;
     }
-    if (camino === 'puppy') { goTo('s-anamnesis-puppy'); return; }
+    if (camino === 'puppy') {
+      goTo('s-anamnesis-puppy');
+      if (armada) { try { dmGuidedStart('puppy'); } catch (e) {} }
+      return;
+    }
 
     goTo('s-anamnesis');
-    /* La conducción por pasos, de momento, solo está montada sobre la
-       anamnesis clínica; los otros dos caminos entran sin pasos hasta que se
-       marquen sus secciones. */
-    if (armada) { try { dmGuidedStart(); } catch (e) {} }
+    if (armada) { try { dmGuidedStart('behavior'); } catch (e) {} }
   }
   window.dmConsultPath = dmConsultPath;
 
   /* Los textos de paso los escribió el founder. No inventar aquí: si falta uno,
      el paso sale sin rótulo antes que con copy improvisado. */
-  function _guidedPasos() {
-    return [
-      { n: 1, txt: _i18nText('guided_s1', 'Empezamos por él: nombre, raza y edad. Treinta segundos.') },
-      { n: 2, txt: _i18nText('guided_s2', 'Ahora su casa: con quién vive y cómo es su día.') },
-      { n: 3, txt: _i18nText('guided_s3', 'Qué habéis probado ya. Esto evita que te proponga algo que no funcionó.') },
-      { n: 4, txt: _i18nText('guided_s4', 'Ahora lo que importa. Qué hace, cuándo, y delante de quién. Cuanto más concreto seas, mejor sale el análisis.') }
-    ];
-  }
-
   var _guidedState = null;
 
   function dmGuidedActivo() { return !!_guidedState; }
   window.dmGuidedActivo = dmGuidedActivo;
 
   /* Arranca la visita en la pantalla de anamnesis clínica. */
-  function dmGuidedStart() {
-    var secs = document.querySelectorAll('#s-anamnesis [data-guided-step]');
+  function dmGuidedStart(camino) {
+    var plan = DM_GUIDED_PLANES[camino || 'behavior'];
+    if (!plan) return false;
+    var secs = document.querySelectorAll('#' + plan.pantalla + ' [data-guided-step]');
     if (!secs.length) return false;            /* sin marcas: modo normal */
-    _guidedState = { paso: 1, total: secs.length };
+    var total = 0;
+    secs.forEach(function (el) {
+      var n = parseInt(el.getAttribute('data-guided-step'), 10);
+      if (n > total) total = n;
+    });
+    _guidedState = { plan: plan, paso: 1, total: total };
     _guidedPintar();
     return true;
   }
@@ -16795,16 +16822,21 @@ function getVal(id, fallback) {
 
   /* Sale de la visita y deja el formulario como estaba (todo visible). */
   function dmGuidedSalir() {
+    var plan = _guidedState && _guidedState.plan;
     _guidedState = null;
-    document.querySelectorAll('#s-anamnesis [data-guided-step]').forEach(function (el) {
-      el.style.display = '';
-    });
+    if (plan) {
+      document.querySelectorAll('#' + plan.pantalla + ' [data-guided-step]').forEach(function (el) {
+        /* Los condicionales los enseña su propia lógica, no nosotros: si los
+           forzáramos a visibles saldrían campos que el usuario no ha pedido. */
+        if (!el.hasAttribute('data-guided-cond')) el.style.display = '';
+      });
+      _guidedMostrarSellos(true, plan);
+      _guidedMostrarEnvio(true, plan);
+    }
     var barra = document.getElementById('guided-bar');
     if (barra) barra.remove();
     var nav = document.getElementById('guided-nav');
     if (nav) nav.remove();
-    _guidedMostrarSellos(true);
-    _guidedMostrarEnvio(true);
   }
   window.dmGuidedSalir = dmGuidedSalir;
 
@@ -16814,13 +16846,14 @@ function getVal(id, fallback) {
      credibilidad al profesional, pero al dueño lego le dicen "esto te supera"
      justo en la puerta. Durante la visita guiada estorban: se ocultan y vuelven
      al salir. */
-  function _guidedMostrarSellos(visible) {
-    var el = document.getElementById('anam-basedon-block');
+  function _guidedMostrarSellos(visible, plan) {
+    if (!plan || !plan.sellos) return;
+    var el = document.getElementById(plan.sellos);
     if (el) el.style.display = visible ? '' : 'none';
   }
 
-  function _guidedMostrarEnvio(visible) {
-    ['analyze-cost-notice', 'analyze-ai-consent', 'btn-analyze'].forEach(function (id) {
+  function _guidedMostrarEnvio(visible, plan) {
+    (plan && plan.envio ? plan.envio : []).forEach(function (id) {
       var el = document.getElementById(id);
       if (el) el.style.display = visible ? '' : 'none';
     });
@@ -16828,31 +16861,38 @@ function getVal(id, fallback) {
 
   function _guidedPintar() {
     if (!_guidedState) return;
-    var paso  = _guidedState.paso;
-    var pasos = _guidedPasos();
+    var plan = _guidedState.plan;
+    var paso = _guidedState.paso;
+    var raiz = '#' + plan.pantalla;
 
-    document.querySelectorAll('#s-anamnesis [data-guided-step]').forEach(function (el) {
+    document.querySelectorAll(raiz + ' [data-guided-step]').forEach(function (el) {
       var n = parseInt(el.getAttribute('data-guided-step'), 10);
-      el.style.display = (n === paso) ? '' : 'none';
+      if (n === paso) {
+        /* Un campo condicional lo enseña su propia lógica cuando toca. Aquí
+           solo lo dejamos en paz: forzarlo a visible sacaría campos que el
+           usuario no ha pedido (edades de los otros perros sin otros perros). */
+        if (!el.hasAttribute('data-guided-cond')) el.style.display = '';
+      } else {
+        el.style.display = 'none';
+      }
     });
 
-    var cont = document.querySelector('#s-anamnesis .anam-body') ||
-               document.querySelector('#s-anamnesis');
+    var pantalla = document.getElementById(plan.pantalla);
     var barra = document.getElementById('guided-bar');
     if (!barra) {
       barra = document.createElement('div');
       barra.id = 'guided-bar';
       barra.className = 'guided-bar';
-      var primera = document.querySelector('#s-anamnesis [data-guided-step]');
+      var primera = document.querySelector(raiz + ' [data-guided-step]');
       if (primera && primera.parentNode) primera.parentNode.insertBefore(barra, primera);
-      else cont.insertBefore(barra, cont.firstChild);
+      else if (pantalla) pantalla.insertBefore(barra, pantalla.firstChild);
     }
-    var actual = pasos[paso - 1] || { txt: '' };
+    var txt = _i18nText(plan.claves[paso - 1], plan.textos[paso - 1] || '');
     barra.innerHTML =
       '<img class="guided-cara" src="aig-katja-pixar.webp" alt="Katja">' +
       '<div class="guided-txt">' +
         '<div class="guided-pasos">' + paso + '/' + _guidedState.total + '</div>' +
-        '<p>' + actual.txt + '</p>' +
+        '<p>' + txt + '</p>' +
       '</div>';
 
     var nav = document.getElementById('guided-nav');
@@ -16860,8 +16900,8 @@ function getVal(id, fallback) {
       nav = document.createElement('div');
       nav.id = 'guided-nav';
       nav.className = 'guided-nav';
-      var envio = document.getElementById('analyze-cost-notice');
-      if (envio && envio.parentNode) envio.parentNode.insertBefore(nav, envio);
+      var ref = document.getElementById(plan.envio[0]);
+      if (ref && ref.parentNode) ref.parentNode.insertBefore(nav, ref);
     }
     var ultimo = (paso >= _guidedState.total);
     nav.innerHTML =
@@ -16874,9 +16914,9 @@ function getVal(id, fallback) {
         : '<button type="button" class="guided-sigue" onclick="dmGuidedSiguiente()">' +
             _i18nText('guided_next', 'Continuar') + '</button>');
 
-    _guidedMostrarSellos(false);
-    _guidedMostrarEnvio(ultimo);
-    try { document.getElementById('s-anamnesis').scrollTop = 0; } catch (e) {}
+    _guidedMostrarSellos(false, plan);
+    _guidedMostrarEnvio(ultimo, plan);
+    try { if (pantalla) pantalla.scrollTop = 0; } catch (e) {}
   }
 
   function dmGuidedSiguiente() {
@@ -20564,6 +20604,9 @@ function endTourIntro() {
       anam_video_warn_t:       'Análisis de video usa más tokens',
       anam_video_warn_b:       'El análisis por video requiere procesar muchos más datos que texto. Cada minuto de video consume aproximadamente <strong>10 tokens</strong>. Valóra si te compensa según el caso.',
       anam_video_add:          'Añadir video a la anamnesis',
+      guided_p1: 'Empezamos por él. Con un cachorro la edad manda, así que la fecha y las semanas son lo que más pesa de toda la ficha.',
+      guided_p2: 'Ahora su casa: con quién vive, cuánto tiempo pasa solo y dónde duerme.',
+      guided_p3: 'Y por último, qué quieres trabajar. De aquí sale el plan.',
       guided_s1: 'Empezamos por él: nombre, raza y edad. Treinta segundos.',
       guided_s2: 'Ahora su casa: con quién vive y cómo es su día.',
       guided_s3: 'Qué habéis probado ya. Esto evita que te proponga algo que ya no funcionó.',
@@ -21647,6 +21690,9 @@ function endTourIntro() {
       anam_video_warn_t:       'Video analysis uses more tokens',
       anam_video_warn_b:       'Video analysis requires processing far more data than text. Each minute of video consumes approximately <strong>10 tokens</strong>. Decide if it\'s worth it for your case.',
       anam_video_add:          'Add video to the anamnesis',
+      guided_p1: 'Let’s start with him. With a puppy the age rules, so the date and the weeks carry more weight than anything else here.',
+      guided_p2: 'Now his home: who he lives with, how long he is alone and where he sleeps.',
+      guided_p3: 'And finally, what you want to work on. The plan comes out of this.',
       guided_s1: 'Let’s start with him: name, breed and age. Thirty seconds.',
       guided_s2: 'Now his home: who he lives with and what his day looks like.',
       guided_s3: 'What you have already tried. This keeps me from suggesting something that did not work.',
@@ -22727,6 +22773,9 @@ function endTourIntro() {
           anam_video_warn_t:       "L'analisi video usa più tokens",
           anam_video_warn_b:       "L'analisi tramite video richiede di elaborare molti più dati del testo. Ogni minuto di video consuma circa <strong>10 tokens</strong>. Valuta se ti conviene a seconda del caso.",
           anam_video_add:          "Aggiungere video all'anamnesi",
+          guided_p1: 'Cominciamo da lui. Con un cucciolo conta l’età, quindi la data e le settimane pesano più di tutto il resto.',
+          guided_p2: 'Ora casa sua: con chi vive, quanto tempo resta solo e dove dorme.',
+          guided_p3: 'E infine, su cosa vuoi lavorare. Il piano nasce da qui.',
           guided_s1: 'Cominciamo da lui: nome, razza ed età. Trenta secondi.',
           guided_s2: 'Ora casa sua: con chi vive e com’è la sua giornata.',
           guided_s3: 'Che cosa avete già provato. Così non ti propongo qualcosa che non ha funzionato.',

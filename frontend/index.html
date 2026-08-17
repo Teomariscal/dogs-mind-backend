@@ -9747,22 +9747,22 @@ button:not(:disabled):active{ transform:scale(0.98); }
 
     <form id="tc-form" class="tc-form" onsubmit="event.preventDefault(); submitTrainingConsult();" novalidate>
 
-      <div class="tc-field">
+      <div class="tc-field" data-guided-step="1">
         <label for="tc-dog-name" data-i18n="tc_field_name">Nombre del perro</label>
         <input id="tc-dog-name" type="text" maxlength="80" required>
       </div>
 
-      <div class="tc-field">
+      <div class="tc-field" data-guided-step="1">
         <label for="tc-breed" data-i18n="tc_field_breed">Tipología racial</label>
         <input id="tc-breed" type="text" maxlength="120" data-i18n-placeholder="tc_breed_ph" placeholder="Border Collie, Malinois, mestizo, podenco…" required>
       </div>
 
-      <div class="tc-field">
+      <div class="tc-field" data-guided-step="1">
         <label for="tc-age" data-i18n="tc_field_age">Edad</label>
         <input id="tc-age" type="text" maxlength="40" data-i18n-placeholder="tc_age_ph" placeholder="2 años, 6 meses…" required>
       </div>
 
-      <div class="tc-field">
+      <div class="tc-field" data-guided-step="2">
         <label data-i18n="tc_field_dog_level">Nivel de entrenamiento del perro</label>
         <div class="tc-radio-row" role="radiogroup">
           <label class="tc-radio-pill"><input type="radio" name="tc-dog-level" value="basico" required><span data-i18n="tc_lvl_basic">Básico</span></label>
@@ -9771,7 +9771,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
         </div>
       </div>
 
-      <div class="tc-field">
+      <div class="tc-field" data-guided-step="2">
         <label data-i18n="tc_field_handler_level">Nivel del guía</label>
         <div class="tc-radio-row" role="radiogroup">
           <label class="tc-radio-pill"><input type="radio" name="tc-handler-level" value="basico" required><span data-i18n="tc_lvl_basic">Básico</span></label>
@@ -9780,7 +9780,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
         </div>
       </div>
 
-      <div class="tc-field">
+      <div class="tc-field" data-guided-step="2">
         <label data-i18n="tc_field_reinforcers">Reforzadores preferidos</label>
         <p class="tc-field-hint" data-i18n="tc_reinforcers_hint">Marca hasta 3 que motiven más a tu perro. "Nada le motiva" es excluyente.</p>
         <div class="tc-checkbox-grid" id="tc-reinforcers-grid">
@@ -9792,12 +9792,12 @@ button:not(:disabled):active{ transform:scale(0.98); }
         </div>
       </div>
 
-      <div class="tc-field">
+      <div class="tc-field" data-guided-step="3">
         <label for="tc-goal" data-i18n="tc_field_goal">Habilidad o ejercicio que quieres mejorar</label>
         <textarea id="tc-goal" maxlength="1000" rows="3" data-i18n-placeholder="tc_goal_ph" placeholder="Ej: contacto visual sostenido con distractores; venir a la primera llamada en parque; no tirar de la correa al cruzarse con peatones…" required></textarea>
       </div>
 
-      <div class="tc-field">
+      <div class="tc-field" data-guided-step="3">
         <label data-i18n="tc_field_context">Contexto principal</label>
         <div class="tc-radio-row" role="radiogroup">
           <label class="tc-radio-pill"><input type="radio" name="tc-context" value="pista" required><span data-i18n="tc_ctx_field">Pista</span></label>
@@ -9806,7 +9806,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
         </div>
       </div>
 
-      <div class="tc-field">
+      <div class="tc-field" data-guided-step="2">
         <label data-i18n="tc_field_clicker">¿Usas clicker habitualmente?</label>
         <div class="tc-radio-row" role="radiogroup">
           <label class="tc-radio-pill"><input type="radio" name="tc-clicker" value="yes" required><span data-i18n="tc_yes">Sí</span></label>
@@ -16735,6 +16735,16 @@ function getVal(id, fallback) {
         'Ahora lo que importa. Qué hace, cuándo, y delante de quién. Cuanto más concreto seas, mejor sale el análisis.'
       ]
     },
+    training: {
+      pantalla: 's-anamnesis-training',
+      envio:    ['tc-submit'],
+      claves:   ['guided_t1', 'guided_t2', 'guided_t3'],
+      textos:   [
+        'Empezamos por él: nombre, raza y edad.',
+        'Ahora por dónde andáis los dos: su nivel, el tuyo, y con qué le pagas el trabajo bien hecho.',
+        'Y lo que quieres enseñarle. Dilo como si se lo explicaras a alguien que no conoce a tu perro: "que venga cuando le llamo aunque haya otros perros" es un objetivo; "que obedezca" no lo es.'
+      ]
+    },
     puppy: {
       pantalla: 's-anamnesis-puppy',
       envio:    ['pup-submit'],
@@ -16783,6 +16793,7 @@ function getVal(id, fallback) {
     if (camino === 'training') {
       if (typeof goToTrainingConsult === 'function') goToTrainingConsult();
       else goTo('s-anamnesis-training');
+      if (armada) { try { dmGuidedStart('training'); } catch (e) {} }
       return;
     }
     if (camino === 'puppy') {
@@ -20604,6 +20615,9 @@ function endTourIntro() {
       anam_video_warn_t:       'Análisis de video usa más tokens',
       anam_video_warn_b:       'El análisis por video requiere procesar muchos más datos que texto. Cada minuto de video consume aproximadamente <strong>10 tokens</strong>. Valóra si te compensa según el caso.',
       anam_video_add:          'Añadir video a la anamnesis',
+      guided_t1: 'Empezamos por él: nombre, raza y edad.',
+      guided_t2: 'Ahora por dónde andáis los dos: su nivel, el tuyo, y con qué le pagas el trabajo bien hecho.',
+      guided_t3: 'Y lo que quieres enseñarle. Dilo como si se lo explicaras a alguien que no conoce a tu perro: "que venga cuando le llamo aunque haya otros perros" es un objetivo; "que obedezca" no lo es.',
       guided_p1: 'Empezamos por él. Con un cachorro la edad manda, así que la fecha y las semanas son lo que más pesa de toda la ficha.',
       guided_p2: 'Ahora su casa: con quién vive, cuánto tiempo pasa solo y dónde duerme.',
       guided_p3: 'Y por último, qué quieres trabajar. De aquí sale el plan.',
@@ -21690,6 +21704,9 @@ function endTourIntro() {
       anam_video_warn_t:       'Video analysis uses more tokens',
       anam_video_warn_b:       'Video analysis requires processing far more data than text. Each minute of video consumes approximately <strong>10 tokens</strong>. Decide if it\'s worth it for your case.',
       anam_video_add:          'Add video to the anamnesis',
+      guided_t1: 'Let’s start with him: name, breed and age.',
+      guided_t2: 'Now where you two are: his level, yours, and what you pay him with for a job well done.',
+      guided_t3: 'And what you want to teach him. Say it as if you were explaining it to someone who does not know your dog: "come when I call even with other dogs around" is a goal; "behave" is not.',
       guided_p1: 'Let’s start with him. With a puppy the age rules, so the date and the weeks carry more weight than anything else here.',
       guided_p2: 'Now his home: who he lives with, how long he is alone and where he sleeps.',
       guided_p3: 'And finally, what you want to work on. The plan comes out of this.',
@@ -22773,6 +22790,9 @@ function endTourIntro() {
           anam_video_warn_t:       "L'analisi video usa più tokens",
           anam_video_warn_b:       "L'analisi tramite video richiede di elaborare molti più dati del testo. Ogni minuto di video consuma circa <strong>10 tokens</strong>. Valuta se ti conviene a seconda del caso.",
           anam_video_add:          "Aggiungere video all'anamnesi",
+          guided_t1: 'Cominciamo da lui: nome, razza ed età.',
+          guided_t2: 'Ora a che punto siete voi due: il suo livello, il tuo, e con che cosa lo ripaghi quando lavora bene.',
+          guided_t3: 'E che cosa vuoi insegnargli. Dillo come lo spiegheresti a chi non conosce il tuo cane: "che venga quando lo chiamo anche con altri cani" è un obiettivo; "che ubbidisca" no.',
           guided_p1: 'Cominciamo da lui. Con un cucciolo conta l’età, quindi la data e le settimane pesano più di tutto il resto.',
           guided_p2: 'Ora casa sua: con chi vive, quanto tempo resta solo e dove dorme.',
           guided_p3: 'E infine, su cosa vuoi lavorare. Il piano nasce da qui.',

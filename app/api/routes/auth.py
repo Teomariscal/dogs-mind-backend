@@ -45,8 +45,9 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # ── Schemas ───────────────────────────────────────────────────────────────────
 AMBASSADOR_CODE    = os.environ.get("AMBASSADOR_CODE", "").strip()
 AMBASSADOR_TOKENS  = 8
-DEFAULT_TOKENS     = 8   # 5 -> 8 (founder 2026-08-17): el saldo de bienvenida tenia que cubrir
-                         # analisis (3,0) + plan (0,20) + varios dias de seguimiento.
+DEFAULT_TOKENS     = 5   # NO subir esto para pagar la consulta guiada: el extra se GANA
+                         # haciendo la visita guiada, no se regala por registrarse
+                         # (founder 2026-08-17). Ver bono guiado en build 28.
 
 class RegisterRequest(BaseModel):
     email: EmailStr

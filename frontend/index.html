@@ -359,7 +359,7 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 /* ══════════════════════════════════════
    S2 — HOME DASHBOARD
 ══════════════════════════════════════ */
-#s-home{background:var(--cream);overflow-y:auto;}
+#s-home{background:#0e1f1a;overflow-y:auto;} /* era var(--cream): resto legacy, tapado por el vibrant. Se deja oscuro para que el fallback nunca sea claro. */
 .home-topbar{
   padding:8px 20px 12px;
   display:flex;align-items:center;justify-content:space-between;
@@ -1624,7 +1624,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
 /* ══════════════════════════════════════
    S4 — TRACKING
 ══════════════════════════════════════ */
-#s-tracking{background:var(--cream);overflow-y:auto;}
+#s-tracking{background:#0e1f1a;overflow-y:auto;} /* era var(--cream) — ver arriba */
 .tracking-topbar{
   padding:8px 20px 14px;
   flex-shrink:0;
@@ -1713,7 +1713,7 @@ input.req-invalid, textarea.req-invalid{ border-color:#c03030 !important; }
 /* ══════════════════════════════════════
    S5 — CHAT NIAZ
 ══════════════════════════════════════ */
-#s-chat{background:var(--cream);}
+#s-chat{background:#0e1f1a;} /* era var(--cream) — ver arriba */
 .chat-hdr{
   padding:10px 18px 12px;border-bottom:1px solid var(--border);
   background:var(--white);display:flex;align-items:center;gap:12px;flex-shrink:0;
@@ -1808,7 +1808,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
 .n-btn:hover,.n-btn.on{color:var(--green);}
 .n-ico{font-size:20px;}
 
-  .av-screen { background:var(--cream); overflow-y:auto; }
+  .av-screen { background:#0e1f1a; overflow-y:auto; } /* era var(--cream) — ver arriba */
   .av-card {
     background:var(--white); border:2px solid var(--border);
     border-radius:var(--r); padding:14px 16px;
@@ -7110,16 +7110,36 @@ button:not(:disabled):active{ transform:scale(0.98); }
 #s-tracking #interv-empty > div:nth-child(2){ color:rgba(243,241,234,0.74) !important; }
 
 /* Plan body: card blanca premium clinical sobre vibrant */
+/* Plan de intervención: tarjeta VIBRANT, no blanca (founder 2026-08-18:
+   "pon fondo vibrant y lo arreglas"). Era la última tarjeta blanca de una
+   pantalla de resultados y la única donde el texto salía ilegible en la app:
+   fondo blanco fijo con texto que el modo oscuro del sistema aclaraba, así que
+   solo se leían las negritas, que tenían su propia regla de color oscuro.
+   Con fondo oscuro el texto claro es lo correcto y deja de depender de cómo
+   tenga el usuario el móvil. */
 #s-tracking #interv-body{
   margin:0 14px;
   padding:18px 16px !important;
-  background:#fff;
+  background:rgba(255,255,255,0.05);
   border-radius:18px;
-  border:1px solid rgba(94,200,230,0.20);
+  border:1px solid rgba(94,200,230,0.28);
   box-shadow:0 12px 36px rgba(0,0,0,0.28);
-  color:var(--dark) !important;
+  backdrop-filter:saturate(130%) blur(10px);
+  -webkit-backdrop-filter:saturate(130%) blur(10px);
+  color:#e8efea !important;
 }
-#s-tracking #interv-body strong, #s-tracking #interv-body b{ color:var(--dark); }
+#s-tracking #interv-body strong,
+#s-tracking #interv-body b{ color:#ffffff !important; }
+#s-tracking #interv-body h1,
+#s-tracking #interv-body h2,
+#s-tracking #interv-body h3,
+#s-tracking #interv-body h4{ color:#ffffff !important; }
+#s-tracking #interv-body a{ color:#ade3f2 !important; }
+/* Cualquier color oscuro que venga en línea desde el markdown o de tokens
+   antiguos, remapeado: sin esto volvería a haber texto oscuro sobre oscuro. */
+#s-tracking #interv-body [style*="color:var(--dark)"],
+#s-tracking #interv-body [style*="color: var(--dark)"],
+#s-tracking #interv-body [style*="color:#2c2a24"]{ color:#e8efea !important; }
 
 /* Acciones inferiores: el grupo de botones queda igual (verde/azul/outline)
    pero subimos contraste del outline "Pedir segunda opinión" sobre vibrant */

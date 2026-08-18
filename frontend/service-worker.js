@@ -1,3 +1,4 @@
+// v257 (plan de intervencion en VIBRANT: era la ultima tarjeta blanca de una pantalla de resultados y en la app el texto salia ilegible -solo se leian las negritas-. Ademas se neutralizan las 4 reglas de fondo cream que quedaban muertas. 2026-08-18)
 // v256 (comprar empieza por PLANES y creditos, no por tokens: las cinco entradas de la app y el saldo de la barra de escritorio llevan a s-planes, y alli hay puerta a "creditos sueltos sin cambiar de plan". 2026-08-17)
 // v255 (paseos: busca tambien caminos, pistas, bosque y prados -no solo parques-, radio creciente, boton explicito "Buscar mis tres rutas" y calibrado de distancia; + area segura arriba en Adiestramiento Avanzado, Privacidad y Terminos, donde el boton de volver quedaba bajo la barra de estado. 2026-08-17)
 // v254 (bienvenida coral con los ocho Aigents antes de Katja + alta guiada en 3 pasos, con salida al formulario entero y recuperacion si algo falla. 2026-08-17)
@@ -57,7 +58,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v256';
+const CACHE_NAME = 'dogs-mind-v257';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

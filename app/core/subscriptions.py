@@ -76,7 +76,9 @@ DEFAULT_PLANS = [
         "product_id_ios": "net.thedogsmind.sub.medio",
         "product_id_android": "net.thedogsmind.sub.medio",
         "stripe_price_env": "STRIPE_PRICE_MEDIO",
-        "trial_days": 0,
+        # Los cuatro planes dan los 3 días (founder 2026-08-18); Stripe y las
+        # tiendas ya los conceden, esto es lo que hace que la tarjeta lo diga.
+        "trial_days": TRIAL_DAYS,
         "badge": {"es": "El más elegido", "en": "Most chosen", "it": "Il più scelto"},
         "audience": "profesional",
         "professional": True,
@@ -95,7 +97,7 @@ DEFAULT_PLANS = [
         "product_id_ios": "net.thedogsmind.sub.pro",
         "product_id_android": "net.thedogsmind.sub.pro",
         "stripe_price_env": "STRIPE_PRICE_PRO",
-        "trial_days": 0,
+        "trial_days": TRIAL_DAYS,
         "badge": {"es": "", "en": "", "it": ""},
         "audience": "profesional",
         "professional": True,
@@ -114,7 +116,7 @@ DEFAULT_PLANS = [
         "product_id_ios": "net.thedogsmind.sub.max",
         "product_id_android": "net.thedogsmind.sub.max",
         "stripe_price_env": "STRIPE_PRICE_MAX",
-        "trial_days": 0,
+        "trial_days": TRIAL_DAYS,
         "badge": {"es": "Clínicas y centros", "en": "Clinics & centres", "it": "Cliniche e centri"},
         "audience": "profesional",
         "professional": True,

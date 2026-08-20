@@ -216,7 +216,12 @@
   }
 
   function montarTarjeta() {
-    var hero = document.querySelector('#s-home .hero-banner');
+    /* Antes iba pegada al hero. El paseo es un extra diario, no la puerta de
+       entrada: ocupaba el sitio de Nueva Consulta y empujaba lo importante
+       fuera de pantalla (founder 2026-08-19). Ahora se ancla abajo, junto al
+       botón de Nueva Consulta; si ese botón no existe, se queda donde estaba. */
+    var ancla = document.querySelector('#s-home .btn-new-consult');
+    var hero = ancla || document.querySelector('#s-home .hero-banner');
     if (!hero || document.getElementById('paseo-card')) return;
     var c = document.createElement('button');
     c.id = 'paseo-card';
@@ -228,7 +233,8 @@
       '</span>' +
       '<span class="pc-km"><span>corta</span><span>media</span><span>larga</span></span>';
     c.onclick = abrir;
-    hero.parentNode.insertBefore(c, hero.nextSibling);
+    /* Con el ancla nueva va ANTES del botón; con el hero (fallback) va después. */
+    hero.parentNode.insertBefore(c, ancla ? hero : hero.nextSibling);
   }
 
   function init() { montarFull(); montarTarjeta(); }

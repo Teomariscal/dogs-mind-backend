@@ -451,6 +451,33 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
   background:var(--green);color:#fff;
   font-family:var(--ff-sans);font-size:14px;font-weight:500;cursor:pointer;
 }
+/* Botón principal del hero: dos líneas — qué es y de qué va.
+   El subtítulo evita que el usuario tenga que adivinar antes de pulsar. */
+.btn-hero--main{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:11px 14px;line-height:1.25;
+}
+.btn-hero--main .bh-t{ font-size:15px;font-weight:700;letter-spacing:-0.2px; }
+.btn-hero--main .bh-s{ font-size:11.5px;font-weight:500;opacity:.88; }
+
+/* Escuela Cachorros — entrada propia justo bajo el hero */
+.puppy-entry{
+  display:flex;align-items:center;gap:12px;text-align:left;
+  margin:12px 16px 0;width:calc(100% - 32px);padding:12px 14px;
+  border-radius:14px;cursor:pointer;font-family:inherit;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(94,200,230,0.28);
+  color:#e8efea;
+}
+.puppy-entry:active{ transform:scale(.99); }
+.puppy-entry .pe-ic{
+  flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(94,200,230,0.14);color:#7fd4ee;
+}
+.puppy-entry .pe-tx{ display:flex;flex-direction:column;gap:2px;min-width:0; }
+.puppy-entry .pe-t{ font-size:14.5px;font-weight:700;color:#ffffff;letter-spacing:-0.2px; }
+.puppy-entry .pe-s{ font-size:11.5px;color:rgba(232,239,234,0.72);line-height:1.35; }
 
 /* MY DOGS */
 .section{padding:18px 16px 0;}
@@ -7463,8 +7490,11 @@ button:not(:disabled):active{ transform:scale(0.98); }
   color:#1f2e1c;
   letter-spacing:0.02em;
   text-align:center;
-  white-space:nowrap;
-  line-height:1.1;
+  /* "Planes de suscripción" no cabe en una línea en el slot (founder
+     2026-08-19): se deja envolver en dos en vez de desbordar. */
+  white-space:normal;
+  max-width:84px;
+  line-height:1.15;
 }
 
 /* ── E extendido: rediseño vibrant de #s-tokens ────────────────────── */
@@ -8162,13 +8192,33 @@ button:not(:disabled):active{ transform:scale(0.98); }
     </div>
 
     <div style="flex:1;overflow-y:auto;padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 110px);">
-      <!-- Hero -->
+      <!-- Hero
+           El botón del hero era "Escuela Cachorros" bajo un título que habla de
+           análisis conductual: el usuario entraba a cachorros sin querer y la
+           puerta principal (Nueva Consulta) quedaba abajo del todo, fuera de
+           pantalla (founder 2026-08-19). Ahora el hero ES la puerta principal y
+           dice de qué va; cachorros baja a su propia tarjeta, ya sin confusión. -->
       <div class="hero-banner">
         <div class="hero-overlay">
           <div class="hero-title" data-i18n="hero_title">Start a new behavioral analysis</div>
-          <button class="btn-hero" onclick="goToPuppySchool()" data-i18n="hero_puppy_btn">Escuela Cachorros</button>
+          <button class="btn-hero btn-hero--main" onclick="goToConsultType()">
+            <span class="bh-t" data-i18n="hero_consult_btn">Nueva consulta</span>
+            <span class="bh-s" data-i18n="hero_consult_sub">Problema de conducta o adiestramiento</span>
+          </button>
         </div>
       </div>
+
+      <!-- Escuela Cachorros: sale del hero pero sigue justo debajo, con su
+           subtítulo, para que se entienda antes de pulsar. -->
+      <button class="puppy-entry" onclick="goToPuppySchool()" type="button">
+        <span class="pe-ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M12 21s-7-4.4-7-9.5A4.5 4.5 0 0 1 12 8a4.5 4.5 0 0 1 7 3.5C19 16.6 12 21 12 21z"/><circle cx="8" cy="4.5" r="1.8"/><circle cx="16" cy="4.5" r="1.8"/></svg>
+        </span>
+        <span class="pe-tx">
+          <span class="pe-t" data-i18n="hero_puppy_btn">Escuela Cachorros</span>
+          <span class="pe-s" data-i18n="hero_puppy_sub">Plan de crianza para tu cachorro</span>
+        </span>
+      </button>
 
       <!-- ── Tarjeta análisis pendiente (pagado, sin aceptar) ─────────────────
            Discreta, inline, scopeada a #s-home. Oculta por defecto;
@@ -8255,7 +8305,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
               <div class="token-lbl">Tokens</div>
             </div>
           </div>
-          <span class="token-recharge-label" data-i18n="recharge_tokens">Comprar tokens</span>
+          <span class="token-recharge-label" data-i18n="recharge_tokens">Planes de suscripción</span>
         </button>
       </div>
 
@@ -15654,7 +15704,7 @@ function dmInitWebLayer() {
     document.body.classList.add('dm-web');
     var l = document.createElement('link');
     l.rel = 'stylesheet';
-    l.href = 'web-desktop.css?v=21';
+    l.href = 'web-desktop.css?v=22';
     document.head.appendChild(l);
     var s = document.createElement('script');
     s.src = 'web-desktop.js?v=27';
@@ -15664,7 +15714,7 @@ function dmInitWebLayer() {
        completa. Sin límite de ancho — en móvil web se ve como se vería en
        la app, que es lo que queremos validar. */
     var sp = document.createElement('script');
-    sp.src = 'web-paseo.js?v=17';
+    sp.src = 'web-paseo.js?v=18';
     sp.defer = true;
     document.head.appendChild(sp);
   } catch (e) { /* ante la duda, no hacer nada */ }
@@ -15688,7 +15738,7 @@ function dmInitPaseoNativo() {
        abre "El paseo de hoy". Cargarlo aquí eran 34 KB de más en cada
        arranque, sin ganar nada. */
     var sp = document.createElement('script');
-    sp.src = 'web-paseo.js?v=17';
+    sp.src = 'web-paseo.js?v=18';
     sp.defer = true;
     document.head.appendChild(sp);
   } catch (e) { /* nunca romper el arranque de la app por el paseo */ }
@@ -21364,7 +21414,7 @@ function endTourIntro() {
       new_analysis:           'Nuevo Análisis',
       continue_case:          'Continuar caso',
       tip_of_day:             'Consejo del día: El refuerzo positivo consistente es clave para el cambio conductual a largo plazo. Recompensa las acciones deseadas de inmediato.',
-      recharge_tokens:        'Comprar tokens',
+      recharge_tokens:        'Planes de suscripción',
       new_consultation:       'Nueva Consulta',
       // Nav
       nav_home:    'Inicio',
@@ -21520,6 +21570,9 @@ function endTourIntro() {
       // Planes de suscripción (agosto 2026)
       // Escuela Cachorros (founder 2026-08-02)
       hero_puppy_btn:  'Escuela Cachorros',
+      hero_puppy_sub:  'Plan de crianza para tu cachorro',
+      hero_consult_btn: 'Nueva consulta',
+      hero_consult_sub: 'Problema de conducta o adiestramiento',
       pup_eyebrow:     'Escuela Cachorros',
       pup_title:       'Cuéntanos de tu cachorro',
       pup_callout:     'Con un cachorro la edad lo cambia todo: lo que se trabaja a las 9 semanas no es lo que se trabaja a las 20. Solo refuerzo positivo, sin castigos ni aversivos.',
@@ -22488,7 +22541,7 @@ function endTourIntro() {
       new_analysis:           'New Analysis',
       continue_case:          'Continue Case',
       tip_of_day:             'Tip of the day: Consistent positive reinforcement is key to long-term behavioral change. Reward desired actions immediately.',
-      recharge_tokens:        'Buy tokens',
+      recharge_tokens:        'Subscription plans',
       new_consultation:       'New Consultation',
       // Nav
       nav_home:    'Home',
@@ -22642,6 +22695,9 @@ function endTourIntro() {
       // Subscription plans (August 2026)
       // Puppy School
       hero_puppy_btn:  'Puppy School',
+      hero_puppy_sub:  'A raising plan for your puppy',
+      hero_consult_btn: 'New consultation',
+      hero_consult_sub: 'Behaviour problem or training',
       pup_eyebrow:     'Puppy School',
       pup_title:       'Tell us about your puppy',
       pup_callout:     'With a puppy, age changes everything: what you work on at 9 weeks is not what you work on at 20. Positive reinforcement only, no punishment, no aversives.',
@@ -23609,7 +23665,7 @@ function endTourIntro() {
           new_analysis:           'Nuova Analisi',
           continue_case:          'Continua caso',
           tip_of_day:             'Consiglio del giorno: Il rinforzo positivo costante è la chiave per il cambiamento comportamentale a lungo termine. Rinforza subito le azioni desiderate.',
-          recharge_tokens:        'Comprare tokens',
+          recharge_tokens:        'Piani di abbonamento',
           new_consultation:       'Nuovo Consulto',
           // Nav
           nav_home:    'Home',
@@ -23765,6 +23821,9 @@ function endTourIntro() {
           // Piani di abbonamento (agosto 2026)
           // Scuola Cuccioli
           hero_puppy_btn:  'Scuola Cuccioli',
+          hero_puppy_sub:  'Piano di crescita per il tuo cucciolo',
+          hero_consult_btn: 'Nuova consulenza',
+          hero_consult_sub: 'Problema di comportamento o addestramento',
           pup_eyebrow:     'Scuola Cuccioli',
           pup_title:       'Raccontaci del tuo cucciolo',
           pup_callout:     "Con un cucciolo l'età cambia tutto: quello che si lavora a 9 settimane non è quello che si lavora a 20. Solo rinforzo positivo, senza punizioni né aversivi.",

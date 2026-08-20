@@ -190,6 +190,7 @@
      otro lenguaje visual → fuera por redundantes (founder 2026-07-29). */
   body.dm-web .home-topbar,
   body.dm-web #s-home .hero-banner,
+  body.dm-web #s-home .puppy-entry,
   body.dm-web #s-home .cards-row,
   body.dm-web #global-nav { display: none !important; }
 

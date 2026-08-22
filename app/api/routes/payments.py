@@ -491,6 +491,35 @@ def pro_activate_promo(
     }
 
 
+# ── Señal a las plataformas de anuncios ───────────────────────────────────────
+# Cuelgan de los webhooks de pago porque es el único sitio donde el importe real
+# se conoce con certeza, venga de la web o de una tienda. Doble red: el módulo
+# ya se traga sus propios errores, y aquí volvemos a envolver — un fallo de
+# telemetría JAMÁS puede dejar a un cliente pagado sin acreditar.
+def _ads_subscribe(user, plan, origen: str, event_id: str, renovacion: bool = False) -> None:
+    try:
+        from app.core import ads_events as _ads
+        _ads.track_subscribe(
+            email=user.email, user_id=str(user.id),
+            valor_eur=float(plan.get("price", 0) or 0),
+            origen=origen, plan_id=plan.get("id", ""),
+            event_id=event_id, renovacion=renovacion,
+        )
+    except Exception as e:  # noqa: BLE001
+        print(f"[ads] subscribe no enviado: {e}")
+
+
+def _ads_purchase(user, valor_eur: float, origen: str, event_id: str) -> None:
+    try:
+        from app.core import ads_events as _ads
+        _ads.track_purchase(
+            email=user.email, user_id=str(user.id),
+            valor_eur=valor_eur, origen=origen, event_id=event_id,
+        )
+    except Exception as e:  # noqa: BLE001
+        print(f"[ads] purchase no enviado: {e}")
+
+
 # ── Webhook de Stripe (automático, <30 segundos) ───────────────────────────────
 @router.post("/webhooks/stripe")
 async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
@@ -527,6 +556,7 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
         user.tokens = float(user.tokens) + float(plan["credits"]) / _subs.CREDITS_PER_TOKEN
         db.commit()
         print(f"[Stripe-SUB] renovación {user.email} plan={plan['id']} saldo={user.tokens}")
+        _ads_subscribe(user, plan, "web", clave, renovacion=True)
         return {"status": "ok"}
 
     if event["type"] == "checkout.session.completed":
@@ -564,6 +594,7 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
                 pago.status = "paid"
             db.commit()
             print(f"[Stripe-SUB] {user.email} plan={plan['id']} +{plan['credits']}cr saldo={user.tokens}")
+            _ads_subscribe(user, plan, "web", f"stripe:{session['id']}")
             return {"status": "ok"}
 
         # ── Flujo Profesional (membresía + opcional bundle) ─────────────────
@@ -788,6 +819,13 @@ async def revenuecat_webhook(request: Request, db: Session = Depends(get_db)):
         db.rollback()
         print(f"[RevenueCat] ERROR inesperado event={event_id}: {e}")
         raise HTTPException(status_code=500, detail="error procesando webhook RevenueCat")
+
+    # 4. Señal a las plataformas de anuncios (nunca puede tumbar el cobro)
+    _origen = "android" if (event.get("store") or "").lower() in ("play_store", "google") else "ios"
+    if _plan:
+        _ads_subscribe(user, _plan, _origen, rc_key, renovacion=(etype == "RENEWAL"))
+    elif amount_cents:
+        _ads_purchase(user, amount_cents / 100.0, _origen, rc_key)
 
     return {"status": "ok", "credited": credited}
 

@@ -50,9 +50,13 @@ def get_app_config():
 
     subscriptions = {
         "enabled": _env_bool("SUBS_PAYWALL_ENABLED", False),
-        # Puerta del 10-ago: si true, la recarga de tokens exige suscripción
-        # activa o código de exención (la aplican los endpoints de compra).
-        "recharge_gate": _env_bool("SUBS_RECHARGE_GATE", False),
+        # Aquí vivía "recharge_gate" (SUBS_RECHARGE_GATE): un flag que se
+        # publicaba y que NO leía nadie — ni el backend ni la app. Encenderlo no
+        # cerraba nada, así que era peor que no tenerlo: invitaba a darlo por
+        # hecho. Se retira a propósito (founder, 22-ago-2026): la recarga suelta
+        # sigue abierta, porque el precio ya empuja a la suscripción (5 € dan 8
+        # tokens suscrito frente a 5 recargando) y quien aun así recarga paga a
+        # 1,00 €/token, el mejor margen del catálogo.
         "plans": _subs.plans(),
         "credits_per_token": _subs.CREDITS_PER_TOKEN,
         "trial_days": _subs.TRIAL_DAYS,

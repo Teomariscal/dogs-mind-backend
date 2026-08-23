@@ -121,7 +121,7 @@ def deduct_token(
         try:
             from app.core import subscriptions as _subs
 
-            estado = _subs.access_state(user)
+            estado = _subs.access_state(user, amount=amount)
             bloqueado = not estado["allowed"]
             motivo = estado["reason"]
             mensaje = _subs.paywall_message(estado) if bloqueado else ""

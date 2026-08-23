@@ -296,9 +296,16 @@ def is_legacy(user) -> bool:
     return bool(created and created < cutover_date())
 
 
-def access_state(user, now: Optional[datetime] = None) -> dict:
+def access_state(user, now: Optional[datetime] = None,
+                 amount: Optional[float] = None) -> dict:
     """
     Decide si el usuario puede consumir créditos, y por qué.
+
+    `amount` = lo que cuesta la operación que se está intentando. Solo lo usa el
+    usuario heredado: pasa mientras le llegue para lo que pide, que es la regla
+    literal del founder ("cuando se les acaben los tokens"). Sin `amount` —la
+    pantalla de estado, que pregunta en abstracto— se toma como referencia el
+    precio de un análisis.
 
     reason:
       paywall_off        · el muro está apagado (estado actual hasta el 10-ago)
@@ -344,9 +351,13 @@ def access_state(user, now: Optional[datetime] = None) -> dict:
         return out(True, "corporate")
     if subscription_active(user, now):
         return out(True, "subscription")
-    if is_legacy(user) and tokens >= ANALYSIS_TOKENS:
-        # Regla del founder: los de antes siguen gastando su saldo sin suscribirse
-        # hasta que baje de lo que cuesta un análisis.
+    # Regla del founder: los de antes siguen gastando su saldo sin suscribirse
+    # hasta que se les acabe. El muro aparece cuando NO LE LLEGA para lo que
+    # está pidiendo — así sigue usando lo barato (chat, sesión diaria) con lo
+    # poco que le quede, y se encuentra los planes justo al ir a por el
+    # análisis. Antes se cortaba en seco por debajo de 3 tk y dejaba a 61
+    # personas mirando créditos que ya no podían gastar.
+    if is_legacy(user) and tokens >= (ANALYSIS_TOKENS if amount is None else amount):
         return out(True, "legacy_balance")
     if trial["active"]:
         return out(True, "trial")

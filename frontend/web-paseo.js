@@ -218,11 +218,17 @@
   function montarTarjeta() {
     /* Antes iba pegada al hero. El paseo es un extra diario, no la puerta de
        entrada: ocupaba el sitio de Nueva Consulta y empujaba lo importante
-       fuera de pantalla (founder 2026-08-19). Ahora se ancla abajo, junto al
-       botón de Nueva Consulta; si ese botón no existe, se queda donde estaba. */
-    var ancla = document.querySelector('#s-home .btn-new-consult');
+       fuera de pantalla (founder 2026-08-19). Va abajo del todo.
+
+       Se anclaba al botón .btn-new-consult del final; ese botón se retiró el
+       22-ago por estar duplicado, y la tarjeta se subió sola hasta debajo del
+       hero — justo lo que no queríamos. Ahora el ancla es el bloque del
+       consejo del día (.insight-row), que es lo último estable de la home. */
+    if (document.getElementById('paseo-card')) return;
+    var insight = document.querySelector('#s-home .insight-row');
+    var ancla = insight || document.querySelector('#s-home .btn-new-consult');
     var hero = ancla || document.querySelector('#s-home .hero-banner');
-    if (!hero || document.getElementById('paseo-card')) return;
+    if (!hero) return;
     var c = document.createElement('button');
     c.id = 'paseo-card';
     c.innerHTML =
@@ -233,8 +239,10 @@
       '</span>' +
       '<span class="pc-km"><span>corta</span><span>media</span><span>larga</span></span>';
     c.onclick = abrir;
-    /* Con el ancla nueva va ANTES del botón; con el hero (fallback) va después. */
-    hero.parentNode.insertBefore(c, ancla ? hero : hero.nextSibling);
+    /* Con .insight-row va DESPUÉS (queda al final de la home); con el botón
+       viejo iba antes; con el hero de último recurso, justo debajo. */
+    if (insight) hero.parentNode.insertBefore(c, hero.nextSibling);
+    else hero.parentNode.insertBefore(c, ancla ? hero : hero.nextSibling);
   }
 
   function init() { montarFull(); montarTarjeta(); }

@@ -8309,7 +8309,10 @@ button:not(:disabled):active{ transform:scale(0.98); }
         </button>
       </div>
 
-      <button class="btn-new-consult" onclick="goToConsultType()" data-i18n="new_consultation">Nueva Consulta</button>
+      <!-- Aquí estaba el segundo "Nueva Consulta". La puerta principal ya está
+           arriba del todo, dentro del hero y diciendo de qué va; repetirla al
+           final, debajo del paseo, era el mismo botón dos veces en la misma
+           pantalla. Retirado (founder, 22-ago-2026). -->
 
       <!-- Card "Inspiración Profesional" (beta) — solo visible si account_type='professional'.
            Display lo controla renderHomeInspBtn() leyendo window._myAccount,
@@ -15714,7 +15717,7 @@ function dmInitWebLayer() {
        completa. Sin límite de ancho — en móvil web se ve como se vería en
        la app, que es lo que queremos validar. */
     var sp = document.createElement('script');
-    sp.src = 'web-paseo.js?v=18';
+    sp.src = 'web-paseo.js?v=19';
     sp.defer = true;
     document.head.appendChild(sp);
   } catch (e) { /* ante la duda, no hacer nada */ }
@@ -15738,7 +15741,7 @@ function dmInitPaseoNativo() {
        abre "El paseo de hoy". Cargarlo aquí eran 34 KB de más en cada
        arranque, sin ganar nada. */
     var sp = document.createElement('script');
-    sp.src = 'web-paseo.js?v=18';
+    sp.src = 'web-paseo.js?v=19';
     sp.defer = true;
     document.head.appendChild(sp);
   } catch (e) { /* nunca romper el arranque de la app por el paseo */ }
@@ -17957,11 +17960,28 @@ function getVal(id, fallback) {
       var r = await fetch(API_URL + '/subscription/status', { headers: { 'Authorization': 'Bearer ' + jwt } });
       if (r.ok) {
         var d = await r.json();
+        if (typeof d.max_dogs === 'number') window._dmMaxDogs = d.max_dogs;
         if (!d.allowed) { renderPlanes(d); window.dmAbrirPlanes('sin_saldo'); return true; }
       }
     } catch (e) {}
     return false;
   };
+
+  /* Cuota de perros de esta cuenta: la manda el backend según el plan. Se pide
+     una vez al arrancar con sesión, para que el aviso diga el número de verdad
+     (un profesional con plan Pro tiene 40, no 2). Si falla, no se bloquea nada
+     en cliente y manda el 429 del backend. */
+  window.dmRefrescarCuotaPerros = async function() {
+    try {
+      var jwt = localStorage.getItem('dm_jwt') || '';
+      if (!jwt) return;
+      var r = await fetch(API_URL + '/subscription/status', { headers: { 'Authorization': 'Bearer ' + jwt } });
+      if (!r.ok) return;
+      var d = await r.json();
+      if (typeof d.max_dogs === 'number') window._dmMaxDogs = d.max_dogs;
+    } catch (e) {}
+  };
+  window.dmRefrescarCuotaPerros();
 
   // Al cargar: refrescar balance si hay sesión activa
   fetchBalance();
@@ -19851,9 +19871,15 @@ function openCreateDog() {
     goTo('s-splash');
     return;
   }
+  // El tope lo manda el backend según el plan (2 el tutor, 20/40/150 el
+  // profesional). Si aún no ha llegado, no bloqueamos aquí: que decida el 429,
+  // que es la fuente de verdad. Antes había un 2 a fuego y un profesional con
+  // plan Pro se comía un "máximo 2 perros" que era mentira.
+  var tope = window._dmMaxDogs;
   var current = (window._myDogs || []).length;
-  if (current >= 2) {
-    showToast(_i18nText('dog_quota_full_short', 'Máximo 2 perros activos.'));
+  if (typeof tope === 'number' && current >= tope) {
+    showToast(_i18nText('dog_quota_full_short', 'Máximo {n} perros activos.')
+                .replace('{n}', tope));
     return;
   }
   window._dogProfileState = { mode: 'create', dogId: null, pendingPhotoBase64: null };
@@ -21698,7 +21724,7 @@ function endTourIntro() {
       dog_new_consult_btn_for:     '+ Nueva consulta para {name}',
       dog_login_required:          'Inicia sesión para crear un perro.',
       dog_login_required_view:     'Inicia sesión para ver la ficha.',
-      dog_quota_full_short:        'Máximo 2 perros activos.',
+      dog_quota_full_short:        'Máximo {n} perros activos.',
       dog_quota_full:              'Has alcanzado el máximo de perros activos.',
       dog_validation_name:         'Pon un nombre.',
       dog_validation_breed:        'Indica la raza.',
@@ -22823,7 +22849,7 @@ function endTourIntro() {
       dog_new_consult_btn_for:     '+ New consultation for {name}',
       dog_login_required:          'Sign in to create a dog.',
       dog_login_required_view:     'Sign in to see the profile.',
-      dog_quota_full_short:        'Maximum 2 active dogs.',
+      dog_quota_full_short:        'Maximum {n} active dogs.',
       dog_quota_full:              'You have reached the maximum number of active dogs.',
       dog_validation_name:         'Please enter a name.',
       dog_validation_breed:        'Please enter the breed.',
@@ -23949,7 +23975,7 @@ function endTourIntro() {
           dog_new_consult_btn_for:     '+ Nuovo consulto per {name}',
           dog_login_required:          'Accedi per creare un cane.',
           dog_login_required_view:     'Accedi per vedere la scheda.',
-          dog_quota_full_short:        'Massimo 2 cani attivi.',
+          dog_quota_full_short:        'Massimo {n} cani attivi.',
           dog_quota_full:              'Hai raggiunto il massimo di cani attivi.',
           dog_validation_name:         'Inserisci un nome.',
           dog_validation_breed:        'Indica la razza.',

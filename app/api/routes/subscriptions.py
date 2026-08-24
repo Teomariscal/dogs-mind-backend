@@ -90,6 +90,10 @@ def subscription_status(
         "credits_per_token": subs.CREDITS_PER_TOKEN,
         "legacy": state["legacy"],
         "legacy_threshold_credits": int(subs.ANALYSIS_TOKENS * subs.CREDITS_PER_TOKEN),
+        # Cuota de perros de ESTA cuenta. La app la lee en vez de llevar el 2 a
+        # fuego, que era lo que hacía que el profesional viera "máximo 2" aunque
+        # su plan le diera 40.
+        "max_dogs": subs.max_dogs_for(current_user),
         "trial": {
             "days": subs.TRIAL_DAYS,
             "welcome_credits": subs.WELCOME_CREDITS,

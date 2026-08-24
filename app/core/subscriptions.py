@@ -135,6 +135,46 @@ DEFAULT_PLANS = [
 # Se puede mover con SUBS_PRO_MIN_PLAN sin tocar código.
 PLAN_RANK = {"basico": 1, "medio": 2, "pro": 3, "max": 4}
 
+# ── Cuántos perros caben por plan (founder 2026-08-22) ──────────────────────
+# El particular lleva sus propios perros; el profesional lleva los de sus
+# clientes, y por eso la cuota escala con el plan. Hasta hoy había un único
+# tope de 2 aplicado a TODO el mundo, profesionales incluidos: se vendían 20
+# casos a quien solo podía dar de alta 2 perros. Esto lo arregla.
+DOGS_PET_OWNER = 2
+DOGS_BY_PLAN = {
+    "basico": 2,     # es el plan de tutor: sus perros, no los de nadie más
+    "medio": 20,
+    "pro": 40,
+    "max": 150,      # clínicas y centros
+}
+# Profesional sin plan de suscripción (membresía Pro antigua, invitados,
+# cortesía): se le respeta el escalón de entrada.
+DOGS_PROFESSIONAL_DEFAULT = 20
+
+
+def max_dogs_for(user) -> int:
+    """
+    Tope de perros activos de esta cuenta.
+
+    Se apoya en `professional_allowed` en vez de mirar `account_type` a pelo:
+    así el que se bajó a Básico deja de tener cuota de profesional, y el que
+    lo era antes del corte la conserva, sin duplicar aquí esas reglas.
+    """
+    at = (getattr(user, "account_type", "particular") or "particular").lower()
+    if at in ("corporativo", "corporate"):
+        return DOGS_BY_PLAN["max"]
+    if at != "professional":
+        return DOGS_PET_OWNER
+    try:
+        if not professional_allowed(user)["allowed"]:
+            return DOGS_PET_OWNER
+    except Exception:            # noqa: BLE001 — ante la duda, no le quitamos nada
+        pass
+    plan = (getattr(user, "subscription_plan", "") or "").strip().lower()
+    if plan in DOGS_BY_PLAN and PLAN_RANK.get(plan, 0) >= PLAN_RANK["medio"]:
+        return DOGS_BY_PLAN[plan]
+    return DOGS_PROFESSIONAL_DEFAULT
+
 
 def _env_bool(name: str, default: bool = False) -> bool:
     return os.environ.get(name, str(default)).strip().lower() in ("1", "true", "yes", "on")

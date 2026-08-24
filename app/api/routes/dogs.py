@@ -28,6 +28,7 @@ from app.database import get_db
 from app.models.user import User
 from app.models.dog import Dog
 from app.api.routes.auth import get_current_user
+from app.core import subscriptions as _subs
 
 router = APIRouter(prefix="/dogs", tags=["dogs"])
 
@@ -251,16 +252,20 @@ def create_dog(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    # Cuota Pet Owner: max 2 perros activos
+    # Cuota de perros activos. El tutor lleva los suyos (2); el profesional
+    # lleva los de sus clientes y la cuota escala con el plan que paga.
+    tope = _subs.max_dogs_for(user)
     active_count = _count_active_dogs(user, db)
-    if active_count >= MAX_DOGS_PET_OWNER:
-        raise HTTPException(
-            status_code=429,
-            detail=(
-                f"Has alcanzado el máximo de {MAX_DOGS_PET_OWNER} perros activos. "
-                "Elimina uno antes de crear otro."
-            ),
+    if active_count >= tope:
+        detalle = (
+            f"Has alcanzado el máximo de {tope} perros activos. "
+            "Elimina uno antes de crear otro."
         )
+        if tope <= MAX_DOGS_PET_OWNER:
+            detalle += (
+                " Si llevas perros de clientes, el plan profesional amplía este límite."
+            )
+        raise HTTPException(status_code=429, detail=detalle)
 
     # Validar foto si viene
     photo = payload.photo_base64

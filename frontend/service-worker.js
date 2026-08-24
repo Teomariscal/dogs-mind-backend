@@ -58,14 +58,13 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v259';
+const CACHE_NAME = 'dogs-mind-v261';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [
   '/manifest.json',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png',
-  '/assets/videos/inspiracion-hero.mp4',
 ];
 
 const API_ORIGIN = 'https://dogs-mind-backend-production.up.railway.app';
@@ -108,6 +107,18 @@ self.addEventListener('fetch', event => {
 
   // Nunca interceptar non-GET ni API — siempre red directa
   if (request.method !== 'GET' || url.origin === API_ORIGIN) {
+    return;
+  }
+
+  // Vídeo y audio: a la red, SIEMPRE, sin pasar por caché.
+  // El <video> pide el fichero por trozos (cabecera Range, respuesta 206) y
+  // cacheFirst le devolvía el fichero entero con un 200. El resultado era un
+  // vídeo congelado en el primer fotograma, con readyState 0 y sin error: no
+  // fallaba, simplemente no arrancaba nunca. Pasó con el vídeo de bienvenida
+  // de Cecilia y afecta igual a cualquier otro vídeo de la app.
+  if (request.headers.has('range') ||
+      request.destination === 'video' || request.destination === 'audio' ||
+      /\.(mp4|mov|webm|m4a|mp3)$/i.test(url.pathname)) {
     return;
   }
 

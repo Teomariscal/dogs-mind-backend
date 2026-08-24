@@ -8995,6 +8995,101 @@ button:not(:disabled):active{ transform:scale(0.98); }
 /* ── Bienvenida coral: los ocho Aigents ───────────────────────────────────
    La foto manda arriba y el texto cae sobre un degradado, para que no haya
    corte duro entre imagen y fondo. */
+/* ══ ONBOARDING CON AIGENT (founder 2026-08-22) ═══════════════════════════
+   Pantalla completa: Cecilia hablando en vídeo, su voz escrita a máquina
+   debajo, y al terminar la pregunta que de verdad importa (Pet Owner o
+   profesional). El vídeo arranca MUDO a propósito: iOS no deja que un vídeo
+   suene sin que el usuario toque antes, así que el texto escribiéndose es lo
+   que lleva el mensaje y el altavoz queda a mano para quien quiera voz. */
+#s-onboarding { display: none; }
+/* La pantalla scrollea: las .screen llevan overflow:hidden y por eso el texto
+   largo y el boton de profesional quedaban fuera, sin manera de llegar a ellos
+   (founder: "se corta el texto", "falta el boton de usuario profesional"). */
+#s-onboarding.active { display: block; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.ob-wrap { position: relative; background: #07100c; min-height: 100%; }
+/* El video, ENTERO y sin recortar: se respeta su proporcion original
+   (9:16, que es como sale de HeyGen). Metido en una caja mas baja, cover se
+   comia las botas de Cecilia; y con posicion absoluta se estiraba hasta dejar
+   un ojo en pantalla. Asi no hay recorte posible. */
+.ob-video {
+  display: block; width: 100%; aspect-ratio: 9 / 16;
+  background: #07100c;
+}
+.ob-scroll { position: relative; z-index: 2; }
+.ob-sound {
+  position: absolute; top: calc(env(safe-area-inset-top, 0px) + 14px); right: 14px;
+  width: 42px; height: 42px; border-radius: 50%; z-index: 4;
+  background: rgba(7,16,12,0.55); border: 1px solid rgba(255,255,255,0.28);
+  backdrop-filter: blur(8px); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; color: #fff;
+}
+/* El padding de arriba deja ver a Cecilia entera antes de que empiece el texto;
+   a partir de ahí se scrollea. */
+.ob-panel {
+  position: relative; z-index: 2; margin-top: -96px;
+  padding: 0 24px calc(34px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(to bottom,
+    rgba(7,16,12,0) 0%, rgba(7,16,12,0.62) 34%, rgba(7,16,12,0.93) 62%, #07100c 100%);
+}
+.ob-typed {
+  margin: 0 auto; max-width: 30em; padding-top: 102px;
+  font-size: 16.5px; line-height: 1.62; color: #fff;
+  text-shadow: 0 1px 10px rgba(0,0,0,0.55);
+  min-height: 9.5em; text-align: center;
+}
+.ob-typed .ob-caret {
+  display: inline-block; width: 2px; height: 1.05em; margin-left: 2px;
+  background: #5ec8e6; vertical-align: -0.16em; animation: obBlink 1s steps(1) infinite;
+}
+@keyframes obBlink { 50% { opacity: 0; } }
+.ob-choice { margin-top: 22px; text-align: center; }
+.ob-q {
+  font-family: 'Cormorant Garamond', serif; font-size: 25px; color: #fff;
+  margin: 0 0 16px; line-height: 1.2;
+}
+.ob-btn {
+  width: 100%; max-width: 24em; margin: 0 auto 10px; display: block;
+  padding: 15px 18px; border: none; border-radius: 100px; cursor: pointer;
+  font-family: inherit; font-size: 15.5px; font-weight: 700; color: #fff;
+}
+.ob-btn--owner { background: linear-gradient(135deg, #5ec8e6, #4a6741); }
+.ob-btn--pro   { background: linear-gradient(135deg, #50833e, #4a6741); }
+.ob-btn small {
+  display: block; font-weight: 500; font-size: 12.5px; margin-top: 3px;
+  color: rgba(255,255,255,0.86);
+}
+.ob-link {
+  background: none; border: none; cursor: pointer; font-family: inherit;
+  font-size: 14px; color: #5ec8e6; text-decoration: underline;
+  padding: 10px; margin-top: 2px;
+}
+.ob-reco {
+  font-size: 13px; line-height: 1.55; color: rgba(255,255,255,0.62);
+  margin: 14px auto 0; max-width: 27em;
+}
+/* Panel de diferencias */
+.ob-diff { margin-top: 18px; text-align: left; display: none; }
+.ob-diff.open { display: block; }
+.ob-diff-card {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(94,200,230,0.26);
+  border-radius: 16px; padding: 16px 18px; margin-bottom: 12px;
+}
+.ob-diff-tag {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: #5ec8e6; display: block; margin-bottom: 6px;
+}
+.ob-diff-h { font-size: 16px; font-weight: 700; color: #fff; margin: 0 0 8px; }
+.ob-diff-p {
+  font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.84); margin: 0 0 10px;
+}
+.ob-diff-l { margin: 0; padding-left: 18px; }
+.ob-diff-l li {
+  font-size: 13.5px; line-height: 1.55; color: rgba(255,255,255,0.78); margin-bottom: 5px;
+}
+.ob-diff-price {
+  font-size: 12.5px; color: rgba(255,255,255,0.6); margin: 8px 0 0;
+}
+
 #s-aigents-welcome { display: none; }
 #s-aigents-welcome.active { display: block; }
 .aw-wrap {
@@ -9853,6 +9948,82 @@ button:not(:disabled):active{ transform:scale(0.98); }
   <!-- ══ BIENVENIDA CORAL (founder 2026-08-17) ═══════════════════════════════
        Va ANTES de la de Katja. Con Katja sola la entrada quedaba sosa: aquí
        aparecen los ocho Aigents y luego uno de ellos da el paso al frente. -->
+  <!-- ══ ONBOARDING CON AIGENT (founder 2026-08-22) ═══════════════════════════
+       Lo primero que ve alguien que acaba de registrarse. Cecilia presenta la
+       app y pregunta de qué lado está, porque de esa respuesta depende que
+       reciba el análisis en lenguaje llano o el técnico. De aquí se pasa a la
+       visita guiada de siempre. -->
+  <div id="s-onboarding" class="screen">
+    <div class="ob-wrap">
+      <video id="ob-video" class="ob-video" playsinline muted preload="auto"
+             poster="aig-cecilia-pixar.webp" aria-hidden="true">
+        <source src="onboarding-cecilia.mp4" type="video/mp4">
+      </video>
+      <button id="ob-sound" class="ob-sound" type="button" onclick="dmObSonido()"
+              aria-label="Activar sonido">
+        <svg id="ob-sound-off" width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M11 5 6 9H2v6h4l5 4z"/><line x1="23" y1="9" x2="17" y2="15"/>
+          <line x1="17" y1="9" x2="23" y2="15"/>
+        </svg>
+        <svg id="ob-sound-on" width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none;">
+          <path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/>
+          <path d="M18.5 5.5a9 9 0 0 1 0 13"/>
+        </svg>
+      </button>
+
+      <div class="ob-scroll" id="ob-scroll">
+      <div class="ob-panel">
+        <p class="ob-typed" id="ob-typed"></p>
+
+        <div class="ob-choice" id="ob-choice" hidden>
+          <p class="ob-q" data-i18n="ob_q">&iquest;Eres Pet Owner o Usuario profesional?</p>
+
+          <button class="ob-btn ob-btn--owner" type="button" onclick="dmObElegir('particular')">
+            <span data-i18n="ob_btn_owner">Pet Owner</span>
+            <small data-i18n="ob_btn_owner_sub">Tengo perro y quiero resolver algo con &eacute;l</small>
+          </button>
+          <button class="ob-btn ob-btn--pro" type="button" onclick="dmObElegir('professional')">
+            <span data-i18n="ob_btn_pro">Usuario profesional</span>
+            <small data-i18n="ob_btn_pro_sub">Trabajo con la conducta de perros de otros</small>
+          </button>
+
+          <button class="ob-link" type="button" onclick="dmObDiferencias()"
+                  data-i18n="ob_diff_cta">Descubrir las diferencias</button>
+
+          <div class="ob-diff" id="ob-diff">
+            <div class="ob-diff-card">
+              <span class="ob-diff-tag" data-i18n="ob_diff_owner_tag">Pet Owner</span>
+              <h3 class="ob-diff-h" data-i18n="ob_diff_owner_h">Para tutores y propietarios</h3>
+              <p class="ob-diff-p" data-i18n="ob_diff_owner_p">Directa y pr&aacute;ctica, en lenguaje llano. Te permite conocer los motivos del comportamiento de tu perro y te ayuda a resolverlo con un plan de varias semanas y seguimientos diarios.</p>
+              <ul class="ob-diff-l">
+                <li data-i18n="ob_diff_owner_1">An&aacute;lisis y plan escritos para que los entiendas sin ser del oficio.</li>
+                <li data-i18n="ob_diff_owner_2">Hasta 2 perros y 2 casos a la vez.</li>
+                <li data-i18n="ob_diff_owner_3">Seguimiento diario que te gu&iacute;a d&iacute;a a d&iacute;a.</li>
+              </ul>
+            </div>
+            <div class="ob-diff-card">
+              <span class="ob-diff-tag" data-i18n="ob_diff_pro_tag">Profesional</span>
+              <h3 class="ob-diff-h" data-i18n="ob_diff_pro_h">Para quien vive de esto</h3>
+              <p class="ob-diff-p" data-i18n="ob_diff_pro_p">Muy t&eacute;cnica. Dirigida a et&oacute;logos cl&iacute;nicos veterinarios, expertos en modificaci&oacute;n de conducta canina, analistas de conducta y profesiones afines. No es la misma respuesta m&aacute;s larga: es otro an&aacute;lisis, con otra profundidad.</p>
+              <ul class="ob-diff-l">
+                <li data-i18n="ob_diff_pro_1">An&aacute;lisis funcional y plan con registro cl&iacute;nico completo.</li>
+                <li data-i18n="ob_diff_pro_2">Hasta 20 casos activos, y de 20 a 150 perros seg&uacute;n el plan.</li>
+                <li data-i18n="ob_diff_pro_3">Informes con el logo de tu empresa y perfil de entidad.</li>
+                <li data-i18n="ob_diff_pro_4">Adiestramiento Avanzado y Entrenamiento Espec&iacute;fico.</li>
+              </ul>
+              <p class="ob-diff-price" data-i18n="ob_diff_pro_price">La versi&oacute;n profesional empieza en 12 &euro;/mes.</p>
+            </div>
+          </div>
+
+          <p class="ob-reco" data-i18n="ob_reco">Para sacar el mayor provecho y disfrutar de la experiencia es importante que elijas bien qu&eacute; versi&oacute;n es la tuya.</p>
+        </div>
+      </div>
+      </div><!-- /ob-scroll -->
+    </div>
+  </div><!-- /s-onboarding -->
+
   <div id="s-aigents-welcome" class="screen">
     <div class="aw-wrap">
       <img class="aw-foto" src="aigents-final.webp" alt="Los Dog Aigents" loading="eager">
@@ -12286,6 +12457,7 @@ function goTo(id) {
   } catch (e) {}
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  if (id === 's-onboarding' && typeof dmObArrancar === 'function') dmObArrancar();
   if (id === 's-records') { renderRecords(); syncBackendCases(); if (typeof reconcileOrphanCases === 'function') reconcileOrphanCases(); }
   if (id === 's-anamnesis' && typeof maybeShowAnamResumeCard === 'function') maybeShowAnamResumeCard();
   if (id === 's-anamnesis' && typeof refreshStanceSelector === 'function') refreshStanceSelector();
@@ -16968,13 +17140,134 @@ function getVal(id, fallback) {
      rechazado. Devuelve true si ya ha navegado a la bienvenida. */
   function dmGuidedOfrecer() {
     try { if (localStorage.getItem(DM_GUIDED_KEY)) return false; } catch (e) {}
-    /* Primero la bienvenida coral (los ocho), después Katja da el paso al
-       frente. Si por lo que sea no existiera esa pantalla, se entra directo a
-       la de Katja y no se rompe nada. */
+    /* Primero Cecilia presenta y pregunta de qué lado está el usuario; luego la
+       bienvenida coral (los ocho) y Katja dando el paso al frente. Cada salto
+       comprueba que la pantalla existe, así que si falta cualquiera de ellas la
+       cadena sigue y nadie se queda encallado en el registro. */
+    if (document.getElementById('s-onboarding')) { goTo('s-onboarding'); return true; }
     goTo(document.getElementById('s-aigents-welcome') ? 's-aigents-welcome' : 's-guided-welcome');
     return true;
   }
   window.dmGuidedOfrecer = dmGuidedOfrecer;
+
+  /* ══ ONBOARDING CON AIGENT ═══════════════════════════════════════════════
+     El vídeo arranca MUDO porque iOS no permite otra cosa sin un toque previo;
+     por eso la voz va escrita. El altavoz la enciende para quien la quiera.
+     El texto se escribe al ritmo del vídeo (o en ~19 s si el vídeo no carga),
+     y hasta que no termina no aparece la pregunta: primero se entiende, luego
+     se elige. Se puede saltar tocando el texto. */
+  var _obTimer = null, _obHecho = false;
+
+  /* OJO: dice "Welcome a", no "Bienvenido a". Es deliberado del founder para
+     no tener que escoger entre "bienvenido" y "bienvenida". No lo "corrijas". */
+  function _obTexto() {
+    return _i18nText('ob_script',
+      'Welcome a The Dogs’ Mind, una revolucionaria inteligencia artificial que te ' +
+      'ayudará a resolver cualquier problema de conducta canina y será tu mejor aliado ' +
+      'para construir ejercicios con tu perro. Antes de seguir dime: ¿eres Pet Owner o ' +
+      'Usuario profesional? Tu respuesta es importante porque hay dos versiones muy ' +
+      'diferentes dentro de la app.');
+  }
+
+  function _obMostrarEleccion() {
+    if (_obHecho) return;
+    _obHecho = true;
+    var caja = document.getElementById('ob-choice');
+    if (caja) caja.hidden = false;
+    var p = document.getElementById('ob-typed');
+    if (p) { var c = p.querySelector('.ob-caret'); if (c) c.remove(); }
+  }
+
+  function dmObArrancar() {
+    _obHecho = false;
+    if (_obTimer) { clearInterval(_obTimer); _obTimer = null; }
+    var p = document.getElementById('ob-typed');
+    var caja = document.getElementById('ob-choice');
+    var dif = document.getElementById('ob-diff');
+    var v = document.getElementById('ob-video');
+    if (caja) caja.hidden = true;
+    if (dif) dif.classList.remove('open');
+    if (!p) return;
+
+    var texto = _obTexto();
+    p.textContent = '';
+    var caret = document.createElement('span');
+    caret.className = 'ob-caret';
+    p.appendChild(caret);
+
+    if (v) { try { v.currentTime = 0; v.muted = true; v.play().catch(function(){}); } catch (e) {} }
+
+    /* El texto se escribe AL RITMO DE LO QUE ELLA DICE. En cada fotograma se
+       mira por dónde va el vídeo y se muestra la parte proporcional del guion:
+       si el vídeo tarda en cargar o se atasca, el texto la espera en vez de
+       adelantarse. Si el vídeo no llega a reproducirse (permiso de iOS, red),
+       se cae a un reloj del mismo tiempo y el mensaje se entrega igual. */
+    var DURACION = 19;           // lo que dura la locución de Cecilia
+    var arranque = Date.now();
+    var i = 0;
+
+    /* setInterval y no requestAnimationFrame: rAF se congela cuando la pantalla
+       no está en primer plano, y entonces el texto se quedaba sin escribir. */
+    _obTimer = setInterval(function alRitmoDeLaVoz() {
+      if (_obHecho) { clearInterval(_obTimer); _obTimer = null; return; }
+      var prog = (v && v.duration && isFinite(v.duration) && v.duration > 1 && v.currentTime > 0)
+        ? v.currentTime / v.duration
+        : (Date.now() - arranque) / (DURACION * 1000);
+      var n = Math.min(texto.length, Math.ceil(prog * texto.length));
+      if (n !== i) { i = n; p.textContent = texto.slice(0, i); p.appendChild(caret); }
+      if (i >= texto.length) { clearInterval(_obTimer); _obTimer = null; _obMostrarEleccion(); }
+    }, 40);
+
+    /* Manda lo que pasa de verdad: en cuanto termina de hablar, la pregunta. */
+    if (v) v.onended = function () { p.textContent = texto; _obMostrarEleccion(); };
+
+    /* Tocar el texto salta al final: nadie debería estar obligado a esperar. */
+    p.onclick = function () {
+      if (_obTimer) { clearInterval(_obTimer); _obTimer = null; }
+      p.textContent = texto;
+      _obMostrarEleccion();
+    };
+  }
+  window.dmObArrancar = dmObArrancar;
+
+  window.dmObSonido = function () {
+    var v = document.getElementById('ob-video');
+    if (!v) return;
+    v.muted = !v.muted;
+    if (!v.muted) { try { v.play().catch(function(){}); } catch (e) {} }
+    var off = document.getElementById('ob-sound-off');
+    var on  = document.getElementById('ob-sound-on');
+    if (off) off.style.display = v.muted ? '' : 'none';
+    if (on)  on.style.display  = v.muted ? 'none' : '';
+  };
+
+  window.dmObDiferencias = function () {
+    var d = document.getElementById('ob-diff');
+    if (!d) return;
+    d.classList.toggle('open');
+    if (d.classList.contains('open')) {
+      try { d.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {}
+    }
+  };
+
+  /* La elección. OJO: marcar 'professional' NO es autoservicio en el backend —
+     esa membresía se paga. Aquí solo se guarda la intención y se le enseña lo
+     que cuesta, en vez de dejarle elegir y estrellarse contra el muro después. */
+  window.dmObElegir = function (tipo) {
+    try { localStorage.setItem('dm_perfil_elegido', tipo); } catch (e) {}
+    var v = document.getElementById('ob-video');
+    if (v) { try { v.pause(); } catch (e) {} }
+    if (_obTimer) { clearInterval(_obTimer); _obTimer = null; }
+
+    if (tipo === 'professional') {
+      /* A planes, con el escalón profesional por delante. Cuando vuelva (pague
+         o no) sigue la visita guiada igual: no se le deja tirado. */
+      try { window._planesVolverA = 's-aigents-welcome'; } catch (e) {}
+      goTo('s-planes');
+      return;
+    }
+    goTo(document.getElementById('s-aigents-welcome') ? 's-aigents-welcome' : 's-guided-welcome');
+  };
 
   /* Acepta: arma la visita y le lleva a elegir camino. El bono NO se pide aquí
      sino al elegir camino — así "arrancar la visita guiada" significa haber
@@ -21498,6 +21791,28 @@ function endTourIntro() {
       ct_a_pitch:               'Análisis funcional ABC + plan de intervención LIMA para resolver un problema de conducta (ansiedad, reactividad, miedos, agresividad…).',
       ct_b_tag:                 'Entrenamiento',
       ct_b_title:               'Entrenamiento específico',
+      ob_script:                'Bienvenido a The Dogs’ Mind, una revolucionaria inteligencia artificial que te ayudará a resolver cualquier problema de conducta canina y será tu mejor aliado para construir ejercicios con tu perro. Antes de seguir dime: ¿eres Pet Owner o Usuario profesional? Tu respuesta es importante porque hay dos versiones muy diferentes dentro de la app.',
+      ob_q:                     '¿Eres Pet Owner o Usuario profesional?',
+      ob_btn_owner:             'Pet Owner',
+      ob_btn_owner_sub:         'Tengo perro y quiero resolver algo con él',
+      ob_btn_pro:               'Usuario profesional',
+      ob_btn_pro_sub:           'Trabajo con la conducta de perros de otros',
+      ob_diff_cta:              'Descubrir las diferencias',
+      ob_diff_owner_tag:        'Pet Owner',
+      ob_diff_owner_h:          'Para tutores y propietarios',
+      ob_diff_owner_p:          'Directa y práctica, en lenguaje llano. Te permite conocer los motivos del comportamiento de tu perro y te ayuda a resolverlo con un plan de varias semanas y seguimientos diarios.',
+      ob_diff_owner_1:          'Análisis y plan escritos para que los entiendas sin ser del oficio.',
+      ob_diff_owner_2:          'Hasta 2 perros y 2 casos a la vez.',
+      ob_diff_owner_3:          'Seguimiento diario que te guía día a día.',
+      ob_diff_pro_tag:          'Profesional',
+      ob_diff_pro_h:            'Para quien vive de esto',
+      ob_diff_pro_p:            'Muy técnica. Dirigida a etólogos clínicos veterinarios, expertos en modificación de conducta canina, analistas de conducta y profesiones afines. No es la misma respuesta más larga: es otro análisis, con otra profundidad.',
+      ob_diff_pro_1:            'Análisis funcional y plan con registro clínico completo.',
+      ob_diff_pro_2:            'Hasta 20 casos activos, y de 20 a 150 perros según el plan.',
+      ob_diff_pro_3:            'Informes con el logo de tu empresa y perfil de entidad.',
+      ob_diff_pro_4:            'Adiestramiento Avanzado y Entrenamiento Específico.',
+      ob_diff_pro_price:        'La versión profesional empieza en 12 €/mes.',
+      ob_reco:                  'Para sacar el mayor provecho y disfrutar de la experiencia es importante que elijas bien qué versión es la tuya.',
       aw_title:                 'Bienvenido a The Dogs’ Mind',
       aw_body:                  'Uno de nosotros te va a acompañar en tu primera consulta.',
       aw_cta:                   'Adelante',
@@ -22624,6 +22939,28 @@ function endTourIntro() {
       ct_a_pitch:               'Functional ABC analysis + LIMA intervention plan to resolve a behavior problem (anxiety, reactivity, fears, aggression…).',
       ct_b_tag:                 'Training',
       ct_b_title:               'Specific training',
+      ob_script:                'Welcome to The Dogs’ Mind, a groundbreaking artificial intelligence that will help you solve any canine behaviour problem and will be your best ally in building exercises with your dog. Before we go on, tell me: are you a Pet Owner or a Professional user? Your answer matters, because there are two very different versions inside the app.',
+      ob_q:                     'Are you a Pet Owner or a Professional user?',
+      ob_btn_owner:             'Pet Owner',
+      ob_btn_owner_sub:         'I have a dog and something to sort out with him',
+      ob_btn_pro:               'Professional user',
+      ob_btn_pro_sub:           'I work with other people’s dogs and their behaviour',
+      ob_diff_cta:              'See how they differ',
+      ob_diff_owner_tag:        'Pet Owner',
+      ob_diff_owner_h:          'For owners and guardians',
+      ob_diff_owner_p:          'Direct and practical, in plain language. It lets you understand what is behind your dog’s behaviour and helps you fix it with a plan of several weeks and daily follow-ups.',
+      ob_diff_owner_1:          'Analysis and plan written so you understand them without being in the trade.',
+      ob_diff_owner_2:          'Up to 2 dogs and 2 cases at a time.',
+      ob_diff_owner_3:          'Daily follow-up that guides you day by day.',
+      ob_diff_pro_tag:          'Professional',
+      ob_diff_pro_h:            'For those who do this for a living',
+      ob_diff_pro_p:            'Highly technical. Aimed at clinical veterinary ethologists, canine behaviour modification experts, behaviour analysts and related professions. It is not the same answer made longer: it is a different analysis, at a different depth.',
+      ob_diff_pro_1:            'Functional analysis and plan with full clinical record.',
+      ob_diff_pro_2:            'Up to 20 active cases, and from 20 to 150 dogs depending on the plan.',
+      ob_diff_pro_3:            'Reports with your company logo and organisation profile.',
+      ob_diff_pro_4:            'Advanced Training and Specific Training.',
+      ob_diff_pro_price:        'The professional version starts at €12/month.',
+      ob_reco:                  'To get the most out of this and enjoy the experience, it matters that you pick the version that is really yours.',
       aw_title:                 'Welcome to The Dogs’ Mind',
       aw_body:                  'One of us is going to be with you through your first consultation.',
       aw_cta:                   'Let’s go',
@@ -23749,6 +24086,28 @@ function endTourIntro() {
           ct_a_pitch:               "Analisi funzionale ABC + piano d'intervento LIMA per risolvere un problema di comportamento (ansia, reattività, paure, aggressività…).",
           ct_b_tag:                 'Addestramento',
           ct_b_title:               'Addestramento specifico',
+          ob_script:                'Benvenuto in The Dogs’ Mind, una rivoluzionaria intelligenza artificiale che ti aiuterà a risolvere qualunque problema di comportamento canino e sarà il tuo migliore alleato per costruire esercizi con il tuo cane. Prima di andare avanti dimmi: sei un Pet Owner o un Utente professionale? La tua risposta è importante perché dentro l’app ci sono due versioni molto diverse.',
+          ob_q:                     'Sei un Pet Owner o un Utente professionale?',
+          ob_btn_owner:             'Pet Owner',
+          ob_btn_owner_sub:         'Ho un cane e voglio risolvere qualcosa con lui',
+          ob_btn_pro:               'Utente professionale',
+          ob_btn_pro_sub:           'Lavoro sul comportamento dei cani di altri',
+          ob_diff_cta:              'Scopri le differenze',
+          ob_diff_owner_tag:        'Pet Owner',
+          ob_diff_owner_h:          'Per tutori e proprietari',
+          ob_diff_owner_p:          'Diretta e pratica, in linguaggio semplice. Ti permette di capire i motivi del comportamento del tuo cane e ti aiuta a risolverlo con un piano di più settimane e monitoraggi quotidiani.',
+          ob_diff_owner_1:          'Analisi e piano scritti perché tu li capisca senza essere del mestiere.',
+          ob_diff_owner_2:          'Fino a 2 cani e 2 casi alla volta.',
+          ob_diff_owner_3:          'Monitoraggio quotidiano che ti guida giorno per giorno.',
+          ob_diff_pro_tag:          'Professionale',
+          ob_diff_pro_h:            'Per chi ci lavora',
+          ob_diff_pro_p:            'Molto tecnica. Rivolta a etologi clinici veterinari, esperti in modificazione del comportamento canino, analisti del comportamento e professioni affini. Non è la stessa risposta più lunga: è un’altra analisi, con un’altra profondità.',
+          ob_diff_pro_1:            'Analisi funzionale e piano con referto clinico completo.',
+          ob_diff_pro_2:            'Fino a 20 casi attivi e da 20 a 150 cani secondo il piano.',
+          ob_diff_pro_3:            'Referti con il logo della tua azienda e profilo aziendale.',
+          ob_diff_pro_4:            'Addestramento Avanzato e Addestramento Specifico.',
+          ob_diff_pro_price:        'La versione professionale parte da 12 €/mese.',
+          ob_reco:                  'Per sfruttarla al meglio e goderti l’esperienza è importante che scelga bene quale versione è la tua.',
           aw_title:                 'Benvenuto in The Dogs’ Mind',
           aw_body:                  'Uno di noi ti accompagnerà nel tuo primo consulto.',
           aw_cta:                   'Avanti',

@@ -58,7 +58,7 @@
 // nuevo automáticamente sin necesidad de borrar caché. Esto resuelve el
 // problema histórico de "tras update tengo que limpiar caché".
 
-const CACHE_NAME = 'dogs-mind-v261';
+const CACHE_NAME = 'dogs-mind-v262';
 
 // Assets a pre-cachear en install — solo el esqueleto crítico para offline
 const PRECACHE_ASSETS = [

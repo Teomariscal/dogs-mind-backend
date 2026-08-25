@@ -15981,12 +15981,20 @@ async function _dmRcBuyProduct(storeProductId) {
       if (offs.all[k] && offs.all[k].availablePackages) listas.push(offs.all[k].availablePackages);
     }
   }
+  /* Google Play le pega el id del plan base al producto: lo que en el catálogo
+     es "net.thedogsmind.sub.basico" allí se llama "net.thedogsmind.sub.basico:mensual".
+     Comparando exacto no encontrábamos NUNCA el paquete en Android y el usuario
+     se comía un error genérico sin poder suscribirse. Se compara ignorando ese
+     sufijo; en iOS no hay dos puntos, así que no cambia nada. */
+  var _base = function (id) { return String(id || '').split(':')[0]; };
+  var diana = _base(storeProductId);
   var pkg = null;
   for (var li = 0; li < listas.length && !pkg; li++) {
     var pkgs = listas[li];
     for (var i = 0; i < pkgs.length; i++) {
       var pr = pkgs[i] && pkgs[i].product;
-      if (pr && pr.identifier === storeProductId) { pkg = pkgs[i]; break; }
+      if (!pr) continue;
+      if (pr.identifier === storeProductId || _base(pr.identifier) === diana) { pkg = pkgs[i]; break; }
     }
   }
   if (!pkg) throw new Error('package-not-found:' + storeProductId);

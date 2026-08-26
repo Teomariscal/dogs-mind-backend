@@ -9090,6 +9090,20 @@ button:not(:disabled):active{ transform:scale(0.98); }
   font-size: 12.5px; color: rgba(255,255,255,0.6); margin: 8px 0 0;
 }
 
+/* ══ NIAZ (founder 2026-08-26) ═══════════════════════════════════════════
+   Segunda pantalla de vídeo, solo para Pet Owner y después del registro.
+   Niaz presenta y ofrece los tres caminos. Reutiliza las clases .ob-* de
+   Cecilia a propósito: mismo lenguaje visual, cero CSS duplicado. */
+#s-niaz { display: none; }
+#s-niaz.active { display: block; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.nz-opcion { text-align: left; }
+.nz-opcion .nz-letra {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 50%; margin-right: 10px;
+  background: rgba(255,255,255,0.18); font-weight: 700; font-size: 13.5px;
+  vertical-align: -6px;
+}
+
 #s-aigents-welcome { display: none; }
 #s-aigents-welcome.active { display: block; }
 .aw-wrap {
@@ -10024,13 +10038,64 @@ button:not(:disabled):active{ transform:scale(0.98); }
     </div>
   </div><!-- /s-onboarding -->
 
+  <!-- ══ NIAZ ═══════════════════════════════════════════════════════════════
+       Sale tras el registro, solo a quien eligió Pet Owner. Presenta y da los
+       tres caminos; de aquí se entra directo a la primera consulta. -->
+  <div id="s-niaz" class="screen">
+    <div class="ob-wrap">
+      <video id="nz-video" class="ob-video" playsinline muted preload="auto"
+             poster="niaz-hero.png" aria-hidden="true">
+        <source src="onboarding-niaz.mp4" type="video/mp4">
+      </video>
+      <button id="nz-sound" class="ob-sound" type="button" onclick="dmNiazSonido()"
+              aria-label="Activar sonido">
+        <svg id="nz-sound-off" width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M11 5 6 9H2v6h4l5 4z"/><line x1="23" y1="9" x2="17" y2="15"/>
+          <line x1="17" y1="9" x2="23" y2="15"/>
+        </svg>
+        <svg id="nz-sound-on" width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none;">
+          <path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/>
+          <path d="M18.5 5.5a9 9 0 0 1 0 13"/>
+        </svg>
+      </button>
+
+      <div class="ob-scroll">
+        <div class="ob-panel">
+          <p class="ob-typed" id="nz-typed"></p>
+
+          <div class="ob-choice" id="nz-choice" hidden>
+            <p class="ob-q" data-i18n="nz_q">&iquest;Qu&eacute; opci&oacute;n prefieres?</p>
+
+            <button class="ob-btn ob-btn--owner nz-opcion" type="button"
+                    onclick="dmNiazElegir('behavior')">
+              <span class="nz-letra">A</span><span data-i18n="nz_a">Solucionar un problema de conducta</span>
+            </button>
+            <button class="ob-btn ob-btn--pro nz-opcion" type="button"
+                    onclick="dmNiazElegir('training')">
+              <span class="nz-letra">B</span><span data-i18n="nz_b">Entrenar un ejercicio de adiestramiento</span>
+            </button>
+            <button class="ob-btn ob-btn--pro nz-opcion" type="button"
+                    onclick="dmNiazElegir('puppy')">
+              <span class="nz-letra">C</span><span data-i18n="nz_c">Educar a tu cachorro y prevenir males futuros</span>
+            </button>
+
+            <button class="ob-link" type="button" onclick="dmNiazAhoraNo()"
+                    data-i18n="nz_skip">Ahora no</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /s-niaz -->
+
   <div id="s-aigents-welcome" class="screen">
     <div class="aw-wrap">
       <img class="aw-foto" src="aigents-final.webp" alt="Los Dog Aigents" loading="eager">
       <div class="aw-txt">
         <h1 class="aw-title" data-i18n="aw_title">Bienvenido a The Dogs&rsquo; Mind</h1>
         <p class="aw-body" data-i18n="aw_body">Uno de nosotros te va a acompa&ntilde;ar en tu primera consulta.</p>
-        <button class="gw-cta" type="button" onclick="goTo('s-guided-welcome')" data-i18n="aw_cta">Adelante</button>
+        <button class="gw-cta" type="button" onclick="goTo(document.getElementById('s-niaz') ? 's-niaz' : 's-guided-welcome')" data-i18n="aw_cta">Adelante</button>
       </div>
     </div>
   </div><!-- /s-aigents-welcome -->
@@ -12458,6 +12523,7 @@ function goTo(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if (id === 's-onboarding' && typeof dmObArrancar === 'function') dmObArrancar();
+  if (id === 's-niaz' && typeof dmNiazArrancar === 'function') dmNiazArrancar();
   if (id === 's-records') { renderRecords(); syncBackendCases(); if (typeof reconcileOrphanCases === 'function') reconcileOrphanCases(); }
   if (id === 's-anamnesis' && typeof maybeShowAnamResumeCard === 'function') maybeShowAnamResumeCard();
   if (id === 's-anamnesis' && typeof refreshStanceSelector === 'function') refreshStanceSelector();
@@ -17249,6 +17315,98 @@ function getVal(id, fallback) {
     if (on)  on.style.display  = v.muted ? 'none' : '';
   };
 
+  /* ══ NIAZ ═══════════════════════════════════════════════════════════════
+     Mismo mecanismo que Cecilia: vídeo mudo (iOS no deja otra cosa sin un toque
+     previo), la voz escrita a máquina, y hasta que no termina no aparecen las
+     opciones. Se salta tocando el texto. */
+  var _nzTimer = null, _nzHecho = false;
+
+  function _nzTexto() {
+    return _i18nText('nz_script',
+      'Hola, soy Niaz, y te voy a acompañar, si tú me dejas, durante el proceso. ' +
+      'Esta app es sin duda una ayuda excelente para solucionar problemas de conducta ' +
+      'de tu perro, generar ejercicios de adiestramiento o educar a tu cachorro. ' +
+      'Libérate de prejuicios y déjame demostrarte lo increíble que es. ' +
+      'Antes de nada dime, ¿qué opción prefieres? ¡Vas a flipar!');
+  }
+
+  function _nzMostrar() {
+    if (_nzHecho) return;
+    _nzHecho = true;
+    var caja = document.getElementById('nz-choice');
+    if (caja) caja.hidden = false;
+    var t = document.getElementById('nz-typed');
+    if (t) { var c = t.querySelector('.ob-caret'); if (c) c.remove(); }
+  }
+
+  function dmNiazArrancar() {
+    _nzHecho = false;
+    if (_nzTimer) { clearInterval(_nzTimer); _nzTimer = null; }
+    var t = document.getElementById('nz-typed');
+    var caja = document.getElementById('nz-choice');
+    var v = document.getElementById('nz-video');
+    if (caja) caja.hidden = true;
+    if (!t) return;
+
+    var texto = _nzTexto();
+    t.textContent = '';
+    var caret = document.createElement('span');
+    caret.className = 'ob-caret';
+    t.appendChild(caret);
+
+    if (v) { try { v.currentTime = 0; v.muted = true; v.play().catch(function(){}); } catch (e) {} }
+
+    var dur = (v && v.duration && isFinite(v.duration) && v.duration > 2) ? v.duration : 24;
+    var paso = Math.max(18, (dur * 1000) / texto.length);
+    var i = 0;
+    _nzTimer = setInterval(function () {
+      i++;
+      t.textContent = texto.slice(0, i);
+      t.appendChild(caret);
+      if (i >= texto.length) { clearInterval(_nzTimer); _nzTimer = null; _nzMostrar(); }
+    }, paso);
+
+    t.onclick = function () {
+      if (_nzTimer) { clearInterval(_nzTimer); _nzTimer = null; }
+      t.textContent = texto;
+      _nzMostrar();
+    };
+  }
+  window.dmNiazArrancar = dmNiazArrancar;
+
+  window.dmNiazSonido = function () {
+    var v = document.getElementById('nz-video');
+    if (!v) return;
+    v.muted = !v.muted;
+    if (!v.muted) { try { v.play().catch(function(){}); } catch (e) {} }
+    var off = document.getElementById('nz-sound-off');
+    var on  = document.getElementById('nz-sound-on');
+    if (off) off.style.display = v.muted ? '' : 'none';
+    if (on)  on.style.display  = v.muted ? 'none' : '';
+  };
+
+  /* Elegir camino desde Niaz = exactamente lo mismo que aceptar la visita
+     guiada y pulsar una de las tres tarjetas. Se arma la visita ANTES de
+     enrutar para que dmConsultPath pida el bono y monte los pasos. */
+  window.dmNiazElegir = function (camino) {
+    if (_nzTimer) { clearInterval(_nzTimer); _nzTimer = null; }
+    var v = document.getElementById('nz-video');
+    if (v) { try { v.pause(); } catch (e) {} }
+    window._guidedArmada = true;
+    try { localStorage.setItem(DM_GUIDED_KEY, '1'); } catch (e) {}
+    dmConsultPath(camino);
+  };
+
+  /* Se puede decir que no. Sin visita, sin bono, al home de siempre. */
+  window.dmNiazAhoraNo = function () {
+    if (_nzTimer) { clearInterval(_nzTimer); _nzTimer = null; }
+    var v = document.getElementById('nz-video');
+    if (v) { try { v.pause(); } catch (e) {} }
+    window._guidedArmada = false;
+    try { localStorage.setItem(DM_GUIDED_KEY, '1'); } catch (e) {}
+    goTo('s-home');
+  };
+
   window.dmObDiferencias = function () {
     var d = document.getElementById('ob-diff');
     if (!d) return;
@@ -17274,7 +17432,10 @@ function getVal(id, fallback) {
       goTo('s-planes');
       return;
     }
-    goTo(document.getElementById('s-aigents-welcome') ? 's-aigents-welcome' : 's-guided-welcome');
+    /* Pet Owner: la bienvenida coral de los ocho y, tras ella, Niaz con los
+       tres caminos. Si faltara alguna pantalla la cadena sigue sin romperse. */
+    goTo(document.getElementById('s-aigents-welcome') ? 's-aigents-welcome'
+         : (document.getElementById('s-niaz') ? 's-niaz' : 's-guided-welcome'));
   };
 
   /* Acepta: arma la visita y le lleva a elegir camino. El bono NO se pide aquí
@@ -21821,6 +21982,12 @@ function endTourIntro() {
       ob_diff_pro_4:            'Adiestramiento Avanzado y Entrenamiento Específico.',
       ob_diff_pro_price:        'La versión profesional empieza en 12 €/mes.',
       ob_reco:                  'Para sacar el mayor provecho y disfrutar de la experiencia es importante que elijas bien qué versión es la tuya.',
+      nz_script:               'Hola, soy Niaz, y te voy a acompañar, si tú me dejas, durante el proceso. Esta app es sin duda una ayuda excelente para solucionar problemas de conducta de tu perro, generar ejercicios de adiestramiento o educar a tu cachorro. Libérate de prejuicios y déjame demostrarte lo increíble que es. Antes de nada dime, ¿qué opción prefieres? ¡Vas a flipar!',
+      nz_q:                    '¿Qué opción prefieres?',
+      nz_a:                    'Solucionar un problema de conducta',
+      nz_b:                    'Entrenar un ejercicio de adiestramiento',
+      nz_c:                    'Educar a tu cachorro y prevenir males futuros',
+      nz_skip:                 'Ahora no',
       aw_title:                 'Bienvenido a The Dogs’ Mind',
       aw_body:                  'Uno de nosotros te va a acompañar en tu primera consulta.',
       aw_cta:                   'Adelante',
@@ -22969,6 +23136,12 @@ function endTourIntro() {
       ob_diff_pro_4:            'Advanced Training and Specific Training.',
       ob_diff_pro_price:        'The professional version starts at €12/month.',
       ob_reco:                  'To get the most out of this and enjoy the experience, it matters that you pick the version that is really yours.',
+      nz_script:               'Hi, I am Niaz, and I will be with you through the process, if you let me. This app is an excellent help for solving your dog\'s behaviour problems, building training exercises or raising your puppy. Let go of your preconceptions and let me show you how incredible it is. First tell me, which option do you prefer? You are going to love this!',
+      nz_q:                    'Which option do you prefer?',
+      nz_a:                    'Solve a behaviour problem',
+      nz_b:                    'Train a specific exercise',
+      nz_c:                    'Raise your puppy and prevent future trouble',
+      nz_skip:                 'Not now',
       aw_title:                 'Welcome to The Dogs’ Mind',
       aw_body:                  'One of us is going to be with you through your first consultation.',
       aw_cta:                   'Let’s go',
@@ -24116,6 +24289,12 @@ function endTourIntro() {
           ob_diff_pro_4:            'Addestramento Avanzato e Addestramento Specifico.',
           ob_diff_pro_price:        'La versione professionale parte da 12 €/mese.',
           ob_reco:                  'Per sfruttarla al meglio e goderti l’esperienza è importante che scelga bene quale versione è la tua.',
+          nz_script:               'Ciao, sono Niaz, e ti accompagnerò, se me lo permetti, durante tutto il percorso. Questa app è senza dubbio un aiuto eccellente per risolvere i problemi di comportamento del tuo cane, creare esercizi di addestramento o educare il tuo cucciolo. Liberati dai pregiudizi e lascia che ti dimostri quanto è incredibile. Prima di tutto dimmi, quale opzione preferisci? Ti stupirà!',
+          nz_q:                    'Quale opzione preferisci?',
+          nz_a:                    'Risolvere un problema di comportamento',
+          nz_b:                    'Allenare un esercizio di addestramento',
+          nz_c:                    'Educare il cucciolo e prevenire problemi futuri',
+          nz_skip:                 'Non ora',
           aw_title:                 'Benvenuto in The Dogs’ Mind',
           aw_body:                  'Uno di noi ti accompagnerà nel tuo primo consulto.',
           aw_cta:                   'Avanti',

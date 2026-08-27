@@ -77,6 +77,35 @@
   function mins(m) { var v = Math.round(m / 1000 / 4.5 * 60); return v >= 60 ? Math.floor(v / 60) + ' h ' + (v % 60) + ' min' : v + ' min'; }
 
   /* ── Datos ─────────────────────────────────────────────────────────────── */
+
+  /* Consulta a Overpass con reintentos. Devuelve null solo si fallan todos los
+     intentos en todos los espejos. */
+  async function _overpass(q) {
+    var servidores = [OVERPASS, 'https://overpass.osm.ch/api/interpreter'];
+    for (var vuelta = 0; vuelta < 2; vuelta++) {
+      for (var i = 0; i < servidores.length; i++) {
+        try {
+          var ctrl = new AbortController();
+          var corte = setTimeout(function () { ctrl.abort(); }, 25000);
+          var r = await fetch(servidores[i], {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'data=' + encodeURIComponent(q),
+            signal: ctrl.signal
+          });
+          clearTimeout(corte);
+          if (r.ok) {
+            var j = await r.json();
+            if (j && j.elements) return j;
+          }
+        } catch (e) { /* siguiente */ }
+      }
+      /* Respiro antes de la segunda vuelta: el 504 suele ser pasajero. */
+      if (vuelta === 0) await new Promise(function (ok) { setTimeout(ok, 1500); });
+    }
+    return null;
+  }
+
   async function buscarPois(lat, lon, radio) {
     var a = '(around:' + radio + ',' + lat + ',' + lon + ');';
     var q = '[out:json][timeout:30];(' +
@@ -93,22 +122,14 @@
       'way["landuse"="meadow"]' + a +
       'way["leisure"="nature_reserve"]' + a +
       ');out center 120;';
-    /* El servidor público de Overpass limita peticiones: si contesta con error
-       o va saturado, reintentamos en el espejo antes de rendirnos. */
-    var servidores = [OVERPASS, 'https://overpass.kumi.systems/api/interpreter'];
-    var d = null, ultimo = '';
-    for (var i = 0; i < servidores.length && !d; i++) {
-      try {
-        var r = await fetch(servidores[i], {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: 'data=' + encodeURIComponent(q)
-        });
-        if (!r.ok) { ultimo = 'HTTP ' + r.status; continue; }
-        d = await r.json();
-      } catch (e) { ultimo = e.message; }
-    }
-    if (!d) throw new Error(ultimo || 'overpass');
+    /* Los servidores públicos de Overpass van saturados y devuelven 504 a ratos:
+       con radio 3.000 m la consulta completa fallaba y el paseo se quedaba
+       "buscando" para siempre (founder, 27-ago). Kumi llevaba caído y era el
+       único repuesto, así que no había red de seguridad.
+       Ahora: dos espejos VIVOS, dos vueltas, y una espera entre medias —un 504
+       casi siempre es momentáneo y a la segunda entra. */
+    var d = await _overpass(q);
+    if (!d) throw new Error('overpass');
     return (d.elements || []).map(function (e) {
       var la = e.lat != null ? e.lat : (e.center && e.center.lat);
       var lo = e.lon != null ? e.lon : (e.center && e.center.lon);
@@ -387,18 +408,10 @@
       'node["tourism"="viewpoint"](around:250,' + c + ');' +
       'way["leisure"="park"]["name"](around:120,' + c + ');' +
       ');out center 90;';
-    var servidores = [OVERPASS, 'https://overpass.kumi.systems/api/interpreter'];
-    var d = null;
-    for (var s = 0; s < servidores.length && !d; s++) {
-      try {
-        var r = await fetch(servidores[s], {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: 'data=' + encodeURIComponent(q)
-        });
-        if (r.ok) d = await r.json();
-      } catch (e) {}
-    }
+    /* Mismo camino que buscarPois: espejos vivos y reintento. Esto es el
+       adorno del paseo (agua, bosque, miradores), así que si falla se sigue
+       sin él en vez de tumbar la ruta. */
+    var d = await _overpass(q);
     if (!d) return null;
     var out = { agua: [], bosque: 0, arboles: 0, montes: [], historico: [], miradores: 0, parques: [] };
     (d.elements || []).forEach(function (e) {
@@ -596,8 +609,13 @@
       } catch (e) { falloMapa = e; continue; }
       if (pois.length >= 6) break;
     }
-    if (falloMapa && !pois.length) {
-      estadoTexto('No se han podido consultar los datos del mapa. Inténtalo en un minuto.');
+    if (!pois.length) {
+      /* Sin sitios no hay ruta que trazar. Se avisa SIEMPRE, haya fallado la
+         consulta o simplemente no haya nada alrededor: quedarse en "buscando"
+         para siempre es lo que hacía pensar que la app estaba rota. */
+      estadoTexto(falloMapa
+        ? 'No se han podido consultar los datos del mapa. Inténtalo en un minuto.'
+        : 'No hemos encontrado zonas verdes ni servicios cerca. Prueba a escribir una ciudad o un pueblo cercano.');
       return;
     }
     estado.pois = pois;

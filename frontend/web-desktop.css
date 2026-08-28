@@ -823,3 +823,63 @@
   body.dm-web .dmw-card:hover { transform: none; }
   body.dm-web .dmw-hero-vid { display: none; }
 }
+
+  /* ══ BIENVENIDA (Cecilia y Niaz) EN ESCRITORIO ═══════════════════════════
+     En el móvil es una toma a pantalla completa: vídeo arriba, texto debajo.
+     En un monitor apaisado eso deja un vídeo vertical gigante y el texto
+     perdido, así que aquí se reparte en dos columnas: ella a la izquierda,
+     lo que dice y lo que hay que decidir a la derecha.
+     La app nativa NO pasa por aquí: este archivo solo se carga en web. */
+  body.dm-web #s-onboarding.active,
+  body.dm-web #s-niaz.active {
+    display: flex; align-items: center; justify-content: center;
+    overflow-y: auto; padding: var(--w-s6) 0;
+  }
+  body.dm-web #s-onboarding .ob-wrap,
+  body.dm-web #s-niaz .ob-wrap {
+    position: relative; flex: 0 1 auto; display: grid;
+    grid-template-columns: 340px minmax(0, 1fr);
+    align-items: center; gap: var(--w-s8);
+    width: min(1000px, 92vw); margin: 0 auto;
+    background: transparent; min-height: 0;
+  }
+  body.dm-web #s-onboarding .ob-video,
+  body.dm-web #s-niaz .ob-video {
+    flex: none; width: 340px; height: auto; aspect-ratio: 9 / 16;
+    max-height: none; border-radius: 22px;
+    object-fit: cover; object-position: center top;
+    box-shadow: 0 24px 60px rgba(0,0,0,.45);
+  }
+  /* El panel deja de solaparse con el vídeo: aquí van al lado, no encima. */
+  body.dm-web #s-onboarding .ob-scroll,
+  body.dm-web #s-niaz .ob-scroll { max-height: none; overflow: visible; }
+  body.dm-web #s-onboarding .ob-panel,
+  body.dm-web #s-niaz .ob-panel {
+    margin-top: 0; padding: 0;
+    background: none; max-width: none;
+  }
+  body.dm-web #s-onboarding .ob-typed,
+  body.dm-web #s-niaz .ob-typed {
+    padding-top: 0; text-align: left; margin: 0;
+    font-size: 17px; line-height: 1.6; min-height: 7.5em;
+    text-shadow: none;
+  }
+  body.dm-web #s-onboarding .ob-choice,
+  body.dm-web #s-niaz .ob-choice { text-align: left; margin-top: var(--w-s5); }
+  body.dm-web #s-onboarding .ob-q,
+  body.dm-web #s-niaz .ob-q { font-size: 28px; }
+  body.dm-web #s-onboarding .ob-btn,
+  body.dm-web #s-niaz .ob-btn { margin-left: 0; margin-right: 0; max-width: 26em; }
+  body.dm-web #s-onboarding .ob-reco,
+  body.dm-web #s-niaz .ob-reco { margin-left: 0; text-align: left; }
+  /* Sonido y repetir van sobre el VÍDEO. Sin esto se quedaban flotando en la
+     esquina de la rejilla, lejos de aquello que controlan. */
+  body.dm-web #s-onboarding .ob-sound, body.dm-web #s-niaz .ob-sound {
+    top: 14px; right: auto; left: 258px;
+  }
+  body.dm-web #s-onboarding .ob-repetir, body.dm-web #s-niaz .ob-repetir {
+    top: 14px; right: auto; left: 206px;
+  }
+  /* Sin barra de navegación tampoco aquí: es una toma completa. */
+  body.dm-web #s-onboarding.active ~ #global-nav,
+  body.dm-web #s-niaz.active ~ #global-nav { display: none !important; }

@@ -17419,8 +17419,13 @@ function getVal(id, fallback) {
       }
     }
 
-    var dur = (v && v.duration && isFinite(v.duration) && v.duration > 2) ? v.duration : 24;
-    var paso = Math.max(18, (dur * 1000) / texto.length);
+    /* 24,6 s es lo que dura el vídeo de Niaz. Se usa como respaldo por si el
+       metadato no ha cargado todavía: así el texto no se adelanta ni se
+       retrasa respecto a lo que ella dice. */
+    var dur = (v && v.duration && isFinite(v.duration) && v.duration > 2) ? v.duration : 24.6;
+    /* 0,93 para que el texto cierre justo antes de que ella acabe de hablar:
+       leer por detrás de la voz se nota mucho más que ir un poco por delante. */
+    var paso = Math.max(16, (dur * 930) / texto.length);
     var i = 0;
     _nzTimer = setInterval(function () {
       i++;

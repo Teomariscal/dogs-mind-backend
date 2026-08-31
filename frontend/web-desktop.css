@@ -824,6 +824,11 @@
   body.dm-web .dmw-hero-vid { display: none; }
 }
 
+/* La bienvenida en escritorio va detrás de la MISMA puerta que el resto del
+   panel: puntero fino. Antes estas reglas quedaron sueltas fuera de todo
+   media query y se aplicaban también en el móvil, donde la rejilla de dos
+   columnas dejaba la pantalla vacía (founder, 28-ago). */
+@media (hover: hover) and (pointer: fine) {
   /* ══ BIENVENIDA (Cecilia y Niaz) EN ESCRITORIO ═══════════════════════════
      En el móvil es una toma a pantalla completa: vídeo arriba, texto debajo.
      En un monitor apaisado eso deja un vídeo vertical gigante y el texto
@@ -883,3 +888,19 @@
   /* Sin barra de navegación tampoco aquí: es una toma completa. */
   body.dm-web #s-onboarding.active ~ #global-nav,
   body.dm-web #s-niaz.active ~ #global-nav { display: none !important; }
+
+  /* Ventana de ordenador estrecha (o media pantalla): dos columnas de 340px +
+     hueco no caben y el texto se salía. Por debajo de 900px se vuelve a la
+     toma vertical, la misma que en el móvil. */
+  @media (max-width: 900px) {
+    body.dm-web #s-onboarding .ob-wrap,
+    body.dm-web #s-niaz .ob-wrap {
+      display: flex; flex-direction: column; width: min(420px, 94vw);
+      gap: var(--w-s5);
+    }
+    body.dm-web #s-onboarding .ob-video,
+    body.dm-web #s-niaz .ob-video { width: 100%; max-width: 340px; margin: 0 auto; }
+    body.dm-web #s-onboarding .ob-sound, body.dm-web #s-niaz .ob-sound { left: auto; right: 14px; }
+    body.dm-web #s-onboarding .ob-repetir, body.dm-web #s-niaz .ob-repetir { left: auto; right: 62px; }
+  }
+}

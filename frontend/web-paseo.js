@@ -161,6 +161,19 @@
   st.textContent = CSS;
   document.head.appendChild(st);
 
+  /* Los textos de la tarjeta estaban fijos en español y salian asi tambien en
+     la app inglesa e italiana (founder, 31-ago-2026). */
+  function _t(clave) {
+    var l = 'es';
+    try { l = (window.currentLang || localStorage.getItem('dm_lang') || 'es').toLowerCase().slice(0,2); } catch (e) {}
+    var D = {
+      es: { titulo:'El paseo de hoy', sub:'Tres rutas cerca de ti', corta:'corta', media:'media', larga:'larga' },
+      en: { titulo:'Today\u2019s walk',  sub:'Three routes near you',  corta:'short', media:'medium', larga:'long' },
+      it: { titulo:'La passeggiata di oggi', sub:'Tre percorsi vicino a te', corta:'corta', media:'media', larga:'lunga' }
+    };
+    return (D[l] || D.es)[clave];
+  }
+
   function abrir() {
     var f = document.getElementById('paseo-full');
     if (!f) return;
@@ -207,7 +220,7 @@
       '<div class="pf-bar">' +
         '<button class="pf-x" aria-label="Cerrar">&#10005;</button>' +
         '<span class="pf-ale"><img src="aig-ale-pixar.webp" alt="Ale"></span>' +
-        '<div><span class="pf-tt">El paseo de hoy</span>' +
+        '<div><span class="pf-tt">' + _t('titulo') + '</span>' +
         '<span class="pf-ts">con Ale · World Wide Dog Walking</span></div>' +
       '</div>' +
       '<div class="pf-body"></div>';
@@ -234,10 +247,10 @@
     c.innerHTML =
       '<span class="pc-top">' +
         '<span class="pc-ic"><img src="aig-ale-pixar.webp" alt="Ale"></span>' +
-        '<span><span class="pc-t">El paseo de hoy</span>' +
-        '<span class="pc-s">Tres rutas cerca de ti</span></span>' +
+        '<span><span class="pc-t">' + _t('titulo') + '</span>' +
+        '<span class="pc-s">' + _t('sub') + '</span></span>' +
       '</span>' +
-      '<span class="pc-km"><span>corta</span><span>media</span><span>larga</span></span>';
+      '<span class="pc-km"><span>' + _t('corta') + '</span><span>' + _t('media') + '</span><span>' + _t('larga') + '</span></span>';
     c.onclick = abrir;
     /* Con .insight-row va DESPUÉS (queda al final de la home); con el botón
        viejo iba antes; con el hero de último recurso, justo debajo. */

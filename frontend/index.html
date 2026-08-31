@@ -6,7 +6,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <meta name="description" content="Dogs’ Mind — Análisis de conducta canina con IA. Consulta con Teo Mariscal y los Dogs Aigents para entender y mejorar el comportamiento de tu perro.">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+<!-- maximum-scale=1 y user-scalable=no: la app es UNA sola pagina, asi que
+     un zoom hecho en cualquier pantalla se quedaba puesto al volver atras y
+     solo se quitaba cerrando la app entera (founder, 30-ago-2026). Los
+     navegadores de escritorio y Safari ignoran user-scalable=no, asi que en
+     la web se puede seguir ampliando; el candado es solo para la WebView. -->
+<meta name="viewport" id="dm-viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <!-- Forzar esquema claro: evita que el modo oscuro de iOS invierta inputs (texto blanco invisible). App es light-themed. -->
 <meta name="color-scheme" content="dark">
 <title>The Dogs’ Mind · AI for Canine Behavior</title>
@@ -344,7 +349,8 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 /* La bienvenida es una pantalla a pantalla completa: la barra de abajo se
    comía los botones de decidir y el usuario no podía avanzar (founder, 27-ago). */
 #s-onboarding.active ~ #global-nav, #s-onboarding.active + #global-nav,
-#s-niaz.active ~ #global-nav, #s-niaz.active + #global-nav { display:none !important; }
+#s-niaz.active ~ #global-nav, #s-niaz.active + #global-nav,
+#s-ale.active ~ #global-nav, #s-ale.active + #global-nav { display:none !important; }
 
 /* OLD SPLASH CSS REMOVED — ahora está al final del bloque <style> en versión vibrant */
 .btn-green{
@@ -9014,7 +9020,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
    usuario no los veía y parecía que la app estaba rota (founder, 27-ago).
    Ahora el vídeo se lleva algo menos de la mitad y el resto es panel, que es
    lo único que scrollea si el texto se alarga. */
-#s-onboarding.active, #s-niaz.active {
+#s-onboarding.active, #s-niaz.active, #s-ale.active {
   display: flex; flex-direction: column; overflow: hidden;
 }
 .ob-wrap {
@@ -9025,9 +9031,11 @@ button:not(:disabled):active{ transform:scale(0.98); }
    centrado salía a la altura de la cintura (founder, 27-ago).
    El alto es lo que sobra tras reservar el panel, con un mínimo y un máximo
    para que no se coma la pantalla ni desaparezca. */
+/* 40vh, no 48vh: con 48 el tercer botón terminaba en el píxel 851 de 852 y en
+   un iPhone quedaba tapado por la barra inferior. Medido, no estimado. */
 .ob-video {
   flex: 1 1 auto; display: block; width: 100%;
-  min-height: 30vh; max-height: 48vh;
+  min-height: 30vh; max-height: 40vh;
   object-fit: cover; object-position: center top; background: #07100c;
 }
 .ob-scroll {
@@ -9063,6 +9071,91 @@ button:not(:disabled):active{ transform:scale(0.98); }
   text-shadow: 0 1px 10px rgba(0,0,0,0.55);
   min-height: 5.6em; text-align: center;
 }
+/* El guion de Niaz ocupa 8 líneas. Se reserva su alto desde el primer momento
+   para que las opciones, que ahora están visibles desde el principio, no vayan
+   bajando conforme se escribe el texto. */
+#nz-typed { min-height: 15.6em; }
+/* El guion de Niaz es más largo que el de Cecilia y su pantalla medía 879 px
+   contra los 852 de un iPhone 16: el último enlace nacía 7 px por debajo del
+   pliegue y había que arrastrar. En un Android con barra de gestos se comía
+   más. Su vídeo baja a 36vh y ya cabe entero. Cecilia se queda en 40vh. */
+/* Niaz sale ENTERA, con su perra. Antes se recortaba: su video es 720x1280 y
+   el hueco 393x307, asi que con object-fit:cover solo se veia el 43% del alto
+   y la perra quedaba fuera (founder, 30-ago-2026: "aleja la imagen y haz el
+   video mas pequeno para que quepa todo, puedes darle un marco"). Ahora el
+   elemento toma la proporcion del propio video —ancho automatico— y el marco
+   lo envuelve a el, no al hueco: se lee como un encuadre, no como un fallo. */
+/* Niaz 2: el titulo va ENCIMA del video, asi que el video baja a 30vh para que
+   quepan titulo + video + subtitulo + cuerpo + boton en una sola pantalla. */
+#s-niaz2 { display: none; }
+#s-niaz2.active { display: flex; flex-direction: column; overflow: hidden; }
+#s-niaz2.active ~ #global-nav, #s-niaz2.active + #global-nav { display: none !important; }
+.n2-titulo {
+  margin: calc(env(safe-area-inset-top, 0px) + 14px) 0 10px;
+  text-align: center; color: #f3f1ea;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 27px; font-weight: 600; letter-spacing: -0.2px;
+}
+#s-niaz2 .ob-video {
+  width: auto; max-width: 100%; height: 30vh; max-height: 30vh;
+  margin: 0 auto; display: block;
+  object-fit: contain; object-position: center center;
+  border-radius: 16px; background: #07100c;
+  box-shadow: 0 10px 30px rgba(0,0,0,.45);
+}
+/* Los controles van DEBAJO del video, no encima: el video de Niaz 2 es mas
+   bajo (30vh) y con la posicion de las otras pantallas caian sobre su cara.
+   El video ocupa 30vh de alto y su ancho es 30vh x 0.571 = 17.13vh, asi que su
+   borde derecho esta en 50% + 8.57vh. */
+#s-niaz2 .ob-sound   { right: calc(50% - 8.57vh); top: calc(env(safe-area-inset-top, 0px) + 30vh + 62px); }
+#s-niaz2 .ob-repetir { right: calc(50% - 8.57vh + 50px); top: calc(env(safe-area-inset-top, 0px) + 30vh + 62px); }
+/* Hueco reservado para el subtitulo: su guion son 211 caracteres, que a este
+   ancho ocupan 5 lineas. Se reserva para que el boton no baile al escribirse. */
+/* El panel de Cecilia y Niaz sube -52px para solaparse con el video. Aqui NO:
+   entre el video y el subtitulo va la banda de los controles, y con el solape
+   los botones se comian la primera linea. Orden limpio: titulo, video,
+   controles, subtitulo, cuerpo, boton. */
+#s-niaz2 .ob-panel { margin-top: 0; padding-top: 0; background: none; }
+#n2-typed { min-height: 5.6em; padding-top: 58px; font-size: 15px; }
+.n2-cuerpo {
+  margin: 4px auto 14px; max-width: 30em; padding: 0 4px;
+  font-size: 14.5px; line-height: 1.55; color: rgba(243,241,234,.82); text-align: center;
+}
+#s-niaz .ob-video {
+  width: auto; max-width: 100%; height: 36vh; max-height: 36vh;
+  margin: 0 auto; display: block;
+  object-fit: contain; object-position: center center;
+  /* Sin borde: el founder dijo que el marco solo si ayuda a definir, y a este
+     tamano la imagen ya se separa sola del fondo. Definen las esquinas
+     redondeadas y la sombra. */
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  background: #07100c;
+}
+/* El hueco que rodea al marco deja de ser negro plano. */
+#s-niaz .ob-wrap { background: #07100c; }
+
+/* Cecilia, igual que Niaz: entera. Su video es 1080x1920 y con recorte por
+   relleno salia a medio cuerpo, sin los pies (founder, 30-ago-2026: "todos los
+   videos siguientes, regla vigilar que salgan enteros"). */
+#s-onboarding .ob-video {
+  width: auto; max-width: 100%; height: 40vh; max-height: 40vh;
+  margin: calc(env(safe-area-inset-top, 0px) + 4px) auto 0; display: block;
+  object-fit: contain; object-position: center center;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  background: #07100c;
+}
+/* Los controles, pegados al video: 40vh x 0.5625 / 2 = 11.25vh a cada lado. */
+#s-onboarding .ob-sound   { right: calc(50% - 11.25vh + 8px);  top: calc(env(safe-area-inset-top, 0px) + 14px); }
+#s-onboarding .ob-repetir { right: calc(50% - 11.25vh + 58px); top: calc(env(safe-area-inset-top, 0px) + 14px); }
+#s-niaz .ob-video { margin-top: calc(env(safe-area-inset-top, 0px) + 4px); }
+/* Los controles van sobre el video, no en la esquina del hueco. Como el video
+   se centra y conserva 9:16, su borde derecho cae en 50% + la mitad de su
+   ancho (36vh x 0.5625 / 2 = 10.125vh). Asi el boton queda pegado a el sea
+   cual sea el alto de la pantalla. */
+#s-niaz .ob-sound   { right: calc(50% - 10.125vh + 8px); top: calc(env(safe-area-inset-top, 0px) + 14px); }
+#s-niaz .ob-repetir { right: calc(50% - 10.125vh + 58px); top: calc(env(safe-area-inset-top, 0px) + 14px); }
 .ob-typed .ob-caret {
   display: inline-block; width: 2px; height: 1.05em; margin-left: 2px;
   background: #5ec8e6; vertical-align: -0.16em; animation: obBlink 1s steps(1) infinite;
@@ -9085,6 +9178,9 @@ button:not(:disabled):active{ transform:scale(0.98); }
   color: rgba(255,255,255,0.86);
 }
 .ob-link {
+  /* display:block para que "Skip intro" y "Don't show me again" caigan uno
+     debajo del otro. Sin esto salían pegados en la misma línea. */
+  display: block; margin-left: auto; margin-right: auto;
   background: none; border: none; cursor: pointer; font-family: inherit;
   font-size: 13.5px; color: #5ec8e6; text-decoration: underline;
   padding: 7px; margin-top: 0;
@@ -9121,7 +9217,9 @@ button:not(:disabled):active{ transform:scale(0.98); }
    Niaz presenta y ofrece los tres caminos. Reutiliza las clases .ob-* de
    Cecilia a propósito: mismo lenguaje visual, cero CSS duplicado. */
 #s-niaz { display: none; }
+#s-ale { display: none; }
 #s-niaz.active { display: block; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+#s-ale.active  { display: block; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .nz-opcion { text-align: left; }
 .nz-opcion .nz-letra {
   display: inline-flex; align-items: center; justify-content: center;
@@ -9304,7 +9402,10 @@ button:not(:disabled):active{ transform:scale(0.98); }
     </div>
 
     <!-- Hero image -->
-    <div style="width:100%;height:210px;overflow:hidden;flex-shrink:0;">
+      <!-- width:auto, no 100%: hereda margin 0 14px de la hoja de estilos y con
+           width:100% medía 393 dentro de un hueco de 365 — se desplazaba 14px
+           y se cortaba por la derecha (medido 30-ago-2026). -->
+    <div style="width:auto;height:210px;overflow:hidden;flex-shrink:0;">
       <img src="full-analysis-hero.jpg" style="width:100%;height:100%;object-fit:cover;object-position:center 42%;" alt="Dogs’ Mind" />
     </div>
 
@@ -9421,7 +9522,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
       <button onclick="goTo('s-tracking')" class="pp-back" aria-label="Volver">&#8592;</button>
       <div style="flex:1;min-width:0;">
         <p class="pp-eyebrow" data-i18n="pp_eyebrow">Versión accesible · Pet Owners</p>
-        <h1 class="pp-title" data-i18n="pp_title">Plan sencillo</h1>
+        <h1 class="pp-title" data-i18n="ps_plan_title">Plan sencillo</h1>
         <p class="pp-meta" id="pp-meta">—</p>
       </div>
     </div>
@@ -9995,10 +10096,14 @@ button:not(:disabled):active{ transform:scale(0.98); }
        visita guiada de siempre. -->
   <div id="s-onboarding" class="screen">
     <div class="ob-wrap">
-      <video id="ob-video" class="ob-video" playsinline muted preload="auto"
-             poster="aig-cecilia-pixar.webp" aria-hidden="true">
-        <source src="onboarding-cecilia.mp4" type="video/mp4">
-      </video>
+      <!-- preload="none" y la fuente en data-src: iOS solo decodifica unos
+           pocos videos a la vez en la WebView y con seis elementos vivos a
+           Niaz no le quedaba decodificador y salia en negro (founder,
+           30-ago). Cada pantalla carga el suyo al abrirse y lo suelta al
+           salir. -->
+      <video id="ob-video" class="ob-video" playsinline muted preload="none"
+             data-src="onboarding-cecilia.mp4"
+             poster="aig-cecilia-pixar.webp" aria-hidden="true"></video>
       <button id="ob-repetir" class="ob-repetir" type="button" onclick="dmObRepetir()"
               aria-label="Repetir">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none"
@@ -10076,10 +10181,9 @@ button:not(:disabled):active{ transform:scale(0.98); }
        tres caminos; de aquí se entra directo a la primera consulta. -->
   <div id="s-niaz" class="screen">
     <div class="ob-wrap">
-      <video id="nz-video" class="ob-video" playsinline muted preload="auto"
-             poster="niaz-hero.png" aria-hidden="true">
-        <source src="onboarding-niaz.mp4" type="video/mp4">
-      </video>
+      <video id="nz-video" class="ob-video" playsinline muted preload="none"
+             data-src="onboarding-niaz.mp4"
+             poster="niaz-hero.png" aria-hidden="true"></video>
       <button id="nz-repetir" class="ob-repetir" type="button" onclick="dmNiazRepetir()"
               aria-label="Repetir">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none"
@@ -10122,18 +10226,139 @@ button:not(:disabled):active{ transform:scale(0.98); }
             </button>
 
             <button class="ob-link" type="button" onclick="dmNiazAhoraNo()"
-                    data-i18n="nz_skip">Ahora no</button>
+                    data-i18n="nz_skip">Skip intro</button>
+            <!-- Segunda salida, solo cuando Niaz aparece de visita a alguien ya
+                 registrado: "ahora no" la deja volver, esto la calla para
+                 siempre. En el alta no se ofrece. ROTULO PENDIENTE DEL FOUNDER. -->
+            <button id="nz-nunca" class="ob-link" type="button" hidden
+                    style="opacity:.62;font-size:13px;margin-top:2px"
+                    onclick="dmNiazNoMostrarMas()"
+                    data-i18n="nz_never">Don’t show me again</button>
           </div>
         </div>
       </div>
     </div>
   </div><!-- /s-niaz -->
 
+  <!-- ══ ALE · el paseo ═══════════════════════════════════════════════════════
+       Salta SOLA en el inicio, un segundo después de llegar, una de cada diez
+       veces (founder, 28-ago). Puede tocar la primera vez. Mismas clases .ob-*
+       que Cecilia y Niaz: un solo estilo para las tres. El texto es del
+       founder, literal; en el guion de HeyGen "feature" se escribe "fichure"
+       y "Aigent" se escribe "Eillent", pero en pantalla van bien escritos. -->
+  <div id="s-ale" class="screen">
+    <div class="ob-wrap">
+      <!-- Sin src ni poster A PROPOSITO: `onboarding-ale.mp4` y `ale-hero.png`
+           todavia no existen, y el navegador los pedia en CADA arranque de la
+           app aunque la pantalla estuviera oculta: dos 404 por usuario y por
+           sesion. Cuando el video este, se restauran estas dos lineas:
+             poster="ale-hero.png"
+             <source src="onboarding-ale.mp4" type="video/mp4"> -->
+      <video id="al-video" class="ob-video" playsinline muted preload="none"
+             aria-hidden="true"></video>
+      <button id="al-repetir" class="ob-repetir" type="button" onclick="dmAleRepetir()"
+              aria-label="Repetir">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>
+        </svg>
+      </button>
+      <button id="al-sound" class="ob-sound" type="button" onclick="dmAleSonido()"
+              aria-label="Activar sonido">
+        <svg id="al-sound-off" width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M11 5 6 9H2v6h4l5 4z"/><line x1="23" y1="9" x2="17" y2="15"/>
+          <line x1="17" y1="9" x2="23" y2="15"/>
+        </svg>
+        <svg id="al-sound-on" width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none;">
+          <path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/>
+          <path d="M18.5 5.5a9 9 0 0 1 0 13"/>
+        </svg>
+      </button>
+
+      <div class="ob-scroll">
+        <div class="ob-panel">
+          <p class="ob-typed" id="al-typed"></p>
+
+          <div class="ob-choice" id="al-choice">
+            <button class="ob-btn ob-btn--owner" type="button" onclick="dmAlePaseo()">
+              <span data-i18n="al_cta">Dog Walking</span>
+            </button>
+
+            <button class="ob-link" type="button" onclick="dmAleAhoraNo()"
+                    data-i18n="nz_skip">Skip intro</button>
+            <button class="ob-link" type="button"
+                    style="opacity:.62;font-size:13px;margin-top:2px"
+                    onclick="dmAleNoMostrarMas()"
+                    data-i18n="nz_never">Don’t show me again</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /s-ale -->
+
+  <!-- ══ NIAZ 2 · "Conoce a tus Aigents" ═════════════════════════════════════
+       Salta sola en el inicio, un 20 % de las veces que el usuario pasa mas de
+       2 segundos sin tocar nada (founder, 30-ago-2026). Sale a los dos tipos de
+       cuenta. A diferencia de Cecilia y Niaz, aqui el titulo va ENCIMA del
+       video. El subtitulo es la transcripcion literal de lo que ella dice. -->
+  <div id="s-niaz2" class="screen">
+    <div class="ob-wrap">
+      <h2 class="n2-titulo" data-i18n="n2_title">Conoce a tus Aigents</h2>
+
+      <video id="n2-video" class="ob-video" playsinline muted preload="none"
+             data-src="aigents-niaz2.mp4" aria-hidden="true"></video>
+
+      <button id="n2-repetir" class="ob-repetir" type="button" onclick="dmN2Repetir()"
+              aria-label="Repetir">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>
+        </svg>
+      </button>
+      <button id="n2-sound" class="ob-sound" type="button" onclick="dmN2Sonido()"
+              aria-label="Activar sonido">
+        <svg id="n2-sound-off" width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M11 5 6 9H2v6h4l5 4z"/><line x1="23" y1="9" x2="17" y2="15"/>
+          <line x1="17" y1="9" x2="23" y2="15"/>
+        </svg>
+        <svg id="n2-sound-on" width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none;">
+          <path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/>
+          <path d="M18.5 5.5a9 9 0 0 1 0 13"/>
+        </svg>
+      </button>
+
+      <div class="ob-scroll">
+        <div class="ob-panel">
+          <p class="ob-typed" id="n2-typed"></p>
+
+          <div class="ob-choice" id="n2-choice">
+            <p class="n2-cuerpo" data-i18n="n2_body">Los Aigents son avatars de IA muy especializados. No sirven para generar an&aacute;lisis de conducta pero te ayudan en tu d&iacute;a a d&iacute;a con tu perro.</p>
+
+            <button class="ob-btn ob-btn--owner" type="button" onclick="dmN2Ir()">
+              <span data-i18n="n2_cta">Conoce a Los Aigents</span>
+            </button>
+
+            <button class="ob-link" type="button" onclick="dmN2AhoraNo()"
+                    data-i18n="nz_skip">Skip intro</button>
+            <button class="ob-link" type="button"
+                    style="opacity:.62;font-size:13px;margin-top:2px"
+                    onclick="dmN2NoMostrarMas()"
+                    data-i18n="nz_never">Don&rsquo;t show me again</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /s-niaz2 -->
+
   <div id="s-aigents-welcome" class="screen">
     <div class="aw-wrap">
       <img class="aw-foto" src="aigents-final.webp" alt="Los Dog Aigents" loading="eager">
       <div class="aw-txt">
-        <h1 class="aw-title" data-i18n="aw_title">Bienvenido a The Dogs&rsquo; Mind</h1>
+        <h1 class="aw-title" data-i18n="aw_title">Welcome a The Dogs&rsquo; Mind</h1>
         <p class="aw-body" data-i18n="aw_body">Uno de nosotros te va a acompa&ntilde;ar en tu primera consulta.</p>
         <button class="gw-cta" type="button" onclick="goTo(document.getElementById('s-niaz') ? 's-niaz' : 's-guided-welcome')" data-i18n="aw_cta">Adelante</button>
       </div>
@@ -12560,10 +12785,15 @@ function goTo(id) {
     var _vis = JSON.parse(localStorage.getItem('dm_vistas') || '{}');
     if (!_vis[id]) { _vis[id] = 1; localStorage.setItem('dm_vistas', JSON.stringify(_vis)); }
   } catch (e) {}
+  if (typeof window.dmZoomReset === 'function') window.dmZoomReset();
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if (id === 's-onboarding' && typeof dmObArrancar === 'function') dmObArrancar();
   if (id === 's-niaz' && typeof dmNiazArrancar === 'function') dmNiazArrancar();
+  if (id === 's-ale'  && typeof dmAleArrancar  === 'function') dmAleArrancar();
+  if (id === 's-niaz2' && typeof dmN2Arrancar === 'function') dmN2Arrancar();
+  /* Ale se ofrece sola al llegar al inicio: espera un segundo y sortea. */
+  if (id === 's-home' && typeof dmAleQuizas === 'function') dmAleQuizas();
   if (id === 's-records') { renderRecords(); syncBackendCases(); if (typeof reconcileOrphanCases === 'function') reconcileOrphanCases(); }
   if (id === 's-anamnesis' && typeof maybeShowAnamResumeCard === 'function') maybeShowAnamResumeCard();
   if (id === 's-anamnesis' && typeof refreshStanceSelector === 'function') refreshStanceSelector();
@@ -16214,7 +16444,9 @@ function loadDailyTip() {
       tipEl.textContent = cached;
       return;
     }
-    var prefix = (lang === 'en') ? 'Tip of the day: ' : 'Consejo del día: ';
+    var prefix = (lang === 'en') ? 'Tip of the day: '
+               : (lang === 'it') ? 'Consiglio del giorno: '
+               : 'Consejo del día: ';
     // Fetch con timeout 3s para no bloquear si Railway esta lento
     var controller = new AbortController();
     var timeoutId = setTimeout(function(){ controller.abort(); }, 3000);
@@ -17195,6 +17427,61 @@ function getVal(id, fallback) {
      Fuera de la visita guiada este módulo no toca absolutamente nada. */
   var DM_GUIDED_KEY = 'dm_guided_done';
 
+  /* ══ DECODIFICADORES DE VIDEO ═══════════════════════════════════════════
+     iOS solo mantiene unos pocos videos decodificando a la vez dentro de una
+     WebView. La app tiene seis elementos <video>; con el splash, el hero de
+     entrenamiento y Cecilia vivos, a Niaz no le quedaba ninguno y su pantalla
+     salia en NEGRO mientras el texto corria por la red de seguridad (founder,
+     30-ago-2026, en la 1.0.9 ya publicada).
+     Regla: un video se carga cuando se abre su pantalla y se suelta al salir.
+     Soltar de verdad exige quitar el src y llamar a load(); con pause() no
+     basta, el decodificador sigue cogido. */
+  /* Deshace un zoom que se haya quedado puesto. Reescribir el meta obliga a la
+     WebView a recalcular la escala; sin esto, la pantalla se queda
+     sobredimensionada hasta cerrar la app. */
+  function dmZoomReset() {
+    try {
+      var m = document.getElementById('dm-viewport');
+      if (!m) return;
+      var fijo = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
+      m.setAttribute('content', fijo + ', minimum-scale=1.0');
+      setTimeout(function () { m.setAttribute('content', fijo); }, 0);
+    } catch (e) {}
+  }
+  window.dmZoomReset = dmZoomReset;
+
+  function dmVideoCargar(v) {
+    if (!v) return null;
+    var fuente = v.getAttribute('data-src');
+    if (fuente && v.getAttribute('src') !== fuente) {
+      v.setAttribute('src', fuente);
+      try { v.load(); } catch (e) {}
+    }
+    return v;
+  }
+  function dmVideoSoltar(v) {
+    if (!v) return;
+    try { v.pause(); } catch (e) {}
+    if (v.getAttribute('data-src')) {
+      try { v.removeAttribute('src'); v.load(); } catch (e) {}
+    }
+  }
+  /* Al entrar en una pantalla de Aigent se sueltan las otras dos, para que
+     nunca haya mas de una de estas tres pidiendo decodificador. */
+  function dmVideosSoltarSalvo(id) {
+    ['ob-video', 'nz-video', 'al-video', 'n2-video'].forEach(function (x) {
+      if (x !== id) dmVideoSoltar(document.getElementById(x));
+    });
+  }
+  window.dmVideoCargar = dmVideoCargar;
+  window.dmVideoSoltar = dmVideoSoltar;
+  window.dmVideosSoltarSalvo = dmVideosSoltarSalvo;
+  /* Niaz de visita: a quien ya está registrado le sale en 7 de cada 10 veces
+     que pulsa "Nueva consulta" (founder, 28-ago). Esta llave la calla para
+     siempre si el usuario lo pide; "ahora no" NO la escribe. */
+  var NZ_SILENCIO_KEY = 'dm_niaz_silencio';
+  var NZ_PROBABILIDAD = 0.70;
+
   /* Un plan por camino. `pantalla` es dónde vive la ficha, `envio` los
      elementos que solo deben verse en el último paso, y `sellos` el bloque de
      credibilidad académica que estorba durante la visita (puede faltar). */
@@ -17301,6 +17588,7 @@ function getVal(id, fallback) {
     var caja = document.getElementById('ob-choice');
     var dif = document.getElementById('ob-diff');
     var v = document.getElementById('ob-video');
+    dmVideosSoltarSalvo('ob-video'); dmVideoCargar(v);
     if (caja && !repeticion) caja.hidden = true;
     if (dif && !repeticion) dif.classList.remove('open');
     if (!p) return;
@@ -17319,6 +17607,7 @@ function getVal(id, fallback) {
        adelantarse. Si el vídeo no llega a reproducirse (permiso de iOS, red),
        se cae a un reloj del mismo tiempo y el mensaje se entrega igual. */
     var DURACION = 19;           // lo que dura la locución de Cecilia
+    var _obUltimoT = -1, _obUltimoAvance = 0, _obAtascado = false;
     var arranque = Date.now();
     var i = 0;
 
@@ -17326,9 +17615,28 @@ function getVal(id, fallback) {
        no está en primer plano, y entonces el texto se quedaba sin escribir. */
     _obTimer = setInterval(function alRitmoDeLaVoz() {
       if (_obHecho) { clearInterval(_obTimer); _obTimer = null; return; }
-      var prog = (v && v.duration && isFinite(v.duration) && v.duration > 1 && v.currentTime > 0)
+      var enMarcha = v && v.duration && isFinite(v.duration) && v.duration > 1 && v.currentTime > 0;
+      /* Mientras el vídeo existe pero todavía no ha arrancado, el texto NO se
+         escribe: si no, se adelantaba a la voz durante la carga y se leía la
+         frase antes de oírla (founder, 28-ago). Pasados 3 s sin que arranque se
+         asume que no va a hacerlo y se entrega el mensaje por reloj. */
+      if (v && !enMarcha && (Date.now() - arranque) < 3000) return;
+
+      /* El vídeo se puede quedar parado a mitad: en iOS basta con que la app
+         pase a segundo plano y no reanude. Si eso pasaba, el progreso se
+         congelaba, el texto no llegaba al final y LAS DOS OPCIONES NO SALÍAN
+         NUNCA — el usuario se quedaba encallado en la primera pantalla. Ahora,
+         si lleva 4 s sin avanzar, se abandona el vídeo y se entrega el mensaje
+         por reloj. Vale más un texto que se adelanta que una pantalla muerta. */
+      if (enMarcha) {
+        if (v.currentTime !== _obUltimoT) { _obUltimoT = v.currentTime; _obUltimoAvance = Date.now(); }
+        else if (_obUltimoAvance && (Date.now() - _obUltimoAvance) > 4000) { _obAtascado = true; }
+      }
+      if (_obAtascado) { p.textContent = texto; clearInterval(_obTimer); _obTimer = null; _obMostrarEleccion(); return; }
+
+      var prog = enMarcha
         ? v.currentTime / v.duration
-        : (Date.now() - arranque) / (DURACION * 1000);
+        : (Date.now() - arranque - (v ? 3000 : 0)) / (DURACION * 1000);
       var n = Math.min(texto.length, Math.ceil(prog * texto.length));
       if (n !== i) { i = n; p.textContent = texto.slice(0, i); p.appendChild(caret); }
       if (i >= texto.length) { clearInterval(_obTimer); _obTimer = null; _obMostrarEleccion(); }
@@ -17396,8 +17704,17 @@ function getVal(id, fallback) {
     var t = document.getElementById('nz-typed');
     var caja = document.getElementById('nz-choice');
     var v = document.getElementById('nz-video');
-    if (caja && !repeticion) caja.hidden = true;
+    dmVideosSoltarSalvo('nz-video'); dmVideoCargar(v);
+    /* Las opciones se ven DESDE EL PRINCIPIO. Antes aparecían al terminar ella
+       de hablar y media pantalla se quedaba negra 25 segundos (founder,
+       28-ago). Además, quien ya sabe lo que quiere no tiene por qué esperar. */
+    if (caja) caja.hidden = false;
     if (!t) return;
+
+    /* La segunda salida solo existe cuando ella viene de visita. En el alta no
+       tiene sentido ofrecer "no volver a mostrarlo": aún no ha visto nada. */
+    var nunca = document.getElementById('nz-nunca');
+    if (nunca) nunca.hidden = (window._nzModo !== 'consulta');
 
     var texto = _nzTexto();
     t.textContent = '';
@@ -17405,7 +17722,37 @@ function getVal(id, fallback) {
     caret.className = 'ob-caret';
     t.appendChild(caret);
 
+    /* El texto es lo que ella está diciendo, así que no puede empezar antes que
+       ella. Antes arrancaba por reloj mientras el vídeo todavía se descargaba:
+       se veía la pantalla anterior con el texto ya corriendo y la voz llegaba
+       tarde (founder, 28-ago: "la voz de Niaz sale durante el vídeo del border
+       collie"). Ahora el reloj lo dispara el propio vídeo al empezar a sonar. */
+    function escribir() {
+      if (_nzTimer) { clearInterval(_nzTimer); _nzTimer = null; }
+      /* 24,6 s es lo que dura el vídeo. Sirve de respaldo si el metadato aún
+         no ha cargado, para que el texto no se adelante ni se retrase. */
+      var dur = (v && v.duration && isFinite(v.duration) && v.duration > 2) ? v.duration : 24.6;
+      /* 0,93 para que el texto cierre justo antes de que ella acabe de hablar:
+         leer por detrás de la voz se nota mucho más que ir un poco por delante. */
+      var paso = Math.max(16, (dur * 930) / texto.length);
+      var i = 0;
+      _nzTimer = setInterval(function () {
+        i++;
+        t.textContent = texto.slice(0, i);
+        t.appendChild(caret);
+        if (i >= texto.length) { clearInterval(_nzTimer); _nzTimer = null; _nzMostrar(); }
+      }, paso);
+    }
+
     if (v) {
+      clearTimeout(v._esperaTexto);
+      v.removeEventListener('playing', v._alSonar || function(){});
+      v._alSonar = function () { clearTimeout(v._esperaTexto); escribir(); };
+      v.addEventListener('playing', v._alSonar, { once: true });
+      /* Red de seguridad: si el vídeo no llega a reproducirse (red caída, un
+         códec que falla), el texto sale igual a los 3 s. Nunca una pantalla
+         muda y en blanco. */
+      v._esperaTexto = setTimeout(escribir, 3000);
       try { v.currentTime = 0; if (!repeticion) v.muted = true; v.play().catch(function(){}); } catch (e) {}
       if (!v._buclePuesto) {
         v._buclePuesto = true;
@@ -17417,22 +17764,9 @@ function getVal(id, fallback) {
           }, 3000);
         });
       }
+    } else {
+      escribir();
     }
-
-    /* 24,6 s es lo que dura el vídeo de Niaz. Se usa como respaldo por si el
-       metadato no ha cargado todavía: así el texto no se adelanta ni se
-       retrasa respecto a lo que ella dice. */
-    var dur = (v && v.duration && isFinite(v.duration) && v.duration > 2) ? v.duration : 24.6;
-    /* 0,93 para que el texto cierre justo antes de que ella acabe de hablar:
-       leer por detrás de la voz se nota mucho más que ir un poco por delante. */
-    var paso = Math.max(16, (dur * 930) / texto.length);
-    var i = 0;
-    _nzTimer = setInterval(function () {
-      i++;
-      t.textContent = texto.slice(0, i);
-      t.appendChild(caret);
-      if (i >= texto.length) { clearInterval(_nzTimer); _nzTimer = null; _nzMostrar(); }
-    }, paso);
 
     t.onclick = function () {
       if (_nzTimer) { clearInterval(_nzTimer); _nzTimer = null; }
@@ -17465,7 +17799,15 @@ function getVal(id, fallback) {
   window.dmNiazElegir = function (camino) {
     if (_nzTimer) { clearInterval(_nzTimer); _nzTimer = null; }
     var v = document.getElementById('nz-video');
-    if (v) { try { v.pause(); } catch (e) {} }
+    clearTimeout(v && v._esperaTexto);
+    dmVideoSoltar(v);
+    if (window._nzModo === 'consulta') {
+      /* Visita a alguien que ya está dentro: encamina y punto. NI se rearma la
+         visita guiada NI se le vuelve a dar el bono — eso es del alta. */
+      window._guidedArmada = false;
+      dmConsultPath(camino);
+      return;
+    }
     window._guidedArmada = true;
     try { localStorage.setItem(DM_GUIDED_KEY, '1'); } catch (e) {}
     dmConsultPath(camino);
@@ -17475,10 +17817,373 @@ function getVal(id, fallback) {
   window.dmNiazAhoraNo = function () {
     if (_nzTimer) { clearInterval(_nzTimer); _nzTimer = null; }
     var v = document.getElementById('nz-video');
-    if (v) { try { v.pause(); } catch (e) {} }
+    clearTimeout(v && v._esperaTexto);
+    dmVideoSoltar(v);
+    if (window._nzModo === 'quietud') {
+      /* Se asomó ella sola y le han dicho que no. Entonces NO se le vuelve a
+         poner delante al pulsar "Nueva consulta" en esta sesión: ya la ha
+         visto y la ha rechazado, insistir sería pesado (founder, 28-ago). */
+      window._nzRechazadaEnSesion = true;
+      window._nzModo = null; window._nzVolverA = null;
+      goTo('s-home');
+      return;
+    }
+    if (window._nzModo === 'consulta') {
+      /* Volver a donde iba: pulsó "Nueva consulta" o "Escuela Cachorros", no
+         "ir al inicio". Que decir que no le cueste una pantalla sería
+         castigarle por saltarse a Niaz, y la próxima vez ella vuelve a salir. */
+      var destino = window._nzVolverA || 's-consult-type';
+      window._nzModo = null; window._nzVolverA = null;
+      goTo(destino);
+      return;
+    }
     window._guidedArmada = false;
     try { localStorage.setItem(DM_GUIDED_KEY, '1'); } catch (e) {}
     goTo('s-home');
+  };
+
+  /* La otra salida: que no vuelva a aparecer nunca. Distinta de "ahora no"
+     a propósito — una es por esta vez y la otra es para siempre. */
+  window.dmNiazNoMostrarMas = function () {
+    try { localStorage.setItem(NZ_SILENCIO_KEY, '1'); } catch (e) {}
+    dmNiazAhoraNo();
+  };
+
+  /* ══ ALE · el paseo ═════════════════════════════════════════════════════
+     A diferencia de Niaz, Ale NO espera a que pulses nada: salta sola en el
+     inicio un segundo después de llegar, una de cada diez veces, y puede
+     tocar ya la primera (founder, 28-ago). */
+  var AL_SILENCIO_KEY = 'dm_ale_silencio';
+  /* 2 de cada 10 veces que el usuario pasa MÁS DE DOS SEGUNDOS en el inicio
+     SIN HACER NADA (founder, 28-ago). La condición es la quietud, no la
+     llegada: si toca, desliza o escribe, no sale y no se le interrumpe. */
+  var AL_PROBABILIDAD = 0.20;
+  var AL_ESPERA_MS    = 2000;
+  var _alTimer = null;
+  var _alCitaPendiente = null;
+
+  /* El texto es el del founder, palabra por palabra. En pantalla se escribe
+     bien: "feature" y "Aigent". La pronunciación forzada ("fichure",
+     "Eillent") va solo en el guion que lee la voz, nunca aquí. */
+  function _alTexto() {
+    return _i18nText('al_script',
+      'Hola, soy Ale, la Aigent con más buena onda. ¿Has probado la feature de ' +
+      'paseos? Estés donde estés puedo trazar tres rutas para pasear con tu perro, ' +
+      'dando prioridad a las zonas verdes, lugares sin excesiva acumulación de ' +
+      'gente o tráfico, incluso, y dependiendo de la hora del día, elegir rutas ' +
+      'con más sombra y más seguras y agradables para tu perro. ' +
+      'Ponme a prueba y pulsa aquí.');
+  }
+
+  function dmAleArrancar(repeticion) {
+    var t = document.getElementById('al-typed');
+    var v = document.getElementById('al-video');
+    dmVideosSoltarSalvo('al-video'); dmVideoCargar(v);
+    if (!t) return;
+    if (_alTimer) { clearInterval(_alTimer); _alTimer = null; }
+
+    var texto = _alTexto();
+    t.textContent = '';
+    var caret = document.createElement('span');
+    caret.className = 'ob-caret';
+    t.appendChild(caret);
+
+    /* Igual que con Niaz: el texto no empieza hasta que ella empieza a sonar. */
+    function escribir() {
+      if (_alTimer) { clearInterval(_alTimer); _alTimer = null; }
+      var dur = (v && v.duration && isFinite(v.duration) && v.duration > 2) ? v.duration : 24;
+      var paso = Math.max(16, (dur * 930) / texto.length);
+      var i = 0;
+      _alTimer = setInterval(function () {
+        i++;
+        t.textContent = texto.slice(0, i);
+        t.appendChild(caret);
+        if (i >= texto.length) { clearInterval(_alTimer); _alTimer = null; }
+      }, paso);
+    }
+
+    if (v) {
+      clearTimeout(v._esperaTexto);
+      v._alSonar = function () { clearTimeout(v._esperaTexto); escribir(); };
+      v.addEventListener('playing', v._alSonar, { once: true });
+      v._esperaTexto = setTimeout(escribir, 3000);
+      try { v.currentTime = 0; if (!repeticion) v.muted = true; v.play().catch(function(){}); } catch (e) {}
+    } else {
+      escribir();
+    }
+
+    t.onclick = function () {
+      if (_alTimer) { clearInterval(_alTimer); _alTimer = null; }
+      t.textContent = texto;
+    };
+  }
+  window.dmAleArrancar = dmAleArrancar;
+
+  function _alParar() {
+    if (_alTimer) { clearInterval(_alTimer); _alTimer = null; }
+    var v = document.getElementById('al-video');
+    clearTimeout(v && v._esperaTexto);
+    dmVideoSoltar(v);
+  }
+
+  window.dmAleSonido = function () {
+    var v = document.getElementById('al-video');
+    if (!v) return;
+    v.muted = !v.muted;
+    var off = document.getElementById('al-sound-off');
+    var on  = document.getElementById('al-sound-on');
+    if (off) off.style.display = v.muted ? '' : 'none';
+    if (on)  on.style.display  = v.muted ? 'none' : '';
+    if (!v.muted) dmAleRepetir();
+  };
+  window.dmAleRepetir = function () {
+    var v = document.getElementById('al-video');
+    if (v) { try { v.currentTime = 0; v.play().catch(function(){}); } catch (e) {} }
+    dmAleArrancar(true);
+  };
+
+  /* "Ponme a prueba y pulsa aquí": el botón abre el planificador de paseos,
+     que es la tarjeta "El paseo de hoy" del inicio. Se pulsa esa misma tarjeta
+     en vez de duplicar su lógica: si mañana cambia, esto sigue funcionando. */
+  window.dmAlePaseo = function () {
+    _alParar();
+    goTo('s-home');
+    setTimeout(function () {
+      var tarjeta = document.getElementById('paseo-card');
+      if (tarjeta) tarjeta.click();
+    }, 60);
+  };
+
+  window.dmAleAhoraNo = function () { _alParar(); goTo('s-home'); };
+  window.dmAleNoMostrarMas = function () {
+    try { localStorage.setItem(AL_SILENCIO_KEY, '1'); } catch (e) {}
+    dmAleAhoraNo();
+  };
+
+  /* Se llama al llegar al inicio. Espera un segundo y sortea. */
+  /* ══ QUIETUD EN EL INICIO ════════════════════════════════════════════════
+     Si el usuario pasa MÁS DE DOS SEGUNDOS en el inicio sin tocar nada, se
+     asoma un Aigent (founder, 28-ago):
+
+         Niaz  50 %      Ale  20 %      nadie  30 %
+
+     Un solo sorteo reparte los tres casos, así que nunca coinciden. La cuenta
+     atrás es de quietud: cualquier gesto la cancela y ni siquiera se sortea.
+     Si está usando la app, no se le interrumpe. */
+  var NZ_PROB_QUIETUD = 0.00;  /* apagado: no lo pidio nadie */
+  var AL_PROB_QUIETUD = 0.00;  /* apagado hasta que Ale tenga video */
+  /* Ale no se asoma hasta que exista su vídeo. Hoy no lo hay: el original de
+     su imagen tiene 300 px y HeyGen le inventaba la cara. Su pantalla está
+     construida y probada; se enciende poniendo esto en true el día que
+     `onboarding-ale.mp4` esté en su sitio. Mientras, su 20 % no sale a nadie:
+     nadie ve una pantalla en negro. */
+  var AL_LISTA = false;
+
+  /* APAGADO PARA LA ENTREGA DEL 29-ago. El bloque de quietud se queda entero,
+     sin borrar, pero no se ejecuta. Motivo: tal como está, quien pulsa
+     "Skip intro" vuelve al inicio y a los 2 s le sale Niaz otra vez —la rama
+     de quietud no mira `_nzRechazadaEnSesion`— y en ese modo el botón de
+     "no volver a mostrar" está oculto, así que no hay forma de callarla.
+     Además la interceptación no mira `account_type` y a un profesional le
+     salía el copy de dueño. Se enciende poniendo esto en true cuando eso esté
+     resuelto. Lo que SÍ va en esta entrega es Niaz al 70% en Nueva consulta,
+     que tiene sus dos salidas y está medido. */
+  /* ENCENDIDA solo para Niaz 2 (founder, 30-ago-2026). Los otros dos repartos
+     de este sorteo siguen a cero a proposito: el 50 % de Niaz no lo pidio nadie
+     y salia encima del 70 % de Nueva consulta, y Ale no tiene video todavia.
+     Se encienden subiendo su probabilidad, no tocando esto. */
+  var QUIETUD_ACTIVA = true;
+  var N2_PROB_QUIETUD = 0.20;
+
+  window.dmAleQuizas = function () {
+    try {
+      if (!QUIETUD_ACTIVA) return;
+      if (typeof getJWT === 'function' && !getJWT()) return;
+
+      /* Antes esto armaba UNA cuenta atras y cualquier gesto la mataba para
+         siempre. En un iPhone eso no llegaba nunca a los 2 segundos: llegar al
+         inicio ya dispara un scroll —el rebote, el layout asentandose, el dedo
+         que viene del boton— y se cancelaba sola (founder, 31-ago-2026: "la
+         nueva Niaz no sale").
+         Ahora es un temporizador de INACTIVIDAD: cada gesto real lo reinicia,
+         y salta cuando de verdad pasan 2 segundos sin tocar nada. Eso es lo que
+         se pidio: "mas de 2 segundos sin hacer nada en el inicio". */
+      if (window._quietudMontada) { window._quietudRearmar(); return; }
+      window._quietudMontada = true;
+
+      var yEnPie = 0;
+      function sigueEnInicio() {
+        var a = document.querySelector('.screen.active');
+        return !!a && a.id === 's-home';
+      }
+      function sortear() {
+        if (!sigueEnInicio()) return;
+        var suerte = Math.random();
+        var hayNiaz = !!document.getElementById('s-niaz');
+        var hayAle  = !!document.getElementById('s-ale');
+        var niazCallada = false, aleCallada = false;
+        try { niazCallada = localStorage.getItem(NZ_SILENCIO_KEY) === '1'; } catch (e) {}
+        try { aleCallada  = localStorage.getItem(AL_SILENCIO_KEY) === '1'; } catch (e) {}
+
+        if (suerte < N2_PROB_QUIETUD) {
+          var hayN2 = !!document.getElementById('s-niaz2');
+          var n2Callada = false;
+          try { n2Callada = localStorage.getItem(N2_SILENCIO_KEY) === '1'; } catch (e) {}
+          if (!hayN2 || n2Callada || window._n2RechazadaEnSesion) return;
+          goTo('s-niaz2');
+          return;
+        }
+        if (suerte < N2_PROB_QUIETUD + NZ_PROB_QUIETUD) {
+          if (!hayNiaz || niazCallada || window._nzRechazadaEnSesion) return;
+          window._nzModo = 'quietud';
+          window._nzVolverA = 's-home';
+          goTo('s-niaz');
+          return;
+        }
+        if (suerte < N2_PROB_QUIETUD + NZ_PROB_QUIETUD + AL_PROB_QUIETUD) {
+          if (!AL_LISTA || !hayAle || aleCallada) return;
+          goTo('s-ale');
+        }
+      }
+      window._quietudRearmar = function () {
+        clearTimeout(_alCitaPendiente);
+        if (!sigueEnInicio()) return;
+        /* Un solo intento por visita al inicio: si el sorteo dice que no, no se
+           reintenta cada dos segundos hasta que salga. */
+        if (yEnPie) return;
+        _alCitaPendiente = setTimeout(function () {
+          yEnPie = 1;
+          sortear();
+        }, AL_ESPERA_MS);
+      };
+      /* Los gestos REINICIAN la espera, no la matan. El scroll de llegada
+         retrasa la cita 2 segundos y ya esta, en vez de cancelarla. */
+      ['pointerdown', 'touchstart', 'keydown', 'wheel', 'scroll'].forEach(function (g) {
+        document.addEventListener(g, function () {
+          if (sigueEnInicio() && !yEnPie) window._quietudRearmar();
+        }, true);
+      });
+      window._quietudRearmar();
+    } catch (e) {}
+  };
+
+  /* Al salir del inicio se olvida el intento, para que la proxima visita
+     vuelva a tener su oportunidad. */
+  window.dmQuietudReset = function () { try { clearTimeout(_alCitaPendiente); } catch (e) {} };
+
+
+  /* ══ NIAZ 2 · "Conoce a tus Aigents" ═══════════════════════════════════
+     Salta sola en el inicio, 20 % de las veces que el usuario pasa mas de 2
+     segundos quieto. Copy del founder; el subtitulo es la transcripcion
+     literal de lo que ella dice en el video. */
+  var N2_SILENCIO_KEY = 'dm_niaz2_silencio';
+  var _n2Timer = null;
+
+  function _n2Texto() {
+    return _i18nText('n2_script',
+      'Uy, perdona, me estaba reseteando. Hola, soy Niaz, tu Aigent de lujo y ' +
+      'lifestyle canino. Y estoy aqu\u00ed para ayudarte con peluquer\u00eda, hoteles, ' +
+      'productos premium, restaurantes y viajes. Solo lo mejor para tu perro.');
+  }
+
+  function dmN2Arrancar(repeticion) {
+    var t = document.getElementById('n2-typed');
+    var v = document.getElementById('n2-video');
+    if (!t) return;
+    if (_n2Timer) { clearInterval(_n2Timer); _n2Timer = null; }
+    dmVideosSoltarSalvo('n2-video');
+    dmVideoCargar(v);
+
+    var texto = _n2Texto();
+    t.textContent = '';
+    var caret = document.createElement('span');
+    caret.className = 'ob-caret';
+    t.appendChild(caret);
+
+    function escribir() {
+      if (_n2Timer) { clearInterval(_n2Timer); _n2Timer = null; }
+      var dur = (v && v.duration && isFinite(v.duration) && v.duration > 2) ? v.duration : 15;
+      var paso = Math.max(16, (dur * 930) / texto.length);
+      var i = 0;
+      _n2Timer = setInterval(function () {
+        i++;
+        t.textContent = texto.slice(0, i);
+        t.appendChild(caret);
+        if (i >= texto.length) { clearInterval(_n2Timer); _n2Timer = null; }
+      }, paso);
+    }
+
+    if (v) {
+      clearTimeout(v._esperaTexto);
+      v._alSonar = function () { clearTimeout(v._esperaTexto); escribir(); };
+      v.addEventListener('playing', v._alSonar, { once: true });
+      v._esperaTexto = setTimeout(escribir, 3000);
+      try { v.currentTime = 0; if (!repeticion) v.muted = true; v.play().catch(function(){}); } catch (e) {}
+    } else { escribir(); }
+
+    t.onclick = function () {
+      if (_n2Timer) { clearInterval(_n2Timer); _n2Timer = null; }
+      t.textContent = texto;
+    };
+  }
+  window.dmN2Arrancar = dmN2Arrancar;
+
+  function _n2Parar() {
+    if (_n2Timer) { clearInterval(_n2Timer); _n2Timer = null; }
+    var v = document.getElementById('n2-video');
+    if (v) { clearTimeout(v._esperaTexto); dmVideoSoltar(v); }
+  }
+
+  window.dmN2Sonido = function () {
+    var v = document.getElementById('n2-video');
+    if (!v) return;
+    v.muted = !v.muted;
+    var off = document.getElementById('n2-sound-off');
+    var on  = document.getElementById('n2-sound-on');
+    if (off) off.style.display = v.muted ? '' : 'none';
+    if (on)  on.style.display  = v.muted ? 'none' : '';
+    if (!v.muted) dmN2Repetir();
+  };
+  window.dmN2Repetir = function () {
+    var v = document.getElementById('n2-video');
+    if (v) { try { v.currentTime = 0; v.play().catch(function(){}); } catch (e) {} }
+    dmN2Arrancar(true);
+  };
+
+  /* El boton lleva a la pantalla donde estan los ocho. */
+  window.dmN2Ir = function () { _n2Parar(); goTo('s-avatars'); };
+
+  /* Saltar: vuelve al inicio y NO se le vuelve a poner delante en esta sesion.
+     Sin esta marca, volver al inicio reabria la cuenta atras y salia otra vez
+     en bucle. */
+  window.dmN2AhoraNo = function () {
+    _n2Parar();
+    window._n2RechazadaEnSesion = true;
+    goTo('s-home');
+  };
+  window.dmN2NoMostrarMas = function () {
+    try { localStorage.setItem(N2_SILENCIO_KEY, '1'); } catch (e) {}
+    dmN2AhoraNo();
+  };
+
+  /* Niaz de visita. Se llama desde los botones que abren una consulta —hoy
+     "Nueva consulta" y "Escuela Cachorros"— y devuelve true si ella se ha
+     puesto delante. El destino se guarda para que decir "ahora no" lleve
+     exactamente adonde iba el usuario, no a otro sitio. */
+  window._nzInterceptar = function (destino) {
+    try {
+      if (!document.getElementById('s-niaz')) return false;
+      if (localStorage.getItem(NZ_SILENCIO_KEY) === '1') return false;
+      /* Ya se asomó por quietud y la saltó: no se le pone otra vez delante. */
+      if (window._nzRechazadaEnSesion) return false;
+      var actual = document.querySelector('.screen.active');
+      if (actual && actual.id === 's-niaz') return false;
+      if (Math.random() >= NZ_PROBABILIDAD) return false;
+      window._nzModo = 'consulta';
+      window._nzVolverA = destino;
+      goTo('s-niaz');
+      return true;
+    } catch (e) { return false; }
   };
 
   window.dmObDiferencias = function () {
@@ -17496,17 +18201,14 @@ function getVal(id, fallback) {
   window.dmObElegir = function (tipo) {
     try { localStorage.setItem('dm_perfil_elegido', tipo); } catch (e) {}
     var v = document.getElementById('ob-video');
-    if (v) { try { v.pause(); } catch (e) {} }
+    dmVideoSoltar(v);
     if (_obTimer) { clearInterval(_obTimer); _obTimer = null; }
 
-    if (tipo === 'professional') {
-      /* A planes, con el escalón profesional por delante. Cuando vuelva (pague
-         o no) sigue la visita guiada igual: no se le deja tirado. */
-      try { window._planesVolverA = 's-aigents-welcome'; } catch (e) {}
-      goTo('s-planes');
-      return;
-    }
-    /* Pet Owner: la bienvenida coral de los ocho y, tras ella, Niaz con los
+    /* Profesional y Pet Owner entran IGUAL (founder, 30-ago-2026): descarga
+       gratuita, tres dias de cortesia y despues suscripcion. Antes al
+       profesional se le metia la pantalla de planes por delante en el alta;
+       ya no: paga cuando se le acaba la cortesia, igual que el otro. */
+    /* La bienvenida coral de los ocho y, tras ella, Niaz con los
        tres caminos. Si faltara alguna pantalla la cadena sigue sin romperse. */
     goTo(document.getElementById('s-aigents-welcome') ? 's-aigents-welcome'
          : (document.getElementById('s-niaz') ? 's-niaz' : 's-guided-welcome'));
@@ -20536,9 +21238,14 @@ window.goToConsultType = async function() {
       goTo('s-splash');
       return;
     }
+    /* Niaz de visita (founder, 28-ago): al que ya está registrado le sale en
+       7 de cada 10 veces que pulsa "Nueva consulta", y desde ahí elige camino. */
+    if (window._nzInterceptar && window._nzInterceptar('s-consult-type')) return;
+
     // Intentar cargar info de cuenta si todavía no está, para no decidir
     // sobre datos vacíos. Si falla, asumimos NO-particular (optimista) y
     // mostramos selector — el backend filtra al submit.
+    window._nzModo = null;
     goTo('s-consult-type');
   } catch(e) {
     // Cualquier excepción inesperada: fallback a anamnesis (comportamiento
@@ -20637,6 +21344,11 @@ window._mdToHtml = function(md) {
    POST → render), con su propio endpoint y sus propios campos.
    ══════════════════════════════════════════════════════════════════════════ */
 window.goToPuppySchool = function() {
+  /* Escuela Cachorros también abre consulta, así que Niaz aparece aquí igual
+     que en "Nueva consulta" (founder, 28-ago). Si dice "ahora no", vuelve
+     exactamente al alta del cachorro, no al selector de consulta. */
+  if (window._nzInterceptar && window._nzInterceptar('s-anamnesis-puppy')) return;
+  window._nzModo = null;
   goTo('s-anamnesis-puppy');
   try { var n = document.getElementById('pup-name'); if (n && !n.value) n.focus(); } catch(e) {}
 };
@@ -22034,7 +22746,7 @@ function endTourIntro() {
       ct_a_pitch:               'Análisis funcional ABC + plan de intervención LIMA para resolver un problema de conducta (ansiedad, reactividad, miedos, agresividad…).',
       ct_b_tag:                 'Entrenamiento',
       ct_b_title:               'Entrenamiento específico',
-      ob_script:                'Bienvenido a The Dogs’ Mind, una revolucionaria inteligencia artificial que te ayudará a resolver cualquier problema de conducta canina y será tu mejor aliado para construir ejercicios con tu perro. Antes de seguir dime: ¿eres Pet Owner o Usuario profesional? Tu respuesta es importante porque hay dos versiones muy diferentes dentro de la app.',
+      ob_script:                'Welcome a The Dogs’ Mind, una revolucionaria inteligencia artificial que te ayudará a resolver cualquier problema de conducta canina y será tu mejor aliado para construir ejercicios con tu perro. Antes de seguir dime: ¿eres Pet Owner o Usuario profesional? Tu respuesta es importante porque hay dos versiones muy diferentes dentro de la app.',
       ob_q:                     '¿Eres Pet Owner o Usuario profesional?',
       ob_btn_owner:             'Pet Owner',
       ob_btn_owner_sub:         'Tengo perro y quiero resolver algo con él',
@@ -22061,8 +22773,14 @@ function endTourIntro() {
       nz_a:                    'Solucionar un problema de conducta',
       nz_b:                    'Entrenar un ejercicio de adiestramiento',
       nz_c:                    'Educar a tu cachorro y prevenir males futuros',
-      nz_skip:                 'Ahora no',
-      aw_title:                 'Bienvenido a The Dogs’ Mind',
+      nz_skip:                 'Skip intro',
+      nz_never:                'Don\u2019t show me again',
+      n2_title:                'Conoce a tus Aigents',
+      n2_body:                 'Los Aigents son avatars de IA muy especializados. No sirven para generar an\u00e1lisis de conducta pero te ayudan en tu d\u00eda a d\u00eda con tu perro.',
+      n2_cta:                  'Conoce a Los Aigents',
+      n2_script:               'Uy, perdona, me estaba reseteando. Hola, soy Niaz, tu Aigent de lujo y lifestyle canino. Y estoy aqu\u00ed para ayudarte con peluquer\u00eda, hoteles, productos premium, restaurantes y viajes. Solo lo mejor para tu perro.',
+      al_cta:                  'Dog Walking',
+      aw_title:                 'Welcome a The Dogs’ Mind',
       aw_body:                  'Uno de nosotros te va a acompañar en tu primera consulta.',
       aw_cta:                   'Adelante',
       pw_tokens_q:              '¿Quieres comprar créditos sueltos sin cambiar de plan?',
@@ -22438,7 +23156,7 @@ function endTourIntro() {
       soon_available:   'Próximamente disponible',
       // Plan Sencillo / Pet Owners (s-plan-simple)
       pp_eyebrow:           'Versión accesible · Pet Owners',
-      pp_title:             'Plan sencillo',
+      ps_plan_title:        'Plan sencillo',
       pp_meta_dog_default:  'Tu perro',
       pp_loading:           'Generando tu plan en lenguaje sencillo…',
       pp_disclaimer:        'Esta versión sencilla es un resumen accesible del plan técnico. No sustituye consulta presencial con etólogo o veterinario cuando el caso lo requiera.',
@@ -22693,7 +23411,7 @@ function endTourIntro() {
       tos_h3:        '3. Cuenta y elegibilidad',
       tos_p3:        'Debes tener al menos 18 años para crear una cuenta. Eres responsable de la veracidad de los datos que introduces y de mantener tu contraseña segura. Una cuenta = una persona física.',
       tos_h4:        '4. Tokens y pagos',
-      tos_p4:        'El acceso a análisis y planes consume tokens. Los tokens se compran en packs y no caducan. Los pagos se procesan a través de Stripe (web) o Apple In-App Purchase (iOS). Los tokens son no reembolsables salvo error técnico imputable a nosotros o requisito legal aplicable. Las recargas son finales tras la confirmación.',
+      tos_p4:        'El acceso a análisis y planes consume tokens. Los tokens se compran en packs y no caducan. Los pagos se procesan a través de Stripe (web), Apple In-App Purchase (iOS) o Google Play (Android). Los tokens son no reembolsables salvo error técnico imputable a nosotros o requisito legal aplicable. Las recargas son finales tras la confirmación.',
       tos_h5:        '5. Uso aceptable',
       tos_p5:        'No puedes usar el servicio para fines ilegales, dañinos o que infrinjan derechos de terceros. Tampoco puedes intentar extraer modelos, hacer ingeniería inversa, ni revender el servicio sin autorización escrita.',
       tos_h6:        '6. Cancelación de cuenta',
@@ -23215,7 +23933,13 @@ function endTourIntro() {
       nz_a:                    'Solve a behaviour problem',
       nz_b:                    'Train a specific exercise',
       nz_c:                    'Raise your puppy and prevent future trouble',
-      nz_skip:                 'Not now',
+      nz_skip:                 'Skip intro',
+      nz_never:                'Don\u2019t show me again',
+      n2_title:                'Meet your Aigents',
+      n2_body:                 'Aigents are highly specialised AI avatars. They do not generate behavioural analyses, but they help you day to day with your dog.',
+      n2_cta:                  'Meet the Aigents',
+      n2_script:               'Oops, sorry, I was rebooting. Hi, I\u2019m Niaz, your luxury and canine lifestyle Aigent. And I\u2019m here to help you with grooming, hotels, premium products, restaurants and travel. Only the best for your dog.',
+      al_cta:                  'Dog Walking',
       aw_title:                 'Welcome to The Dogs’ Mind',
       aw_body:                  'One of us is going to be with you through your first consultation.',
       aw_cta:                   'Let’s go',
@@ -23591,7 +24315,7 @@ function endTourIntro() {
       soon_available:   'Coming soon',
       // Simple Plan / Pet Owners (s-plan-simple)
       pp_eyebrow:           'Accessible version · Pet Owners',
-      pp_title:             'Simple plan',
+      ps_plan_title:        'Simple plan',
       pp_meta_dog_default:  'Your dog',
       pp_loading:           'Generating your plan in plain language…',
       pp_disclaimer:        'This simple version is an accessible summary of the technical plan. It does not replace in-person consultation with an ethologist or vet when the case requires it.',
@@ -23845,7 +24569,7 @@ function endTourIntro() {
       tos_h3:        '3. Account and eligibility',
       tos_p3:        'You must be at least 18 years old to create an account. You are responsible for the accuracy of the data you provide and for keeping your password safe. One account = one natural person.',
       tos_h4:        '4. Tokens and payments',
-      tos_p4:        'Access to analyses and plans consumes tokens. Tokens are sold in packs and do not expire. Payments are processed via Stripe (web) or Apple In-App Purchase (iOS). Tokens are non-refundable except in cases of technical error attributable to us or applicable legal requirements. Top-ups are final once confirmed.',
+      tos_p4:        'Access to analyses and plans consumes tokens. Tokens are sold in packs and do not expire. Payments are processed via Stripe (web), Apple In-App Purchase (iOS) or Google Play (Android). Tokens are non-refundable except in cases of technical error attributable to us or applicable legal requirements. Top-ups are final once confirmed.',
       tos_h5:        '5. Acceptable use',
       tos_p5:        'You may not use the service for illegal, harmful, or third-party-rights-infringing purposes. You may not attempt to extract models, reverse-engineer, or resell the service without written authorization.',
       tos_h6:        '6. Account cancellation',
@@ -24341,7 +25065,7 @@ function endTourIntro() {
           ct_a_pitch:               "Analisi funzionale ABC + piano d'intervento LIMA per risolvere un problema di comportamento (ansia, reattività, paure, aggressività…).",
           ct_b_tag:                 'Addestramento',
           ct_b_title:               'Addestramento specifico',
-          ob_script:                'Benvenuto in The Dogs’ Mind, una rivoluzionaria intelligenza artificiale che ti aiuterà a risolvere qualunque problema di comportamento canino e sarà il tuo migliore alleato per costruire esercizi con il tuo cane. Prima di andare avanti dimmi: sei un Pet Owner o un Utente professionale? La tua risposta è importante perché dentro l’app ci sono due versioni molto diverse.',
+          ob_script:                'Welcome in The Dogs’ Mind, una rivoluzionaria intelligenza artificiale che ti aiuterà a risolvere qualunque problema di comportamento canino e sarà il tuo migliore alleato per costruire esercizi con il tuo cane. Prima di andare avanti dimmi: sei un Pet Owner o un Utente professionale? La tua risposta è importante perché dentro l’app ci sono due versioni molto diverse.',
           ob_q:                     'Sei un Pet Owner o un Utente professionale?',
           ob_btn_owner:             'Pet Owner',
           ob_btn_owner_sub:         'Ho un cane e voglio risolvere qualcosa con lui',
@@ -24368,8 +25092,14 @@ function endTourIntro() {
           nz_a:                    'Risolvere un problema di comportamento',
           nz_b:                    'Allenare un esercizio di addestramento',
           nz_c:                    'Educare il cucciolo e prevenire problemi futuri',
-          nz_skip:                 'Non ora',
-          aw_title:                 'Benvenuto in The Dogs’ Mind',
+          nz_skip:                 'Skip intro',
+          nz_never:                'Don\u2019t show me again',
+          n2_title:                'Conosci i tuoi Aigents',
+          n2_body:                 'Gli Aigents sono avatar di IA molto specializzati. Non servono a generare analisi del comportamento, ma ti aiutano ogni giorno con il tuo cane.',
+          n2_cta:                  'Conosci gli Aigents',
+          n2_script:               'Ops, scusa, mi stavo riavviando. Ciao, sono Niaz, la tua Aigent di lusso e lifestyle canino. E sono qui per aiutarti con toelettatura, hotel, prodotti premium, ristoranti e viaggi. Solo il meglio per il tuo cane.',
+          al_cta:                  'Dog Walking',
+          aw_title:                 'Welcome in The Dogs’ Mind',
           aw_body:                  'Uno di noi ti accompagnerà nel tuo primo consulto.',
           aw_cta:                   'Avanti',
           pw_tokens_q:              'Vuoi comprare crediti singoli senza cambiare piano?',
@@ -24745,7 +25475,7 @@ function endTourIntro() {
           soon_available:   'Prossimamente disponibile',
           // Piano Semplice / Pet Owners (s-plan-simple)
           pp_eyebrow:           'Versione accessibile · Pet Owners',
-          pp_title:             'Piano semplice',
+          ps_plan_title:        'Piano semplice',
           pp_meta_dog_default:  'Il tuo cane',
           pp_loading:           'Generazione del tuo piano in linguaggio semplice…',
           pp_disclaimer:        'Questa versione semplice è un riassunto accessibile del piano tecnico. Non sostituisce il consulto in presenza con etologo o veterinario quando il caso lo richiede.',
@@ -24999,7 +25729,7 @@ function endTourIntro() {
           tos_h3:        '3. Account e idoneità',
           tos_p3:        'Devi avere almeno 18 anni per creare un account. Sei responsabile della veridicità dei dati che inserisci e del mantenere sicura la tua password. Un account = una persona fisica.',
           tos_h4:        '4. Tokens e pagamenti',
-          tos_p4:        'L’accesso ad analisi e piani consuma tokens. I tokens si acquistano in pack e non scadono. I pagamenti vengono elaborati tramite Stripe (web) o Apple In-App Purchase (iOS). I tokens non sono rimborsabili salvo errore tecnico a noi imputabile o obbligo legale applicabile. Le ricariche sono definitive dopo la conferma.',
+          tos_p4:        'L’accesso ad analisi e piani consuma tokens. I tokens si acquistano in pack e non scadono. I pagamenti vengono elaborati tramite Stripe (web), Apple In-App Purchase (iOS) o Google Play (Android). I tokens non sono rimborsabili salvo errore tecnico a noi imputabile o obbligo legale applicabile. Le ricariche sono definitive dopo la conferma.',
           tos_h5:        '5. Uso accettabile',
           tos_p5:        'Non puoi usare il servizio per fini illegali, dannosi o che violino i diritti di terzi. Non puoi inoltre tentare di estrarre i modelli, fare reverse engineering, né rivendere il servizio senza autorizzazione scritta.',
           tos_h6:        '6. Cancellazione dell’account',
@@ -25340,7 +26070,7 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
       <p style="margin:0 0 20px;" data-i18n="tos_p3">Debes tener al menos 18 años para crear una cuenta. Eres responsable de la veracidad de los datos que introduces y de mantener tu contraseña segura. Una cuenta = una persona física.</p>
 
       <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="tos_h4">4. Tokens y pagos</h3>
-      <p style="margin:0 0 20px;" data-i18n="tos_p4">El acceso a análisis y planes consume tokens. Los tokens se compran en packs y no caducan. Los pagos se procesan a través de Stripe (web) o Apple In-App Purchase (iOS). Los tokens son no reembolsables salvo error técnico imputable a nosotros o requisito legal aplicable. Las recargas son finales tras la confirmación.</p>
+      <p style="margin:0 0 20px;" data-i18n="tos_p4">El acceso a análisis y planes consume tokens. Los tokens se compran en packs y no caducan. Los pagos se procesan a través de Stripe (web), Apple In-App Purchase (iOS) o Google Play (Android). Los tokens son no reembolsables salvo error técnico imputable a nosotros o requisito legal aplicable. Las recargas son finales tras la confirmación.</p>
 
       <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="tos_h5">5. Uso aceptable</h3>
       <p style="margin:0 0 20px;" data-i18n="tos_p5">No puedes usar el servicio para fines ilegales, dañinos o que infrinjan derechos de terceros. Tampoco puedes intentar extraer modelos, hacer ingeniería inversa, ni revender el servicio sin autorización escrita.</p>

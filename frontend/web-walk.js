@@ -81,7 +81,14 @@
   /* Consulta a Overpass con reintentos. Devuelve null solo si fallan todos los
      intentos en todos los espejos. */
   async function _overpass(q) {
-    var servidores = [OVERPASS, 'https://overpass.osm.ch/api/interpreter'];
+    /* overpass.osm.ch FUERA: responde 200 con una respuesta bien formada pero
+       SIN DATOS (su timestamp_osm_base es "116774", que ni es una fecha). El
+       paseo caia ahi, recibia cero sitios y el boton no hacia nada (founder,
+       30-ago-2026, en iPhone). */
+    var servidores = [OVERPASS,
+                      'https://overpass.kumi.systems/api/interpreter',
+                      'https://overpass.private.coffee/api/interpreter'];
+    var hubo200Vacio = false;
     for (var vuelta = 0; vuelta < 2; vuelta++) {
       for (var i = 0; i < servidores.length; i++) {
         try {
@@ -96,14 +103,19 @@
           clearTimeout(corte);
           if (r.ok) {
             var j = await r.json();
-            if (j && j.elements) return j;
+            /* Una lista VACIA no cuenta como respuesta buena: un array vacio
+               es "truthy" y antes se daba por valida. Se sigue probando. */
+            if (j && j.elements && j.elements.length) return j;
+            if (j && j.elements) hubo200Vacio = true;
           }
         } catch (e) { /* siguiente */ }
       }
       /* Respiro antes de la segunda vuelta: el 504 suele ser pasajero. */
       if (vuelta === 0) await new Promise(function (ok) { setTimeout(ok, 1500); });
     }
-    return null;
+    /* Si TODOS contestaron vacio, se devuelve vacio para poder decir "aqui no
+       hay sitios" en vez de "no se pudo conectar". */
+    return hubo200Vacio ? { elements: [] } : null;
   }
 
   async function buscarPois(lat, lon, radio) {
@@ -558,7 +570,7 @@
     if (e) e.textContent = t;
   }
 
-  /* Cobro del paseo: 10 créditos (0,1 tk) por planificación, precio de salida
+  /* Cobro del paseo: 25 créditos (0,25 tk) por planificación. Subió de 10 a 25
      del founder — "ningún uso es gratis". Solo con sesión; si no hay saldo,
      sale el aviso de recarga y no se genera. Si el cobro falla por red, el
      paseo NO se bloquea (fail-open, como el resto de la app). */
@@ -585,7 +597,7 @@
   async function generar(centro, etiqueta) {
     /* El cobro va DESPUÉS de tener los datos (2026-08-06). Antes se cobraba
        aquí arriba: si Overpass estaba caído —pasa a menudo, es un servicio
-       público gratuito— el usuario pagaba 10 créditos, veía "no se han podido
+       público gratuito— el usuario pagaba los créditos, veía "no se han podido
        consultar los datos" y volvía a pagar en cada reintento. */
     estado.centro = centro;
     estadoTexto('Buscando zonas verdes y servicios…');
@@ -640,13 +652,16 @@
          pedir 1,5 km devolvía 4,3 km reales, que para un cachorro o un perro
          mayor no sirve. Tanteamos varias escalas y nos quedamos con la que más
          se acerca a la distancia pedida. */
+      /* UNA sola candidata por ruta. Antes se probaban hasta cinco y se
+         quedaba con la que mas se acercaba a la distancia pedida: mejor
+         precision, pero entre 3 y 15 llamadas al motor de rutas por paseo.
+         Con Google Maps eso es dinero variable, y el precio al usuario no
+         puede bailar segun lo que tarde en encontrar ruta (founder,
+         30-ago-2026). Ahora son 3 llamadas fijas y el coste queda clavado. */
       var candidatos = [];
-      [0.45, 0.7, 1].forEach(function (esc) {
-        var cp = elegirDestinos(pois, centro, o.m, esc);
-        if (cp) candidatos.push(cp);
-      });
-      candidatos.push(destinosPorRumbo(centro, o.m, 0));
-      candidatos.push(destinosPorRumbo(centro, o.m, 1));
+      var cp = elegirDestinos(pois, centro, o.m, 0.7);
+      if (cp) candidatos.push(cp);
+      else candidatos.push(destinosPorRumbo(centro, o.m, 0));
 
       var res = null, mejorDif = Infinity;
       for (var c = 0; c < candidatos.length; c++) {

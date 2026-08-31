@@ -1,4 +1,5 @@
 import json
+import hashlib
 import os
 import tempfile
 from typing import Optional, List
@@ -6,6 +7,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, BackgroundTasks, File, Form, HTTPException, UploadFile, Header, Depends, Query
 from pydantic import BaseModel
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.models.anamnesis import AnamnesisInput, AnalysisResponse
@@ -80,6 +82,65 @@ ALLOWED_VIDEO_TYPES = {
 }
 
 
+# ── Idempotencia de /analysis ────────────────────────────────────────────────
+# MEDIDO 2026-08-31 contra produccion: /analysis tarda 68,5 s en responder 200.
+# El WebView nativo corta antes, el usuario ve "error de conexion" y el cobro YA
+# se hizo (deduct_token va antes de generar). Al reintentar se le vuelve a cobrar:
+# un usuario real pago 9 tokens por un solo analisis el 1-ago-2026.
+#
+# Solucion: el servidor recuerda lo que genero. Se guarda con una huella de la
+# anamnesis; si vuelve la MISMA anamnesis del MISMO usuario dentro de 24 h, se
+# devuelve lo guardado al instante y SIN cobrar.
+_CACHE_HORAS = 24
+
+
+def _huella_anamnesis(anamnesis, user_id: Optional[str], sufijo: str = "") -> Optional[str]:
+    """Huella estable de (usuario + anamnesis). None si no se puede calcular."""
+    if not user_id:
+        return None
+    try:
+        datos = anamnesis.model_dump() if hasattr(anamnesis, "model_dump") else anamnesis.dict()
+        crudo = json.dumps(datos, sort_keys=True, default=str, ensure_ascii=False)
+        return hashlib.sha256((str(user_id) + "|" + sufijo + "|" + crudo).encode("utf-8")).hexdigest()
+    except Exception:
+        return None
+
+
+def _cache_leer(db, huella: Optional[str]):
+    """Devuelve el resultado guardado, o None. Nunca lanza."""
+    if not huella:
+        return None
+    try:
+        fila = db.execute(
+            text("select payload from analysis_cache "
+                 "where fingerprint = :f "
+                 "and created_at > now() - make_interval(hours => :h)"),
+            {"f": huella, "h": _CACHE_HORAS},
+        ).fetchone()
+        return json.loads(fila[0]) if fila else None
+    except Exception:
+        return None
+
+
+def _cache_guardar(db, huella: Optional[str], user_id: str, endpoint: str, payload: dict) -> None:
+    """Guarda el resultado. Nunca lanza: si falla, el usuario ya tiene su analisis."""
+    if not huella:
+        return
+    try:
+        db.execute(
+            text("insert into analysis_cache (fingerprint, user_id, endpoint, payload) "
+                 "values (:f, :u, :e, :p) on conflict (fingerprint) do nothing"),
+            {"f": huella, "u": str(user_id), "e": endpoint,
+             "p": json.dumps(payload, default=str, ensure_ascii=False)},
+        )
+        db.commit()
+    except Exception:
+        try:
+            db.rollback()
+        except Exception:
+            pass
+
+
 @router.post("", response_model=AnalysisResponse)
 def create_analysis(
     anamnesis: AnamnesisInput,
@@ -100,8 +161,19 @@ def create_analysis(
     SHADOW SAFETY: lanza un classifier en background tras la respuesta
     (no añade latencia) que loguea categorías de riesgo en safety_log.
     """
-    deduct_token(authorization, db, amount=ANALYSIS_TEXT_TOKEN_COST, require_auth=True)
+    # ── Idempotencia: PRIMERO mirar, y solo cobrar si hay que generar ────────
+    # Si al usuario se le corto la conexion y vuelve a pedir la MISMA anamnesis,
+    # se le devuelve lo ya generado al instante y sin cobrarle otra vez.
     user_id_for_logs = _extract_user_id(authorization)
+    _huella = _huella_anamnesis(anamnesis, user_id_for_logs)
+    _guardado = _cache_leer(db, _huella)
+    if _guardado is not None:
+        try:
+            return AnalysisResponse(**_guardado)
+        except Exception:
+            pass  # si el guardado no encaja con el modelo, se genera de nuevo
+
+    deduct_token(authorization, db, amount=ANALYSIS_TEXT_TOKEN_COST, require_auth=True)
     # Shadow-mode safety classifier — no bloquea, solo loguea para análisis posterior
     safety_text = _anamnesis_text_for_safety(anamnesis)
     if safety_text:
@@ -144,6 +216,15 @@ def create_analysis(
                 tokens_charged=ANALYSIS_TEXT_TOKEN_COST,
                 update_summary_abc=True,
             )
+        # Se guarda ANTES de devolver: si el WebView corta ahora mismo, el
+        # usuario recupera este analisis al reintentar, sin pagar otra vez.
+        try:
+            _cache_guardar(
+                db, _huella, user_id_for_logs, "/analysis",
+                result.model_dump() if hasattr(result, "model_dump") else result.dict(),
+            )
+        except Exception:
+            pass
         return result
     except Exception as e:
         # Refund tokens — no cobramos al usuario por errores de IA/red.

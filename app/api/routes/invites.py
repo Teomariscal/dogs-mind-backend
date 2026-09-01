@@ -88,6 +88,12 @@ def canjear(
 
     # Concede los créditos del plan y deja la suscripción viva ese tiempo.
     # NO renueva sola: al vencer, la cuenta vuelve a la norma general.
+    # Hasta cuando dura la invitacion. meses=None -> sin tope (equipo);
+    # meses=N -> N abonos mensuales y se acaba (founder, 1-sep-2026).
+    meses = getattr(inv, "meses", 1)
+    current_user.invite_until = None if meses is None else (
+        datetime.utcnow() + timedelta(days=30 * int(meses)))
+
     if not ya_este_ciclo:
         current_user.tokens = float(current_user.tokens or 0) + creditos
         current_user.subscription_last_grant = ciclo

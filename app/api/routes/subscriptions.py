@@ -81,12 +81,15 @@ def _renovar_invitacion(user: User, db: Session) -> None:
     dia no regala veinte veces (founder, 1-sep-2026).
     """
     try:
-        # SOLO los miembros permanentes del equipo se renuevan solos. Los codigos
-        # de invitado dan UN MES y se acaban: el invitado pasa entonces a la
-        # norma general (founder, 1-sep-2026).
+        # Se renueva mientras la invitacion siga viva. invite_until a None =
+        # sin tope (miembros del equipo); con fecha = se renueva hasta ahi y se
+        # acaba (invitados: 1 mes; casos especiales: los que se le pongan).
         if (user.subscription_store or "") != "invitacion":
             return
-        if (user.subscription_plan or "") != "tdm_team":
+        if not (user.subscription_plan or ""):
+            return
+        tope = getattr(user, "invite_until", None)
+        if tope is not None and datetime.utcnow() >= tope:
             return
         vence = user.subscription_expires_at
         if vence and datetime.utcnow() < vence:

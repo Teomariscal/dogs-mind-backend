@@ -56,6 +56,8 @@ class User(Base):
     subscription_status      = Column(String(20), nullable=True)   # active|trialing|in_grace|canceled|expired
     subscription_store       = Column(String(20), nullable=True)   # apple|google|stripe
     subscription_expires_at  = Column(DateTime, nullable=True)     # fin del ciclo pagado
+    # Hasta cuando dura una invitacion. None = sin tope (miembros del equipo).
+    invite_until           = Column(DateTime, nullable=True)
     subscription_started_at  = Column(DateTime, nullable=True)
     # Clave del último ciclo al que ya se le abonaron créditos — evita doble
     # abono si la tienda reenvía el mismo webhook.

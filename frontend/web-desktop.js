@@ -128,10 +128,16 @@
        escritorio, con su propia barra: sin esto seguiría entrando por tokens. */
     saldo.onclick = function () { irA('s-planes'); };
     inner.appendChild(saldo);
+    /* 'tok-home' YA viene en creditos: la conversion la hace fmtTokens en
+       index.html, que es el unico sitio donde se multiplica (1-sep-2026).
+       Aqui solo se copia. Antes se volvia a multiplicar por 100 y ademas el
+       punto de los miles se leia como decimal, asi que "4.000" acababa
+       pintando 400. */
     var pinta = function () {
       var src = document.getElementById('tok-home');
       var n = document.getElementById('dmw-saldo-n');
-      if (src && n) n.textContent = (src.textContent || '').trim() || '–';
+      if (!src || !n) return;
+      n.textContent = (src.textContent || '').trim() || '–';
     };
     pinta();
     setInterval(pinta, 2500);

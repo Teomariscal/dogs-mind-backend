@@ -134,7 +134,7 @@ def deduct_token(
             raise HTTPException(status_code=402, detail=mensaje)
 
         if float(user.tokens) < amount:
-            raise HTTPException(status_code=402, detail="Sin tokens. Recarga para continuar.")
+            raise HTTPException(status_code=402, detail="Sin créditos. Recarga para continuar.")
 
         user.tokens = float(user.tokens) - amount
         db.commit()
@@ -146,7 +146,7 @@ def deduct_token(
     except Exception as exc:
         _log.exception("deduct_token: unexpected error — %s", exc)
         if require_auth:
-            raise HTTPException(status_code=500, detail="Error al verificar tokens.")
+            raise HTTPException(status_code=500, detail="Error al verificar el saldo.")
         return None
 
 

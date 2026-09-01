@@ -441,7 +441,7 @@ def _charge_user_tokens(user: User, amount: float, db: Session) -> float:
     if current < amount:
         raise HTTPException(
             status_code=402,
-            detail="Saldo insuficiente. Recarga tokens para continuar.",
+            detail="Saldo insuficiente. Recarga créditos para continuar.",
         )
     user.tokens = current - amount
     db.flush()  # propaga el cambio dentro de la transacción sin commit

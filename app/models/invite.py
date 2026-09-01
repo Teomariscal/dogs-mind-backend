@@ -24,6 +24,11 @@ class Invite(Base):
     days         = Column(Integer, nullable=False, default=30)
     account_type = Column(String(20), nullable=False, default="particular")
     note         = Column(String(300), nullable=True)
+    # Cuantos abonos mensuales da la invitacion. None = sin tope (miembros del
+    # equipo). 1 = un mes (invitados). 3 = Embajador. Si esta columna no esta
+    # declarada aqui, el codigo lee el valor por defecto y todos duran 1 mes:
+    # me paso el 1-sep-2026.
+    meses        = Column(Integer, nullable=True, default=1)
 
     # Codigos ABIERTOS (tipo="abierto"): los usa cualquiera que los tenga, no se
     # gastan y no caducan. Para esos, used_by_id se queda a NULL y el control es

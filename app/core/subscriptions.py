@@ -44,6 +44,24 @@ DEFAULT_CUTOVER = "2026-08-10"
 
 # Catálogo por defecto. Se puede sobreescribir entero con SUBS_PLANS (JSON) en
 # Railway sin tocar código ni publicar build nuevo.
+# Plan interno TDM Team. NO se compra ni sale en la tienda: se entra por el
+# código TDM-TEAM. 9.000 créditos al mes = 90 tokens = 30 análisis completos
+# (3 tokens cada uno). Marcado "oculto" para que plans_publicos() lo excluya.
+TDM_TEAM_PLAN = {
+    "id": "tdm_team",
+    "name": {"es": "TDM Team", "en": "TDM Team", "it": "TDM Team"},
+    "price": 0.0,
+    "price_display": "—",
+    "credits": 9000,
+    "product_id_ios": None,
+    "product_id_android": None,
+    "stripe_price_env": None,
+    "trial_days": 0,
+    "badge": {"es": "Equipo", "en": "Team", "it": "Team"},
+    "audience": "ambos",
+    "oculto": True,
+}
+
 DEFAULT_PLANS = [
     {
         "id": "basico",
@@ -272,7 +290,15 @@ def plan_by_id(plan_id: str) -> Optional[dict]:
     for p in plans():
         if p.get("id") == plan_id:
             return p
+    # Planes internos que no estan en el catalogo publico.
+    if plan_id == TDM_TEAM_PLAN["id"]:
+        return TDM_TEAM_PLAN
     return None
+
+
+def plans_publicos() -> list:
+    """Los que se le ensenan al usuario: sin los internos."""
+    return [p for p in plans() if not p.get("oculto")]
 
 
 def plan_by_product_id(product_id: str) -> Optional[dict]:

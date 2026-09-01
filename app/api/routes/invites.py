@@ -62,7 +62,14 @@ def canjear(
     inv = db.query(Invite).filter(Invite.code == codigo).with_for_update().first()
     if not inv:
         raise HTTPException(status_code=404, detail="Ese código no existe.")
-    if inv.used_by_id:
+    abierto = (inv.tipo or "") == "abierto"
+
+    # Los codigos ABIERTOS no se gastan: los usa cualquiera que los tenga, tantas
+    # veces como haga falta. Lo unico que los frena es 'activo' (founder,
+    # 1-sep-2026). Los normales siguen siendo de un solo uso.
+    if getattr(inv, "activo", True) is False:
+        raise HTTPException(status_code=410, detail="Ese código ya no está activo.")
+    if not abierto and inv.used_by_id:
         raise HTTPException(status_code=409, detail="Ese código ya se ha usado.")
     if inv.expires_at and datetime.utcnow() > inv.expires_at:
         raise HTTPException(status_code=410, detail="Ese código ha caducado.")
@@ -75,20 +82,29 @@ def canjear(
     hasta = datetime.utcnow() + timedelta(days=dias)
     creditos = float(plan["credits"]) / subs.CREDITS_PER_TOKEN
 
+    # Canjear dos veces el mismo mes no regala el doble: se mira el ciclo.
+    ciclo = "invitacion:%s:%s" % (plan["id"], hasta.strftime("%Y%m"))
+    ya_este_ciclo = (current_user.subscription_last_grant or "") == ciclo
+
     # Concede los créditos del plan y deja la suscripción viva ese tiempo.
     # NO renueva sola: al vencer, la cuenta vuelve a la norma general.
-    current_user.tokens = float(current_user.tokens or 0) + creditos
+    if not ya_este_ciclo:
+        current_user.tokens = float(current_user.tokens or 0) + creditos
+        current_user.subscription_last_grant = ciclo
     current_user.subscription_plan = plan["id"]
     current_user.subscription_status = "active"
     current_user.subscription_store = "invitacion"
     current_user.subscription_expires_at = hasta
     if not current_user.subscription_started_at:
         current_user.subscription_started_at = datetime.utcnow()
-    if inv.account_type == "professional":
+    # Un codigo abierto NO cambia el tipo de cuenta: vale igual a un profesional
+    # y a un particular, y cada uno se queda como esta.
+    if not abierto and inv.account_type == "professional":
         current_user.account_type = "professional"
 
-    inv.used_by_id = current_user.id
-    inv.used_at = datetime.utcnow()
+    if not abierto:
+        inv.used_by_id = current_user.id
+        inv.used_at = datetime.utcnow()
     db.commit()
     _log.info("invite: %s canjeado por %s → plan=%s %sd",
               codigo, current_user.email, plan["id"], dias)

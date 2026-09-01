@@ -81,12 +81,12 @@ def _renovar_invitacion(user: User, db: Session) -> None:
     dia no regala veinte veces (founder, 1-sep-2026).
     """
     try:
-        # Vale para CUALQUIER plan entrado por invitacion, no solo TDM Team: el
-        # founder pidio codigos "que no haya que renovarlos" (1-sep-2026), asi
-        # que el plan sigue vivo mes a mes mientras el codigo lo diera.
+        # SOLO los miembros permanentes del equipo se renuevan solos. Los codigos
+        # de invitado dan UN MES y se acaban: el invitado pasa entonces a la
+        # norma general (founder, 1-sep-2026).
         if (user.subscription_store or "") != "invitacion":
             return
-        if not (user.subscription_plan or ""):
+        if (user.subscription_plan or "") != "tdm_team":
             return
         vence = user.subscription_expires_at
         if vence and datetime.utcnow() < vence:

@@ -16250,7 +16250,7 @@ function dmInitWebLayer() {
        completa. Sin límite de ancho — en móvil web se ve como se vería en
        la app, que es lo que queremos validar. */
     var sp = document.createElement('script');
-    sp.src = 'web-paseo.js?v=20';
+    sp.src = 'web-paseo.js?v=21';
     sp.defer = true;
     document.head.appendChild(sp);
   } catch (e) { /* ante la duda, no hacer nada */ }
@@ -16274,7 +16274,7 @@ function dmInitPaseoNativo() {
        abre "El paseo de hoy". Cargarlo aquí eran 34 KB de más en cada
        arranque, sin ganar nada. */
     var sp = document.createElement('script');
-    sp.src = 'web-paseo.js?v=20';
+    sp.src = 'web-paseo.js?v=21';
     sp.defer = true;
     document.head.appendChild(sp);
   } catch (e) { /* nunca romper el arranque de la app por el paseo */ }

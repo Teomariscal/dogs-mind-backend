@@ -80,7 +80,13 @@
 
   /* Consulta a Overpass con reintentos. Devuelve null solo si fallan todos los
      intentos en todos los espejos. */
-  async function _overpass(q) {
+  async function _overpass(q, limite) {
+    /* `limite` es el instante (Date.now()) pasado el cual se abandona. Overpass
+       es un ADORNO: aporta parques, fuentes y veterinarios, pero la ruta la
+       calcula OSRM, que no depende de el. Sin plazo, con los tres servidores
+       caidos —como el 1-sep-2026— se encadenaban 3 servidores x 2 vueltas x 25 s,
+       y `generar` lo repetia para 3 radios: mas de SIETE MINUTOS mirando
+       "buscando". El usuario se iba mucho antes y parecia que la app colgaba. */
     /* overpass.osm.ch FUERA: responde 200 con una respuesta bien formada pero
        SIN DATOS (su timestamp_osm_base es "116774", que ni es una fecha). El
        paseo caia ahi, recibia cero sitios y el boton no hacia nada (founder,
@@ -89,11 +95,14 @@
                       'https://overpass.kumi.systems/api/interpreter',
                       'https://overpass.private.coffee/api/interpreter'];
     var hubo200Vacio = false;
+    var queda = function () { return limite ? (limite - Date.now()) : 25000; };
     for (var vuelta = 0; vuelta < 2; vuelta++) {
       for (var i = 0; i < servidores.length; i++) {
+        if (queda() <= 250) return hubo200Vacio ? { elements: [] } : null;
         try {
           var ctrl = new AbortController();
-          var corte = setTimeout(function () { ctrl.abort(); }, 25000);
+          var corte = setTimeout(function () { ctrl.abort(); },
+                                 Math.max(250, Math.min(8000, queda())));
           var r = await fetch(servidores[i], {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -111,14 +120,15 @@
         } catch (e) { /* siguiente */ }
       }
       /* Respiro antes de la segunda vuelta: el 504 suele ser pasajero. */
-      if (vuelta === 0) await new Promise(function (ok) { setTimeout(ok, 1500); });
+      if (vuelta === 0 && queda() > 2000) await new Promise(function (ok) { setTimeout(ok, 1000); });
+      else if (vuelta === 0) break;
     }
     /* Si TODOS contestaron vacio, se devuelve vacio para poder decir "aqui no
        hay sitios" en vez de "no se pudo conectar". */
     return hubo200Vacio ? { elements: [] } : null;
   }
 
-  async function buscarPois(lat, lon, radio) {
+  async function buscarPois(lat, lon, radio, limite) {
     var a = '(around:' + radio + ',' + lat + ',' + lon + ');';
     var q = '[out:json][timeout:30];(' +
       'node["amenity"="veterinary"]' + a +
@@ -140,7 +150,7 @@
        único repuesto, así que no había red de seguridad.
        Ahora: dos espejos VIVOS, dos vueltas, y una espera entre medias —un 504
        casi siempre es momentáneo y a la segunda entra. */
-    var d = await _overpass(q);
+    var d = await _overpass(q, limite);
     if (!d) throw new Error('overpass');
     return (d.elements || []).map(function (e) {
       var la = e.lat != null ? e.lat : (e.center && e.center.lat);
@@ -219,7 +229,14 @@
      reales. Se prueban varias orientaciones porque en un sitio puede no haber
      camino hacia el norte y sí hacia el este. */
   function destinosPorRumbo(centro, objetivoM, intento) {
-    var r = objetivoM / 3.2;
+    /* 3.2 seria el divisor si el triangulo se recorriese en linea recta, pero se
+       recorre por calles, que dan rodeos. Medido contra el OSRM real en Madrid,
+       Montevideo, Napoles y Villamantilla (1-sep-2026): con 3.2 la ruta salia
+       1,57 veces mas larga de lo pedido —una "vuelta corta" de 1,5 km acababa
+       siendo de 3,3, que para un cachorro o un perro mayor no sirve—. Con 5.0 la
+       desviacion media baja del 57 % al 19 %, y sin gastar ni una llamada mas al
+       motor de rutas: el coste por paseo sigue clavado. */
+    var r = objetivoM / 5.0;
     var giro = (intento || 0) * 55;
     var a = mover(centro.lat, centro.lon, r, giro);
     var b = mover(centro.lat, centro.lon, r, giro + 110);
@@ -611,24 +628,32 @@
 
     /* Radio creciente: en ciudad sobra con 1,6 km; en campo abierto hay que
        abrirse para encontrar las pistas. Nos paramos en cuanto hay material. */
+    /* LOS SITIOS SON UN EXTRA, NUNCA UN REQUISITO (founder, 1-sep-2026):
+       "aunque sea por las calles de una ciudad la ruta debe salir; los parques,
+       la sombra, las fuentes de agua y las veterinarias son puntos a favor pero
+       nunca requisito imprescindible".
+       Los sitios salen de Overpass, un servicio publico gratuito que se cae a
+       ratos —el 1-sep-2026 estaban caidos los TRES servidores a la vez—. La ruta
+       en cambio la calcula OSRM sobre el callejero, y ese va aparte. Por eso
+       aqui no se corta nunca: sin sitios se traza igual por rumbo, que es lo que
+       hace destinosPorRumbo() mas abajo. Antes habia un `return` justo aqui y
+       dejaba al usuario sin paseo cada vez que Overpass fallaba. */
     var pois = [];
     var radios = [1600, 3000, 5000];
     var falloMapa = null;
+    var limite = Date.now() + 10000;   /* todo el rato que se le concede a Overpass */
     for (var ri = 0; ri < radios.length; ri++) {
+      if (Date.now() >= limite) break;
       try {
-        pois = await buscarPois(centro.lat, centro.lon, radios[ri]);
+        pois = await buscarPois(centro.lat, centro.lon, radios[ri], limite);
         falloMapa = null;
       } catch (e) { falloMapa = e; continue; }
       if (pois.length >= 6) break;
     }
     if (!pois.length) {
-      /* Sin sitios no hay ruta que trazar. Se avisa SIEMPRE, haya fallado la
-         consulta o simplemente no haya nada alrededor: quedarse en "buscando"
-         para siempre es lo que hacía pensar que la app estaba rota. */
       estadoTexto(falloMapa
-        ? 'No se han podido consultar los datos del mapa. Inténtalo en un minuto.'
-        : 'No hemos encontrado zonas verdes ni servicios cerca. Prueba a escribir una ciudad o un pueblo cercano.');
-      return;
+        ? 'El mapa de zonas verdes no responde ahora mismo. Te trazamos rutas a pie igualmente.'
+        : 'No hay zonas verdes registradas cerca. Te trazamos rutas a pie por el entorno.');
     }
     estado.pois = pois;
 

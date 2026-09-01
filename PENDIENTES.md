@@ -7,9 +7,31 @@ Lista viva. Se actualiza en cuanto algo entra o sale. Última revisión: 1-sep-2
 | rama | versión | estado |
 |---|---|---|
 | Web | v288 | en vivo, con todo lo de hoy INCLUIDOS los paseos |
-| Backend | `cd6a6c8` | desplegado, Railway SUCCESS |
+| Backend | `/analysis` con latidos | desplegado, Railway SUCCESS |
 | Google Play | 1.0.12 (vc26) | publicada en producción |
 | App Store | 1.0.12 (build 48) | en revisión · 1.0.11 en venta |
+
+## Cerrado hoy — el usuario de pago que no podia analizar
+
+**Sintoma:** "Error de conexion. El analisis puede haberse completado igualmente"
+al pulsar Analizar con IA en la web de escritorio. NO era la etiqueta de creditos.
+
+**Causa, medida contra produccion:** el analisis tarda 66,6 s y la respuesta
+llegaba entera al final, asi que la conexion pasaba mas de un minuto sin enviar
+un solo byte. Los proxies que cortan por inactividad a los 60 s la mataban. Por
+eso le pasaba a el y no a otros: depende de su red.
+
+**Arreglado** (`app/api/routes/analysis.py`): si tarda mas de 20 s se mandan
+espacios cada 5 s. Un JSON admite espacios delante, asi que el cliente sigue
+haciendo `res.json()` y no hay que tocar la app — cubre iOS, Android y web a la
+vez, incluidas las versiones ya instaladas, sin pasar por tienda.
+Primer byte: 66,6 s -> 21,0 s. Silencio maximo: 21 s.
+
+Comprobado en produccion: camino rapido intacto (cacheado 0,18 s, cero latidos),
+422 y 401 intactos, y se cobra exactamente una vez.
+
+**Al usuario:** que reintente con la MISMA anamnesis. La idempotencia le devuelve
+lo ya generado al instante y sin cobrar (medido: 0,17 s, 0 creditos).
 
 ## Prioridad
 
@@ -81,6 +103,8 @@ pasar en revisión aunque no lleve paseos, en vez de sacarla y rehacerla.
 - [ ] `payments.py:881` dice "añadir tokens" a propósito: ese endpoint de admin
   suma **tokens** como unidad interna. Renombrarlo sin convertir haría meter 100
   veces de más.
+- [ ] `cobrarPaseo()` falla en abierto: si la llamada de cobro cae por red, el
+  paseo sale gratis (`catch { return true }`). Previo y parece deliberado.
 - [ ] Mensajes 402 del backend solo en español (la app pone los suyos traducidos,
   así que hoy no se ven).
 - [ ] Vídeos por idioma de Cecilia y Niaz (EN/IT) servidos desde nuestro dominio.

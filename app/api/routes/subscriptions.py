@@ -73,7 +73,7 @@ def _public_plans() -> list:
 
 
 # ── GET /subscription/status ────────────────────────────────────────────────
-def _renovar_tdm_team(user: User, db: Session) -> None:
+def _renovar_invitacion(user: User, db: Session) -> None:
     """
     TDM Team no pasa por ninguna tienda, asi que nadie avisa de la renovacion:
     se renueva aqui, la primera vez que el usuario abre la app despues de que se
@@ -81,18 +81,21 @@ def _renovar_tdm_team(user: User, db: Session) -> None:
     dia no regala veinte veces (founder, 1-sep-2026).
     """
     try:
-        if (user.subscription_plan or "") != "tdm_team":
-            return
+        # Vale para CUALQUIER plan entrado por invitacion, no solo TDM Team: el
+        # founder pidio codigos "que no haya que renovarlos" (1-sep-2026), asi
+        # que el plan sigue vivo mes a mes mientras el codigo lo diera.
         if (user.subscription_store or "") != "invitacion":
+            return
+        if not (user.subscription_plan or ""):
             return
         vence = user.subscription_expires_at
         if vence and datetime.utcnow() < vence:
             return
-        plan = subs.plan_by_id("tdm_team")
+        plan = subs.plan_by_id(user.subscription_plan)
         if not plan:
             return
         hasta = datetime.utcnow() + timedelta(days=30)
-        ciclo = "invitacion:tdm_team:%s" % hasta.strftime("%Y%m")
+        ciclo = "invitacion:%s:%s" % (plan["id"], hasta.strftime("%Y%m"))
         if (user.subscription_last_grant or "") == ciclo:
             user.subscription_expires_at = hasta
             db.commit()
@@ -102,9 +105,9 @@ def _renovar_tdm_team(user: User, db: Session) -> None:
         user.subscription_status = "active"
         user.subscription_expires_at = hasta
         db.commit()
-        _log.info("tdm_team: renovado %s → +%s creditos", user.email, plan["credits"])
+        _log.info("invitacion: renovado %s plan=%s → +%s creditos", user.email, plan["id"], plan["credits"])
     except Exception:
-        _log.exception("tdm_team: fallo al renovar %s", getattr(user, "email", "?"))
+        _log.exception("invitacion: fallo al renovar %s", getattr(user, "email", "?"))
         db.rollback()
 
 
@@ -113,7 +116,7 @@ def subscription_status(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    _renovar_tdm_team(current_user, db)
+    _renovar_invitacion(current_user, db)
     state = subs.access_state(current_user)
     plan = subs.plan_by_id(state.get("plan") or "")
     return {

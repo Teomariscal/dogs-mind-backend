@@ -6,28 +6,36 @@ Lista viva. Se actualiza en cuanto algo entra o sale. Última revisión: 1-sep-2
 
 | rama | versión | estado |
 |---|---|---|
-| Web | v287 | en vivo, con todo lo de hoy |
+| Web | v288 | en vivo, con todo lo de hoy INCLUIDOS los paseos |
 | Backend | `cd6a6c8` | desplegado, Railway SUCCESS |
 | Google Play | 1.0.12 (vc26) | publicada en producción |
 | App Store | 1.0.12 (build 48) | en revisión · 1.0.11 en venta |
 
-## URGENTE — tiene que entrar en la próxima que salga
+## Prioridad
 
-- [ ] **Paseos / mapas con rutas: no funcionan en la app.**
-  Causa localizada (sin reproducir aún en simulador): `capacitor.config.ts` tiene
-  `limitsNavigationsToAppBoundDomains: true`, pero **no existe la clave
-  `WKAppBoundDomains` en `mobile/ios/App/App/Info.plist`** — comprobadas las 21
-  claves. Con esa opción activa y sin lista declarada, iOS bloquea las llamadas a
-  `overpass-api.de`, `nominatim.openstreetmap.org` y `routing.openstreetmap.de`,
-  que es justo lo que necesitan las rutas. En web funciona porque ahí no hay
-  restricción.
-  Siguiente paso: reproducir en el simulador, y arreglar declarando los dominios
-  o quitando la restricción.
-  **La 1.0.12 que está en revisión NO lleva esto.**
+**Los créditos van por delante de los paseos** (founder, 1-sep-2026): "los paseos
+son poco importantes en comparación con los créditos". Por eso la 1.0.12 se deja
+pasar en revisión aunque no lleve paseos, en vez de sacarla y rehacerla.
 
-- [ ] **Cobros**: pendiente de que el founder concrete qué falla exactamente.
-  Lo que sí está arreglado y va en la 1.0.12: el muro de pago vacío y el saldo
-  cien veces menor.
+- [x] **Créditos**: saldo correcto, muro de pago que ya no sale vacío, banner de
+  bienvenida, mensajes de saldo y páginas legales.
+  Web v288 · Google Play 1.0.12 (26) publicada · App Store 1.0.12 en revisión.
+
+- [ ] **Paseos: arreglado en web (v288), falta en las apps → va en la 1.0.13.**
+  Causa real, medida el 1-sep: **los tres servidores de Overpass caídos a la vez**
+  (el principal corta la conexión, los dos espejos dan 502). No cambió nada del
+  código; se cayó el servicio público gratuito que busca parques. OSRM, que es
+  quien calcula la ruta, estaba y está perfecto.
+  Lo arreglado en `web-walk.js`:
+  1. `generar()` ya no corta cuando no hay sitios. El plan B por rumbo existía
+     desde hacía semanas pero era inalcanzable: había un `return` veinte líneas
+     antes.
+  2. Overpass pasa a tener plazo de 10 s en total. Antes eran 3 servidores × 2
+     vueltas × 25 s, repetido para 3 radios: más de siete minutos en "buscando".
+  3. Divisor del plan B de 3.2 a 5.0 — la desviación media baja del 57 % al 19 %,
+     sin gastar ni una llamada más.
+  Comprobado: 12 de 12 rutas con la lista de sitios VACÍA, en ciudad y en pueblo,
+  en tres países.
 
 ## Decidido, montado a medias, esperando a la 1.0.12
 

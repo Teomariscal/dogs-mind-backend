@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
 
 from app.models.intervention import InterventionRequest, InterventionResponse
+from app.core.latidos import con_latidos
 from app.services.intervention_ai import run_intervention_plan
 from app.database import get_db
 from app.core.case_persistence import persist_to_case_safely, get_user_from_authorization
@@ -21,8 +22,7 @@ router = APIRouter(prefix="/intervention", tags=["intervention-plan"])
 INTERVENTION_TOKEN_COST = 0.20
 
 
-@router.post("", response_model=InterventionResponse)
-def create_intervention(
+def _create_intervention_sincrono(
     request: InterventionRequest,
     background_tasks: BackgroundTasks,
     case_id: Optional[str] = Query(None, description="Si se pasa, persiste el plan como entry del caso"),
@@ -89,6 +89,20 @@ def create_intervention(
             notes=str(e)[:200],
         )
         raise_http_for_anthropic(e)
+
+
+
+@router.post("", response_model=None)
+async def create_intervention(
+    request: InterventionRequest,
+    background_tasks: BackgroundTasks,
+    case_id: Optional[str] = None,
+    authorization: Optional[str] = Header(None),
+    db: Session = Depends(get_db),
+):
+    """Igual que siempre, sin dejar la conexion muda. Ver app/core/latidos.py."""
+    return await con_latidos(
+        _create_intervention_sincrono, request, background_tasks, case_id, authorization, db)
 
 # ── POST /intervention/apply-refinement ─────────────────────────────────────
 class AplicarRefinamientoIn(BaseModel):

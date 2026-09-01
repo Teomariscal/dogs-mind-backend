@@ -1,4 +1,3 @@
-import asyncio
 import json
 import hashlib
 import os
@@ -7,10 +6,7 @@ from typing import Optional, List
 from uuid import UUID
 
 from fastapi import APIRouter, BackgroundTasks, File, Form, HTTPException, UploadFile, Header, Depends, Query
-from fastapi.encoders import jsonable_encoder
-from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from starlette.concurrency import run_in_threadpool
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -21,6 +17,7 @@ from app.core.safety import log_classification_sync
 from app.core.usage_tracker import log_usage
 from app.core.case_persistence import persist_to_case_safely, get_user_from_authorization
 from app.core.anthropic_error import raise_http_for_anthropic
+from app.core.latidos import con_latidos
 from app.config import get_settings
 
 
@@ -145,16 +142,6 @@ def _cache_guardar(db, huella: Optional[str], user_id: str, endpoint: str, paylo
             pass
 
 
-# Cuanto se espera en silencio antes de empezar a mandar senales de vida, y cada
-# cuanto se manda una. Un analisis tarda unos 66 s medidos contra produccion
-# (1-sep-2026) y durante todo ese rato la conexion no enviaba NI UN BYTE: los
-# proxies que cortan por inactividad a los 60 s la mataban, y el usuario veia
-# "Error de conexion" aunque el analisis se hubiese generado y cobrado bien.
-# Lo reporto un cliente de pago desde un portatil (founder, 1-sep-2026).
-_ESPERA_SIN_LATIDO = 20     # segundos
-_CADA_LATIDO       = 5      # segundos
-
-
 def _analisis_sincrono(
     anamnesis: AnamnesisInput,
     background_tasks: BackgroundTasks,
@@ -264,39 +251,10 @@ async def create_analysis(
 ):
     """Igual que siempre, pero sin dejar la conexion callada 66 segundos.
 
-    El trabajo real lo sigue haciendo _analisis_sincrono en el mismo hilo de
-    siempre (el del threadpool), asi que nada de la logica de cobro, reintegro
-    ni persistencia cambia. Lo unico nuevo: si tarda mas de _ESPERA_SIN_LATIDO
-    se empiezan a mandar espacios cada _CADA_LATIDO segundos para que ningun
-    proxy la de por muerta. Un JSON admite espacios delante, asi que el cliente
-    hace res.json() igual que hasta ahora y no hay que tocar la app.
-
-    El camino rapido no cambia: si termina dentro de la espera —una respuesta
-    ya cacheada tarda 0,17 s— se devuelve tal cual, con sus codigos de estado y
-    sus errores HTTP intactos.
+    Ver app/core/latidos.py para el porque y las medidas.
     """
-    tarea = asyncio.ensure_future(run_in_threadpool(
-        _analisis_sincrono, anamnesis, background_tasks, case_id, authorization, db))
-    try:
-        return await asyncio.wait_for(asyncio.shield(tarea), timeout=_ESPERA_SIN_LATIDO)
-    except asyncio.TimeoutError:
-        pass
-
-    async def _con_latidos():
-        while not tarea.done():
-            yield b" "
-            await asyncio.sleep(_CADA_LATIDO)
-        try:
-            yield json.dumps(jsonable_encoder(tarea.result()), ensure_ascii=False).encode("utf-8")
-        except HTTPException as e:
-            # Ya hemos mandado un 200, asi que el codigo no se puede cambiar. El
-            # cliente vera lo mismo que ve hoy cuando se corta, y el reintegro ya
-            # lo hizo _analisis_sincrono antes de lanzar.
-            yield json.dumps({"detail": e.detail}, ensure_ascii=False, default=str).encode("utf-8")
-        except Exception:
-            yield json.dumps({"detail": "No se ha podido generar el analisis."}).encode("utf-8")
-
-    return StreamingResponse(_con_latidos(), media_type="application/json")
+    return await con_latidos(
+        _analisis_sincrono, anamnesis, background_tasks, case_id, authorization, db)
 
 
 @router.post("/video", response_model=AnalysisResponse)

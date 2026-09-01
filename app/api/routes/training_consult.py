@@ -34,6 +34,7 @@ from pydantic import BaseModel, Field, field_validator
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.core.latidos import con_latidos
 from app.config import get_settings
 from app.core.token_utils import deduct_token, refund_token
 from app.core.anthropic_error import raise_http_for_anthropic
@@ -107,8 +108,7 @@ class TrainingConsultResponse(BaseModel):
 
 
 # ── Endpoint ──────────────────────────────────────────────────────────────
-@router.post("", response_model=TrainingConsultResponse)
-def create_training_consult(
+def _create_training_consult_sincrono(
     payload: TrainingConsultInput,
     background_tasks: BackgroundTasks,
     case_id: Optional[str] = None,
@@ -216,3 +216,22 @@ def create_training_consult(
             notes=str(e)[:200],
         )
         raise_http_for_anthropic(e)
+
+
+
+@router.post("", response_model=None)
+async def create_training_consult(
+    payload: TrainingConsultInput,
+    background_tasks: BackgroundTasks,
+    case_id: Optional[str] = None,
+    authorization: Optional[str] = Header(None),
+    db: Session = Depends(get_db),
+):
+    """Igual que siempre, sin dejar la conexion muda.
+
+    Medido el 1-sep-2026 contra produccion: 45,2 s hasta el primer byte, a solo
+    quince segundos del corte de 60 s que sufria un cliente de pago en /analysis.
+    Ver app/core/latidos.py.
+    """
+    return await con_latidos(
+        _create_training_consult_sincrono, payload, background_tasks, case_id, authorization, db)

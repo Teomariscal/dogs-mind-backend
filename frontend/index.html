@@ -12796,6 +12796,23 @@ function goTo(id) {
   if (id === 's-niaz' && typeof dmNiazArrancar === 'function') dmNiazArrancar();
   if (id === 's-ale'  && typeof dmAleArrancar  === 'function') dmAleArrancar();
   if (id === 's-niaz2' && typeof dmN2Arrancar === 'function') dmN2Arrancar();
+  /* La lista de planes y el saldo los pinta dmCargarPlanes(). Antes solo se
+     llamaba desde dmAbrirPlanes(), asi que las SEIS entradas que hacian
+     goTo('s-planes') a pelo —la barra del inicio, el menu, el boton "Recargar
+     creditos" del aviso de saldo, el 402 de /analysis y la pildora de
+     escritorio— dejaban un muro de pago VACIO: saldo en guion y ni un plan que
+     comprar (founder, 1-sep-2026, captura de TestFlight). Se engancha aqui para
+     que ninguna entrada futura pueda saltarselo. */
+  if (id === 's-planes') {
+    if (typeof dmCargarPlanes === 'function') dmCargarPlanes();
+    /* El boton atras vuelve al inicio salvo que quien abra la pantalla diga otra
+       cosa. Sin esto se quedaba con el destino de la visita anterior. */
+    var _pb = document.getElementById('planes-back');
+    if (_pb) {
+      if (!_pb._dmDestinoFijado) _pb.onclick = function() { goTo('s-home'); };
+      _pb._dmDestinoFijado = false;
+    }
+  }
   /* Ale se ofrece sola al llegar al inicio: espera un segundo y sortea. */
   if (id === 's-home' && typeof dmAleQuizas === 'function') dmAleQuizas();
   /* Al irse del inicio se olvida el intento gastado: la proxima visita
@@ -19097,9 +19114,9 @@ function getVal(id, fallback) {
   /* Punto de entrada único. motivo: 'sin_saldo' | 'menu' | undefined */
   window.dmAbrirPlanes = function(motivo) {
     var volver = document.getElementById('planes-back');
+    if (volver) volver._dmDestinoFijado = true;   /* respeta el destino de abajo */
+    goTo('s-planes');                             /* goTo ya llama a dmCargarPlanes() */
     if (volver) volver.onclick = function() { goTo(motivo === 'sin_saldo' ? 's-home' : 's-tokens'); };
-    goTo('s-planes');
-    dmCargarPlanes();
   };
 
   /* Compra de un plan. En la app va por la tienda con la MISMA fontanería

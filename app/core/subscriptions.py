@@ -454,3 +454,54 @@ def paywall_message(state: dict, lang: str = "es") -> str:
         ),
     }
     return textos.get(lang, textos["es"])
+
+
+# ── Créditos sueltos ─────────────────────────────────────────────────────────
+# "Comprar créditos sueltos a un valor un 20 % más caro cada uno que el que
+# tienen en la suscripción, a fin de que les compense subir de plan"
+# (founder, 1-sep-2026). El valor del crédito de un plan es su precio dividido
+# entre los créditos que da.
+#
+# Un pack cuesta SIEMPRE lo mismo en la tienda y lo que varía son los créditos
+# que entrega. Se hace así, y no con un precio distinto por plan, porque en App
+# Store y Google Play cada precio es un producto aparte: variar el precio serían
+# doce productos que dar de alta y que aprueben. Variando los créditos bastan los
+# tres que ya existen, y la regla se cumple igual de exacta.
+RECARGA_SOBRECOSTE = 1.20
+
+
+def valor_credito_plan(plan_id: str) -> float:
+    """Euros que le cuesta un crédito a quien está en ese plan."""
+    for p in plans():
+        precio, creditos = p.get("price"), p.get("credits")
+        if p["id"] == plan_id and precio and creditos:
+            return float(precio) / float(creditos)
+    # Sin plan, plan desconocido o plan gratuito (TDM Team): se toma el Básico,
+    # que es el crédito más caro. Así el suelto nunca sale más barato que
+    # suscribirse, que es justo lo que queremos evitar.
+    for p in plans():
+        if p["id"] == "basico":
+            return float(p["price"]) / float(p["credits"])
+    return 0.00625
+
+
+def valor_credito_suelto(plan_id: str) -> float:
+    """Lo que cuesta un crédito comprado suelto: un 20 % sobre el de su plan."""
+    return valor_credito_plan(plan_id) * RECARGA_SOBRECOSTE
+
+
+def tokens_por_recarga(plan_id: str, amount_cents: int) -> float:
+    """Cuántos TOKENS acreditar por un pack de `amount_cents` céntimos.
+
+    El backend trabaja en tokens; al usuario se le habla en créditos, que son
+    cien veces más. Se redondea a crédito entero para no dejar fracciones que
+    luego no cuadren en pantalla.
+    """
+    euros = float(amount_cents) / 100.0
+    creditos = round(euros / valor_credito_suelto(plan_id))
+    return creditos / float(CREDITS_PER_TOKEN)
+
+
+def creditos_por_recarga(plan_id: str, amount_cents: int) -> int:
+    """Lo mismo, en la unidad que ve el usuario."""
+    return int(round(tokens_por_recarga(plan_id, amount_cents) * CREDITS_PER_TOKEN))

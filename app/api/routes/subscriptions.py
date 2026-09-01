@@ -73,7 +73,6 @@ def _public_plans() -> list:
 
 
 # ── GET /subscription/status ────────────────────────────────────────────────
-@router.get("/status")
 def _renovar_tdm_team(user: User, db: Session) -> None:
     """
     TDM Team no pasa por ninguna tienda, asi que nadie avisa de la renovacion:
@@ -109,6 +108,7 @@ def _renovar_tdm_team(user: User, db: Session) -> None:
         db.rollback()
 
 
+@router.get("/status")
 def subscription_status(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),

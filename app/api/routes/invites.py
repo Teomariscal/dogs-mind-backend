@@ -62,6 +62,10 @@ def canjear(
     inv = db.query(Invite).filter(Invite.code == codigo).with_for_update().first()
     if not inv:
         raise HTTPException(status_code=404, detail="Ese código no existe.")
+    # "abierto" es el MECANISMO (no se gasta, no caduca), no la etiqueta. El
+    # nombre comercial va en el codigo y en la nota: Embajador, TEAM, INV...
+    # Cambiar el tipo por su nombre bonito lo volvia de un solo uso
+    # (me paso el 1-sep-2026 al renombrar Embajador).
     abierto = (inv.tipo or "") == "abierto"
 
     # Los codigos ABIERTOS no se gastan: los usa cualquiera que los tenga, tantas

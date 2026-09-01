@@ -274,10 +274,22 @@ def redeem_team_code(
     No regala créditos: quita el muro. Los créditos se siguen descontando
     igual, así que el consumo se mide (regla: ningún uso es gratis).
     """
+    codigo = (body.code or "").strip().upper()
+
+    # La app manda TODOS los codigos a este sitio: el de equipo y los de
+    # invitacion. Antes solo entendia el de equipo, asi que TEO-TEAM, EMBAJADOR
+    # y los INV daban "Ese codigo no es valido" desde el movil aunque
+    # funcionaran por la API (1-sep-2026). Se prueban aqui primero, y si no es
+    # ninguno se sigue con el de equipo de siempre.
+    from app.api.routes.invites import canjear_codigo
+    hecho = canjear_codigo(codigo, current_user, db)
+    if hecho is not None:
+        return hecho
+
     esperado = subs.team_code()
     if not esperado:
-        raise HTTPException(status_code=503, detail="No hay ningún código activo.")
-    if (body.code or "").strip().upper() != esperado:
+        raise HTTPException(status_code=400, detail="Ese código no es válido.")
+    if codigo != esperado:
         raise HTTPException(status_code=400, detail="Ese código no es válido.")
 
     if subs.is_exempt(current_user):

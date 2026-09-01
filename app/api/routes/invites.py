@@ -52,16 +52,20 @@ class CanjeIn(BaseModel):
     code: str = Field(..., min_length=4, max_length=40)
 
 
-@router.post("/invites/redeem")
-def canjear(
-    body: CanjeIn,
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    codigo = body.code.strip().upper()
+def canjear_codigo(codigo: str, current_user: User, db: Session):
+    """
+    Canjea un codigo de invitacion. Devuelve el diccionario de respuesta si
+    el codigo existe, o None si no es un codigo de invitacion — asi quien
+    llama puede seguir probando otras cosas.
+
+    Lo usan DOS sitios: POST /invites/redeem y POST /subscription/redeem-code,
+    que es al que llama la app. Tienen que hacer exactamente lo mismo, por eso
+    la logica vive aqui y no duplicada (1-sep-2026).
+    """
+    codigo = (codigo or "").strip().upper()
     inv = db.query(Invite).filter(Invite.code == codigo).with_for_update().first()
     if not inv:
-        raise HTTPException(status_code=404, detail="Ese código no existe.")
+        return None
     # "abierto" es el MECANISMO (no se gasta, no caduca), no la etiqueta. El
     # nombre comercial va en el codigo y en la nota: Embajador, TEAM, INV...
     # Cambiar el tipo por su nombre bonito lo volvia de un solo uso
@@ -132,6 +136,17 @@ def canjear(
     }
 
 
+
+@router.post("/invites/redeem")
+def canjear(
+    body: CanjeIn,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    hecho = canjear_codigo(body.code, current_user, db)
+    if hecho is None:
+        raise HTTPException(status_code=404, detail="Ese código no existe.")
+    return hecho
 # ── Administración ──────────────────────────────────────────────────────────
 class GenerarIn(BaseModel):
     tipo: str = Field("embajador", description="embajador | invitado")

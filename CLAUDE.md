@@ -22,6 +22,7 @@ Si algo que voy a hacer contradice una de estas líneas, me paro y pregunto.
 
 | desde | decisión |
 |---|---|
+| 2-sep-2026 | **Vía cognitivista italiana: sin sellos académicos.** El bloque "Analisi basata su" (Skinner, Pavlov, revistas de ABA) es conductista y contradice el enfoque. Solo se ve en Analisi ABA. |
 | 2-sep-2026 | **Paseo: 25 créditos** (antes 10). Con Google Maps un paseo cuesta 0,0478 € (1 geocoding + 1 places + 3 routes); a 10 créditos se perdía dinero en Max y no cubría en Pro. A 25 el margen es +0,06 € en Básico y +0,03 € en Max. |
 | 2-sep-2026 | **Mapas: SIEMPRE Google Maps, sin excepción ni respaldo. OpenStreetMap ANULADO** — fuera Overpass, OSRM, Nominatim y Leaflet. La clave y la facturación están pagadas. *Me lo dijo, dije que ok y no lo escribí; al día siguiente verifiqué y estuve a punto de publicar sobre OSM.* |
 | 1-sep-2026 | **Planes: precios fijos** 5 / 12 / 22 / 75 €. Solo varía el **crédito suelto**: un 20 % más caro que el crédito del plan que tiene cada uno, para que compense subir de plan. |

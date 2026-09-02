@@ -18418,6 +18418,13 @@ function getVal(id, fallback) {
      al salir. */
   function _guidedMostrarSellos(visible, plan) {
     if (!plan || !plan.sellos) return;
+    /* No se toca el display a pelo: en cognitivista los sellos siguen ocultos
+       aunque la guiada termine. Decide dmSellosRefrescar(). */
+    if (plan.sellos === 'anam-basedon-block' && typeof window.dmSellosRefrescar === 'function') {
+      window._guiadaOcultaSellos = !visible;
+      window.dmSellosRefrescar();
+      return;
+    }
     var el = document.getElementById(plan.sellos);
     if (el) el.style.display = visible ? '' : 'none';
   }
@@ -19790,6 +19797,21 @@ function getVal(id, fallback) {
 // El selector aparece únicamente con lang=='it'. En es/en nunca se muestra y el
 // backend ignora el campo → comportamiento idéntico al actual.
 window._tdmStance = window._tdmStance || 'behavioral';
+/* UNICO sitio que decide si se ven los sellos academicos (Applied Animal
+   Behaviour Science, Journal of Veterinary Behavior, Casos Teo Mariscal,
+   Skinner-Pavlov-Pryor). Hay DOS motivos independientes para ocultarlos y antes
+   se pisaban entre si:
+     · Via cognitivista: Skinner, Pavlov y las revistas de ABA son conductistas y
+       contradicen el enfoque. Solo se ven en ABA (founder, 2-sep-2026).
+     · Visita guiada: al dueno lego le dicen "esto te supera" en la puerta.
+   La guiada los restauraba con display='' y en cognitivista reaparecian. */
+window.dmSellosRefrescar = function () {
+  var el = document.getElementById('anam-basedon-block');
+  if (!el) return;
+  var ocultar = (window._tdmStance === 'cognitive') || !!window._guiadaOcultaSellos;
+  el.style.display = ocultar ? 'none' : '';
+};
+
 function setStance(s) {
   window._tdmStance = (s === 'cognitive') ? 'cognitive' : 'behavioral';
   var b = document.getElementById('stance-behavioral');
@@ -19798,6 +19820,7 @@ function setStance(s) {
   var off = 'flex:1;padding:12px;border-radius:14px;border:2px solid var(--green2);background:transparent;color:var(--green2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;';
   if (b) b.style.cssText = (window._tdmStance === 'behavioral') ? on : off;
   if (c) c.style.cssText = (window._tdmStance === 'cognitive')  ? on : off;
+  window.dmSellosRefrescar();
 }
 // Muestra u oculta el selector según el idioma actual (llamar al entrar a s-anamnesis y en applyLang).
 function refreshStanceSelector() {
@@ -19810,6 +19833,7 @@ function refreshStanceSelector() {
   } else {
     sel.style.display = 'none';
     window._tdmStance = 'behavioral';  // fuera de italiano: siempre conductual
+    window.dmSellosRefrescar();
   }
 }
 

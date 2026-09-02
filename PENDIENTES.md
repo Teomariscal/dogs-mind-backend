@@ -1,5 +1,21 @@
 # Pendientes — The Dogs' Mind
 
+## ⛔ DECISIONES VIGENTES — leer ANTES de tocar nada
+
+Cada linea es una decision del founder con su fecha. Si algo que voy a hacer la
+contradice, me paro y pregunto. **Se escribe aqui EN EL MOMENTO en que la dice,
+antes de empezar el trabajo**, no despues: una decision que solo vive en el chat
+desaparece cuando la conversacion se resume.
+
+| desde | decision |
+|---|---|
+| 2-sep-2026 | **Mapas: SOLO Google Maps. OpenStreetMap queda anulado** (Overpass, OSRM, Nominatim y Leaflet fuera). La clave y la facturacion ya estan pagadas. Me lo dijo, dije que ok y NO lo escribi: al dia siguiente verifique y publique sobre OSM. |
+| 1-sep-2026 | Los planes mantienen sus precios (5/12/22/75 €). Solo varia el credito suelto: un 20 % mas caro que el del plan de cada uno, para que compense subir de plan. |
+| 1-sep-2026 | Los creditos van por delante de los paseos. |
+| 1-sep-2026 | Ningun build se envia ni se publica sin su OK explicito, y antes de enseñarselo lo compruebo yo paso a paso. |
+| 1-sep-2026 | Al usuario solo se le habla de **creditos**. Los tokens no existen como concepto de cara afuera. |
+
+
 Lista viva. Se actualiza en cuanto algo entra o sale. Última revisión: 1-sep-2026, 23:05.
 
 ## Estado de las ramas ahora mismo

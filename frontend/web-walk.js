@@ -602,7 +602,7 @@
         headers: { 'Authorization': 'Bearer ' + jwt }
       });
       if (r.status === 402) {
-        if (typeof showRechargeNotice === 'function') showRechargeNotice(0.1);
+        if (typeof showRechargeNotice === 'function') showRechargeNotice(0.25);
         else estadoTexto('Te has quedado sin créditos para el paseo.');
         return false;
       }

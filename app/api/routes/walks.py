@@ -3,10 +3,11 @@ Paseos (World Wide Dog Walking) — cobro del uso.
 
 POST /walks/charge — cobra el paseo al usuario autenticado y devuelve el saldo.
 
-Precio: 0,1 tokens = 10 créditos por planificación de rutas (precio de salida
-fijado por el founder el 2026-07-30; lo revisará según el uso real). Regla de
-fondo: ningún uso es gratis, aunque el coste de infraestructura sea ~0 — los
-mapas son OpenStreetMap/OSRM, lo que se cobra es el servicio.
+Precio: 0,25 tokens = 25 créditos por planificación de rutas (founder,
+2-sep-2026). Subió de 10 a 25 al pasar a Google Maps: un paseo cuesta 0,0478 €
+de API (1 geocoding + 1 places + 3 routes) y a 10 créditos se perdía dinero en
+el plan Max y no cubría en Pro. A 25 el margen va de +0,06 € en Básico a
++0,03 € en Max.
 
 El muro de suscripción se aplica solo (deduct_token pasa por access_state).
 """
@@ -24,7 +25,7 @@ _log = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/walks", tags=["walks"])
 
-WALK_TOKEN_COST = 0.1  # 10 créditos
+WALK_TOKEN_COST = 0.25  # 25 créditos
 
 
 @router.post("/charge")

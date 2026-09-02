@@ -63,4 +63,13 @@ def get_app_config():
         "welcome_credits": _subs.WELCOME_CREDITS,
     }
 
-    return {"banner": banner, "subscriptions": subscriptions}
+    # ── Mapas (2-sep) ────────────────────────────────────────────────────────
+    # Clave del NAVEGADOR, distinta de la del servidor: solo sirve para pintar el
+    # mapa (Maps JavaScript) y está restringida por dominio. Las consultas caras
+    # —sitios, rutas y búsqueda— van por /walks/*, donde la clave buena no sale
+    # nunca del backend.
+    # Se sirve desde aquí y no dentro del binario para poder rotarla sin pasar por
+    # las tiendas.
+    maps = {"browser_key": os.environ.get("GOOGLE_MAPS_BROWSER_KEY", "").strip()}
+
+    return {"banner": banner, "subscriptions": subscriptions, "maps": maps}

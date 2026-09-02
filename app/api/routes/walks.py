@@ -153,11 +153,22 @@ def calcular_ruta(r: RutaIn, authorization: Optional[str] = Header(None)):
         "https://routes.googleapis.com/directions/v2:computeRoutes",
         {"origin": salida, "destination": salida, "intermediates": medias,
          "travelMode": "WALK", "polylineQuality": "HIGH_QUALITY"},
-        "routes.distanceMeters,routes.duration,routes.polyline.encodedPolyline")
+        "routes.distanceMeters,routes.duration,routes.polyline.encodedPolyline,"
+        "routes.legs.steps.navigationInstruction,routes.legs.steps.distanceMeters")
     rutas = d.get("routes") or []
     if not rutas:
         raise HTTPException(status_code=404, detail="Por aquí no sale ruta a pie.")
     x = rutas[0]
+    # Indicaciones: Google las da ya redactadas y en el idioma de la peticion, asi
+    # que no hay que traducir maniobras a mano como con OSRM. Se descartan los
+    # tramos de menos de 25 m, que son ruido ("continua 8 m").
+    pasos = []
+    for leg in (x.get("legs") or []):
+        for st in (leg.get("steps") or []):
+            texto = ((st.get("navigationInstruction") or {}).get("instructions") or "").strip()
+            if texto and st.get("distanceMeters", 0) >= 25:
+                pasos.append(texto)
     return {"metros": x.get("distanceMeters", 0),
             "segundos": int(str(x.get("duration", "0s")).rstrip("s") or 0),
-            "trazado": (x.get("polyline") or {}).get("encodedPolyline", "")}
+            "trazado": (x.get("polyline") or {}).get("encodedPolyline", ""),
+            "pasos": pasos}

@@ -1,15 +1,17 @@
 # Pendientes — The Dogs' Mind
 
-Lista viva. Se actualiza en cuanto algo entra o sale. Última revisión: 1-sep-2026.
+Lista viva. Se actualiza en cuanto algo entra o sale. Última revisión: 1-sep-2026, 23:05.
 
 ## Estado de las ramas ahora mismo
 
 | rama | versión | estado |
 |---|---|---|
 | Web | v288 | en vivo, con todo lo de hoy INCLUIDOS los paseos |
-| Backend | `/analysis` con latidos | desplegado, Railway SUCCESS |
+| Backend | latidos en los 3 endpoints de IA | desplegado, Railway SUCCESS |
 | Google Play | 1.0.12 (vc26) | publicada en producción |
-| App Store | 1.0.12 (build 48) | en revisión · 1.0.11 en venta |
+| App Store | 1.0.12 (build 48) | **IN_REVIEW** · 1.0.11 en venta |
+| iOS 1.0.13 | build 49 | compilada en local, SIN subir (decisión: esperar a la 12) |
+| Android 1.0.13 | vc27 | compilada, sin publicar |
 
 ## Cerrado hoy — el usuario de pago que no podia analizar
 
@@ -21,11 +23,25 @@ llegaba entera al final, asi que la conexion pasaba mas de un minuto sin enviar
 un solo byte. Los proxies que cortan por inactividad a los 60 s la mataban. Por
 eso le pasaba a el y no a otros: depende de su red.
 
-**Arreglado** (`app/api/routes/analysis.py`): si tarda mas de 20 s se mandan
+**Arreglado** (`app/core/latidos.py`, aplicado a los TRES endpoints que generan
+con IA): si tarda mas de 20 s se mandan
 espacios cada 5 s. Un JSON admite espacios delante, asi que el cliente sigue
 haciendo `res.json()` y no hay que tocar la app — cubre iOS, Android y web a la
 vez, incluidas las versiones ya instaladas, sin pasar por tienda.
-Primer byte: 66,6 s -> 21,0 s. Silencio maximo: 21 s.
+Medido en produccion, primer byte:
+
+| endpoint | antes | ahora |
+|---|---|---|
+| `/analysis` (Problema de conducta) | 66,6 s | 20,1 s |
+| `/training-analysis` (Educacion y entrenamiento) | 45,2 s | 21,2 s |
+| `/intervention` (plan) | — | envuelto igual |
+
+El corte de jpcarmid estaba entre 45 y 66 s: por eso le funcionaba uno y el otro
+no. A las 22:46, ya con el arreglo, su `/analysis` salio bien y se cobro una sola
+vez (saldo 4450 -> 4150).
+
+OJO al probar justo tras un despliegue: un 502 a los ~24 s es el contenedor
+reiniciandose, no el codigo. Repetir con el servidor estable.
 
 Comprobado en produccion: camino rapido intacto (cacheado 0,18 s, cero latidos),
 422 y 401 intactos, y se cobra exactamente una vez.
@@ -105,6 +121,8 @@ pasar en revisión aunque no lleve paseos, en vez de sacarla y rehacerla.
   veces de más.
 - [ ] `cobrarPaseo()` falla en abierto: si la llamada de cobro cae por red, el
   paseo sale gratis (`catch { return true }`). Previo y parece deliberado.
+- [ ] `/analysis/video` sin latidos: ya era async y maneja ficheros subidos, es
+  otra estructura. Es el unico de los cuatro que genera con IA sin proteger.
 - [ ] Mensajes 402 del backend solo en español (la app pone los suyos traducidos,
   así que hoy no se ven).
 - [ ] Vídeos por idioma de Cecilia y Niaz (EN/IT) servidos desde nuestro dominio.

@@ -206,6 +206,7 @@ def _grant_cycle(user: User, plan: dict, db: Session, cycle_key: str, status_val
     plan_tokens = float(plan["credits"]) / subs.CREDITS_PER_TOKEN
 
     user.subscription_plan = plan["id"]
+    subs.aplicar_acceso_profesional(user, plan["id"])
     user.subscription_status = status_value
     user.subscription_store = store
     user.subscription_expires_at = expires_at

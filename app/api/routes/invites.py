@@ -111,9 +111,15 @@ def canjear_codigo(codigo: str, current_user: User, db: Session):
     current_user.subscription_expires_at = hasta
     if not current_user.subscription_started_at:
         current_user.subscription_started_at = datetime.utcnow()
-    # Un codigo abierto NO cambia el tipo de cuenta: vale igual a un profesional
-    # y a un particular, y cada uno se queda como esta.
-    if not abierto and inv.account_type == "professional":
+    # Quien decide el tipo de cuenta es el CODIGO, no si es abierto o de un uso.
+    # Antes esta linea llevaba "not abierto", porque los abiertos que habia
+    # entonces (TDM-TEAM y los de invitado) eran todos 'particular' y valian igual
+    # a un profesional y a un particular. Al crear el primer codigo abierto
+    # PROFESIONAL (PROINV, founder 3-sep-2026) esa guarda lo dejaba sin efecto:
+    # daba el plan pero no el acceso profesional, que era justo lo que se pedia.
+    # Comprobado antes de tocarlo: los otros 16 codigos son 'particular', asi que
+    # para ellos la condicion sigue siendo falsa y no cambia nada.
+    if inv.account_type == "professional":
         current_user.account_type = "professional"
 
     if not abierto:

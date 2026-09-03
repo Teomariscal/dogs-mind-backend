@@ -11861,7 +11861,13 @@ button, a, [onclick], input, select, textarea, .n-btn, .cm-btn-primary,
 
     <section class="pro-cards">
 
-      <article class="pro-card pro-card--standard">
+      <!-- MEMBRESIA PROFESIONAL RETIRADA (founder, 3-sep-2026): "quita los 19,99 €
+           de la interfaz". Ya no se vende aparte: el acceso profesional lo da una
+           suscripcion Medio o superior. Los 137 profesionales que ya existian
+           conservan el suyo; no se degrada a nadie. Se OCULTA en vez de borrarse
+           para no tocar el resto de la pantalla ni las traducciones, y para poder
+           revisar el codigo muerto entero antes de retirarlo. -->
+      <article class="pro-card pro-card--standard" style="display:none;" data-retirada="membresia-19-99">
         <span class="pro-card-tag" data-i18n="pro_tag_pro">Profesional</span>
         <h3 class="pro-card-title" data-i18n="pro_pro_title">Membresía Profesional</h3>
         <p class="pro-card-pitch" data-i18n="pro_pro_pitch">Tus informes con el logo de tu empresa junto al de The Dogs’ Mind. Imagen internacional para tus clientes desde el primer caso.</p>
@@ -16250,7 +16256,7 @@ function dmInitWebLayer() {
        completa. Sin límite de ancho — en móvil web se ve como se vería en
        la app, que es lo que queremos validar. */
     var sp = document.createElement('script');
-    sp.src = 'web-paseo.js?v=21';
+    sp.src = 'web-paseo.js?v=22';
     sp.defer = true;
     document.head.appendChild(sp);
   } catch (e) { /* ante la duda, no hacer nada */ }
@@ -16274,7 +16280,7 @@ function dmInitPaseoNativo() {
        abre "El paseo de hoy". Cargarlo aquí eran 34 KB de más en cada
        arranque, sin ganar nada. */
     var sp = document.createElement('script');
-    sp.src = 'web-paseo.js?v=21';
+    sp.src = 'web-paseo.js?v=22';
     sp.defer = true;
     document.head.appendChild(sp);
   } catch (e) { /* nunca romper el arranque de la app por el paseo */ }
@@ -25925,6 +25931,9 @@ function endTourIntro() {
     localStorage.setItem('dm_lang', lang);
     var t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
     if (typeof refreshStanceSelector === 'function') refreshStanceSelector();
+    /* La tarjeta del paseo la pinta web-paseo.js una sola vez y no lleva
+       data-i18n: hay que avisarla a mano o se queda en el idioma anterior. */
+    if (typeof window.dmPaseoRefrescarIdioma === 'function') window.dmPaseoRefrescarIdioma();
 
     document.querySelectorAll('[data-i18n]').forEach(function(el) {
       var key = el.getAttribute('data-i18n');

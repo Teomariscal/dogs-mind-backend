@@ -18,6 +18,20 @@ desaparece cuando la conversacion se resume.
 
 Lista viva. Se actualiza en cuanto algo entra o sale. Última revisión: 1-sep-2026, 23:05.
 
+## 🔴 ABIERTO — reportado el 3-sep-2026 desde el iPhone
+
+1. **Paseos sale en italiano dentro de la versión española.** "La passeggiata di
+   oggi", "Tre percorsi vicino a te", botones "corta / media / lunga" — en una
+   app con el resto en español.
+2. **El mapa de paseos pide una clave de API.** Las teselas de CARTO ya no son
+   gratis: sale la marca de agua "API KEY REQUIRED" encima del mapa. Lo resuelve
+   la migración a Google Maps, ya escrita y pendiente de verificar.
+3. **La Membresía Profesional de 19,99 €/año ya no aplica.** El profesional debe
+   comprar una suscripción **Medio como mínimo**; la Básica no le vale. Hay que
+   quitar ese producto y cambiar la puerta de acceso profesional.
+4. De paso, en esa misma pantalla: "10 **tokens** incluidos para empezar" — debe
+   decir créditos.
+
 ## Estado de las ramas ahora mismo
 
 | rama | versión | estado |

@@ -505,3 +505,25 @@ def tokens_por_recarga(plan_id: str, amount_cents: int) -> float:
 def creditos_por_recarga(plan_id: str, amount_cents: int) -> int:
     """Lo mismo, en la unidad que ve el usuario."""
     return int(round(tokens_por_recarga(plan_id, amount_cents) * CREDITS_PER_TOKEN))
+
+
+# ── Acceso profesional ────────────────────────────────────────────────────────
+# Hasta el 3-sep-2026 el acceso profesional se compraba aparte: una "Membresia
+# Profesional" de 19,99 EUR/ano. Se acabo. Ahora lo da una suscripcion Medio o
+# superior; la Basica NO (founder, 3-sep-2026).
+#
+# NUNCA se degrada a nadie. Los 137 profesionales que ya existian —16 de ellos
+# pagaron aquella membresia— conservan el acceso aunque no tengan plan o tengan
+# Basico. Cuando se les acaben los creditos tendran que contratar suscripcion,
+# como todo el mundo, pero eso lo decide el muro de pago, no esta funcion.
+PLANES_CON_ACCESO_PROFESIONAL = ("medio", "pro", "max")
+
+
+def aplicar_acceso_profesional(user, plan_id: str) -> bool:
+    """Sube a profesional si el plan lo merece. Devuelve True si ha cambiado."""
+    if (plan_id or "") not in PLANES_CON_ACCESO_PROFESIONAL:
+        return False                      # Basico y sin plan: no tocar
+    if (getattr(user, "account_type", "") or "") == "professional":
+        return False                      # ya lo era
+    user.account_type = "professional"
+    return True

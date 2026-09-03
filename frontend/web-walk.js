@@ -30,11 +30,101 @@
     if (!_nativo && (!document.body || !document.body.classList.contains('dm-web'))) return;
   } catch (e) { return; }
 
-  var LEAFLET_CSS = 'vendor/leaflet/leaflet.css';  /* local: sin CDN en el binario */
-  var LEAFLET_JS  = 'vendor/leaflet/leaflet.js';
-  var OVERPASS    = 'https://overpass-api.de/api/interpreter';
-  var OSRM        = 'https://routing.openstreetmap.de/routed-foot/route/v1/foot/';
-  var NOMINATIM   = 'https://nominatim.openstreetmap.org/search';
+  /* SIEMPRE Google Maps, sin respaldo (founder, 2-sep-2026). OpenStreetMap queda
+     anulado: fuera Overpass, OSRM, Nominatim y Leaflet.
+     Los datos NO se piden desde aqui: van por nuestro backend (/walks/*), que es
+     quien guarda la clave buena. El navegador solo recibe una clave distinta,
+     restringida al mapa y por dominio, que llega en /app-config. */
+  /* Capa minima sobre Google Maps con la FORMA de las cuatro cosas que se usaban
+     de Leaflet (capas, trazado, punto, encuadre). Se hace asi a proposito: el
+     resto del fichero —seleccionar(), generar(), pintarLista()— no se toca, que
+     es donde estaba el riesgo de romper algo. */
+  function GCapa() { this._e = []; }
+  GCapa.prototype.clearLayers = function () {
+    this._e.forEach(function (x) { try { x.setMap(null); } catch (e) {} });
+    this._e = [];
+  };
+  GCapa.prototype.add = function (x) { this._e.push(x); return x; };
+
+  function gTrazado(linea, estilo, capa) {
+    var pl = new google.maps.Polyline({
+      path: linea.map(function (p) { return { lat: p[0], lng: p[1] }; }),
+      strokeColor: estilo.color, strokeWeight: estilo.weight,
+      strokeOpacity: estilo.opacity, map: mapa, zIndex: 1
+    });
+    pl.setStyle = function (e) {
+      this.setOptions({ strokeColor: e.color, strokeOpacity: e.opacity, strokeWeight: e.weight });
+    };
+    pl.bringToFront = function () { this.setOptions({ zIndex: 99 }); };
+    pl.getBounds = function () {
+      var b = new google.maps.LatLngBounds();
+      this.getPath().forEach(function (ll) { b.extend(ll); });
+      return b;
+    };
+    if (capa) capa.add(pl);
+    return pl;
+  }
+
+  function gPunto(lat, lon, estilo, titulo, capa) {
+    var m = new google.maps.Marker({
+      position: { lat: lat, lng: lon }, map: mapa, title: titulo || '',
+      icon: { path: google.maps.SymbolPath.CIRCLE, scale: estilo.radius,
+              fillColor: estilo.fillColor, fillOpacity: estilo.fillOpacity,
+              strokeColor: estilo.color, strokeWeight: estilo.weight }
+    });
+    if (capa) capa.add(m);
+    return m;
+  }
+
+  /* Estilo oscuro, para que el mapa no deslumbre dentro de la app. */
+  var ESTILO_OSCURO = [
+    { elementType: 'geometry', stylers: [{ color: '#1a2b24' }] },
+    { elementType: 'labels.text.stroke', stylers: [{ color: '#0a1a14' }] },
+    { elementType: 'labels.text.fill', stylers: [{ color: '#8fa89b' }] },
+    { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#22402f' }] },
+    { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#2b3d35' }] },
+    { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#9fb5a8' }] },
+    { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#12333f' }] },
+    { featureType: 'transit', stylers: [{ visibility: 'off' }] }
+  ];
+
+  /* La clave del mapa llega de /app-config, no va dentro del binario: asi se
+     puede rotar sin pasar por las tiendas. */
+  var _gmCargando = null;
+  function cargarGoogleMaps() {
+    if (window.google && window.google.maps) return Promise.resolve();
+    if (_gmCargando) return _gmCargando;
+    _gmCargando = (async function () {
+      var r = await fetch(API() + '/app-config');
+      var cfg = await r.json();
+      var clave = ((cfg || {}).maps || {}).browser_key || '';
+      if (!clave) throw new Error('sin clave de mapa');
+      await new Promise(function (ok, ko) {
+        var sc = document.createElement('script');
+        sc.src = 'https://maps.googleapis.com/maps/api/js?key=' + encodeURIComponent(clave) + '&v=weekly';
+        sc.async = true; sc.onload = ok; sc.onerror = function () { ko(new Error('maps js')); };
+        document.head.appendChild(sc);
+      });
+    })();
+    return _gmCargando;
+  }
+
+  function API() {
+    return (typeof API_URL !== 'undefined' && API_URL)
+      ? API_URL : 'https://dogs-mind-backend-production.up.railway.app';
+  }
+  function _jwt() { try { return localStorage.getItem('dm_jwt') || ''; } catch (e) { return ''; } }
+  async function pedir(ruta, cuerpo) {
+    var r = await fetch(API() + ruta, {
+      method: cuerpo ? 'POST' : 'GET',
+      headers: cuerpo
+        ? { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + _jwt() }
+        : { 'Authorization': 'Bearer ' + _jwt() },
+      body: cuerpo ? JSON.stringify(cuerpo) : undefined
+    });
+    if (!r.ok) { var e = new Error('http ' + r.status); e.status = r.status; throw e; }
+    return r.json();
+  }
 
   var TIPOS = {
     park:         { n: 'Zona verde',        c: '#7eb86a' },
@@ -80,97 +170,12 @@
 
   /* Consulta a Overpass con reintentos. Devuelve null solo si fallan todos los
      intentos en todos los espejos. */
-  async function _overpass(q, limite) {
-    /* `limite` es el instante (Date.now()) pasado el cual se abandona. Overpass
-       es un ADORNO: aporta parques, fuentes y veterinarios, pero la ruta la
-       calcula OSRM, que no depende de el. Sin plazo, con los tres servidores
-       caidos —como el 1-sep-2026— se encadenaban 3 servidores x 2 vueltas x 25 s,
-       y `generar` lo repetia para 3 radios: mas de SIETE MINUTOS mirando
-       "buscando". El usuario se iba mucho antes y parecia que la app colgaba. */
-    /* overpass.osm.ch FUERA: responde 200 con una respuesta bien formada pero
-       SIN DATOS (su timestamp_osm_base es "116774", que ni es una fecha). El
-       paseo caia ahi, recibia cero sitios y el boton no hacia nada (founder,
-       30-ago-2026, en iPhone). */
-    var servidores = [OVERPASS,
-                      'https://overpass.kumi.systems/api/interpreter',
-                      'https://overpass.private.coffee/api/interpreter'];
-    var hubo200Vacio = false;
-    var queda = function () { return limite ? (limite - Date.now()) : 25000; };
-    for (var vuelta = 0; vuelta < 2; vuelta++) {
-      for (var i = 0; i < servidores.length; i++) {
-        if (queda() <= 250) return hubo200Vacio ? { elements: [] } : null;
-        try {
-          var ctrl = new AbortController();
-          var corte = setTimeout(function () { ctrl.abort(); },
-                                 Math.max(250, Math.min(8000, queda())));
-          var r = await fetch(servidores[i], {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'data=' + encodeURIComponent(q),
-            signal: ctrl.signal
-          });
-          clearTimeout(corte);
-          if (r.ok) {
-            var j = await r.json();
-            /* Una lista VACIA no cuenta como respuesta buena: un array vacio
-               es "truthy" y antes se daba por valida. Se sigue probando. */
-            if (j && j.elements && j.elements.length) return j;
-            if (j && j.elements) hubo200Vacio = true;
-          }
-        } catch (e) { /* siguiente */ }
-      }
-      /* Respiro antes de la segunda vuelta: el 504 suele ser pasajero. */
-      if (vuelta === 0 && queda() > 2000) await new Promise(function (ok) { setTimeout(ok, 1000); });
-      else if (vuelta === 0) break;
-    }
-    /* Si TODOS contestaron vacio, se devuelve vacio para poder decir "aqui no
-       hay sitios" en vez de "no se pudo conectar". */
-    return hubo200Vacio ? { elements: [] } : null;
-  }
-
   async function buscarPois(lat, lon, radio, limite) {
-    var a = '(around:' + radio + ',' + lat + ',' + lon + ');';
-    var q = '[out:json][timeout:30];(' +
-      'node["amenity"="veterinary"]' + a +
-      'node["amenity"="drinking_water"]' + a +
-      'node["shop"="pet"]' + a +
-      'node["leisure"="dog_park"]' + a +
-      'way["leisure"="dog_park"]' + a +
-      'way["leisure"="park"]' + a +
-      /* Campo y monte: sin esto, un pueblo se quedaba sin ninguna ruta. */
-      'way["highway"~"^(path|track|footway|bridleway)$"]' + a +
-      'way["natural"="wood"]' + a +
-      'way["landuse"="forest"]' + a +
-      'way["landuse"="meadow"]' + a +
-      'way["leisure"="nature_reserve"]' + a +
-      ');out center 120;';
-    /* Los servidores públicos de Overpass van saturados y devuelven 504 a ratos:
-       con radio 3.000 m la consulta completa fallaba y el paseo se quedaba
-       "buscando" para siempre (founder, 27-ago). Kumi llevaba caído y era el
-       único repuesto, así que no había red de seguridad.
-       Ahora: dos espejos VIVOS, dos vueltas, y una espera entre medias —un 504
-       casi siempre es momentáneo y a la segunda entra. */
-    var d = await _overpass(q, limite);
-    if (!d) throw new Error('overpass');
-    return (d.elements || []).map(function (e) {
-      var la = e.lat != null ? e.lat : (e.center && e.center.lat);
-      var lo = e.lon != null ? e.lon : (e.center && e.center.lon);
-      if (la == null) return null;
-      var t = e.tags || {};
-      var tipo = t.leisure === 'dog_park' ? 'dog_park'
-               : t.leisure === 'park' ? 'park'
-               : t.amenity === 'veterinary' ? 'veterinary'
-               : t.amenity === 'drinking_water' ? 'drinking_water'
-               : t.shop === 'pet' ? 'pet'
-               : t.leisure === 'nature_reserve' ? 'nature'
-               : (t.natural === 'wood' || t.landuse === 'forest') ? 'wood'
-               : t.landuse === 'meadow' ? 'meadow'
-               : t.highway === 'track' ? 'track'
-               : (t.highway === 'path' || t.highway === 'footway' || t.highway === 'bridleway') ? 'path'
-               : null;
-      if (!tipo) return null;
-      return { lat: la, lon: lo, tipo: tipo, nombre: t.name || TIPOS[tipo].n };
-    }).filter(Boolean);
+    /* Google Places, en UNA sola llamada con los cuatro tipos. Pedir un tipo por
+       llamada triplicaba el coste del paseo. El backend traduce los tipos de
+       Google a los nuestros. */
+    var d = await pedir('/walks/sitios', { lat: lat, lon: lon, radio: radio });
+    return (d.sitios || []).filter(function (p) { return TIPOS[p.tipo]; });
   }
 
   /* Traducción de las maniobras que devuelve OSRM (vienen en inglés) */
@@ -191,26 +196,35 @@
     return g.charAt(0).toUpperCase() + g.slice(1) + via + d;
   }
 
+  /* Trazado codificado de Google -> [[lat,lon], …]. Es el algoritmo estandar de
+     polilineas; se hace aqui para no cargar la libreria 'geometry' solo por esto. */
+  function descodificar(txt) {
+    var pts = [], i = 0, lat = 0, lon = 0;
+    while (i < txt.length) {
+      var b, giro = 0, desp = 0;
+      do { b = txt.charCodeAt(i++) - 63; giro |= (b & 0x1f) << desp; desp += 5; } while (b >= 0x20);
+      lat += ((giro & 1) ? ~(giro >> 1) : (giro >> 1));
+      giro = 0; desp = 0;
+      do { b = txt.charCodeAt(i++) - 63; giro |= (b & 0x1f) << desp; desp += 5; } while (b >= 0x20);
+      lon += ((giro & 1) ? ~(giro >> 1) : (giro >> 1));
+      pts.push([lat / 1e5, lon / 1e5]);
+    }
+    return pts;
+  }
+
   async function ruta(puntos) {          // puntos: [[lat,lon], …] — vuelve al inicio
-    var coords = puntos.concat([puntos[0]]).map(function (p) { return p[1] + ',' + p[0]; }).join(';');
-    var r = await fetch(OSRM + coords + '?overview=full&geometries=geojson&steps=true');
-    if (!r.ok) throw new Error('osrm');
-    var d = await r.json();
-    if (!d.routes || !d.routes.length) throw new Error('sin ruta');
-    var pasos = [];
-    (d.routes[0].legs || []).forEach(function (leg) {
-      (leg.steps || []).forEach(function (s) {
-        if (s.distance > 25 || (s.maneuver && s.maneuver.type === 'depart')) pasos.push(instruccion(s));
-      });
-    });
+    /* Google Routes por nuestro backend. Las indicaciones vienen ya redactadas y
+       en el idioma de la peticion, asi que no hay que traducir maniobras a mano
+       como con OSRM. */
+    var d = await pedir('/walks/ruta', { puntos: puntos });
+    if (!d || !d.trazado) throw new Error('sin ruta');
     return {
-      metros: d.routes[0].distance,
-      linea: d.routes[0].geometry.coordinates.map(function (c) { return [c[1], c[0]]; }),
-      pasos: pasos,
+      metros: d.metros,
+      linea: descodificar(d.trazado),
+      pasos: d.pasos || [],
       puntos: puntos
     };
   }
-
   /* Mueve un punto `m` metros en el rumbo `grados`. */
   function mover(lat, lon, m, grados) {
     var R = 6371000, t = Math.PI / 180, d = m / R, b = grados * t;
@@ -405,7 +419,7 @@
     estado.rutas.forEach(function (r, j) {
       if (!r.capa) return;
       r.capa.setStyle({ color: j === i ? '#5ec8e6' : '#e8efea', opacity: j === i ? 1 : 0.25, weight: j === i ? 5 : 3 });
-      if (j === i) { r.capa.bringToFront(); mapa.fitBounds(r.capa.getBounds(), { padding: [30, 30] }); }
+      if (j === i) { r.capa.bringToFront(); mapa.fitBounds(r.capa.getBounds(), 30); }
     });
     document.querySelectorAll('#dmw-walk-lista .dmw-ruta-c').forEach(function (c, j) {
       c.classList.toggle('on', j === i);
@@ -422,43 +436,13 @@
      está cartografiado, no se menciona. (Cuando esto pase al backend, la IA
      redactará el texto ENCIMA de esta misma lista, sin añadir nada nuevo.) */
   async function rasgosRuta(linea) {
-    var muestra = [];
-    var salto = Math.max(1, Math.floor(linea.length / 24));
-    for (var i = 0; i < linea.length; i += salto) muestra.push(linea[i][0] + ',' + linea[i][1]);
-    var c = muestra.join(',');
-    var q = '[out:json][timeout:25];(' +
-      'way["waterway"~"^(river|stream|canal)$"]["name"](around:130,' + c + ');' +
-      'way["natural"~"^(wood|scrub)$"](around:120,' + c + ');' +
-      'way["landuse"="forest"](around:120,' + c + ');' +
-      'way["natural"="tree_row"](around:60,' + c + ');' +
-      'node["natural"="peak"]["name"](around:1500,' + c + ');' +
-      'way["historic"]["name"](around:160,' + c + ');' +
-      'node["historic"]["name"](around:160,' + c + ');' +
-      'node["tourism"="viewpoint"](around:250,' + c + ');' +
-      'way["leisure"="park"]["name"](around:120,' + c + ');' +
-      ');out center 90;';
-    /* Mismo camino que buscarPois: espejos vivos y reintento. Esto es el
-       adorno del paseo (agua, bosque, miradores), así que si falla se sigue
-       sin él en vez de tumbar la ruta. */
-    var d = await _overpass(q);
-    if (!d) return null;
-    var out = { agua: [], bosque: 0, arboles: 0, montes: [], historico: [], miradores: 0, parques: [] };
-    (d.elements || []).forEach(function (e) {
-      var t = e.tags || {};
-      if (t.waterway && t.name) { if (out.agua.indexOf(t.name) < 0) out.agua.push(t.name); }
-      else if (t.natural === 'wood' || t.natural === 'scrub' || t.landuse === 'forest') out.bosque++;
-      else if (t.natural === 'tree_row') out.arboles++;
-      else if (t.natural === 'peak' && t.name) { if (out.montes.indexOf(t.name) < 0) out.montes.push(t.name); }
-      else if (t.historic && t.name) {
-        if (!out.historico.some(function (h) { return h.n === t.name; }))
-          out.historico.push({ n: t.name, t: t.historic });
-      }
-      else if (t.tourism === 'viewpoint') out.miradores++;
-      else if (t.leisure === 'park' && t.name) { if (out.parques.indexOf(t.name) < 0) out.parques.push(t.name); }
-    });
-    return out;
+    /* El adorno del paseo —rios, bosque, miradores, cimas, historico— salia de
+       Overpass, que queda anulado (founder, 2-sep-2026). Google Places no da esa
+       informacion por tramo sin una llamada mas por ruta, que triplicaria el
+       coste. Se devuelve null: el llamador ya lo contempla y la ruta se pinta
+       igual, solo sin ese detalle. Anotado en PENDIENTES.md para decidirlo. */
+    return null;
   }
-
   /* Posición del sol — cálculo astronómico, sin servicios externos.
      Sirve para decir a qué hora las sombras son más largas y útiles. */
   function alturaSol(fecha, lat, lon) {
@@ -620,11 +604,12 @@
     estadoTexto('Buscando zonas verdes y servicios…');
     capaRutas.clearLayers(); capaPois.clearLayers();
     estado.rutas = [];
-    mapa.setView([centro.lat, centro.lon], 15);
-    if (marcadorYo) mapa.removeLayer(marcadorYo);
-    marcadorYo = L.circleMarker([centro.lat, centro.lon], {
-      radius: 8, color: '#fff', weight: 3, fillColor: '#5ec8e6', fillOpacity: 1
-    }).addTo(mapa).bindTooltip(etiqueta || 'Estáis aquí');
+    mapa.setCenter({ lat: centro.lat, lng: centro.lon });
+    mapa.setZoom(15);
+    if (marcadorYo) { try { marcadorYo.setMap(null); } catch (e) {} }
+    marcadorYo = gPunto(centro.lat, centro.lon,
+      { radius: 8, color: '#fff', weight: 3, fillColor: '#5ec8e6', fillOpacity: 1 },
+      etiqueta || 'Estáis aquí');
 
     /* Radio creciente: en ciudad sobra con 1,6 km; en campo abierto hay que
        abrirse para encontrar las pistas. Nos paramos en cuanto hay material. */
@@ -658,9 +643,9 @@
     estado.pois = pois;
 
     pois.forEach(function (p) {
-      L.circleMarker([p.lat, p.lon], {
-        radius: 5, color: TIPOS[p.tipo].c, weight: 2, fillColor: TIPOS[p.tipo].c, fillOpacity: .55
-      }).bindTooltip(p.nombre + ' · ' + TIPOS[p.tipo].n).addTo(capaPois);
+      gPunto(p.lat, p.lon,
+        { radius: 5, color: TIPOS[p.tipo].c, weight: 2, fillColor: TIPOS[p.tipo].c, fillOpacity: .55 },
+        p.nombre + ' · ' + TIPOS[p.tipo].n, capaPois);
     });
 
     estadoTexto('Calculando rutas a pie…');
@@ -702,7 +687,7 @@
          en vez de llamar "vuelta corta" a 4 km. */
       o = { nombre: o.nombre, por: o.por, m: o.m };
       try {
-        var capa = L.polyline(res.linea, { color: '#e8efea', weight: 3, opacity: .25 }).addTo(capaRutas);
+        var capa = gTrazado(res.linea, { color: '#e8efea', weight: 3, opacity: .25 }, capaRutas);
         estado.rutas.push({
           nombre: o.nombre, por: o.por, metros: res.metros, linea: res.linea,
           pasos: res.pasos, puntos: res.puntos,
@@ -757,20 +742,18 @@
           '<label class="dmw-suelto"><input type="checkbox" id="dmw-suelto"> Va suelto durante el paseo</label>' +
           '<div class="dmw-perfil-nota" id="dmw-perfil-nota"></div>' +
         '</div>' +
-        '<div class="dmw-walk-f"><span id="dmw-walk-estado">Datos de OpenStreetMap · rutas a pie por OSRM</span></div>' +
+        '<div class="dmw-walk-f"><span id="dmw-walk-estado">Datos y rutas a pie de Google Maps</span></div>' +
       '</div>';
 
-    if (!window.L) {
-      try { await cargar(LEAFLET_CSS, 'css'); await cargar(LEAFLET_JS, 'js'); }
-      catch (e) { estadoTexto('No se ha podido cargar el mapa.'); return; }
-    }
-    mapa = L.map('dmw-walk-map', { zoomControl: true, attributionControl: true })
-            .setView([40.4168, -3.7038], 13);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '© OpenStreetMap · © CARTO', maxZoom: 19
-    }).addTo(mapa);
-    capaRutas = L.layerGroup().addTo(mapa);
-    capaPois  = L.layerGroup().addTo(mapa);
+    try { await cargarGoogleMaps(); }
+    catch (e) { estadoTexto('No se ha podido cargar el mapa.'); return; }
+    mapa = new google.maps.Map(document.getElementById('dmw-walk-map'), {
+      center: { lat: 40.4168, lng: -3.7038 }, zoom: 13,
+      styles: ESTILO_OSCURO, disableDefaultUI: true, zoomControl: true,
+      gestureHandling: 'greedy', clickableIcons: false
+    });
+    capaRutas = new GCapa();
+    capaPois  = new GCapa();
 
     /* Perfil del perro: nivel de actividad + si va suelto */
     var ops = document.getElementById('dmw-perfil-ops');
@@ -814,10 +797,8 @@
       if (!q) return;
       estadoTexto('Buscando «' + q + '»…');
       try {
-        var r = await fetch(NOMINATIM + '?format=json&limit=1&q=' + encodeURIComponent(q));
-        var d = await r.json();
-        if (!d.length) { estadoTexto('No hemos encontrado ese sitio.'); return; }
-        generar({ lat: parseFloat(d[0].lat), lon: parseFloat(d[0].lon) }, d[0].display_name.split(',')[0]);
+        var d = await pedir('/walks/buscar?q=' + encodeURIComponent(q));
+        generar({ lat: d.lat, lon: d.lon }, (d.nombre || q).split(',')[0]);
       } catch (e) { estadoTexto('No se ha podido buscar ese sitio.'); }
     };
     document.getElementById('dmw-walk-go').onclick = buscar;

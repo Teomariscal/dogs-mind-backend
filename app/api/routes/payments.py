@@ -583,6 +583,7 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
             if not plan or not user:
                 return {"status": "ignored"}
             user.subscription_plan = plan["id"]
+            _subs.aplicar_acceso_profesional(user, plan["id"])
             user.subscription_status = "active"
             user.subscription_store = "stripe"
             user.subscription_expires_at = _now.utcnow() + _delta(days=31)
@@ -767,6 +768,7 @@ async def revenuecat_webhook(request: Request, db: Session = Depends(get_db)):
         _exp = _now.utcfromtimestamp(_exp_ms / 1000.0) if _exp_ms else None
         _trial = (event.get("period_type") or "").upper() == "TRIAL"
         user.subscription_plan = _plan["id"]
+        _subs.aplicar_acceso_profesional(user, _plan["id"])
         user.subscription_status = "trialing" if _trial else "active"
         user.subscription_store = (event.get("store") or "app_store").lower()
         user.subscription_expires_at = _exp

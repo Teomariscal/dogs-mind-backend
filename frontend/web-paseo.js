@@ -164,8 +164,14 @@
   /* Los textos de la tarjeta estaban fijos en español y salian asi tambien en
      la app inglesa e italiana (founder, 31-ago-2026). */
   function _t(clave) {
+    /* OJO: 'window.currentLang' NO existe — nadie lo asigna nunca. El idioma vivo
+       lo publica la app en window.getCurrentLang(); dm_lang es solo el respaldo
+       guardado, que puede ir por detras del idioma real. */
     var l = 'es';
-    try { l = (window.currentLang || localStorage.getItem('dm_lang') || 'es').toLowerCase().slice(0,2); } catch (e) {}
+    try {
+      l = ((window.getCurrentLang ? window.getCurrentLang() : '') ||
+           localStorage.getItem('dm_lang') || 'es').toLowerCase().slice(0, 2);
+    } catch (e) {}
     var D = {
       es: { titulo:'El paseo de hoy', sub:'Tres rutas cerca de ti', corta:'corta', media:'media', larga:'larga' },
       en: { titulo:'Today\u2019s walk',  sub:'Three routes near you',  corta:'short', media:'medium', larga:'long' },
@@ -203,7 +209,7 @@
     host.appendChild(caja);
     if (window.dmwWalkMontar) { window.dmwWalkMontar(caja); return; }
     var s = document.createElement('script');
-    s.src = 'web-walk.js?v=14';
+    s.src = 'web-walk.js?v=15';
     s.onload = function () { if (window.dmwWalkMontar) window.dmwWalkMontar(caja); };
     document.head.appendChild(s);
   }
@@ -257,6 +263,26 @@
     if (insight) hero.parentNode.insertBefore(c, hero.nextSibling);
     else hero.parentNode.insertBefore(c, ancla ? hero : hero.nextSibling);
   }
+
+  /* La tarjeta se construye UNA vez con _t() y no lleva marcas data-i18n, asi que
+     applyLang() no puede traducirla: se quedaba clavada en el idioma en que se
+     pinto. Un usuario espanol que hubiese pasado por el italiano veia "La
+     passeggiata di oggi" para siempre (founder, 3-sep-2026, iPhone). Se expone
+     este repintado y la app lo llama al cambiar de idioma. */
+  window.dmPaseoRefrescarIdioma = function () {
+    try {
+      var c = document.getElementById('paseo-card');
+      if (!c) return;
+      var t = c.querySelector('.pc-t'); if (t) t.textContent = _t('titulo');
+      var u = c.querySelector('.pc-s'); if (u) u.textContent = _t('sub');
+      var k = c.querySelectorAll('.pc-km span');
+      if (k.length === 3) {
+        k[0].textContent = _t('corta');
+        k[1].textContent = _t('media');
+        k[2].textContent = _t('larga');
+      }
+    } catch (e) {}
+  };
 
   function init() { montarFull(); montarTarjeta(); }
   if (document.readyState !== 'loading') init();

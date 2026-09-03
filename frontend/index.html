@@ -17898,6 +17898,31 @@ function getVal(id, fallback) {
      llegada: si toca, desliza o escribe, no sale y no se le interrumpe. */
   var AL_PROBABILIDAD = 0.20;
   var AL_ESPERA_MS    = 2000;
+  /* Cuanto se espera en el inicio antes de asomar una pantalla de quietud.
+     La PRIMERA vez a los 2 s, para que se descubra. De la SEGUNDA en adelante a
+     los 8: aparecer cada dos segundos mientras el usuario todavia esta decidiendo
+     que hacer resulta molesto (founder, 2-sep-2026). El contador va por
+     dispositivo y cuenta las veces que ya se ha asomado alguna. */
+  /* OJO al orden: QUIETUD_PANTALLAS guarda esta clave, y hasta el 2-sep-2026
+     estaba declarada 95 lineas MAS ABAJO. Por el izado de 'var' valia undefined
+     al construir la lista, asi que se consultaba localStorage.getItem(undefined),
+     que siempre devuelve null: "No volver a mostrar" no callaba nada y la
+     pantalla seguia saliendo. Si se mueve, tiene que quedar por encima. */
+  var N2_SILENCIO_KEY = 'dm_niaz2_silencio';
+
+  var QUIETUD_ESPERA_1A_MS = 2000;
+  var QUIETUD_ESPERA_MS    = 8000;
+  var QUIETUD_VISTAS_KEY   = 'dm_quietud_vistas';
+  function _quietudVistas() {
+    try { return parseInt(localStorage.getItem(QUIETUD_VISTAS_KEY) || '0', 10) || 0; }
+    catch (e) { return 0; }
+  }
+  function _quietudApuntarVista() {
+    try { localStorage.setItem(QUIETUD_VISTAS_KEY, String(_quietudVistas() + 1)); } catch (e) {}
+  }
+  function _quietudEspera() {
+    return _quietudVistas() === 0 ? QUIETUD_ESPERA_1A_MS : QUIETUD_ESPERA_MS;
+  }
   var _alTimer = null;
   var _alCitaPendiente = null;
 
@@ -18033,7 +18058,8 @@ function getVal(id, fallback) {
      Se encienden subiendo su probabilidad, no tocando esto. */
   var QUIETUD_ACTIVA = true;
   var N2_PROB_QUIETUD = 0.20;
-  /* Pantallas que pueden asomarse en el inicio tras 2 segundos de quietud.
+  /* Pantallas que pueden asomarse en el inicio tras un rato de quietud
+     (2 s la primera vez, 8 s de la segunda en adelante — ver _quietudEspera).
      Anadir una nueva es meter su linea aqui. La suma de 'prob' es la
      probabilidad total de que salga alguna. */
   var QUIETUD_PANTALLAS = [
@@ -18079,6 +18105,7 @@ function getVal(id, fallback) {
               var callada = false;
               try { callada = localStorage.getItem(it.llave) === '1'; } catch (e) {}
               if (callada) return;
+              _quietudApuntarVista();   /* la proxima ya espera 8 s */
               goTo(it.pantalla);
               return;
             }
@@ -18094,10 +18121,12 @@ function getVal(id, fallback) {
            una sola tirada por arranque de app: como el sorteo falla 4 de cada 5
            veces, en la practica no salia nunca (founder, 31-ago-2026). */
         if (yEnPie) return;
+        /* La espera se calcula AL ARMAR el temporizador, no una vez al cargar:
+           asi la primera aparicion ya alarga la siguiente sin reiniciar la app. */
         _alCitaPendiente = setTimeout(function () {
           yEnPie = 1;
           sortear();
-        }, AL_ESPERA_MS);
+        }, _quietudEspera());
       };
       window._quietudOlvidarIntento = function () { yEnPie = 0; };
       /* Los gestos REINICIAN la espera, no la matan. Y ademas devuelven la
@@ -18129,7 +18158,8 @@ function getVal(id, fallback) {
      Salta sola en el inicio, 20 % de las veces que el usuario pasa mas de 2
      segundos quieto. Copy del founder; el subtitulo es la transcripcion
      literal de lo que ella dice en el video. */
-  var N2_SILENCIO_KEY = 'dm_niaz2_silencio';
+  /* N2_SILENCIO_KEY se declara arriba, junto a QUIETUD_PANTALLAS: ahi se usa
+     antes y el orden importa. */
   var _n2Timer = null;
 
   function _n2Texto() {

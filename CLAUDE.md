@@ -22,6 +22,11 @@ Si algo que voy a hacer contradice una de estas líneas, me paro y pregunto.
 
 | desde | decisión |
 |---|---|
+| 4-sep-2026 | **El prompt clínico conductual se queda como está.** Menciona "cognitive-ethological frameworks" entre sus marcos; se propuso quitarlo y el founder dijo que no. No tocarlo. |
+| 4-sep-2026 | **ASIMETRÍA: que salga algo conductual a lo cognitivista es un resfriado; que salga algo COGNITIVISTA y contamine lo ABA conductual es el Ébola.** Palabras del founder. La vía conductual —es, en, it— es el producto principal y no puede llevar ni una palabra de zooantropología. Ante cualquier duda, se cierra hacia el lado conductual. |
+| 4-sep-2026 | **`IT_ZOO_VENEER` APAGADO.** Metía una segunda pasada zooantropológica ENCIMA del análisis y el plan CONDUCTUALES del profesional italiano. Estaba a `true` en Railway (el código lo trae apagado por defecto). No volver a encenderlo. |
+| 4-sep-2026 | **Estanqueidad cognitivista: hay que cerrar Nueva consulta (problema de comportamiento) y Seguimiento del caso.** Hoy solo `clinical_ai` e `intervention_ai` comprueban la puerta; los otros once servicios que generan texto con IA no, así que le sirven vocabulario conductual al veterinario italiano que eligió cognitivista. |
+| 4-sep-2026 | **La vía COGNITIVISTA es ESTANCA.** Nunca, bajo ningún motivo, puede contaminar ni filtrarse a la vía ABA conductual, ni a la versión en español, ni a la inglesa. Solo existe en italiano y solo con `stance='cognitive'`. Cualquier cambio cognitivista se comprueba además en las otras tres para verificar que NO se ha movido nada. |
 | 4-sep-2026 | **El negocio está en la consulta.** Los paseos y lo demás son reclamo. Ante la duda entre servicio y coste, gana el servicio: los rasgos del camino (agua, bosque, miradores) se recuperan pagando Google. |
 | 4-sep-2026 | **Código `PROINV-A04748`: abierto.** Lo usa cualquiera que lo tenga, no se gasta, y da un mes de plan Medio con cuenta profesional. |
 | 3-sep-2026 | **Se acabó la Membresía Profesional de 19,99 €/año.** El acceso profesional lo da ahora una suscripción **Medio o superior**; la Básica NO. **Los 137 profesionales actuales CONSERVAN el acceso** (16 pagaron la membresía): no se degrada a nadie. Cuando se les acaben los créditos tendrán que contratar suscripción, como todo el mundo. |

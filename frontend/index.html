@@ -17916,8 +17916,15 @@ function getVal(id, fallback) {
      pantalla seguia saliendo. Si se mueve, tiene que quedar por encima. */
   var N2_SILENCIO_KEY = 'dm_niaz2_silencio';
 
-  var QUIETUD_ESPERA_1A_MS = 2000;
+  /* SIEMPRE 8 segundos, tambien la primera vez. El 3-sep se puso 2 s para la
+     primera aparicion, pero con sesion la app entra directa al inicio y a los dos
+     segundos Niaz 2 secuestraba la pantalla antes de que al usuario le diera
+     tiempo a mirar nada: "me ha saltado sola sin pasar por splash ni por inicio,
+     eso no es muy correcto" (founder, 4-sep-2026). Ocho segundos es lo que el
+     mismo pidio —"cualquier espera de mas de 8 segundos"— y deja ver el inicio. */
   var QUIETUD_ESPERA_MS    = 8000;
+  var QUIETUD_ARRANQUE     = Date.now();
+  var QUIETUD_GRACIA_MS    = 8000;   /* nunca en los primeros 8 s de app viva */
   var QUIETUD_VISTAS_KEY   = 'dm_quietud_vistas';
   function _quietudVistas() {
     try { return parseInt(localStorage.getItem(QUIETUD_VISTAS_KEY) || '0', 10) || 0; }
@@ -17927,7 +17934,11 @@ function getVal(id, fallback) {
     try { localStorage.setItem(QUIETUD_VISTAS_KEY, String(_quietudVistas() + 1)); } catch (e) {}
   }
   function _quietudEspera() {
-    return _quietudVistas() === 0 ? QUIETUD_ESPERA_1A_MS : QUIETUD_ESPERA_MS;
+    /* Un unico sitio decide, pase por donde pase la llamada: ni el vigilante ni
+       goTo('s-home') pueden saltarselo. Si la app acaba de arrancar, se espera
+       ademas lo que falte para cumplir la gracia. */
+    var falta = QUIETUD_GRACIA_MS - (Date.now() - QUIETUD_ARRANQUE);
+    return Math.max(QUIETUD_ESPERA_MS, falta > 0 ? falta : 0);
   }
   var _alTimer = null;
   var _alCitaPendiente = null;
@@ -18166,10 +18177,20 @@ function getVal(id, fallback) {
      barato y no depende de ninguna ruta de navegacion. */
   (function vigilarQuietud() {
     var enInicioAntes = false;
+    var arranque = Date.now();
+    var segundosEnInicio = 0;
     setInterval(function () {
       try {
         var a = document.querySelector('.screen.active');
         var enInicio = !!a && a.id === 's-home';
+        /* NUNCA nada mas arrancar. El founder lo vio el 4-sep-2026: "me ha
+           saltado sola sin pasar por splash ni por inicio... eso no es muy
+           correcto". Y tiene razon: no puede secuestrar la pantalla antes de que
+           al usuario le haya dado tiempo a ver el inicio. Se exigen 3 segundos de
+           app viva Y que el inicio lleve al menos un segundo a la vista. */
+        if (Date.now() - arranque < 3000) { enInicioAntes = enInicio; return; }
+        segundosEnInicio = enInicio ? (segundosEnInicio + 1) : 0;
+        if (enInicio && segundosEnInicio < 2) { enInicioAntes = enInicio; return; }
         if (enInicio && !enInicioAntes) {
           /* Acaba de entrar (o la app arranco ya aqui): darle su tirada. */
           if (typeof window.dmQuietudReset === 'function') window.dmQuietudReset();

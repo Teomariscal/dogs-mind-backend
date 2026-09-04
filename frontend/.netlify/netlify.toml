@@ -45,7 +45,6 @@ for = "/index.html"
 Cache-Control = "no-cache, must-revalidate"
 
 [[headers]]
-[[headers]]
 for = "/privacy.html"
 
 [headers.values]

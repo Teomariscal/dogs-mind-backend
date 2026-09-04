@@ -52,7 +52,7 @@ paso "Compilando iOS"
      -destination 'generic/platform=iOS' -archivePath /tmp/DMbuild.xcarchive archive \
      -allowProvisioningUpdates >/dev/null )
 rm -rf /tmp/DMexport && xcodebuild -exportArchive -archivePath /tmp/DMbuild.xcarchive \
-  -exportOptionsPlist /tmp/exportOptions.plist -exportPath /tmp/DMexport \
+  -exportOptionsPlist "$RAIZ/scripts/exportOptions.plist" -exportPath /tmp/DMexport \
   -allowProvisioningUpdates >/dev/null
 rm -rf /tmp/rama_ios && mkdir /tmp/rama_ios && ( cd /tmp/rama_ios && unzip -q /tmp/DMexport/App.ipa )
 cp /tmp/rama_ios/Payload/App.app/public/index.html /tmp/rama_ios.html

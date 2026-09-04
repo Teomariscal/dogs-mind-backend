@@ -140,7 +140,12 @@
     track:        { n: 'Pista / camino',    c: '#b6dca0' },
     wood:         { n: 'Bosque',            c: '#7eb86a' },
     nature:       { n: 'Espacio natural',   c: '#7eb86a' },
-    meadow:       { n: 'Prado',             c: '#9ecf86' }
+    meadow:       { n: 'Prado',             c: '#9ecf86' },
+    /* Tipos que aporta Google y no tenia OpenStreetMap. Comprobados contra la
+       API el 4-sep-2026 en Madrid y en Villamantilla (pueblo). */
+    jardin:       { n: 'Jardín',            c: '#7eb86a' },
+    plaza:        { n: 'Plaza',             c: '#b6dca0' },
+    historico:    { n: 'Monumento',         c: '#e0bd8c' }
   };
 
   var mapa = null, capaRutas = null, capaPois = null, marcadorYo = null;

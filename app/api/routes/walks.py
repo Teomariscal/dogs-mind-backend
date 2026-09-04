@@ -52,6 +52,7 @@ def charge_walk(
 # planes.
 
 import os
+import time as _time
 import json as _json
 import urllib.parse
 import urllib.request
@@ -60,7 +61,22 @@ from fastapi import HTTPException
 from pydantic import BaseModel, Field
 
 _GKEY = (os.environ.get("GOOGLE_MAPS_API_KEY") or "").strip()
-_TIPOS_SITIO = ["park", "dog_park", "veterinary_care", "pet_store"]
+# Dos consultas por paseo en vez de una. Cada searchNearby devuelve como mucho 20
+# sitios, y con todos los tipos juntos los parques se comian el cupo y no quedaba
+# hueco para veterinarios ni senderos. Se separan en SERVICIOS y PAISAJE para que
+# cada grupo tenga sus 20.
+#
+# "Me da igual la decision y el coste, quiero el mejor servicio" (founder,
+# 4-sep-2026). Son 0,032 EUR mas por paseo; el negocio esta en la consulta y el
+# paseo es reclamo, asi que se paga.
+#
+# Los tipos estan COMPROBADOS contra la API el 4-sep-2026 en Madrid y en
+# Villamantilla (pueblo). Descartados: 'national_park' devolvia un bar, y
+# 'drinking_water' no existe en Google —las fuentes de beber se pierden respecto
+# a OpenStreetMap, es lo unico que empeora—.
+_TIPOS_SERVICIOS = ["veterinary_care", "pet_store", "dog_park"]
+_TIPOS_PAISAJE   = ["park", "garden", "hiking_area", "plaza", "historical_landmark"]
+_TIPOS_SITIO = _TIPOS_SERVICIOS + _TIPOS_PAISAJE
 
 
 def _google(url: str, cuerpo: Optional[dict] = None, mascara: Optional[str] = None) -> dict:
@@ -72,17 +88,29 @@ def _google(url: str, cuerpo: Optional[dict] = None, mascara: Optional[str] = No
         cabeceras["X-Goog-Api-Key"] = _GKEY
         cabeceras["X-Goog-FieldMask"] = mascara
     datos = _json.dumps(cuerpo).encode() if cuerpo is not None else None
-    peticion = urllib.request.Request(
-        url, data=datos, method=("POST" if cuerpo is not None else "GET"), headers=cabeceras)
-    try:
-        with urllib.request.urlopen(peticion, timeout=20) as r:
-            return _json.loads(r.read() or b"{}")
-    except urllib.error.HTTPError as e:
-        _log.warning("google maps %s -> %s", url.split("/")[2], e.code)
-        raise HTTPException(status_code=502, detail="El mapa no responde. Inténtalo en un minuto.")
-    except Exception as e:
-        _log.warning("google maps %s -> %s", url.split("/")[2], type(e).__name__)
-        raise HTTPException(status_code=502, detail="El mapa no responde. Inténtalo en un minuto.")
+    # Dos intentos con una espera corta. Un corte de red o un 5xx pasajero de
+    # Google no puede dejar al usuario sin paseo: "que funcione siempre" es uno de
+    # los tres criterios (founder, 4-sep-2026). Un 4xx no se reintenta porque es
+    # culpa nuestra —peticion mal formada o clave— y reintentar solo hace perder
+    # tiempo al usuario.
+    ultimo = None
+    for intento in (1, 2):
+        peticion = urllib.request.Request(
+            url, data=datos, method=("POST" if cuerpo is not None else "GET"), headers=cabeceras)
+        try:
+            with urllib.request.urlopen(peticion, timeout=12) as r:
+                return _json.loads(r.read() or b"{}")
+        except urllib.error.HTTPError as e:
+            _log.warning("google maps %s -> HTTP %s (intento %d)", url.split("/")[2], e.code, intento)
+            if e.code < 500:
+                break
+            ultimo = e
+        except Exception as e:
+            _log.warning("google maps %s -> %s (intento %d)", url.split("/")[2], type(e).__name__, intento)
+            ultimo = e
+        if intento == 1:
+            _time.sleep(0.8)
+    raise HTTPException(status_code=502, detail="El mapa no responde. Inténtalo en un minuto.")
 
 
 class Punto(BaseModel):
@@ -115,23 +143,36 @@ def sitios_cerca(p: SitiosIn, authorization: Optional[str] = Header(None)):
 
     UNA sola llamada con los cuatro tipos: es la parte cara (32 USD/1.000).
     """
-    d = _google(
-        "https://places.googleapis.com/v1/places:searchNearby",
-        {"includedTypes": _TIPOS_SITIO, "maxResultCount": 20,
-         "locationRestriction": {"circle": {
-             "center": {"latitude": p.lat, "longitude": p.lon}, "radius": p.radio}}},
-        "places.displayName,places.location,places.types")
-    fuera = []
-    for s in d.get("places", []):
+    def _busca(tipos):
+        return _google(
+            "https://places.googleapis.com/v1/places:searchNearby",
+            {"includedTypes": tipos, "maxResultCount": 20,
+             "locationRestriction": {"circle": {
+                 "center": {"latitude": p.lat, "longitude": p.lon}, "radius": p.radio}}},
+            "places.displayName,places.location,places.types").get("places", [])
+
+    crudos = _busca(_TIPOS_SERVICIOS) + _busca(_TIPOS_PAISAJE)
+    fuera, vistos = [], set()
+    for s in crudos:
         loc = s.get("location") or {}
         if loc.get("latitude") is None:
             continue
         tipos = s.get("types") or []
+        # El orden importa: un sitio puede ser varias cosas y gana la mas util.
         tipo = ("dog_park" if "dog_park" in tipos else
                 "veterinary" if "veterinary_care" in tipos else
-                "pet" if "pet_store" in tipos else "park")
+                "pet" if "pet_store" in tipos else
+                "nature" if "hiking_area" in tipos else
+                "jardin" if "garden" in tipos else
+                "historico" if "historical_landmark" in tipos else
+                "plaza" if "plaza" in tipos else "park")
+        nombre = (s.get("displayName") or {}).get("text", "")
+        clave = (round(loc["latitude"], 5), round(loc["longitude"], 5), nombre)
+        if clave in vistos:           # las dos consultas pueden solaparse
+            continue
+        vistos.add(clave)
         fuera.append({"lat": loc["latitude"], "lon": loc["longitude"],
-                      "nombre": (s.get("displayName") or {}).get("text", ""), "tipo": tipo})
+                      "nombre": nombre, "tipo": tipo})
     return {"sitios": fuera}
 
 

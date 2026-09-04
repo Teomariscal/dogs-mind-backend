@@ -22,6 +22,8 @@ Si algo que voy a hacer contradice una de estas líneas, me paro y pregunto.
 
 | desde | decisión |
 |---|---|
+| 4-sep-2026 | **El negocio está en la consulta.** Los paseos y lo demás son reclamo. Ante la duda entre servicio y coste, gana el servicio: los rasgos del camino (agua, bosque, miradores) se recuperan pagando Google. |
+| 4-sep-2026 | **Código `PROINV-A04748`: abierto.** Lo usa cualquiera que lo tenga, no se gasta, y da un mes de plan Medio con cuenta profesional. |
 | 3-sep-2026 | **Se acabó la Membresía Profesional de 19,99 €/año.** El acceso profesional lo da ahora una suscripción **Medio o superior**; la Básica NO. **Los 137 profesionales actuales CONSERVAN el acceso** (16 pagaron la membresía): no se degrada a nadie. Cuando se les acaben los créditos tendrán que contratar suscripción, como todo el mundo. |
 | 3-sep-2026 | **Quietud en el inicio: 2 s la primera vez, 8 s a partir de la segunda.** Salir cada dos segundos mientras el usuario todavía decide qué hacer resulta molesto. |
 | 2-sep-2026 | **Vía cognitivista italiana: sin sellos académicos.** El bloque "Analisi basata su" (Skinner, Pavlov, revistas de ABA) es conductista y contradice el enfoque. Solo se ve en Analisi ABA. |

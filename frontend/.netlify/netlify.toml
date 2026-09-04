@@ -45,11 +45,6 @@ for = "/index.html"
 Cache-Control = "no-cache, must-revalidate"
 
 [[headers]]
-for = "/teo-mariscal-v3.html"
-
-[headers.values]
-Cache-Control = "no-cache, must-revalidate"
-
 [[headers]]
 for = "/privacy.html"
 

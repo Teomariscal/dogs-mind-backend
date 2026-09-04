@@ -22,6 +22,7 @@ Si algo que voy a hacer contradice una de estas líneas, me paro y pregunto.
 
 | desde | decisión |
 |---|---|
+| 4-sep-2026 | **Vía cognitivista: análisis funcional INTERNO, nunca visible.** El informe sale con la estructura de Odette, pero por debajo hay una pasada que extrae HECHOS OBSERVABLES —qué pasa, cuándo, con quién, qué hace el cuerpo, en qué orden, a qué edad— sin una sola palabra funcional. Motivo del founder: *"con tanta prosa es peligrosa porque le falta estructura medible y método científico y está llena de constructos"*. Un constructo no se mide; un hecho sí. **Solo en la parte italiana cognitivista.** |
 | 4-sep-2026 | **El prompt clínico conductual se queda como está.** Menciona "cognitive-ethological frameworks" entre sus marcos; se propuso quitarlo y el founder dijo que no. No tocarlo. |
 | 4-sep-2026 | **ASIMETRÍA: que salga algo conductual a lo cognitivista es un resfriado; que salga algo COGNITIVISTA y contamine lo ABA conductual es el Ébola.** Palabras del founder. La vía conductual —es, en, it— es el producto principal y no puede llevar ni una palabra de zooantropología. Ante cualquier duda, se cierra hacia el lado conductual. |
 | 4-sep-2026 | **`IT_ZOO_VENEER` APAGADO.** Metía una segunda pasada zooantropológica ENCIMA del análisis y el plan CONDUCTUALES del profesional italiano. Estaba a `true` en Railway (el código lo trae apagado por defecto). No volver a encenderlo. |

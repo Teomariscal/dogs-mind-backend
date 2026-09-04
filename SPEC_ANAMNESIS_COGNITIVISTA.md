@@ -180,3 +180,49 @@ possessiva, competitiva, sillectica, di solitaria autogestione.
 Otros: appraisal, coping, arousal, cooling-down, referenzialità, prossemica,
 detour cognitivo, iper-polarizzazione, motivazioni neglette, i 4 indicatori CZ,
 sistemica familiare.
+
+
+---
+
+# Cómo se genera: hechos debajo, prosa CZ encima
+
+**Decidido el 4-sep-2026.** El founder sobre los informes de Odette: *"la respeto
+obviamente pero me pone de los nervios porque con tanta prosa es peligrosa porque
+le falta estructura medible y método científico y está llena de constructos"*.
+
+Y sin embargo la estructura se respeta entera, porque es la que entiende y firma
+el veterinario italiano. Lo que cambia es lo que hay debajo.
+
+## Las dos pasadas
+
+**Pasada 1 — HECHOS (interna, nunca se enseña).**
+No es un análisis ABA con su vocabulario, como hoy. Es una extracción de hechos
+observables a partir de la anamnesis: qué ocurre, cuándo, con quién, qué hace el
+cuerpo, en qué orden, a qué edad, con qué frecuencia, qué lo precede y qué viene
+después. **Cero terminología funcional.** Es el ancla contra la invención: sin
+ella el modelo escribe prosa cognitivista preciosa sacada del relato del dueño, y
+eso en un informe clínico que un veterinario firma es peligroso.
+
+Que Odette hace exactamente esto se ve en sus propios informes: *"irrigidimento
+posturale completo che culmina in un abbaio"*, *"arousal basale costantemente
+elevato"*, *"cooling-down lento"*, *"si attiva tra le 5:00 e le 6:00"*. Observa
+primero, interpreta después. La taxonomía CZ es la lectura, no la prueba.
+
+**Pasada 2 — INFORME CZ (lo que se entrega).**
+Construye las 8 secciones sobre esos hechos, con el vocabulario y el orden de
+Odette.
+
+## Por qué así y no como está hoy
+
+Hoy la pasada 1 genera un análisis ABA **con su vocabulario**, y la 2 lo reescribe
+mientras una lista negra frota las palabras conductuales. Es trabajo doble y
+frágil: basta que a la lista se le escape un término para que el veterinario vea
+ABA. Extrayendo hechos sin vocabulario funcional no hay nada que borrar.
+
+Se gana: el ancla contra la invención · cero vocabulario que limpiar · una sola
+redacción en vez de escribir y reescribir.
+
+## Límite
+
+**Solo la vía italiana cognitivista.** La conductual —es, en, it— no se toca. Ver
+la regla del Ébola en `CLAUDE.md`.

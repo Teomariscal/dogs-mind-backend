@@ -25,7 +25,7 @@ Si algo que voy a hacer contradice una de estas líneas, me paro y pregunto.
 | 4-sep-2026 | **El negocio está en la consulta.** Los paseos y lo demás son reclamo. Ante la duda entre servicio y coste, gana el servicio: los rasgos del camino (agua, bosque, miradores) se recuperan pagando Google. |
 | 4-sep-2026 | **Código `PROINV-A04748`: abierto.** Lo usa cualquiera que lo tenga, no se gasta, y da un mes de plan Medio con cuenta profesional. |
 | 3-sep-2026 | **Se acabó la Membresía Profesional de 19,99 €/año.** El acceso profesional lo da ahora una suscripción **Medio o superior**; la Básica NO. **Los 137 profesionales actuales CONSERVAN el acceso** (16 pagaron la membresía): no se degrada a nadie. Cuando se les acaben los créditos tendrán que contratar suscripción, como todo el mundo. |
-| 3-sep-2026 | **Quietud en el inicio: 2 s la primera vez, 8 s a partir de la segunda.** Salir cada dos segundos mientras el usuario todavía decide qué hacer resulta molesto. |
+| 4-sep-2026 | **Quietud en el inicio: SIEMPRE sale, no es una tirada.** Cualquier espera de más de 8 s activa el vídeo de Niaz 2 (2 s la primera vez). Antes salía solo el 20 % de las veces y en la práctica no salía nunca. Y **no puede depender de cómo se llegue al inicio**: se vigila que el inicio sea la pantalla activa, no la navegación. |
 | 2-sep-2026 | **Vía cognitivista italiana: sin sellos académicos.** El bloque "Analisi basata su" (Skinner, Pavlov, revistas de ABA) es conductista y contradice el enfoque. Solo se ve en Analisi ABA. |
 | 2-sep-2026 | **Paseo: 25 créditos** (antes 10). Con Google Maps un paseo cuesta 0,0478 € (1 geocoding + 1 places + 3 routes); a 10 créditos se perdía dinero en Max y no cubría en Pro. A 25 el margen es +0,06 € en Básico y +0,03 € en Max. |
 | 2-sep-2026 | **Mapas: SIEMPRE Google Maps, sin excepción ni respaldo. OpenStreetMap ANULADO** — fuera Overpass, OSRM, Nominatim y Leaflet. La clave y la facturación están pagadas. *Me lo dijo, dije que ok y no lo escribí; al día siguiente verifiqué y estuve a punto de publicar sobre OSM.* |
@@ -42,6 +42,13 @@ Si algo que voy a hacer contradice una de estas líneas, me paro y pregunto.
 ---
 
 ## Reglas duras de trabajo
+
+- **Cuando el founder habla, habla SIEMPRE de la app**, no de la web. La web
+  la actualizo yo por mi cuenta como consecuencia de los cambios de la app.
+  Si reporta un fallo, es del iPhone salvo que diga "web" explícitamente.
+- Pruebo en el navegador porque ejecuta el MISMO código que va dentro del
+  binario y tarda segundos en vez de una compilación. Pero lo que se arregla
+  es la app.
 
 - **Verificar antes de afirmar.** Abrir el contenido real, no el envoltorio.
   Etiquetar lo que es deducción y no comprobación. Un "no lo sé" vale; una

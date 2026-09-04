@@ -6,7 +6,7 @@
    existe si NO estamos en app nativa. Además vuelve a comprobarlo al arrancar.
 
    DATOS REALES, SIN CLAVES NI FACTURACIÓN:
-     · Mapa      → OpenStreetMap (teselas CARTO dark)
+     · Mapa      → Google Maps (estilo oscuro propio)
      · Lugares   → Overpass API (parques, zonas de perros, veterinarios,
                    fuentes de agua, tiendas de animales) — datos OSM reales
      · Rutas     → OSRM perfil peatonal (routing.openstreetmap.de)
@@ -508,7 +508,7 @@
     if (!f.length) return '';
     return '<div class="dmw-relato"><div class="dmw-relato-h">Lo que vais a ver</div>' +
            '<p>' + f.join(' ') + '</p>' +
-           '<div class="dmw-relato-f">Elementos cartografiados en OpenStreetMap sobre el recorrido. ' +
+           '<div class="dmw-relato-f">Lugares reales sobre el recorrido, segun Google Maps. ' +
            'Hora de sombra calculada con la posición real del sol.</div></div>';
   }
 
@@ -565,7 +565,7 @@
         : '<div class="dmw-nav-vacio">Sin indicaciones detalladas para esta ruta.</div>') +
       '<div class="dmw-nav-btns">' +
         (g ? '<a class="dmw-nav-btn" href="' + g + '" target="_blank" rel="noopener">Abrir en mi app de mapas</a>' : '') +
-        (o ? '<a class="dmw-nav-btn alt" href="' + o + '" target="_blank" rel="noopener">Ver en OpenStreetMap</a>' : '') +
+        /* El enlace a OpenStreetMap se retira: ya no es nuestra fuente (4-sep-2026). */
       '</div>' +
       '<div class="dmw-nav-nota">Se abre tu app de mapas con esta ruta ya elegida — ' +
       'salida, paradas y vuelta — y la sigues desde ahí con tu GPS.</div>';
@@ -673,10 +673,19 @@
          Con Google Maps eso es dinero variable, y el precio al usuario no
          puede bailar segun lo que tarde en encontrar ruta (founder,
          30-ago-2026). Ahora son 3 llamadas fijas y el coste queda clavado. */
+      /* DOS candidatas, no una, y gana la que mas se acerca a la distancia
+         prometida (founder, 4-sep-2026: "quiero el mejor servicio").
+           · Por SITIOS: pasa por parques y jardines, mas bonita, pero medida
+             contra la API real da un 49 % de desviacion y hasta un 197 %: una
+             "Vuelta corta" de 1,5 km salia de 3,6.
+           · Por RUMBO: 13 % de desviacion, pero no busca lo verde.
+         Calculando las dos y quedandose con la mejor: 11 % de desviacion, y la
+         bonita gana en 4 de cada 15. Cuesta una llamada mas de rutas por paseo
+         (~0,005 EUR) y se paga: la distancia prometida tiene que ser cierta. */
       var candidatos = [];
       var cp = elegirDestinos(pois, centro, o.m, 0.7);
       if (cp) candidatos.push(cp);
-      else candidatos.push(destinosPorRumbo(centro, o.m, 0));
+      candidatos.push(destinosPorRumbo(centro, o.m, 0));
 
       var res = null, mejorDif = Infinity;
       for (var c = 0; c < candidatos.length; c++) {
@@ -684,8 +693,10 @@
         try { cand = await ruta(candidatos[c]); } catch (e) { continue; }
         var dif = Math.abs(cand.metros - o.m);
         if (dif < mejorDif) { mejorDif = dif; res = cand; }
-        /* Suficientemente cerca: no gastamos más llamadas. */
-        if (dif <= o.m * 0.3) break;
+        /* Solo se corta si la primera ya es MUY buena (10 %). Con el 30 % de
+           antes se aceptaba la de sitios sin llegar a probar la de rumbo, que
+           casi siempre era mejor. */
+        if (dif <= o.m * 0.1) break;
       }
       if (!res) continue;
       /* El nombre promete una distancia; si la real se aleja mucho, lo decimos
@@ -712,7 +723,7 @@
     /* Ya hay rutas de verdad: ahora sí se cobra. */
     if (!(await cobrarPaseo())) return;
     pintarLista(document.getElementById('dmw-walk-lista'));
-    estadoTexto(estado.rutas.length + ' rutas sobre datos reales de OpenStreetMap');
+    estadoTexto(estado.rutas.length + ' rutas a pie sobre datos de Google Maps');
     if (estado.rutas.length) seleccionar(0);
   }
 

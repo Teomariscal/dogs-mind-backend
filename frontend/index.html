@@ -16256,7 +16256,7 @@ function dmInitWebLayer() {
        completa. Sin límite de ancho — en móvil web se ve como se vería en
        la app, que es lo que queremos validar. */
     var sp = document.createElement('script');
-    sp.src = 'web-paseo.js?v=22';
+    sp.src = 'web-paseo.js?v=23';
     sp.defer = true;
     document.head.appendChild(sp);
   } catch (e) { /* ante la duda, no hacer nada */ }
@@ -16280,7 +16280,7 @@ function dmInitPaseoNativo() {
        abre "El paseo de hoy". Cargarlo aquí eran 34 KB de más en cada
        arranque, sin ganar nada. */
     var sp = document.createElement('script');
-    sp.src = 'web-paseo.js?v=22';
+    sp.src = 'web-paseo.js?v=23';
     sp.defer = true;
     document.head.appendChild(sp);
   } catch (e) { /* nunca romper el arranque de la app por el paseo */ }
@@ -18063,7 +18063,11 @@ function getVal(id, fallback) {
      y salia encima del 70 % de Nueva consulta, y Ale no tiene video todavia.
      Se encienden subiendo su probabilidad, no tocando esto. */
   var QUIETUD_ACTIVA = true;
-  var N2_PROB_QUIETUD = 0.20;
+  /* SIEMPRE, no es una tirada: "cualquier espera de mas de 8 segundos activa
+     video de Niaz 2" (founder, 4-sep-2026). Estaba al 20 %, asi que fallaba 4 de
+     cada 5 veces y en la practica no salia nunca. Quien no la quiera ver tiene
+     "No volver a mostrar", que desde el 3-sep si funciona. */
+  var N2_PROB_QUIETUD = 1.00;
   /* Pantallas que pueden asomarse en el inicio tras un rato de quietud
      (2 s la primera vez, 8 s de la segunda en adelante — ver _quietudEspera).
      Anadir una nueva es meter su linea aqui. La suma de 'prob' es la
@@ -18151,6 +18155,33 @@ function getVal(id, fallback) {
       window._quietudRearmar();
     } catch (e) {}
   };
+
+  /* VIGILANTE: la quietud no puede depender de COMO se llegue al inicio.
+     Hasta el 4-sep-2026 solo se armaba desde goTo('s-home'), asi que si la app
+     ya estaba en el inicio —arranque, sesion restaurada, o el usuario que
+     simplemente se queda ahi— no se armaba nunca y Niaz 2 no salia jamas. El
+     founder lo reporto: "me he quedado varias veces en el inicio mas de 8 seg y
+     no ha saltado nunca... tiene que dar igual".
+     Ahora se mira una vez por segundo si el inicio es la pantalla activa. Es
+     barato y no depende de ninguna ruta de navegacion. */
+  (function vigilarQuietud() {
+    var enInicioAntes = false;
+    setInterval(function () {
+      try {
+        var a = document.querySelector('.screen.active');
+        var enInicio = !!a && a.id === 's-home';
+        if (enInicio && !enInicioAntes) {
+          /* Acaba de entrar (o la app arranco ya aqui): darle su tirada. */
+          if (typeof window.dmQuietudReset === 'function') window.dmQuietudReset();
+          if (typeof window.dmAleQuizas === 'function') window.dmAleQuizas();
+        } else if (enInicio && typeof window.dmAleQuizas === 'function' && !window._quietudMontada) {
+          /* Todavia no se habia montado (p.ej. sin sesion al arrancar). */
+          window.dmAleQuizas();
+        }
+        enInicioAntes = enInicio;
+      } catch (e) {}
+    }, 1000);
+  })();
 
   /* Al salir del inicio se olvida el intento, para que la proxima visita
      vuelva a tener su oportunidad. */

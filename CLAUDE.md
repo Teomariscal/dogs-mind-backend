@@ -61,6 +61,15 @@ Si algo que voy a hacer contradice una de estas líneas, me paro y pregunto.
 - **No quitar nada sin OK** para ese elemento concreto.
 - Si algo depende de él: cortar el discurso, decir solo su paso, dar link
   comprobado y hacer el seguimiento yo por API.
+- **PUERTA DE ENVÍO — no es opcional.** Antes de pedirle el OK para subir a
+  cualquier tienda: `scripts/listo-para-enviar.sh comprobar`. Se niega si el
+  frontend que va dentro del binario no es EXACTAMENTE el que registré como
+  verificado, o si las dos tiendas llevan cosas distintas. Verificar y luego
+  recompilar invalida la verificación: hay que repetirla sobre el binario
+  nuevo y volver a registrarla con `registrar "prueba"…`.
+  Nace del 4-sep-2026: verifiqué `2728e243`, recompilé a `2938b371` y le pedí
+  permiso para enviar ése. *"¿Para qué me preguntas si lo envías cuando sabes
+  que no debes?"* Saltársela exige que él lo pida explícitamente.
 
 ---
 

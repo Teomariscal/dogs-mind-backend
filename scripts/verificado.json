@@ -1,0 +1,17 @@
+{
+  "md5_frontend": "2938b3713d4fbc0c1eb20210962f8a3a",
+  "verificado_el": "2026-09-04T18:34:49",
+  "pruebas": [
+    "Niaz 2: arranque medido al ms sobre ESTE binario — splash 0,08 s, inicio 0,27 s, Niaz 2 a los 8,27 s",
+    "Niaz 2: segunda aparicion 8,0 s",
+    "Niaz 2: tocando la pantalla 11 s no sale; al parar, sale",
+    "Niaz 2: con 'No volver a mostrar' no sale",
+    "Sellos academicos: ocultos en Analisi Cognitivista, visibles en Analisi ABA",
+    "Tarjeta de paseo: espanol -> italiano -> espanol, se retraduce sola",
+    "Paseos: mapa de Google cargado, Leaflet fuera, cero menciones a OpenStreetMap",
+    "Paseos Madrid: 3 rutas reales de 1,4 / 2,0 / 2,7 km con trazado en el mapa",
+    "Membresia 19,99: cero botones visibles que lleven a comprarla",
+    "Membresia 19,99: ni un precio visible en splash, perfil, area profesional, inicio, planes ni creditos",
+    "iOS y Android: mismo frontend, md5 identico"
+  ]
+}

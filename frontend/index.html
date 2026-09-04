@@ -11884,6 +11884,21 @@ button, a, [onclick], input, select, textarea, .n-btn, .cm-btn-primary,
         <button class="pro-card-cta" onclick="onActivateProClick()" data-i18n="pro_cta_activate">Activar Profesional</button>
       </article>
 
+      <!-- Ocupa el hueco de la membresia retirada. Sin esta tarjeta, quien pulsa
+           "Profesional" en la eleccion de perfil llega a una pantalla con la
+           cabecera y poco mas: un callejon sin salida (founder, 4-sep-2026).
+           El texto es suyo: analisis mas complejos, para quien trabaja con
+           conducta canina, y desaconsejado al particular por falta de formacion
+           previa. El plan se nombra sin precio para no tener que tocarlo si
+           algun dia cambia. -->
+      <article class="pro-card pro-card--standard">
+        <span class="pro-card-tag" data-i18n="pro_acc_tag">Profesional</span>
+        <h3 class="pro-card-title" data-i18n="pro_acc_title">Análisis profesional</h3>
+        <p class="pro-card-pitch" data-i18n="pro_acc_p1">El análisis profesional es más complejo y está pensado para quien trabaja con conducta canina. Requiere formación previa para aprovecharlo: si eres particular, no te recomendamos esta opción — la versión para tutores te dará respuestas más útiles.</p>
+        <p class="pro-card-pitch" data-i18n="pro_acc_p2">El acceso profesional va incluido en la suscripción Medio o superior.</p>
+        <button class="pro-card-cta" onclick="dmAbrirPlanes('menu')" data-i18n="pro_acc_cta">Ver planes</button>
+      </article>
+
       <!-- Card Certified Professional ocultado 2026-05-17 (audit) por riesgo
            App Store Review Guideline 2.1 ("apps with placeholder content")
            debido a botón "Próximamente". Reactivar en v1.1 cuando el curso +
@@ -22827,6 +22842,11 @@ function endTourIntro() {
       pro_tag_pro:            'Profesional',
       pro_pro_title:          'Membresía Profesional',
       pro_pro_pitch:          'Tus informes con el logo de tu empresa junto al de The Dogs’ Mind. Imagen internacional para tus clientes desde el primer caso.',
+      pro_acc_tag:            'Profesional',
+      pro_acc_title:          'Análisis profesional',
+      pro_acc_p1:             "El análisis profesional es más complejo y está pensado para quien trabaja con conducta canina. Requiere formación previa para aprovecharlo: si eres particular, no te recomendamos esta opción — la versión para tutores te dará respuestas más útiles.",
+      pro_acc_p2:             "El acceso profesional va incluido en la suscripción Medio o superior.",
+      pro_acc_cta:            'Ver planes',
       pro_pro_feat_1:         'Hasta 20 perros activos en tu cuenta',
       pro_pro_feat_2:         'Informes descargables co-marcados con tu logo',
       pro_pro_feat_3:         'Registro completo de casos y seguimientos',
@@ -23988,6 +24008,11 @@ function endTourIntro() {
       pro_tag_pro:            'Professional',
       pro_pro_title:          'Professional Membership',
       pro_pro_pitch:          "Your reports with your company logo next to The Dogs’ Mind's. International image for your clients from day one.",
+      pro_acc_tag:            'Professional',
+      pro_acc_title:          'Professional analysis',
+      pro_acc_p1:             "Professional analysis is more complex and designed for people who work with canine behaviour. It takes prior training to get value from it: if you are a dog owner, we don't recommend this option — the tutor version will give you more useful answers.",
+      pro_acc_p2:             "Professional access is included with the Medio subscription or above.",
+      pro_acc_cta:            'See plans',
       pro_pro_feat_1:         'Up to 20 active dogs in your account',
       pro_pro_feat_2:         'Downloadable reports co-branded with your logo',
       pro_pro_feat_3:         'Full case and follow-up records',
@@ -25146,6 +25171,11 @@ function endTourIntro() {
           pro_tag_pro:            'Professionale',
           pro_pro_title:          'Membership Professionale',
           pro_pro_pitch:          'I tuoi report con il logo della tua azienda accanto a quello di The Dogs’ Mind. Immagine internazionale per i tuoi clienti fin dal primo caso.',
+          pro_acc_tag:            'Professionale',
+          pro_acc_title:          'Analisi professionale',
+          pro_acc_p1:             "L'analisi professionale è più complessa ed è pensata per chi lavora con il comportamento canino. Richiede una formazione precedente per sfruttarla: se sei un privato, non ti consigliamo questa opzione — la versione per tutori ti darà risposte più utili.",
+          pro_acc_p2:             "L'accesso professionale è incluso nell'abbonamento Medio o superiore.",
+          pro_acc_cta:            'Vedi i piani',
           pro_pro_feat_1:         'Fino a 20 cani attivi nel tuo account',
           pro_pro_feat_2:         'Report scaricabili co-brandizzati con il tuo logo',
           pro_pro_feat_3:         'Registro completo di casi e monitoraggi',

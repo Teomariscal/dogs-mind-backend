@@ -904,3 +904,50 @@
     body.dm-web #s-onboarding .ob-repetir, body.dm-web #s-niaz .ob-repetir { left: auto; right: 62px; }
   }
 }
+
+  /* ══ AJUSTE DE ESCALA EN ESCRITORIO (founder, 4-sep-2026) ══════════════════
+     "Está demasiado grande y no se ajusta bien a la pantalla."
+     Medido en 1440x900 antes de tocar nada:
+       · Las dos barras de arriba ocupaban 208 px de 900 —casi una cuarta parte—
+         porque los 5 botones necesitaban 886 px y solo tenían 781: saltaban a
+         dos filas. Y sobraban 200 px a los lados sin usar, con el contenedor
+         limitado a 1240.
+       · La anamnesis eran 4,2 pantallas de scroll con 12 campos de 1250 px de
+         ancho. Un campo de metro y cuarto para escribir una raza.
+     Va al final del fichero a propósito: así solo AÑADE y se puede quitar
+     entero sin tocar nada de lo anterior. */
+  @media (hover: hover) and (pointer: fine) {
+
+    /* 1. La barra usa el ancho que ya sobraba, y los botones caben en UNA fila. */
+    body.dm-web .dmw-bar-in { max-width: 1560px; }
+    body.dm-web .dmw-bar-in > *:nth-child(2) { flex-wrap: nowrap; }
+    body.dm-web .dmw-btn-accion { font-size: 13px; padding: 9px 13px; }
+
+    /* 2. El contenido deja de estirarse hasta el borde. Un texto de 1250 px no
+       se lee: el ojo pierde el renglón. */
+    /* (el ancho de cada campo lo marca ya la columna de la regla 3) */
+
+    /* 3. La anamnesis se centra en una columna legible. OJO: esta pantalla NO
+       tiene el contenedor con overflow-y que usan las demás —lo comprobé y por
+       eso una primera versión de esta regla no enganchaba—: son dos DIV sueltos
+       hijos directos de #s-anamnesis. Se acotan esos.
+       Sin esto, los campos quedaban acotados a 620 px pero pegados a la
+       izquierda, con medio metro de vacío a la derecha: peor que antes, porque
+       el hueco se hacía evidente. */
+    body.dm-web #s-anamnesis { align-items: center; }
+    body.dm-web #s-anamnesis > div {
+      max-width: 760px; width: 100%;
+      /* `margin-inline: auto` NO bastaba: otra regla impone margen 14px y gana.
+         Y como el padre es flex, lo que centra de verdad es align-self. */
+      margin-left: auto !important; margin-right: auto !important;
+      align-self: center;
+    }
+    body.dm-web #s-anamnesis input:not([type="checkbox"]):not([type="radio"]),
+    body.dm-web #s-anamnesis textarea,
+    body.dm-web #s-anamnesis select { max-width: none; }
+
+    /* 4. Los botones de ancho completo dentro de créditos y registros dejan de
+       medir 1256 px. */
+    body.dm-web #s-tokens button[style*="width:100%"],
+    body.dm-web #s-records button[style*="width:100%"] { max-width: 720px; margin-inline: auto; }
+  }

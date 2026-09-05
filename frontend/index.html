@@ -10248,14 +10248,10 @@ button:not(:disabled):active{ transform:scale(0.98); }
        y "Aigent" se escribe "Eillent", pero en pantalla van bien escritos. -->
   <div id="s-ale" class="screen">
     <div class="ob-wrap">
-      <!-- Sin src ni poster A PROPOSITO: `onboarding-ale.mp4` y `ale-hero.png`
-           todavia no existen, y el navegador los pedia en CADA arranque de la
-           app aunque la pantalla estuviera oculta: dos 404 por usuario y por
-           sesion. Cuando el video este, se restauran estas dos lineas:
-             poster="ale-hero.png"
-             <source src="onboarding-ale.mp4" type="video/mp4"> -->
+      <!-- data-src y no src: el video se carga al abrir la pantalla
+           (dmVideoCargar), no en cada arranque de la app. -->
       <video id="al-video" class="ob-video" playsinline muted preload="none"
-             aria-hidden="true"></video>
+             data-src="aigents-ale.mp4" aria-hidden="true"></video>
       <button id="al-repetir" class="ob-repetir" type="button" onclick="dmAleRepetir()"
               aria-label="Repetir">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none"
@@ -10283,7 +10279,16 @@ button:not(:disabled):active{ transform:scale(0.98); }
 
           <div class="ob-choice" id="al-choice">
             <button class="ob-btn ob-btn--owner" type="button" onclick="dmAlePaseo()">
-              <span data-i18n="al_cta">Dog Walking</span>
+              <span data-i18n="al_cta">Buscar rutas con mi perro</span>
+            </button>
+
+            <!-- La otra salida: el nucleo de la app. Asi el usuario descubre los
+                 paseos O se va derecho a lo que de verdad importa (founder,
+                 5-sep-2026). En italiano la anamnesis ya ofrece elegir ABA o
+                 Cognitivista; fuera de italiano entra directa a conductual. -->
+            <button class="ob-btn" type="button" onclick="dmAleConducta()"
+                    style="background:transparent;border:1.5px solid rgba(94,200,230,0.45);color:#ade3f2;">
+              <span data-i18n="al_cta2">Problema de comportamiento</span>
             </button>
 
             <button class="ob-link" type="button" onclick="dmAleAhoraNo()"
@@ -17937,9 +17942,13 @@ function getVal(id, fallback) {
      tiempo a mirar nada: "me ha saltado sola sin pasar por splash ni por inicio,
      eso no es muy correcto" (founder, 4-sep-2026). Ocho segundos es lo que el
      mismo pidio —"cualquier espera de mas de 8 segundos"— y deja ver el inicio. */
+  /* 4 s en el PRIMER uso, 8 s a partir de entonces (founder, 5-sep-2026).
+     La gracia de arranque baja a 4 para que esos 4 s se cumplan de verdad: si
+     se quedara en 8 mandaria ella y el primer uso saldria igualmente a los 8. */
+  var QUIETUD_ESPERA_1A_MS = 4000;
   var QUIETUD_ESPERA_MS    = 8000;
   var QUIETUD_ARRANQUE     = Date.now();
-  var QUIETUD_GRACIA_MS    = 8000;   /* nunca en los primeros 8 s de app viva */
+  var QUIETUD_GRACIA_MS    = 4000;   /* nunca en los primeros 4 s de app viva */
   var QUIETUD_VISTAS_KEY   = 'dm_quietud_vistas';
   function _quietudVistas() {
     try { return parseInt(localStorage.getItem(QUIETUD_VISTAS_KEY) || '0', 10) || 0; }
@@ -17952,8 +17961,9 @@ function getVal(id, fallback) {
     /* Un unico sitio decide, pase por donde pase la llamada: ni el vigilante ni
        goTo('s-home') pueden saltarselo. Si la app acaba de arrancar, se espera
        ademas lo que falte para cumplir la gracia. */
+    var base = (_quietudVistas() === 0) ? QUIETUD_ESPERA_1A_MS : QUIETUD_ESPERA_MS;
     var falta = QUIETUD_GRACIA_MS - (Date.now() - QUIETUD_ARRANQUE);
-    return Math.max(QUIETUD_ESPERA_MS, falta > 0 ? falta : 0);
+    return Math.max(base, falta > 0 ? falta : 0);
   }
   var _alTimer = null;
   var _alCitaPendiente = null;
@@ -18050,6 +18060,8 @@ function getVal(id, fallback) {
     }, 60);
   };
 
+  window.dmAleConducta = function () { _alParar(); goTo('s-anamnesis'); };
+
   window.dmAleAhoraNo = function () { _alParar(); goTo('s-home'); };
   window.dmAleNoMostrarMas = function () {
     try { localStorage.setItem(AL_SILENCIO_KEY, '1'); } catch (e) {}
@@ -18067,7 +18079,9 @@ function getVal(id, fallback) {
      atrás es de quietud: cualquier gesto la cancela y ni siquiera se sortea.
      Si está usando la app, no se le interrumpe. */
   var NZ_PROB_QUIETUD = 0.00;  /* apagado: no lo pidio nadie */
-  var AL_PROB_QUIETUD = 0.00;  /* apagado hasta que Ale tenga video */
+  /* Ale, 10 % de las veces; Niaz 2 se queda con el 90 % restante (founder,
+     5-sep-2026). El sorteo reparte por tramos, asi que la suma debe dar 1.00. */
+  var AL_PROB_QUIETUD = 0.10;
   /* Ale no se asoma hasta que exista su vídeo. Hoy no lo hay: el original de
      su imagen tiene 300 px y HeyGen le inventaba la cara. Su pantalla está
      construida y probada; se enciende poniendo esto en true el día que
@@ -18093,14 +18107,17 @@ function getVal(id, fallback) {
      video de Niaz 2" (founder, 4-sep-2026). Estaba al 20 %, asi que fallaba 4 de
      cada 5 veces y en la practica no salia nunca. Quien no la quiera ver tiene
      "No volver a mostrar", que desde el 3-sep si funciona. */
-  var N2_PROB_QUIETUD = 1.00;
+  var N2_PROB_QUIETUD = 0.90;
   /* Pantallas que pueden asomarse en el inicio tras un rato de quietud
-     (2 s la primera vez, 8 s de la segunda en adelante — ver _quietudEspera).
+     (4 s el primer uso, 8 s a partir de entonces — ver _quietudEspera).
      Anadir una nueva es meter su linea aqui. La suma de 'prob' es la
      probabilidad total de que salga alguna. */
   var QUIETUD_PANTALLAS = [
+    /* Se reparte por TRAMOS acumulados, asi que el ORDEN importa y la suma debe
+       dar 1.00: Ale se lleva el primer 10 % y Niaz 2 el 90 % restante. */
+    { pantalla: 's-ale',   prob: AL_PROB_QUIETUD, llave: AL_SILENCIO_KEY },
     { pantalla: 's-niaz2', prob: N2_PROB_QUIETUD, llave: N2_SILENCIO_KEY }
-    /* Siguiente video: anadir aqui. */
+    /* Siguiente video: anadir aqui, y recolocar las probabilidades. */
   ];
 
   window.dmAleQuizas = function () {
@@ -22973,7 +22990,8 @@ function endTourIntro() {
       n2_body:                 'Los Aigents son avatars de IA muy especializados. No sirven para generar an\u00e1lisis de conducta pero te ayudan en tu d\u00eda a d\u00eda con tu perro.',
       n2_cta:                  'Conoce a Los Aigents',
       n2_script:               'Uy, perdona, me estaba reseteando. Hola, soy Niaz, tu Aigent de lujo y lifestyle canino. Y estoy aqu\u00ed para ayudarte con peluquer\u00eda, hoteles, productos premium, restaurantes y viajes. Solo lo mejor para tu perro.',
-      al_cta:                  'Dog Walking',
+      al_cta:                  'Buscar rutas con mi perro',
+      al_cta2:                 'Problema de comportamiento',
       aw_title:                 'Welcome a The Dogs’ Mind',
       aw_body:                  'Uno de nosotros te va a acompañar en tu primera consulta.',
       aw_cta:                   'Adelante',
@@ -24138,7 +24156,8 @@ function endTourIntro() {
       n2_body:                 'Aigents are highly specialised AI avatars. They do not generate behavioural analyses, but they help you day to day with your dog.',
       n2_cta:                  'Meet the Aigents',
       n2_script:               'Oops, sorry, I was rebooting. Hi, I\u2019m Niaz, your luxury and canine lifestyle Aigent. And I\u2019m here to help you with grooming, hotels, premium products, restaurants and travel. Only the best for your dog.',
-      al_cta:                  'Dog Walking',
+      al_cta:                  'Find routes with my dog',
+      al_cta2:                 'Behaviour problem',
       aw_title:                 'Welcome to The Dogs’ Mind',
       aw_body:                  'One of us is going to be with you through your first consultation.',
       aw_cta:                   'Let’s go',
@@ -25302,7 +25321,8 @@ function endTourIntro() {
           n2_body:                 'Gli Aigents sono avatar di IA molto specializzati. Non servono a generare analisi del comportamento, ma ti aiutano ogni giorno con il tuo cane.',
           n2_cta:                  'Conosci gli Aigents',
           n2_script:               'Ops, scusa, mi stavo riavviando. Ciao, sono Niaz, la tua Aigent di lusso e lifestyle canino. E sono qui per aiutarti con toelettatura, hotel, prodotti premium, ristoranti e viaggi. Solo il meglio per il tuo cane.',
-          al_cta:                  'Dog Walking',
+          al_cta:                  'Cerca percorsi con il mio cane',
+          al_cta2:                 'Problema di comportamento',
           aw_title:                 'Welcome in The Dogs’ Mind',
           aw_body:                  'Uno di noi ti accompagnerà nel tuo primo consulto.',
           aw_cta:                   'Avanti',

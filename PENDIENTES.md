@@ -18,30 +18,22 @@ desaparece cuando la conversacion se resume.
 
 Lista viva. Se actualiza en cuanto algo entra o sale. Última revisión: 1-sep-2026, 23:05.
 
-## 🔴 ABIERTO — reportado el 3-sep-2026 desde el iPhone
-
-1. **Paseos sale en italiano dentro de la versión española.** "La passeggiata di
-   oggi", "Tre percorsi vicino a te", botones "corta / media / lunga" — en una
-   app con el resto en español.
-2. **El mapa de paseos pide una clave de API.** Las teselas de CARTO ya no son
-   gratis: sale la marca de agua "API KEY REQUIRED" encima del mapa. Lo resuelve
-   la migración a Google Maps, ya escrita y pendiente de verificar.
-3. **La Membresía Profesional de 19,99 €/año ya no aplica.** El profesional debe
-   comprar una suscripción **Medio como mínimo**; la Básica no le vale. Hay que
-   quitar ese producto y cambiar la puerta de acceso profesional.
-4. De paso, en esa misma pantalla: "10 **tokens** incluidos para empezar" — debe
-   decir créditos.
-
-## Estado de las ramas ahora mismo
+## Estado de las ramas — 5-sep-2026
 
 | rama | versión | estado |
 |---|---|---|
-| Web | v288 | en vivo, con todo lo de hoy INCLUIDOS los paseos |
-| Backend | latidos en los 3 endpoints de IA | desplegado, Railway SUCCESS |
-| Google Play | 1.0.12 (vc26) | publicada en producción |
-| App Store | 1.0.12 (build 48) | **IN_REVIEW** · 1.0.11 en venta |
-| iOS 1.0.13 | build 49 | compilada en local, SIN subir (decisión: esperar a la 12) |
-| Android 1.0.13 | vc27 | compilada, sin publicar |
+| Web | v295 | en vivo, con Ale, el área profesional y el ajuste de escritorio |
+| Backend | Google Maps + latidos | desplegado, Railway SUCCESS |
+| Google Play | **1.0.14 (30)** | publicada en producción |
+| App Store | **1.0.14 (build 49)** | en revisión; sale sola al aprobarse (AFTER_APPROVAL) |
+
+Cerrado desde la última revisión: créditos, muro de pago vacío, corte de conexión
+en los análisis, paseos migrados a Google Maps, italiano colándose en español,
+sellos fuera de la vía cognitivista, membresía de 19,99 retirada, acceso
+profesional por suscripción Medio+, clasificación por edades respondida, área
+profesional con su tarjeta, y Ale en la quietud del inicio.
+
+Pendiente de compilar en la 1.0.15: **Ale** (solo está en web).
 
 ## Cerrado hoy — el usuario de pago que no podia analizar
 

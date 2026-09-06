@@ -22,6 +22,7 @@ Si algo que voy a hacer contradice una de estas líneas, me paro y pregunto.
 
 | desde | decisión |
 |---|---|
+| 6-sep-2026 | **`Skip intro` y `Don't show me again` se quedan en INGLÉS en los tres idiomas.** Es deliberado, no un olvido de traducción: los diccionarios `es`, `en` e `it` llevan el mismo texto inglés a propósito (mismo criterio que el "Welcome" del saludo). **No traducirlos.** Salen así en Niaz 2 y en Ale. |
 | 6-sep-2026 | **Quietud: 4 s SIEMPRE**, también a partir del segundo uso. Corrige la línea del 5-sep que ponía 8 s para los usos posteriores. |
 | 6-sep-2026 | **Ale y Niaz 2 al 50 % cada uno, "de momento".** Provisional: sustituye al reparto 10/90 del 5-sep mientras se ve cómo funciona Ale. |
 | 5-sep-2026 | ~~**Ale en la quietud del inicio, 10 % de las veces**~~ *(sustituido el 6-sep por el 50/50)* (Niaz 2 se queda con el 90 %). Sorteo aleatorio por tramos: puede tocar a la primera. Misma estructura que Niaz 2. Su pantalla lleva a dos botones: **"Buscar rutas con mi perro"** (paseos) y **"Problema de comportamiento"**, que va a la anamnesis; en italiano esa misma pantalla ya ofrece elegir ABA o Cognitivista. Textos en español, inglés e italiano. |

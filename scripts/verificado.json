@@ -1,17 +1,14 @@
 {
-  "md5_frontend": "2938b3713d4fbc0c1eb20210962f8a3a",
-  "verificado_el": "2026-09-04T18:34:49",
+  "md5_frontend": "7dcfef110c205d469a94bcfb0be145ee",
+  "verificado_el": "2026-09-06T18:16:03",
   "pruebas": [
-    "Niaz 2: arranque medido al ms sobre ESTE binario — splash 0,08 s, inicio 0,27 s, Niaz 2 a los 8,27 s",
-    "Niaz 2: segunda aparicion 8,0 s",
-    "Niaz 2: tocando la pantalla 11 s no sale; al parar, sale",
-    "Niaz 2: con 'No volver a mostrar' no sale",
-    "Sellos academicos: ocultos en Analisi Cognitivista, visibles en Analisi ABA",
-    "Tarjeta de paseo: espanol -> italiano -> espanol, se retraduce sola",
-    "Paseos: mapa de Google cargado, Leaflet fuera, cero menciones a OpenStreetMap",
-    "Paseos Madrid: 3 rutas reales de 1,4 / 2,0 / 2,7 km con trazado en el mapa",
-    "Membresia 19,99: cero botones visibles que lleven a comprarla",
-    "Membresia 19,99: ni un precio visible en splash, perfil, area profesional, inicio, planes ni creditos",
-    "iOS y Android: mismo frontend, md5 identico"
+    "Quietud: 4000 ms armados con 0, 1, 9 y 60 vistas — una vez por visita",
+    "Tramos 50/50, suma 1.00; 4000 sorteos dan 49,3% Ale / 50,8% Niaz 2",
+    "Sorteo real sobre el binario: 0,25 -> s-ale y 0,75 -> s-niaz2, con Math.random llamado UNA vez",
+    "PAGOS: muro con la respuesta real de produccion, 4 planes, 22.395 creditos, precios correctos, sin undefined",
+    "PAGOS: 0 menciones de 19,99 y tarjeta de area profesional presente",
+    "PASEOS: la tarjeta sigue el idioma en es, it y en",
+    "Estanqueidad: selector cognitivista solo en it; es/en ocultos, stance=behavioral, cero texto cognitivista visible",
+    "Ale: 'Buscar rutas con mi perro' pulsa la tarjeta real y 'Problema de comportamiento' lleva a la anamnesis"
   ]
 }

@@ -26,7 +26,10 @@ import re
 from typing import Optional
 
 from app.config import get_settings
-from app.core.anthropic_client import create_message_resilient
+from app.core.anthropic_client import (
+    create_message_resilient,
+    create_message_streaming_resilient,
+)
 from app.core.prompts.clinical import CLINICAL_SYSTEM_PROMPT
 from app.core.prompts.cognitive_odette import PASADA_1_AVISO, PASADA_2_INFORME
 from app.models.anamnesis_cognitiva import AnamnesiCognitivaInput
@@ -208,7 +211,7 @@ def redactar_relazione(
                         "eliminandoli, senza perdere nessun criterio numerico né "
                         "nessuna istruzione eseguibile.")
         try:
-            r2 = create_message_resilient(
+            r2 = create_message_streaming_resilient(
                 model=settings.clinical_model,
                 fallback_model=settings.clinical_fallback_model,
                 max_tokens=MAX_SALIDA_INFORME,

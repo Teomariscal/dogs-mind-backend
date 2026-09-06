@@ -36,3 +36,30 @@ def create_message_resilient(*, model, fallback_model=None, **kwargs):
                          if k not in ("temperature", "top_p", "top_k")}
             return client.messages.create(model=fallback_model, **fb_kwargs)
         raise
+
+
+def create_message_streaming_resilient(*, model, fallback_model=None, **kwargs):
+    """Igual que create_message_resilient, pero por STREAMING.
+
+    Hace falta cuando `max_tokens` es alto: el SDK se NIEGA a hacer la llamada
+    sin streaming si estima que puede pasar de diez minutos, y devuelve
+    "Streaming is strongly recommended for operations that may take longer than
+    10 minutes". Nos lo encontramos el 7-sep-2026 con el informe cognitivista de
+    Odette, que necesita 24000 tokens de salida: los tres intentos morian ahi.
+
+    Devuelve el MISMO objeto Message que `create` —con `.content` y
+    `.stop_reason`— asi que quien llama no tiene que cambiar nada mas.
+
+    ADITIVA: no toca `create_message_resilient` ni a quien la usa.
+    """
+    client = get_anthropic_client()
+    try:
+        with client.messages.stream(model=model, **kwargs) as flujo:
+            return flujo.get_final_message()
+    except anthropic.APIStatusError as e:
+        if fallback_model and getattr(e, "status_code", None) == 529:
+            fb_kwargs = {k: v for k, v in kwargs.items()
+                         if k not in ("temperature", "top_p", "top_k")}
+            with client.messages.stream(model=fallback_model, **fb_kwargs) as flujo:
+                return flujo.get_final_message()
+        raise

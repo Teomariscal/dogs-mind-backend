@@ -22,6 +22,8 @@ Si algo que voy a hacer contradice una de estas líneas, me paro y pregunto.
 
 | desde | decisión |
 |---|---|
+| 6-sep-2026 | **SE MONTA la anamnesis y el informe cognitivistas de Odette, en build.** Con *"extrema cautela, iteración y triple comprobación"* (palabras del founder) para que **nunca** haya fuga cognitivista hacia la parte conductual. Diseño elegido: **vía separada, no compartida** — pantalla propia, endpoint propio, esquema propio y prompts propios. La vía conductual (es · en · it) no se toca ni una línea. Detalle en `SPEC_ANAMNESIS_COGNITIVISTA.md`. |
+| 6-sep-2026 | **La anamnesis cognitivista SUSTITUYE, no convive.** En `stance='cognitive'` se usa SOLO el formulario de Odette; el ABC no aparece. Es lo que pide el motor nuevo (pasada 1 = hechos observables, no ABC) y además es el aislamiento más fuerte: dos formularios que no comparten campos no pueden filtrarse el uno al otro. |
 | 6-sep-2026 | **`Skip intro` y `Don't show me again` se quedan en INGLÉS en los tres idiomas.** Es deliberado, no un olvido de traducción: los diccionarios `es`, `en` e `it` llevan el mismo texto inglés a propósito (mismo criterio que el "Welcome" del saludo). **No traducirlos.** Salen así en Niaz 2 y en Ale. |
 | 6-sep-2026 | **Quietud: 4 s SIEMPRE**, también a partir del segundo uso. Corrige la línea del 5-sep que ponía 8 s para los usos posteriores. |
 | 6-sep-2026 | **Ale y Niaz 2 al 50 % cada uno, "de momento".** Provisional: sustituye al reparto 10/90 del 5-sep mientras se ve cómo funciona Ale. |

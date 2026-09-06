@@ -5,6 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
 from app.api.routes import health, analysis, avatar, documents, intervention
+# Via cognitivista italiana: router APARTE, para no tocar analysis.py.
+from app.api.routes import analysis_cognitiva as analysis_cognitiva_router
 from app.api.routes import auth, payments as payments_router
 from app.api.routes import dogs as dogs_router
 from app.api.routes import cases as cases_router
@@ -306,6 +308,7 @@ app.include_router(health.router)
 app.include_router(auth.router)
 app.include_router(payments_router.router)
 app.include_router(analysis.router)
+app.include_router(analysis_cognitiva_router.router)
 app.include_router(intervention.router)
 app.include_router(avatar.router)
 app.include_router(documents.router)

@@ -63,7 +63,10 @@ SERVICIOS_AUTORIZADOS = {
     "app/services/italian_cognitive.py",
     "app/services/clinical_ai.py",
     "app/services/intervention_ai.py",
-    "app/services/cognitive_ingestion.py",   # solo ingesta de la RAG B
+    "app/services/cognitive_ingestion.py",     # solo ingesta de la RAG B
+    "app/services/cognitive_odette.py",        # motor del informe de Odette
+    "app/api/routes/analysis_cognitiva.py",    # su ruta, con la puerta delante
+    "app/main.py",                             # solo registra el router
 }
 
 fallos: list[str] = []
@@ -128,7 +131,7 @@ def comprobar_frontend(ruta: Path):
 def comprobar_backend():
     print("\n2. BACKEND — quién puede importar los prompts cognitivistas")
     r = subprocess.run(
-        ["grep", "-rln", "italian_cognitive", "app/"],
+        ["grep", "-rln", "--exclude-dir=__pycache__", "italian_cognitive", "app/"],
         cwd=RAIZ, capture_output=True, text=True)
     ficheros = [f for f in r.stdout.strip().split("\n") if f]
     intrusos = [f for f in ficheros
@@ -141,6 +144,24 @@ def comprobar_backend():
         fallos.append(f"FUGA en backend: {f} usa el motor cognitivista sin estar autorizado")
     if not intrusos:
         print(verde("   ✓ solo servicios autorizados"))
+
+
+def comprobar_prompt_odette():
+    """El prompt de Odette solo lo puede tocar su motor."""
+    print("\n2b. BACKEND — quién importa el prompt de Odette")
+    r = subprocess.run(["grep", "-rln", "--exclude-dir=__pycache__", "cognitive_odette", "app/"],
+                       cwd=RAIZ, capture_output=True, text=True)
+    ficheros = [f for f in r.stdout.strip().split("\n") if f]
+    permitidos = {"app/core/prompts/cognitive_odette.py",
+                  "app/services/cognitive_odette.py",
+                  "app/api/routes/analysis_cognitiva.py"}
+    for f in ficheros:
+        intruso = f not in permitidos
+        print(f"   {rojo('✗') if intruso else verde('✓')} {f}")
+        if intruso:
+            fallos.append(f"FUGA en backend: {f} importa el prompt de Odette sin permiso")
+    if not ficheros:
+        avisos.append("nadie importa el prompt de Odette todavía")
 
 
 def comprobar_puerta():
@@ -176,6 +197,7 @@ def main():
     print("═" * 66)
     comprobar_frontend(destino)
     comprobar_backend()
+    comprobar_prompt_odette()
     comprobar_puerta()
     print("\n" + "═" * 66)
     if fallos:

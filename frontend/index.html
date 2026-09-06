@@ -11116,6 +11116,38 @@ button:not(:disabled):active{ transform:scale(0.98); }
   <!-- fin anamnesis screen -->
 
 
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       == INICIO VIA COGNITIVISTA ==
+       Anamnesi cognitiva, modello Dott.ssa Odette Abramovich.
+
+       SOLO italiano + cuenta profesional + stance 'cognitive'. Todo el texto va
+       en italiano A FUEGO, sin claves de traduccion: si estas cadenas no existen
+       en los diccionarios es/en, no pueden aparecer alli ni por accidente. Ese
+       es el aislamiento, y no depende de que nadie se acuerde de nada.
+       La vigila scripts/sin-fugas.py: fuera de estas marcas, ni una palabra.
+       ══════════════════════════════════════════════════════════════════════ -->
+  <div id="s-anamnesi-cognitiva" class="screen" style="overflow-y:auto;">
+    <div style="padding:20px 20px 40px;max-width:640px;margin:0 auto;">
+
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:8px;">
+        <button onclick="dmCZSalir()" aria-label="Indietro" style="width:42px;height:42px;border-radius:50%;border:none;background:rgba(255,255,255,0.08);color:inherit;font-size:20px;cursor:pointer;font-family:inherit;">&#8592;</button>
+        <div>
+          <div style="font-size:22px;font-weight:700;">Anamnesi cognitiva</div>
+          <div style="font-size:13px;opacity:.72;">Approccio cognitivo-zooantropologico</div>
+        </div>
+      </div>
+
+      <div id="cz-form" style="margin-top:18px;"></div>
+
+      <button id="cz-invia" onclick="dmCZInviare()" style="width:100%;padding:15px;margin-top:22px;background:var(--green2);color:#fff;border:none;border-radius:100px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">Redigi la relazione</button>
+      <div id="cz-stato" style="margin-top:14px;font-size:13px;line-height:1.6;text-align:center;opacity:.85;"></div>
+
+      <div id="cz-relazione" style="margin-top:26px;white-space:pre-wrap;font-size:14px;line-height:1.7;"></div>
+    </div>
+  </div>
+  <!-- == FIN VIA COGNITIVISTA == -->
+
   <!-- s-records: Behavioral Records -->
   <div id="s-records" class="screen" style="overflow-y:auto;">
 
@@ -12815,6 +12847,32 @@ function goTo(id) {
     var _vis = JSON.parse(localStorage.getItem('dm_vistas') || '{}');
     if (!_vis[id]) { _vis[id] = 1; localStorage.setItem('dm_vistas', JSON.stringify(_vis)); }
   } catch (e) {}
+  /* CIERRE DE LA VIA COGNITIVISTA. La pantalla de Odette no puede pintarse si
+     no se cumplen las tres condiciones, se llegue POR DONDE SE LLEGUE. No basta
+     con guardar la entrada: el caso que lo destapo (detector en vivo, 6-sep-2026)
+     es el veterinario que la abre en italiano y luego cambia el idioma a
+     español — la pantalla seguia activa y su texto cognitivista quedaba a la
+     vista en español. Ante cualquier duda se cae hacia la anamnesis conductual. */
+  /* CANAL ESTANCO (founder, 6-sep-2026): "una vez estas en cognitivista, para
+     salir de idioma debes salir de cognitivista". Asi que SALIR de la pantalla
+     CIERRA el canal: la via vuelve a conductual y hay que volver a entrar a
+     proposito pulsando "Analisi Cognitivista". Nadie se queda en cognitivista
+     paseando por el resto de la app. */
+  try {
+    var _act_prev = document.querySelector('.screen.active');
+    if (_act_prev && _act_prev.id === 's-anamnesi-cognitiva' && id !== 's-anamnesi-cognitiva') {
+      window._tdmStance = 'behavioral';
+      if (typeof window.dmSellosRefrescar === 'function') window.dmSellosRefrescar();
+    }
+  } catch (e) {}
+  if (id === 's-anamnesi-cognitiva') {
+    var _cz_lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+    var _cz_cuenta = '';
+    try { _cz_cuenta = (localStorage.getItem('dm_account_type') || '').toLowerCase(); } catch (e) {}
+    if (_cz_lang !== 'it' || _cz_cuenta !== 'professional' || window._tdmStance !== 'cognitive') {
+      id = 's-anamnesis';
+    }
+  }
   if (typeof window.dmZoomReset === 'function') window.dmZoomReset();
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -19937,6 +19995,15 @@ window.dmSellosRefrescar = function () {
 
 function setStance(s) {
   window._tdmStance = (s === 'cognitive') ? 'cognitive' : 'behavioral';
+  /* La via cognitivista tiene su propia anamnesis, la de Odette: es biografica
+     y no comparte ni un campo con el ABC. Al elegirla se va alli. dmCZAbrir()
+     vuelve a comprobar idioma, cuenta y via, y si no cuadra devuelve al ABC.
+     (founder, 6-sep-2026) */
+  if (window._tdmStance === 'cognitive' && typeof window.dmCZAbrir === 'function') {
+    window.dmSellosRefrescar();
+    window.dmCZAbrir();
+    return;
+  }
   var b = document.getElementById('stance-behavioral');
   var c = document.getElementById('stance-cognitive');
   var on  = 'flex:1;padding:12px;border-radius:14px;border:2px solid var(--green2);background:var(--green2);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;';
@@ -19950,9 +20017,23 @@ function refreshStanceSelector() {
   var sel = document.getElementById('stance-selector');
   if (!sel) return;
   var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
-  if (lang === 'it') {
+  /* La puerta del servidor exige ADEMAS cuenta profesional. Si aqui se ofreciera
+     a un particular, elegiria una via que el backend le va a negar con un 403.
+     (6-sep-2026) */
+  var _cuenta = '';
+  try { _cuenta = (localStorage.getItem('dm_account_type') || '').toLowerCase(); } catch (e) {}
+  if (lang === 'it' && _cuenta === 'professional') {
     sel.style.display = 'block';
-    setStance(window._tdmStance || 'behavioral');
+    /* Sin volver a navegar: setStance() llevaria a la pantalla cognitiva cada
+       vez que se refresca el selector. Aqui solo se repinta el estado. */
+    var _b = document.getElementById('stance-behavioral');
+    var _c = document.getElementById('stance-cognitive');
+    var _on  = 'flex:1;padding:12px;border-radius:14px;border:2px solid var(--green2);background:var(--green2);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;';
+    var _off = 'flex:1;padding:12px;border-radius:14px;border:2px solid var(--green2);background:transparent;color:var(--green2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;';
+    window._tdmStance = window._tdmStance || 'behavioral';
+    if (_b) _b.style.cssText = (window._tdmStance === 'behavioral') ? _on : _off;
+    if (_c) _c.style.cssText = (window._tdmStance === 'cognitive')  ? _on : _off;
+    window.dmSellosRefrescar();
   } else {
     sel.style.display = 'none';
     window._tdmStance = 'behavioral';  // fuera de italiano: siempre conductual
@@ -26096,6 +26177,17 @@ function endTourIntro() {
     // iOS: re-aplica precios/textos nativos (19,99 €, tarjeta de plan, disclosures)
     // tras el re-render i18n, para que el cambio de idioma no revierta a precios web.
     try { if (typeof window.dmApplyIosNativeUI === 'function') window.dmApplyIosNativeUI(); } catch(e) {}
+    /* Si estaba DENTRO de la anamnesis cognitiva y acaba de cambiar de idioma,
+       hay que echarlo: la pantalla ya no cumple sus condiciones y su texto es
+       italiano cognitivista. goTo() tiene el guardián, así que basta con
+       reevaluar. (detector en vivo, 6-sep-2026) */
+    try {
+      var _act = document.querySelector('.screen.active');
+      if (_act && _act.id === 's-anamnesi-cognitiva' && lang !== 'it') {
+        window._tdmStance = 'behavioral';
+        goTo('s-anamnesis');
+      }
+    } catch (e) {}
   }
 
   window.setLang = function(lang) { applyLang(lang); };
@@ -27044,6 +27136,190 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
   }
 })();
 </script>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     == INICIO VIA COGNITIVISTA ==
+     Logica de la anamnesi cognitiva. Aislada a proposito:
+      · su texto va en italiano a fuego, no toca los diccionarios
+      · su unica entrada es dmCZAbrir(), que vuelve a comprobar las tres
+        condiciones del cliente antes de dejar entrar
+      · llama SOLO a /analysis/cognitiva, nunca a /analysis
+     La vigila scripts/sin-fugas.py.
+     ══════════════════════════════════════════════════════════════════════ -->
+<script>
+(function () {
+  /* El cuestionario de Odette. El orden es el suyo: primero quien es el
+     animal, luego por que se consulta, luego su historia, y al final que
+     quiere aprender el tutor. */
+  var CZ_CAMPI = [
+    { g: 'Identificazione' },
+    { k: 'specie_razza', t: 'Specie e razza', req: 1 },
+    { k: 'nome',         t: 'Come si chiama', req: 1 },
+    { k: 'eta',          t: 'Che età ha', req: 1, ph: 'es. 8 mesi, 4 anni' },
+    { k: 'sterilizzato', t: 'È castrato/sterilizzato? A che età' },
+
+    { g: 'Motivo della visita' },
+    { k: 'motivo_visita', t: 'Descrivi brevemente il motivo della visita', area: 1, req: 1 },
+    { k: 'comportamenti_notati', t: 'Quali di questi comportamenti hai notato', multi: [
+        'Vocalizzazione eccessiva','Deiezioni in luogo inadeguato','Distruzioni',
+        'Aggressività','Ansia','Attacchi di panico','Stereotipie',
+        'Problemi al guinzaglio o in libertà','Impetuosità','Iperattività','Inattività'] },
+
+    { g: 'Storia e contesto' },
+    { k: 'nucleo_familiare',    t: 'Da chi è composto il nucleo familiare? Convive con altri animali o bambini', area: 1 },
+    { k: 'motivo_adozione',     t: "Qual è stato il motivo dell'adozione", area: 1 },
+    { k: 'vita_prima_adozione', t: "Cosa sai della sua vita prima dell'adozione? Provenienza, genitori", area: 1 },
+    { k: 'alimentazione',       t: 'Cosa mangia, quando e come? Marche e quantità', area: 1 },
+
+    { g: 'Come affronta il mondo' },
+    { k: 'viaggi',                  t: 'Come affronta i viaggi' },
+    { k: 'separazioni',             t: 'Come affronta le separazioni' },
+    { k: 'veterinario',             t: 'Come affronta le visite veterinarie' },
+    { k: 'luoghi_pubblici',         t: 'Come si comporta in luoghi pubblici (bar, ristoranti)' },
+    { k: 'relazioni_altri_animali', t: 'Come sono le relazioni con altri animali' },
+    { k: 'traumi',                  t: 'Ha subito traumi', area: 1 },
+
+    { g: 'Salute' },
+    { k: 'patologie', t: 'Che patologie o sintomi ha o ha avuto', multi: [
+        'Dermatologici','Gastroenterici','Vie urinarie','Neurologici','Pica',
+        'Interventi chirurgici','Altro'] },
+    { k: 'farmaci',   t: 'Che farmaci assume' },
+
+    { g: 'Vita quotidiana' },
+    { k: 'ambienti', t: 'Quali ambienti ha a disposizione', multi: [
+        'Zona giorno','Zona notte','Giardino','Balcone','Altro'] },
+    { k: 'emozioni_prevalenti', t: 'Quali sono le emozioni prevalenti nel tuo animale', multi: [
+        'Gioia','Paura','Rabbia','Noia','Nostalgia','Tristezza','Ansia','Altro'] },
+    { k: 'cosa_gli_piace_fare', t: 'Cosa gli piace fare' },
+    { k: 'esercizi_che_sa',     t: 'Cosa sa fare in termini di esercizi' },
+    { k: 'cosa_ti_piace_fare',  t: 'Cosa piace fare a te con il tuo animale' },
+    { k: 'giochi',              t: 'Che giochi sa fare con te o in autonomia' },
+    { k: 'attivita_fisica', t: 'Che attività fisica svolge', uno: [
+        ['passeggiata','Passeggiata'],['giochi_con_altri_animali','Giochi con altri animali'],
+        ['giochi_con_te','Giochi con te'],['attivita_in_casa','Attività in casa'],
+        ['attivita_in_liberta','Attività in libertà'],['sport','Sport'],['altro','Altro']] },
+    { k: 'giornata_tipo', t: 'Descrivi una giornata tipo con tutti i dettagli, orari e tempi', area: 1, alto: 1 },
+
+    { g: 'Chiusura' },
+    { k: 'altri_professionisti', t: 'Hai già visto altri professionisti' },
+    { k: 'cosa_vuoi_imparare',   t: 'Cosa vuoi imparare nella visita', area: 1 },
+    { k: 'ha_aggredito',         t: 'Il tuo animale ha mai aggredito qualcuno o è stato segnalato alla ASL' }
+  ];
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function pintar() {
+    var caja = document.getElementById('cz-form');
+    if (!caja || caja._pintado) return;
+    var h = '';
+    CZ_CAMPI.forEach(function (c) {
+      if (c.g) {
+        h += '<div style="font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;' +
+             'opacity:.7;margin:26px 0 12px;">' + esc(c.g) + '</div>';
+        return;
+      }
+      var et = '<label for="cz-' + c.k + '" style="display:block;font-size:13px;font-weight:600;' +
+               'margin-bottom:7px;line-height:1.45;">' + esc(c.t) +
+               (c.req ? ' <span style="opacity:.6;">*</span>' : '') + '</label>';
+      var est = 'width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid rgba(127,127,127,.35);' +
+                'background:transparent;color:inherit;font-size:14px;font-family:inherit;';
+      var campo;
+      if (c.multi) {
+        campo = '<div id="cz-' + c.k + '" style="display:flex;flex-wrap:wrap;gap:8px;">' +
+          c.multi.map(function (o) {
+            return '<label style="font-size:12.5px;border:1.5px solid rgba(127,127,127,.35);' +
+              'border-radius:100px;padding:7px 13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;">' +
+              '<input type="checkbox" value="' + esc(o) + '" style="margin:0;"> ' + esc(o) + '</label>';
+          }).join('') + '</div>';
+      } else if (c.uno) {
+        campo = '<select id="cz-' + c.k + '" style="' + est + '"><option value="">—</option>' +
+          c.uno.map(function (o) { return '<option value="' + esc(o[0]) + '">' + esc(o[1]) + '</option>'; }).join('') +
+          '</select>';
+      } else if (c.area) {
+        campo = '<textarea id="cz-' + c.k + '" rows="' + (c.alto ? 5 : 3) + '" style="' + est + 'resize:vertical;"></textarea>';
+      } else {
+        campo = '<input id="cz-' + c.k + '" type="text" ' +
+                (c.ph ? 'placeholder="' + esc(c.ph) + '" ' : '') + 'style="' + est + '">';
+      }
+      h += '<div style="margin-bottom:16px;">' + et + campo + '</div>';
+    });
+    caja.innerHTML = h;
+    caja._pintado = 1;
+  }
+
+  function recoger() {
+    var d = { lang: 'it', stance: 'cognitive' };
+    CZ_CAMPI.forEach(function (c) {
+      if (c.g) return;
+      var el = document.getElementById('cz-' + c.k);
+      if (!el) return;
+      if (c.multi) {
+        d[c.k] = [].slice.call(el.querySelectorAll('input:checked')).map(function (i) { return i.value; });
+      } else {
+        var v = (el.value || '').trim();
+        if (v) d[c.k] = v;
+      }
+    });
+    return d;
+  }
+
+  /* La UNICA entrada. Vuelve a comprobar las tres condiciones del lado
+     cliente: aunque el servidor tenga la ultima palabra, la pantalla no debe
+     poder abrirse desde ningun sitio que no cumpla. */
+  window.dmCZAbrir = function () {
+    var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+    var cuenta = '';
+    try { cuenta = (localStorage.getItem('dm_account_type') || '').toLowerCase(); } catch (e) {}
+    if (lang !== 'it' || cuenta !== 'professional' || window._tdmStance !== 'cognitive') {
+      goTo('s-anamnesis');
+      return;
+    }
+    pintar();
+    goTo('s-anamnesi-cognitiva');
+  };
+
+  window.dmCZSalir = function () { goTo('s-anamnesis'); };
+
+  window.dmCZInviare = async function () {
+    var estado = document.getElementById('cz-stato');
+    var boton  = document.getElementById('cz-invia');
+    var salida = document.getElementById('cz-relazione');
+    var d = recoger();
+    var faltan = ['specie_razza','nome','eta','motivo_visita'].filter(function (k) { return !d[k]; });
+    if (faltan.length) {
+      estado.textContent = 'Compila i campi obbligatori.';
+      var pr = document.getElementById('cz-' + faltan[0]);
+      if (pr) pr.focus();
+      return;
+    }
+    boton.disabled = true;
+    estado.textContent = 'Redazione della relazione in corso. Può richiedere un minuto…';
+    salida.textContent = '';
+    try {
+      var r = await fetch(API_URL + '/analysis/cognitiva', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json',
+                   'Authorization': 'Bearer ' + (localStorage.getItem('dm_jwt') || '') },
+        body: JSON.stringify(d)
+      });
+      var j = await r.json();
+      if (!r.ok) throw new Error(j && j.detail ? j.detail : ('errore ' + r.status));
+      /* `fatti` viaja en la respuesta para poder auditarla desde fuera, pero
+         NO se pinta nunca: es el analisis oculto. */
+      salida.textContent = j.relazione || '';
+      estado.textContent = '';
+    } catch (e) {
+      estado.textContent = String(e.message || e);
+    } finally {
+      boton.disabled = false;
+    }
+  };
+})();
+</script>
+<!-- == FIN VIA COGNITIVISTA == -->
 
 </body>
 </html>

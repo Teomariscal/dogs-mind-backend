@@ -1,8 +1,20 @@
 # Anamnesis cognitivista italiana — modelo Odette Abramovich
 
-**Estado: SIGUIENTE OBJETIVO de la sección cognitivista italiana. NO entra en la
-1.0.14** (founder, 4-sep-2026: *"no es necesario para este build si toma tiempo
-pero sería el siguiente objetivo"*).
+**Estado (7-sep-2026): MONTADO, sin desplegar ni compilar.**
+
+| pieza | estado |
+|---|---|
+| Modelo `AnamnesiCognitivaInput` (29 campos de Odette) | hecho |
+| Prompt del informe, 8 secciones | hecho |
+| Motor `cognitive_odette.py` (ABA oculto → RAG B → auditoría) | hecho |
+| Endpoint `POST /analysis/cognitiva`, con la puerta delante | hecho |
+| Pantalla `s-anamnesi-cognitiva`, italiano a fuego | hecha |
+| Canal estanco (entrar, salir, cambio de idioma) | hecho y probado |
+| Detectores de fuga, estático y en vivo | hechos |
+| **Desplegar backend** | **pendiente de su OK** |
+| **Compilar y enviar app** | **pendiente de su OK** |
+| Informe en PDF con la plantilla de Odette | pendiente |
+| Cerrar los 13 servicios sin puerta (el "resfriado") | pendiente |
 
 Origen: *Scheda anamnestica* de la **Dott.ssa Odette Abramovich**, médico
 veterinario experta en comportamiento animal. PDF de 9 páginas entregado por el

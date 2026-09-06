@@ -24,8 +24,9 @@ Lista viva. Se actualiza en cuanto algo entra o sale. Última revisión: 1-sep-2
 |---|---|---|
 | Web | v295 | en vivo, con Ale, el área profesional y el ajuste de escritorio |
 | Backend | Google Maps + latidos | desplegado, Railway SUCCESS |
-| Google Play | **1.0.14 (30)** | publicada en producción |
-| App Store | **1.0.14 (build 49)** | **APROBADA Y EN VENTA.** Salió sola, sin pulsar Publicar |
+| Google Play | **1.0.15 (32)** | publicada en producción el 6-sep |
+| App Store | **1.0.15 (build 50)** | en revisión; sale sola al aprobarse (AFTER_APPROVAL) |
+| App Store | 1.0.14 (build 49) | en venta. Salió sola, sin pulsar Publicar |
 
 ## 6-sep — "el muro de pago vuelve a salir vacío": era un build viejo
 

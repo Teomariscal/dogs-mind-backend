@@ -45,6 +45,11 @@ from app.services.rag import build_rag_context_block, retrieve, retrieve_cogniti
 _log = logging.getLogger("cognitive_odette")
 
 INTENTOS = 3
+# El informe completo de Odette no cabe en 8000. Medido contra produccion el
+# 7-sep-2026: los tres intentos se truncaban y el endpoint devolvia 503 tras
+# 556 s. Un informe clinico truncado no se entrega NUNCA, asi que lo que sube
+# es el techo, no la tolerancia.
+MAX_SALIDA_INFORME = 24000
 
 
 # ── El cuestionario, hecho texto ─────────────────────────────────────────
@@ -195,7 +200,7 @@ def redactar_relazione(
     mejor_restos: list = []
     restos: list = []
 
-    for _ in range(INTENTOS):
+    for _ in range(INTENTOS):  # _ = numero de intento, se usa en los avisos
         mensaje = base
         if restos:
             mensaje += ("\n\nATTENZIONE — il tentativo precedente conteneva termini "
@@ -206,19 +211,23 @@ def redactar_relazione(
             r2 = create_message_resilient(
                 model=settings.clinical_model,
                 fallback_model=settings.clinical_fallback_model,
-                max_tokens=8000,
+                max_tokens=MAX_SALIDA_INFORME,
                 system=[{"type": "text", "text": PASADA_2_INFORME,
                          "cache_control": {"type": "ephemeral"}}],
                 messages=[{"role": "user", "content": mensaje}],
             )
-        except Exception:
+        except Exception as e:
+            _log.warning("informe cognitivista, intento %d: la llamada fallo (%s)", _ + 1, e)
             continue
 
         if getattr(r2, "stop_reason", None) == "max_tokens":
+            _log.warning("informe cognitivista, intento %d: TRUNCADO en %d tokens",
+                         _ + 1, MAX_SALIDA_INFORME)
             continue
 
         salida = _strip_source_apparatus(_texto_de(r2))
         if not salida:
+            _log.warning("informe cognitivista, intento %d: salida vacia", _ + 1)
             continue
 
         restos = find_blacklisted(salida)

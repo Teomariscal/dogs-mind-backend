@@ -25,7 +25,38 @@ Lista viva. Se actualiza en cuanto algo entra o sale. Última revisión: 1-sep-2
 | Web | v295 | en vivo, con Ale, el área profesional y el ajuste de escritorio |
 | Backend | Google Maps + latidos | desplegado, Railway SUCCESS |
 | Google Play | **1.0.14 (30)** | publicada en producción |
-| App Store | **1.0.14 (build 49)** | en revisión; sale sola al aprobarse (AFTER_APPROVAL) |
+| App Store | **1.0.14 (build 49)** | **APROBADA Y EN VENTA.** Salió sola, sin pulsar Publicar |
+
+## 6-sep — "el muro de pago vuelve a salir vacío": era un build viejo
+
+**Síntoma:** captura de TestFlight, pantalla Elige tu plan con el saldo en guion,
+sin un solo plan y **sin mensaje de error**.
+
+**No es una regresión.** El arreglo está intacto en lo que hay publicado. La
+fecha lo cierra:
+
+| | |
+|---|---|
+| builds 47 y 48 subidos a Apple (= **1.0.12**) | 1-sep 08:22 y 08:55 |
+| commit `a4d55ba` que arregla el muro | **1-sep 17:41** — nueve horas después |
+| build 49 (= 1.0.14), primero que lo lleva | 4-sep |
+
+Comprobado, no deducido: `git show a4d55ba^:frontend/index.html` tiene **cero**
+apariciones del gancho y el commit las deja en una. Y el gancho **sí** está
+dentro del IPA del build 49. Con sesión real en producción (cuenta de revisión,
+22.395 créditos) la pantalla pinta los 4 planes y el saldo correcto.
+
+**Por qué no deja ni rastro de error:** en ≤48 nadie llama a `dmCargarPlanes()`
+al entrar por la píldora del saldo, así que la función no llega a ejecutarse.
+No hay "Cargando planes…" ni error porque no corre nada: el HTML se queda como
+nació. Por eso la captura enseña el guion original.
+
+**Qué hace falta:** actualizar la app del teléfono. TestFlight **no se actualiza
+solo**.
+
+**La lección, que es la parte que se repite:** un fallo reportado desde el móvil
+no se diagnostica contra el repositorio, sino contra **el binario que tiene él
+instalado**. Ver la regla en `CLAUDE.md`.
 
 Cerrado desde la última revisión: créditos, muro de pago vacío, corte de conexión
 en los análisis, paseos migrados a Google Maps, italiano colándose en español,

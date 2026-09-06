@@ -58,6 +58,14 @@ Si algo que voy a hacer contradice una de estas líneas, me paro y pregunto.
   binario y tarda segundos en vez de una compilación. Pero lo que se arregla
   es la app.
 
+- **PRIMERA PREGUNTA ANTE UN FALLO DEL MÓVIL: ¿qué build tiene instalado?**
+  El repositorio no es lo que él está usando. **TestFlight no se actualiza solo**,
+  así que puede estar mirando un binario de hace días mientras yo verifico el
+  código de hoy y digo que funciona. Se comprueba en qué build entró el arreglo
+  (`git log -S"<línea>"`) y se compara con la fecha de subida del binario que él
+  tiene. Nace del 6-sep-2026: el muro de pago "volvía" a salir vacío; el arreglo
+  entró el 1-sep a las 17:41 y su 1.0.12 se había subido a las 08:55 de esa misma
+  mañana. Diagnosticar contra el repositorio habría dado "no puede pasar".
 - **Verificar antes de afirmar.** Abrir el contenido real, no el envoltorio.
   Etiquetar lo que es deducción y no comprobación. Un "no lo sé" vale; una
   afirmación cómoda que luego se cae, no.

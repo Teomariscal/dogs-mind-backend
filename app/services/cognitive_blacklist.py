@@ -20,7 +20,11 @@ import re
 # Cada patrón es regex case-insensitive con límites de palabra.
 _BLACKLIST_PATTERNS: list[tuple[str, str]] = [
     # Núcleo operante
-    (r"\brinforz\w*", "rinforzo/rinforzare (positivo, negativo, differenziale)"),
+    # "rinforzo" SI se puede usar (founder, 7-sep-2026). No es exclusiva del
+    # marco conductual: en italiano corriente y en el cognitivismo se usa
+    # igual. Estaba prohibida y sobrevivia a los tres intentos, obligando a
+    # entregar el informe con un aviso de resto. Ya no se persigue.
+    # (r"\brinforz\w*", "rinforzo/rinforzare"),
     (r"\bestinzion\w*", "estinzione"),
     (r"\bcondizionament\w*", "condizionamento (operante/classico)"),
     (r"\bcontingenz\w*", "contingenza"),

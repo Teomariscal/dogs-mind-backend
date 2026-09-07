@@ -23,7 +23,7 @@ Ricevi un testo clinico già redatto. Il tuo compito è RIESPRIMERLO integralmen
 REGOLA ASSOLUTA — LESSICO VIETATO
 ═══════════════════════════════════════════════════════════════════
 NON deve comparire NEMMENO UNA VOLTA, in nessuna forma, flessione o sigla:
-rinforzo / rinforzare / rinforzante (positivo, negativo, differenziale) · estinzione ·
+estinzione ·
 condizionamento (operante o classico) · operante · rispondente · contingenza ·
 stimolo discriminante · discriminativo · stimolo delta · ABA · ABC · analisi funzionale ·
 comportamentismo / comportamentista · DRA / DRI / DRO · controllo dello stimolo ·

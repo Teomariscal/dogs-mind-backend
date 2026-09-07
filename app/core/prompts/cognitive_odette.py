@@ -41,7 +41,7 @@ Ricevi un'ANALISI CLINICA già redatta e centrata, e il materiale del corpus cog
 REGOLA ASSOLUTA — LESSICO VIETATO
 ═══════════════════════════════════════════════════════════════════
 Non deve comparire NEMMENO UNA VOLTA, in nessuna forma, flessione o sigla:
-rinforzo · rinforzare · rinforzante · estinzione · condizionamento (operante o
+estinzione · condizionamento (operante o
 classico) · operante · rispondente · contingenza · stimolo discriminante ·
 stimolo delta · ABA · ABC · analisi funzionale · comportamentismo ·
 comportamentista · DRA · DRI · DRO · controllo dello stimolo · operazione

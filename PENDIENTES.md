@@ -171,6 +171,16 @@ pasar en revisión aunque no lleve paseos, en vez de sacarla y rehacerla.
 - [ ] **Copy legal de fondo**: `terms.html` apartado 4 y `privacy.html` ya dicen
   "créditos", pero el texto es mío adaptado del suyo. Que lo revise.
 
+## Medio plazo — NO activo
+
+- [ ] **Red profesional: círculos de clientes alrededor de un profesional.**
+  Diseñado y acordado el 7-sep-2026, **sin construir y sin publicar** (founder:
+  *"no lo publiques, es un trabajo a medio plazo"*). El profesional paga una
+  licencia, cada cliente paga su suscripción, y el cliente entra con un código
+  aceptando compartir un perro concreto. Diseño completo en
+  `SPEC_RED_PROFESIONAL.md`. Quedan tres decisiones suyas anotadas ahí, y obliga
+  a actualizar las fichas de privacidad de Apple y Google.
+
 ## Menor / arrastrado
 
 - [ ] `teo-mariscal-v3.html`: copia del 26-may que sigue publicándose, indexable,

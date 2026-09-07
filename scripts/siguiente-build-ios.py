@@ -5,7 +5,8 @@ rechaza con ITMS-90062 sin gastar revision pero perdiendo el viaje
 (paso el 1-sep-2026).
 """
 import sys
-sys.path.insert(0, "/private/tmp/claude-501/-Users-teomariscal/0e1cfb7e-2c92-4e57-a1c6-08e8bf5c9726/scratchpad")
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 try:
     from asc import call
     b = call("/v1/builds?filter[app]=6777848632&limit=10&sort=-uploadedDate")

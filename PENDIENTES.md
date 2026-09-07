@@ -27,6 +27,13 @@ Lista viva. Se actualiza en cuanto algo entra o sale. Última revisión: 1-sep-2
 | Google Play | **1.0.15 (32)** | publicada en producción el 6-sep |
 | App Store | **1.0.15 (build 50)** | en revisión; sale sola al aprobarse (AFTER_APPROVAL) |
 | App Store | 1.0.14 (build 49) | en venta. Salió sola, sin pulsar Publicar |
+| Backend | vía cognitivista de Odette | **DESPLEGADO** el 7-sep |
+| Web | pantalla y canal estanco | **EN VIVO** el 7-sep, comprobado en thedogsmind.net |
+
+**La vía de Odette NO está en las apps.** Apple no deja crear la 1.0.16 mientras
+la 1.0.15 esté en revisión (409), y no se sube un binario encima de otro que
+está siendo revisado. En cuanto la 1.0.15 quede aprobada, se compila la 1.0.16
+con esto dentro. Mientras tanto, el backend y la web ya la sirven.
 
 ## 6-sep — "el muro de pago vuelve a salir vacío": era un build viejo
 

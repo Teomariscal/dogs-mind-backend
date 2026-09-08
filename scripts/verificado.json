@@ -1,14 +1,15 @@
 {
-  "md5_frontend": "51a23c68510403fa2a22652aeeb8f5bc",
-  "verificado_el": "2026-09-08T08:42:01",
+  "md5_frontend": "f642c53d1442b47a5591c3c438689763",
+  "verificado_el": "2026-09-09T01:39:21",
   "pruebas": [
-    "Detector estatico sobre el binario: 2 regiones marcadas, cero vocabulario CZ fuera de su region",
-    "Detector en vivo sobre el binario: 36 combinaciones (3 idiomas x 2 vias x 6 pantallas), CERO fugas cognitivistas",
-    "Canal estanco: entra solo it+profesional; SALIR cierra el canal (stance vuelve a conductual)",
-    "Canal estanco: volver por goTo directo rebota a la anamnesis conductual",
-    "Canal estanco: cambiar de idioma dentro expulsa y cierra el canal",
-    "Forzar entrada desde es/professional, en/professional e it/particular: los tres rebotan",
-    "La anamnesis de Odette pinta sus 29 preguntas en 7 secciones, en italiano",
-    "Puerta del servidor: 11/11 casos correctos y los rechazos NO cobran (probado en produccion)"
+    "Video de bienvenida: 15 s con el overlay puesto y la quietud NO salta; al quitarlo sale a los 6,0 s",
+    "Camino normal intacto: primer uso a los 5,0 s, tramo Ale",
+    "Silencio con fecha: 7 casos correctos (ahora, 1d, 4,9d, 5,1d, 30d, llave vieja '1' y sin llave)",
+    "Boton 'Don't show' en las tres pantallas; cero 'show me again' en el binario",
+    "Reparto 50/50 Ale-Niaz2 y espera 4000/4000 ms",
+    "Canal estanco cognitivista: entra solo con it+profesional (56 campos), salir lo cierra, volver directo rebota",
+    "Cambiar de idioma dentro expulsa y fuerza stance conductual",
+    "Forzar entrada desde es, en y it/particular: los tres van a la anamnesis conductual",
+    "Detector estatico sobre el binario: cero vocabulario cognitivista fuera de su region"
   ]
 }

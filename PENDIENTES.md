@@ -251,7 +251,19 @@ Probadas SEIS combinaciones, todas fallan:
 Cambiar motor, proveedor de voz e idioma del prompt no cambia nada, así que el
 mensaje no dice la verdad sobre la causa. Lo que lo delata: **la vista previa
 gratuita SÍ se genera**, con imagen y sincronía labial. Solo cae el render.
-Ticket abierto con su soporte (Rhys) el 8-sep por el founder.
+Ticket abierto con su soporte el 8-sep. **ESCALADO a su equipo tecnico** ese
+mismo dia, con el proyecto, el grupo del avatar, el look, la prueba en incognito
+y la confirmacion de que falla en los dos editores. Su soporte pidio
+expresamente **no abrir mas tickets** por lo mismo, que solo retrasa la
+respuesta. Identificadores, por si hacen falta otra vez:
+
+    Proyecto (AI Studio) : 75d6908bb0b34886ac0974bfa1f7bddf
+    Avatar Cecilia TDM   : a466c76c02cd42ff9a3f4079749c4c0f
+    Look usado           : e781fa51d4c54be0b3279ed2469bea57
+
+Su primera respuesta decia que el espanol si esta admitido y que la vista previa
+funciona: eso ya lo sabiamos y es justo lo que hace sospechoso el fallo. Lo que
+tienen que mirar es el render final.
 
 - [ ] Vídeo `aigents-cecilia2.mp4` — **esperando a que HeyGen desbloquee el render**
 - [ ] Guion en inglés e italiano — **lo escribe el founder** (no se inventa copy)

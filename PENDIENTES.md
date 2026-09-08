@@ -30,10 +30,11 @@ Lista viva. Se actualiza en cuanto algo entra o sale. Última revisión: 1-sep-2
 | Backend | vía cognitivista de Odette | **DESPLEGADO** el 7-sep |
 | Web | pantalla y canal estanco | **EN VIVO** el 7-sep, comprobado en thedogsmind.net |
 
-**La vía de Odette NO está en las apps.** Apple no deja crear la 1.0.16 mientras
-la 1.0.15 esté en revisión (409), y no se sube un binario encima de otro que
-está siendo revisado. En cuanto la 1.0.15 quede aprobada, se compila la 1.0.16
-con esto dentro. Mientras tanto, el backend y la web ya la sirven.
+**8-sep: la vía de Odette YA VA EN LAS APPS.** Apple aprobó la 1.0.15 y eso
+desbloqueó la 1.0.16: **Google Play publicada (vc 33)** y **App Store build 51
+en revisión**, con salida automática al aprobarse. Verificada sobre el binario:
+36 combinaciones en vivo con cero fugas, el canal estanco cerrado por los tres
+lados (entrar, salir y cambiar de idioma) y la puerta del servidor con 11/11.
 
 ## 6-sep — "el muro de pago vuelve a salir vacío": era un build viejo
 

@@ -195,9 +195,29 @@ pasar en revisión aunque no lleve paseos, en vez de sacarla y rehacerla.
 > posible. Quiero felicitarte porque has elegido una magnífica herramienta.
 > Entra en nueva consulta y compruébalo.
 
-**El vídeo:** Cecilia **sin fusta**, con el **shih tzu** que aparece con ella en la
-pantalla de Los Aigents, sujeto en una mano. Lo lanza el founder; yo lo monto.
-Formato de sus hermanos: 1080x1920, como `aigents-niaz2.mp4` y `aigents-ale.mp4`.
+**Version recortada a 25-30 s (founder, 8-sep-2026: "reduce texto y dejalo en
+25-30 seg"). MEDIDA con sintesis de voz, no estimada: 78 palabras, 25,5 s.
+El original eran 90 palabras y 30,5 s. PENDIENTE DE SU VISTO BUENO:**
+
+> Estás en una app sustentada por principios científicos. Tu herramienta perfecta
+> para solucionar un problema de conducta de tu perro, enseñarle un ejercicio o
+> crear un plan de educación temprana. A veces los términos pueden abrumar, sobre
+> todo si no eres profesional; no te preocupes, para eso estoy yo durante todo el
+> análisis. Consúltame en cualquier momento y te lo explicaré de la forma más
+> sencilla posible. Has elegido una magnífica herramienta. Entra en nueva consulta
+> y compruébalo.
+
+Lo quitado: "establecer una estrategia para" (queda "enseñarle un ejercicio"),
+"Si tienes la más mínima duda ... durante el proceso" (queda "en cualquier
+momento") y "Quiero felicitarte porque" (queda "Has elegido").
+
+**La imagen:** NO es un vídeo nuevo desde cero. Es **el mismo de onboarding**
+(`onboarding-cecilia.mp4`) con dos cambios: **fuera la fusta** —que lleva en la
+mano DERECHA— y **el shih tzu en esa mano**. El casco de la izquierda se queda.
+Es una edicion generativa, no un recorte: la lanza el founder.
+Referencias entregadas el 8-sep: el frame base 1080x1920 y el recorte del shih
+tzu de `aigents-final.webp`.
+Formato de salida, el de sus hermanos: 1080x1920 o 576x1024, H.264 + AAC.
 
 - [ ] Vídeo `aigents-cecilia2.mp4` — **lo produce el founder**
 - [ ] Guion en inglés e italiano — **lo escribe el founder** (no se inventa copy)

@@ -219,7 +219,41 @@ Referencias entregadas el 8-sep: el frame base 1080x1920 y el recorte del shih
 tzu de `aigents-final.webp`.
 Formato de salida, el de sus hermanos: 1080x1920 o 576x1024, H.264 + AAC.
 
-- [ ] Vídeo `aigents-cecilia2.mp4` — **lo produce el founder**
+### Estado al 8-sep-2026, 19:30
+
+**HECHO:** el avatar nuevo está creado en HeyGen — "Cecilia TDM with her puppy",
+sin fusta, con el shih tzu de Los Aigents en el brazo derecho, el casco en el
+izquierdo, misma cara y mismo fondo dorado. Hay seis variantes guardadas del
+look. Aprobado por el founder: *"está fenomenal con el perro"*.
+
+**Guion final, 29,2 s** según la línea de tiempo de HeyGen (73 palabras).
+Es la versión de arriba menos "perfecta", "pueden" y "no te preocupes,".
+
+**Voz elegida: `Catalina - Warm`** — la ÚNICA femenina chilena de la biblioteca
+de HeyGen (*Youth, Explainer, Ads, E-learning*, motor Azure). El founder pidió
+chilena, ~30 años, profesional y amable; encaja salvo que HeyGen la etiqueta
+como *Youth*, así que puede sonar más joven. OJO: existe también
+`Catalina - Professional`, que es ESTADOUNIDENSE, no chilena.
+
+**BLOQUEADO POR HEYGEN.** El render final devuelve siempre *"Idioma no
+compatible — Tu guion está en Spanish, y el motor de esta voz no lo admite"*.
+Probadas SEIS combinaciones, todas fallan:
+
+| motor | voz | look |
+|---|---|---|
+| Avatar III | Lucia (Google, ES) | inglés |
+| Avatar IV | Lucia | inglés |
+| Avatar V | Lucia | inglés |
+| Avatar V | Catalina (Azure, CL) | inglés |
+| Avatar IV | Catalina | inglés |
+| Avatar IV | Catalina | **español** |
+
+Cambiar motor, proveedor de voz e idioma del prompt no cambia nada, así que el
+mensaje no dice la verdad sobre la causa. Lo que lo delata: **la vista previa
+gratuita SÍ se genera**, con imagen y sincronía labial. Solo cae el render.
+Ticket abierto con su soporte (Rhys) el 8-sep por el founder.
+
+- [ ] Vídeo `aigents-cecilia2.mp4` — **esperando a que HeyGen desbloquee el render**
 - [ ] Guion en inglés e italiano — **lo escribe el founder** (no se inventa copy)
 - [ ] Pantalla `s-cecilia2` y su entrada en el sorteo a 1/3 — se enciende el día
       que el vídeo esté en `frontend/`

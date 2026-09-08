@@ -18209,21 +18209,39 @@ function getVal(id, fallback) {
              pueden repetirse dentro de la misma sesion: eso es deliberado
              (founder, 31-ago-2026). Lo unico que calla una del todo es
              "Don't show me again", que deja su llave en el dispositivo. */
-          var suerte = Math.random();
-          var acumulado = 0;
+          /* Se sortea SOLO entre las que siguen habladas. Antes se sorteaba
+             entre todas y, si salia una callada, se hacia return: la visita se
+             gastaba y NO se ensenaba ninguna. Con el 50/50 eso era la mitad de
+             las veces sin que saliera nada aunque solo hubiera una silenciada
+             (founder, 8-sep-2026: "me he quedado quieto mas de 10 segundos y
+             Niaz 2 no sale y Ale tampoco"). Las proporciones entre las vivas se
+             respetan porque la suerte se escala al total que queda. */
+          var vivas = [];
+          var total = 0;
           for (var q = 0; q < QUIETUD_PANTALLAS.length; q++) {
             var it = QUIETUD_PANTALLAS[q];
-            acumulado += it.prob;
+            if (!document.getElementById(it.pantalla)) continue;
+            var callada = false;
+            try { callada = localStorage.getItem(it.llave) === '1'; } catch (e) {}
+            if (callada) continue;
+            vivas.push(it);
+            total += it.prob;
+          }
+          if (!vivas.length || total <= 0) return;   /* todas calladas: nada que ensenar */
+
+          var suerte = Math.random() * total;
+          var acumulado = 0;
+          for (var v = 0; v < vivas.length; v++) {
+            acumulado += vivas[v].prob;
             if (suerte < acumulado) {
-              if (!document.getElementById(it.pantalla)) return;
-              var callada = false;
-              try { callada = localStorage.getItem(it.llave) === '1'; } catch (e) {}
-              if (callada) return;
-              _quietudApuntarVista();   /* la proxima ya espera 8 s */
-              goTo(it.pantalla);
+              _quietudApuntarVista();
+              goTo(vivas[v].pantalla);
               return;
             }
           }
+          /* Por redondeo en coma flotante, la ultima. */
+          _quietudApuntarVista();
+          goTo(vivas[vivas.length - 1].pantalla);
         }
       window._quietudRearmar = function () {
         clearTimeout(_alCitaPendiente);

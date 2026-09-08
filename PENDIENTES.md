@@ -182,6 +182,28 @@ pasar en revisión aunque no lleve paseos, en vez de sacarla y rehacerla.
   `SPEC_RED_PROFESIONAL.md`. Quedan tres decisiones suyas anotadas ahí, y obliga
   a actualizar las fichas de privacidad de Apple y Google.
 
+## Cecilia en la quietud — falta su vídeo
+
+**Guion del founder, 8-sep-2026. Va LITERAL, no se toca una coma:**
+
+> Estás en una app sustentada por principios científicos. Tu herramienta perfecta
+> para solucionar un problema de conducta de tu perro, establecer una estrategia
+> para enseñarle un ejercicio, o crear un plan de educación temprana. A veces los
+> términos pueden abrumar, especialmente si no eres profesional; no te preocupes,
+> para eso estoy yo durante todo el análisis. Si tienes la más mínima duda,
+> consúltame durante el proceso y te explicaré todo de la forma más sencilla
+> posible. Quiero felicitarte porque has elegido una magnífica herramienta.
+> Entra en nueva consulta y compruébalo.
+
+**El vídeo:** Cecilia **sin fusta**, con el **shih tzu** que aparece con ella en la
+pantalla de Los Aigents, sujeto en una mano. Lo lanza el founder; yo lo monto.
+Formato de sus hermanos: 1080x1920, como `aigents-niaz2.mp4` y `aigents-ale.mp4`.
+
+- [ ] Vídeo `aigents-cecilia2.mp4` — **lo produce el founder**
+- [ ] Guion en inglés e italiano — **lo escribe el founder** (no se inventa copy)
+- [ ] Pantalla `s-cecilia2` y su entrada en el sorteo a 1/3 — se enciende el día
+      que el vídeo esté en `frontend/`
+
 ## Menor / arrastrado
 
 - [ ] **La app no enseña su versión por ningún lado.** Es lo que nos ha costado

@@ -9178,7 +9178,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
   color: rgba(255,255,255,0.86);
 }
 .ob-link {
-  /* display:block para que "Skip intro" y "Don't show me again" caigan uno
+  /* display:block para que "Skip intro" y "Don't show" caigan uno
      debajo del otro. Sin esto salían pegados en la misma línea. */
   display: block; margin-left: auto; margin-right: auto;
   background: none; border: none; cursor: pointer; font-family: inherit;
@@ -10233,7 +10233,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
             <button id="nz-nunca" class="ob-link" type="button" hidden
                     style="opacity:.62;font-size:13px;margin-top:2px"
                     onclick="dmNiazNoMostrarMas()"
-                    data-i18n="nz_never">Don’t show me again</button>
+                    data-i18n="nz_never">Don’t show</button>
           </div>
         </div>
       </div>
@@ -10296,7 +10296,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
             <button class="ob-link" type="button"
                     style="opacity:.62;font-size:13px;margin-top:2px"
                     onclick="dmAleNoMostrarMas()"
-                    data-i18n="nz_never">Don’t show me again</button>
+                    data-i18n="nz_never">Don’t show</button>
           </div>
         </div>
       </div>
@@ -10352,7 +10352,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
             <button class="ob-link" type="button"
                     style="opacity:.62;font-size:13px;margin-top:2px"
                     onclick="dmN2NoMostrarMas()"
-                    data-i18n="nz_never">Don&rsquo;t show me again</button>
+                    data-i18n="nz_never">Don&rsquo;t show</button>
           </div>
         </div>
       </div>
@@ -17968,7 +17968,7 @@ function getVal(id, fallback) {
   /* La otra salida: que no vuelva a aparecer nunca. Distinta de "ahora no"
      a propósito — una es por esta vez y la otra es para siempre. */
   window.dmNiazNoMostrarMas = function () {
-    try { localStorage.setItem(NZ_SILENCIO_KEY, '1'); } catch (e) {}
+    quietudCallar(NZ_SILENCIO_KEY);
     dmNiazAhoraNo();
   };
 
@@ -18009,6 +18009,29 @@ function getVal(id, fallback) {
   var QUIETUD_ARRANQUE     = Date.now();
   var QUIETUD_GRACIA_MS    = 4000;   /* nunca en los primeros 4 s de app viva */
   var QUIETUD_VISTAS_KEY   = 'dm_quietud_vistas';
+
+  /* EL SILENCIO CADUCA (founder, 8-sep-2026: "tiene marcha atras, y de todas
+     maneras cada 5 dias vuelve"). Antes la llave guardaba un '1' y era para
+     siempre: no habia NINGUN sitio en la app que la borrara, asi que quien
+     pulsaba el boton no volvia a ver esa pantalla jamas en ese dispositivo.
+     Ahora guarda la FECHA en que se pulso y solo calla 5 dias.
+     Las llaves viejas ('1', sin fecha) se dan por CADUCADAS: quien lleva
+     semanas silenciado la recupera, que es justo lo que se pidio. */
+  var QUIETUD_SILENCIO_DIAS = 5;
+
+  function quietudCallada(llave) {
+    var v = '';
+    try { v = localStorage.getItem(llave) || ''; } catch (e) { return false; }
+    if (!v) return false;
+    var cuando = parseInt(v, 10);
+    /* '1' es la llave vieja, sin fecha: caducada. */
+    if (!cuando || cuando <= 1) return false;
+    return (Date.now() - cuando) < QUIETUD_SILENCIO_DIAS * 864e5;
+  }
+
+  function quietudCallar(llave) {
+    try { localStorage.setItem(llave, String(Date.now())); } catch (e) {}
+  }
   function _quietudVistas() {
     try { return parseInt(localStorage.getItem(QUIETUD_VISTAS_KEY) || '0', 10) || 0; }
     catch (e) { return 0; }
@@ -18123,7 +18146,7 @@ function getVal(id, fallback) {
 
   window.dmAleAhoraNo = function () { _alParar(); goTo('s-home'); };
   window.dmAleNoMostrarMas = function () {
-    try { localStorage.setItem(AL_SILENCIO_KEY, '1'); } catch (e) {}
+    quietudCallar(AL_SILENCIO_KEY);
     dmAleAhoraNo();
   };
 
@@ -18208,7 +18231,7 @@ function getVal(id, fallback) {
              lista. Solo en el inicio, solo tras 2 segundos sin tocar nada, y
              pueden repetirse dentro de la misma sesion: eso es deliberado
              (founder, 31-ago-2026). Lo unico que calla una del todo es
-             "Don't show me again", que deja su llave en el dispositivo. */
+             "Don't show", que la calla 5 dias (ver quietudCallada). */
           /* Se sortea SOLO entre las que siguen habladas. Antes se sorteaba
              entre todas y, si salia una callada, se hacia return: la visita se
              gastaba y NO se ensenaba ninguna. Con el 50/50 eso era la mitad de
@@ -18221,9 +18244,7 @@ function getVal(id, fallback) {
           for (var q = 0; q < QUIETUD_PANTALLAS.length; q++) {
             var it = QUIETUD_PANTALLAS[q];
             if (!document.getElementById(it.pantalla)) continue;
-            var callada = false;
-            try { callada = localStorage.getItem(it.llave) === '1'; } catch (e) {}
-            if (callada) continue;
+            if (quietudCallada(it.llave)) continue;
             vivas.push(it);
             total += it.prob;
           }
@@ -18414,7 +18435,7 @@ function getVal(id, fallback) {
     goTo('s-home');
   };
   window.dmN2NoMostrarMas = function () {
-    try { localStorage.setItem(N2_SILENCIO_KEY, '1'); } catch (e) {}
+    quietudCallar(N2_SILENCIO_KEY);
     dmN2AhoraNo();
   };
 
@@ -18425,7 +18446,7 @@ function getVal(id, fallback) {
   window._nzInterceptar = function (destino) {
     try {
       if (!document.getElementById('s-niaz')) return false;
-      if (localStorage.getItem(NZ_SILENCIO_KEY) === '1') return false;
+      if (quietudCallada(NZ_SILENCIO_KEY)) return false;
       /* Ya se asomó por quietud y la saltó: no se le pone otra vez delante. */
       if (window._nzRechazadaEnSesion) return false;
       var actual = document.querySelector('.screen.active');
@@ -23090,7 +23111,7 @@ function endTourIntro() {
          (founder, 6-sep-2026), igual que el "Welcome" del saludo. No es un
          olvido de traduccion: no tocarlos. */
       nz_skip:                 'Skip intro',
-      nz_never:                'Don\u2019t show me again',
+      nz_never:                'Don\u2019t show',
       n2_title:                'Conoce a tus Aigents',
       n2_body:                 'Los Aigents son avatars de IA muy especializados. No sirven para generar an\u00e1lisis de conducta pero te ayudan en tu d\u00eda a d\u00eda con tu perro.',
       n2_cta:                  'Conoce a Los Aigents',
@@ -24259,7 +24280,7 @@ function endTourIntro() {
          (founder, 6-sep-2026), igual que el "Welcome" del saludo. No es un
          olvido de traduccion: no tocarlos. */
       nz_skip:                 'Skip intro',
-      nz_never:                'Don\u2019t show me again',
+      nz_never:                'Don\u2019t show',
       n2_title:                'Meet your Aigents',
       n2_body:                 'Aigents are highly specialised AI avatars. They do not generate behavioural analyses, but they help you day to day with your dog.',
       n2_cta:                  'Meet the Aigents',
@@ -25427,7 +25448,7 @@ function endTourIntro() {
          (founder, 6-sep-2026), igual que el "Welcome" del saludo. No es un
          olvido de traduccion: no tocarlos. */
           nz_skip:                 'Skip intro',
-          nz_never:                'Don\u2019t show me again',
+          nz_never:                'Don\u2019t show',
           n2_title:                'Conosci i tuoi Aigents',
           n2_body:                 'Gli Aigents sono avatar di IA molto specializzati. Non servono a generare analisi del comportamento, ma ti aiutano ogni giorno con il tuo cane.',
           n2_cta:                  'Conosci gli Aigents',

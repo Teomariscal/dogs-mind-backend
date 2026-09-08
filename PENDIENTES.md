@@ -276,10 +276,11 @@ tienen que mirar es el render final.
   dos diagnósticos fallidos esta semana (muro de pago el 6-sep, quietud el
   8-sep). Poner el número de versión y de build visibles, p. ej. al pie de la
   cuenta. Va en el próximo build.
-- [ ] **"No volver a mostrar" no tiene marcha atrás.** Una vez pulsado, esa
-  pantalla no vuelve nunca en ese dispositivo y no hay ningún sitio en la app
-  que borre la llave. Decisión del founder: si se pone una forma de
-  reactivarlas, y dónde.
+- [x] **"No volver a mostrar" ya tiene marcha atrás** (founder, 8-sep-2026).
+  El silencio dura **5 días** y el botón pasa a llamarse "Don't show". La llave
+  guarda la FECHA en vez de un `1`, y las llaves viejas (`'1'`, sin fecha) se dan
+  por caducadas, así que quien llevaba semanas silenciado la recupera.
+  Probado: 7 casos de la función y 3 ciclos completos.
 
 - [ ] `teo-mariscal-v3.html`: copia del 26-may que sigue publicándose, indexable,
   con 182 menciones a "tokens". Nadie la enlaza desde la app. No se borra sin OK.

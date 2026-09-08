@@ -1,14 +1,14 @@
 {
-  "md5_frontend": "7dcfef110c205d469a94bcfb0be145ee",
-  "verificado_el": "2026-09-06T18:16:03",
+  "md5_frontend": "51a23c68510403fa2a22652aeeb8f5bc",
+  "verificado_el": "2026-09-08T08:42:01",
   "pruebas": [
-    "Quietud: 4000 ms armados con 0, 1, 9 y 60 vistas — una vez por visita",
-    "Tramos 50/50, suma 1.00; 4000 sorteos dan 49,3% Ale / 50,8% Niaz 2",
-    "Sorteo real sobre el binario: 0,25 -> s-ale y 0,75 -> s-niaz2, con Math.random llamado UNA vez",
-    "PAGOS: muro con la respuesta real de produccion, 4 planes, 22.395 creditos, precios correctos, sin undefined",
-    "PAGOS: 0 menciones de 19,99 y tarjeta de area profesional presente",
-    "PASEOS: la tarjeta sigue el idioma en es, it y en",
-    "Estanqueidad: selector cognitivista solo en it; es/en ocultos, stance=behavioral, cero texto cognitivista visible",
-    "Ale: 'Buscar rutas con mi perro' pulsa la tarjeta real y 'Problema de comportamiento' lleva a la anamnesis"
+    "Detector estatico sobre el binario: 2 regiones marcadas, cero vocabulario CZ fuera de su region",
+    "Detector en vivo sobre el binario: 36 combinaciones (3 idiomas x 2 vias x 6 pantallas), CERO fugas cognitivistas",
+    "Canal estanco: entra solo it+profesional; SALIR cierra el canal (stance vuelve a conductual)",
+    "Canal estanco: volver por goTo directo rebota a la anamnesis conductual",
+    "Canal estanco: cambiar de idioma dentro expulsa y cierra el canal",
+    "Forzar entrada desde es/professional, en/professional e it/particular: los tres rebotan",
+    "La anamnesis de Odette pinta sus 29 preguntas en 7 secciones, en italiano",
+    "Puerta del servidor: 11/11 casos correctos y los rechazos NO cobran (probado en produccion)"
   ]
 }

@@ -68,7 +68,17 @@ Si algo que voy a hacer contradice una de estas líneas, me paro y pregunto.
   binario y tarda segundos en vez de una compilación. Pero lo que se arregla
   es la app.
 
-- **PRIMERA PREGUNTA ANTE UN FALLO DEL MÓVIL: ¿qué build tiene instalado?**
+- **PRIMERA PREGUNTA ANTE UN FALLO DEL MÓVIL, Y SE LE PREGUNTA A ÉL: ¿qué
+  versión pone TestFlight?** No vale comprobarlo contra el repositorio ni contra
+  el simulador: eso demuestra que el código puede funcionar, no que el suyo
+  funcione. Es UNA pregunta y se hace ANTES de investigar nada.
+  Pasó dos veces la misma semana. El 6-sep el muro de pago "volvía" a salir
+  vacío: tenía la 1.0.12, anterior al arreglo. El 8-sep no le salían Niaz 2 ni
+  Ale: tenía la **1.0.10 (build 42) del 31-ago**, diez builds atrás, donde la
+  pantalla de Ale y el vigilante de la quietud sencillamente NO EXISTEN. En los
+  dos casos perseguí un fallo que no existía. Sus palabras: *"no sé qué iPhone
+  tienes tú porque a mí no me salen"*.
+- **(regla anterior, que se queda)**
   El repositorio no es lo que él está usando. **TestFlight no se actualiza solo**,
   así que puede estar mirando un binario de hace días mientras yo verifico el
   código de hoy y digo que funciona. Se comprueba en qué build entró el arreglo

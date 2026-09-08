@@ -184,6 +184,15 @@ pasar en revisión aunque no lleve paseos, en vez de sacarla y rehacerla.
 
 ## Menor / arrastrado
 
+- [ ] **La app no enseña su versión por ningún lado.** Es lo que nos ha costado
+  dos diagnósticos fallidos esta semana (muro de pago el 6-sep, quietud el
+  8-sep). Poner el número de versión y de build visibles, p. ej. al pie de la
+  cuenta. Va en el próximo build.
+- [ ] **"No volver a mostrar" no tiene marcha atrás.** Una vez pulsado, esa
+  pantalla no vuelve nunca en ese dispositivo y no hay ningún sitio en la app
+  que borre la llave. Decisión del founder: si se pone una forma de
+  reactivarlas, y dónde.
+
 - [ ] `teo-mariscal-v3.html`: copia del 26-may que sigue publicándose, indexable,
   con 182 menciones a "tokens". Nadie la enlaza desde la app. No se borra sin OK.
 - [ ] Código muerto `checkVideoTokens` (`index.html` ~12659): cadena entera

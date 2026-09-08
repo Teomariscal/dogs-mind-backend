@@ -7929,7 +7929,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
     if (!isNative && sessionStorage.getItem('dm_intro_seen')) { kill(); return; }  // web: 1x/sesion · iOS: cada arranque
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { kill(); return; }
     var done = false;
-    function finish(){ if (done) return; done = true; if (!isNative) { try{ sessionStorage.setItem('dm_intro_seen','1'); }catch(e){} } ov.style.opacity='0'; setTimeout(kill, 600); }
+    function finish(){ if (done) return; done = true; if (!isNative) { try{ sessionStorage.setItem('dm_intro_seen','1'); }catch(e){} } ov.style.opacity='0'; setTimeout(function(){ kill(); /* La gracia de la quietud arranca AQUI: hasta ahora el usuario no ha visto nada de la app. Sin esto, un video de 15 s se comia los 4 s de gracia y Niaz 2 salia nada mas quitarse el overlay. */ try { if (typeof window.dmQuietudArranqueReset === 'function') window.dmQuietudArranqueReset(); } catch(e){} }, 600); }
     vid.addEventListener('ended', finish);
     vid.addEventListener('error', finish);   // si el vídeo falla → directo al splash
     ov.addEventListener('click', finish);     // tap para saltar
@@ -18019,6 +18019,22 @@ function getVal(id, fallback) {
      semanas silenciado la recupera, que es justo lo que se pidio. */
   var QUIETUD_SILENCIO_DIAS = 5;
 
+  /* EL INICIO NO CUENTA SI ESTA TAPADO (founder, 8-sep-2026: "despues del video
+     inicial sin pasar por splash aparece Niaz 2").
+     `#intro-overlay` es el video de bienvenida: un fixed a pantalla completa con
+     z-index 99999 que se pone ENCIMA de todo. Por debajo la app arranca, entra
+     sola al inicio y el vigilante empezaba a contar, asi que la quietud saltaba
+     DETRAS del video; al quitarse el overlay el usuario se encontraba a Niaz 2
+     de frente, sin haber visto ni el splash ni el inicio.
+     Mientras el overlay exista, el inicio no cuenta como visible. */
+  function quietudTapada() {
+    try { return !!document.getElementById('intro-overlay'); } catch (e) { return true; }
+  }
+
+  /* Y la GRACIA de arranque se cuenta desde que el video termina, no desde que
+     carga la pagina: si no, un video de 15 s se come los 4 s de gracia enteros. */
+  window.dmQuietudArranqueReset = function () { QUIETUD_ARRANQUE = Date.now(); };
+
   function quietudCallada(llave) {
     var v = '';
     try { v = localStorage.getItem(llave) || ''; } catch (e) { return false; }
@@ -18222,6 +18238,7 @@ function getVal(id, fallback) {
 
       var yEnPie = 0;
       function sigueEnInicio() {
+        if (quietudTapada()) return false;
         var a = document.querySelector('.screen.active');
         return !!a && a.id === 's-home';
       }
@@ -18266,6 +18283,7 @@ function getVal(id, fallback) {
         }
       window._quietudRearmar = function () {
         clearTimeout(_alCitaPendiente);
+        window._quietudArmado = false;
         if (!sigueEnInicio()) return;
         /* Un intento por VISITA al inicio: si el sorteo dice que no, no se
            reintenta cada dos segundos hasta que salga. Se reinicia al salir del
@@ -18276,7 +18294,9 @@ function getVal(id, fallback) {
         if (yEnPie) return;
         /* La espera se calcula AL ARMAR el temporizador, no una vez al cargar:
            asi la primera aparicion ya alarga la siguiente sin reiniciar la app. */
+        window._quietudArmado = true;
         _alCitaPendiente = setTimeout(function () {
+          window._quietudArmado = false;
           yEnPie = 1;
           sortear();
         }, _quietudEspera());
@@ -18314,7 +18334,7 @@ function getVal(id, fallback) {
     setInterval(function () {
       try {
         var a = document.querySelector('.screen.active');
-        var enInicio = !!a && a.id === 's-home';
+        var enInicio = !!a && a.id === 's-home' && !quietudTapada();
         /* NUNCA nada mas arrancar. El founder lo vio el 4-sep-2026: "me ha
            saltado sola sin pasar por splash ni por inicio... eso no es muy
            correcto". Y tiene razon: no puede secuestrar la pantalla antes de que
@@ -18327,9 +18347,18 @@ function getVal(id, fallback) {
           /* Acaba de entrar (o la app arranco ya aqui): darle su tirada. */
           if (typeof window.dmQuietudReset === 'function') window.dmQuietudReset();
           if (typeof window.dmAleQuizas === 'function') window.dmAleQuizas();
-        } else if (enInicio && typeof window.dmAleQuizas === 'function' && !window._quietudMontada) {
+        } else if (enInicio && typeof window.dmAleQuizas === 'function' &&
+                   !window._quietudMontada) {
           /* Todavia no se habia montado (p.ej. sin sesion al arrancar). */
           window.dmAleQuizas();
+        } else if (enInicio && window._quietudMontada && !window._quietudArmado &&
+                   typeof window._quietudRearmar === 'function') {
+          /* Montada, en el inicio y SIN cuenta atras viva. Pasa cuando se monto
+             con el inicio tapado por el video de bienvenida: entonces no armo
+             nada, y al quitarse el overlay nadie la volvia a armar. Se comprueba
+             `_quietudArmado` a proposito: llamar a rearmar cada segundo a secas
+             reiniciaria la cuenta y no llegaria a cumplirse nunca. */
+          window._quietudRearmar();
         }
         enInicioAntes = enInicio;
       } catch (e) {}

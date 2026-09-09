@@ -1,15 +1,13 @@
 {
-  "md5_frontend": "f642c53d1442b47a5591c3c438689763",
-  "verificado_el": "2026-09-09T01:39:21",
+  "md5_frontend": "b050e35195b392729daf62729a0f5e8b",
+  "verificado_el": "2026-09-09T05:00:06",
   "pruebas": [
-    "Video de bienvenida: 15 s con el overlay puesto y la quietud NO salta; al quitarlo sale a los 6,0 s",
-    "Camino normal intacto: primer uso a los 5,0 s, tramo Ale",
-    "Silencio con fecha: 7 casos correctos (ahora, 1d, 4,9d, 5,1d, 30d, llave vieja '1' y sin llave)",
-    "Boton 'Don't show' en las tres pantallas; cero 'show me again' en el binario",
-    "Reparto 50/50 Ale-Niaz2 y espera 4000/4000 ms",
-    "Canal estanco cognitivista: entra solo con it+profesional (56 campos), salir lo cierra, volver directo rebota",
-    "Cambiar de idioma dentro expulsa y fuerza stance conductual",
-    "Forzar entrada desde es, en y it/particular: los tres van a la anamnesis conductual",
-    "Detector estatico sobre el binario: cero vocabulario cognitivista fuera de su region"
+    "SIN dm_account_type (condicion real del telefono): en italiano el selector SE VE y la anamnesis abre con 56 campos",
+    "Cero sitios con la comprobacion rota de dm_account_type dentro del binario",
+    "Espanol e ingles: selector oculto y forzar la entrada rebota, con cero vocabulario cognitivista visible",
+    "Salir de la pantalla cierra el canal; volver directo rebota; cambiar de idioma expulsa",
+    "Video de bienvenida: quietudTapada con 3 usos dentro del binario",
+    "Silencio de 5 dias y boton 'Don't show'; cero 'show me again'",
+    "Detector estatico: cero vocabulario cognitivista fuera de su region"
   ]
 }

@@ -72,6 +72,21 @@ Si algo que voy a hacer contradice una de estas líneas, me paro y pregunto.
   binario y tarda segundos en vez de una compilación. Pero lo que se arregla
   es la app.
 
+- **SUBIR UN BUILD NO LO PONE EN TESTFLIGHT. Hay que ASIGNARLO AL GRUPO.**
+  `altool --upload-app` lo sube y el envío a revisión lo manda a la App Store,
+  pero TestFlight solo enseña los builds asignados a un grupo de pruebas. Sin
+  ese paso el founder se queda congelado en el último que sí lo tuvo.
+  Pasó de verdad: el grupo `Internal` tenía los builds **1 al 42 y ninguno más**,
+  así que desde el 31-ago hasta el 9-sep él probaba la 1.0.10 mientras yo
+  publicaba la 1.0.14, 1.0.15 y 1.0.16. De ahí salieron DOS cacerías de fallos
+  inexistentes: el muro de pago vacío (6-sep) y "Niaz 2 no sale" (8-sep).
+  **Después de cada `altool`, añadir el build al grupo:**
+
+      GI=3d98316a-77f2-49e4-81d3-9771243f6d12   # grupo Internal
+      POST /v1/betaGroups/$GI/relationships/builds
+           {"data":[{"type":"builds","id":"<id del build>"}]}
+
+  Y comprobarlo con `GET /v1/betaGroups/$GI/builds`.
 - **PRIMERA PREGUNTA ANTE UN FALLO DEL MÓVIL, Y SE LE PREGUNTA A ÉL: ¿qué
   versión pone TestFlight?** No vale comprobarlo contra el repositorio ni contra
   el simulador: eso demuestra que el código puede funcionar, no que el suyo

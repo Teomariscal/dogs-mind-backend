@@ -12867,9 +12867,7 @@ function goTo(id) {
   } catch (e) {}
   if (id === 's-anamnesi-cognitiva') {
     var _cz_lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
-    var _cz_cuenta = '';
-    try { _cz_cuenta = (localStorage.getItem('dm_account_type') || '').toLowerCase(); } catch (e) {}
-    if (_cz_lang !== 'it' || _cz_cuenta !== 'professional' || window._tdmStance !== 'cognitive') {
+    if (_cz_lang !== 'it' || window._tdmStance !== 'cognitive') {
       id = 's-anamnesis';
     }
   }
@@ -20085,12 +20083,12 @@ function refreshStanceSelector() {
   var sel = document.getElementById('stance-selector');
   if (!sel) return;
   var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
-  /* La puerta del servidor exige ADEMAS cuenta profesional. Si aqui se ofreciera
-     a un particular, elegiria una via que el backend le va a negar con un 403.
-     (6-sep-2026) */
-  var _cuenta = '';
-  try { _cuenta = (localStorage.getItem('dm_account_type') || '').toLowerCase(); } catch (e) {}
-  if (lang === 'it' && _cuenta === 'professional') {
+  /* SOLO el idioma, como siempre. El 7-sep-2026 anadi aqui una comprobacion de
+     cuenta profesional leyendo 'dm_account_type' de localStorage — una llave que
+     NADIE ESCRIBE en toda la app. Resultado: el selector cognitivista desaparecio
+     por completo del italiano. Quien decide de verdad si la cuenta es profesional
+     es el servidor, que responde 403. Aqui no se replica. */
+  if (lang === 'it') {
     sel.style.display = 'block';
     /* Sin volver a navegar: setStance() llevaria a la pantalla cognitiva cada
        vez que se refresca el selector. Aqui solo se repinta el estado. */
@@ -27339,9 +27337,7 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
      poder abrirse desde ningun sitio que no cumpla. */
   window.dmCZAbrir = function () {
     var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
-    var cuenta = '';
-    try { cuenta = (localStorage.getItem('dm_account_type') || '').toLowerCase(); } catch (e) {}
-    if (lang !== 'it' || cuenta !== 'professional' || window._tdmStance !== 'cognitive') {
+    if (lang !== 'it' || window._tdmStance !== 'cognitive') {
       goTo('s-anamnesis');
       return;
     }

@@ -22,6 +22,9 @@ Si algo que voy a hacer contradice una de estas líneas, me paro y pregunto.
 
 | desde | decisión |
 |---|---|
+| 9-sep-2026 | **Un dato sobre publicar/subir solo se da si se puede MEDIR al 99 %.** *"Nunca me des un dato como que has publicado sin poder medir al 99 % que es así"*. Regla dura; el cómo está abajo, en Reglas duras de trabajo. |
+| 9-sep-2026 | **Ale sale ENTERA, con su perra.** Era la única de las cuatro pantallas de Aigent que seguía con el recorte compartido (`object-fit: cover` anclado arriba): su vídeo es 9:16 y por abajo se comía justo a la perra. Founder: *"retrásala más como hiciste con Niaz para que se vea la perra"*. Es la misma regla del 30-ago —los vídeos salen enteros—, que a Ale no se le había aplicado. Sus controles, al contrario que en Cecilia y Niaz, van a la esquina de la pantalla y no pegados al vídeo: la imagen es estrecha y ella está centrada, así que pegados le caen en la cara. |
+| 9-sep-2026 | **El subtítulo de Ale se traduce.** `al_script` no existía en NINGÚN diccionario —ni en español—, así que el texto caía siempre al literal castellano de la función y el italiano y el inglés veían español bajo botones traducidos. Founder: *"Ale en la versión en italiano los subtítulos están en español"*. |
 | 9-sep-2026 | **El inicio TAPADO no cuenta para la quietud.** El vídeo de bienvenida (`#intro-overlay`) es un fixed a pantalla completa por ENCIMA de todo; por debajo la app entraba sola al inicio y el vigilante contaba, así que Niaz 2 saltaba detrás del vídeo y el usuario se la encontraba de frente al quitarse el overlay. Founder: *"después del vídeo inicial sin pasar por splash aparece Niaz 2"*. Ahora `quietudTapada()` lo bloquea y la GRACIA de arranque se cuenta desde que el vídeo termina, no desde que carga la página. |
 | 8-sep-2026 | **El silencio de la quietud CADUCA A LOS 5 DÍAS y el botón pasa de "no volver a mostrar" a "no mostrar".** Founder: *"tiene marcha atrás, y de todas maneras cada 5 días vuelve"*. Antes era definitivo y no había NINGÚN sitio en la app que borrara la llave: quien lo pulsaba no volvía a ver esa pantalla jamás en ese dispositivo. Ahora la llave guarda la FECHA, no un `1`. |
 | 8-sep-2026 | **Quietud a TRES: Niaz 2, Ale y Cecilia, un tercio cada una.** Sustituye al 50/50 del 6-sep. Cecilia entra con un vídeo NUEVO: **sin fusta** y con el **shih tzu** que sale con ella en Los Aigents, en una mano. Su guion lo escribió el founder y va literal (ver `PENDIENTES.md`); termina en *"Entra en nueva consulta y compruébalo"*, así que su botón lleva a Nueva consulta. |
@@ -65,6 +68,22 @@ Si algo que voy a hacer contradice una de estas líneas, me paro y pregunto.
 
 ## Reglas duras de trabajo
 
+- **NUNCA decir "está publicado" / "está subido" / "está hecho" sin haberlo
+  MEDIDO al 99 %.** Founder, 9-sep-2026: *"nunca me des un dato como que has
+  publicado sin poder medir al 99 % que es así"*.
+  Medir no es que el comando saliera con código 0, ni que el script imprimiera
+  un "ok", ni acordarme de haberlo hecho. Es **preguntarle al sitio que manda y
+  leer la respuesta**:
+  · Play → `tracks().list` y ver `status: completed` con el versionCode.
+  · TestFlight → `GET /v1/betaGroups/$GI/builds` y ver el build en la lista.
+  · App Store → el `processingState` del build, no el "UPLOAD SUCCEEDED".
+  · Un arreglo en la app → abrir el índice DENTRO del IPA, no el del repositorio.
+  Si no puedo medirlo, se dice **"lo he lanzado y no lo he podido comprobar"**,
+  con esas palabras. Un "no lo sé" vale; un dato cómodo que luego se cae, no.
+  Esta regla es la que faltaba detrás de los tres fallos de la semana: el muro
+  de pago (6-sep), la quietud (8-sep) y los builds que no estaban en TestFlight
+  (43-52). En los tres afirmé sobre lo que creía, no sobre lo que había mirado.
+
 - **Cuando el founder habla, habla SIEMPRE de la app**, no de la web. La web
   la actualizo yo por mi cuenta como consecuencia de los cambios de la app.
   Si reporta un fallo, es del iPhone salvo que diga "web" explícitamente.
@@ -105,6 +124,16 @@ Si algo que voy a hacer contradice una de estas líneas, me paro y pregunto.
   tiene. Nace del 6-sep-2026: el muro de pago "volvía" a salir vacío; el arreglo
   entró el 1-sep a las 17:41 y su 1.0.12 se había subido a las 08:55 de esa misma
   mañana. Diagnosticar contra el repositorio habría dado "no puede pasar".
+- **Un texto nuevo se añade a los TRES diccionarios, y se audita.** `_i18nText`
+  y `data-i18n` caen a un literal castellano cuando la clave no existe, y no
+  avisan de nada: el inglés y el italiano se quedan en español sin que se note
+  al probar en español. Así llevaban meses el subtítulo de Ale y los 20 errores
+  del formulario de cachorro (los dos, 9-sep-2026). La auditoría es cruzar las
+  claves de `_i18nText('…')` y `data-i18n` con los tres diccionarios de
+  `TRANSLATIONS`; el 9-sep quedó en 987 usadas y 0 huecos. Ojo con dos trampas:
+  una clave que sirva a la vez a un `data-i18n` y a JS con datos dentro (hay que
+  partirla, o `applyLang` borra el dato), y una clave pedida desde dos sitios
+  con literales distintos.
 - **Verificar antes de afirmar.** Abrir el contenido real, no el envoltorio.
   Etiquetar lo que es deducción y no comprobación. Un "no lo sé" vale; una
   afirmación cómoda que luego se cae, no.
@@ -138,6 +167,13 @@ antes, hay que hacer `git push` a mano.
 `scripts/compilar-apps.sh 1.0.X` — compila las dos tiendas y **se niega a seguir
 si los frontends difieren**. Pide el número de build a Apple, no al fichero local
 (contar en local repite número y Apple lo rechaza con ITMS-90062).
+
+**Google Play va por API, con una credencial que NO está en el repositorio**
+(`~/Desktop/PLAY-STORE-subir/CREDENCIAL-REVENUECAT.json`, cuenta
+`tdm-play-billing@…`). El camino entero y la trampa —`status:'draft'` sube sin
+publicar, `'completed'` publica— están en `PENDIENTES.md`. El 9-sep-2026 estuve
+media hora buscándolo porque no lo había escrito en ninguna parte y el founder
+tuvo que decirme que lo subía yo: *"a PLAY supuestamente lo subiste siempre tú"*.
 
 Apple **no deja crear una versión nueva** mientras otra está pendiente o en
 revisión: devuelve 409 *"You cannot create a new version of the App in the

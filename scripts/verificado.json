@@ -1,13 +1,14 @@
 {
-  "md5_frontend": "b050e35195b392729daf62729a0f5e8b",
-  "verificado_el": "2026-09-09T05:00:06",
+  "md5_frontend": "6ab9661072927e0d3de6b294f3469bac",
+  "verificado_el": "2026-09-10T04:15:20",
   "pruebas": [
-    "SIN dm_account_type (condicion real del telefono): en italiano el selector SE VE y la anamnesis abre con 56 campos",
-    "Cero sitios con la comprobacion rota de dm_account_type dentro del binario",
-    "Espanol e ingles: selector oculto y forzar la entrada rebota, con cero vocabulario cognitivista visible",
-    "Salir de la pantalla cierra el canal; volver directo rebota; cambiar de idioma expulsa",
-    "Video de bienvenida: quietudTapada con 3 usos dentro del binario",
-    "Silencio de 5 dias y boton 'Don't show'; cero 'show me again'",
-    "Detector estatico: cero vocabulario cognitivista fuera de su region"
+    "subtitulo de Ale traducido en es/en/it, leido del IPA",
+    "Ale entera: video 164x292 contenido, la perra se ve completa",
+    "cabe sin scroll en 375x812 y en 375x667 (ultimo enlace en el pixel 639 de 667)",
+    "controles fuera de su cara, en la esquina de la pantalla",
+    "formulario de cachorro en italiano: 'Manca il nome.'",
+    "auditoria i18n sobre el binario: 987 claves usadas, 0 huecos en los tres diccionarios",
+    "sin-fugas.py estatico: SIN FUGAS, puerta con 4 condiciones y 4 salidas en False",
+    "sin-fugas-vivo sobre el binario: 30 casos, 0 fugas CZ"
   ]
 }

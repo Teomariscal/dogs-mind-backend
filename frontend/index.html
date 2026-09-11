@@ -9156,6 +9156,30 @@ button:not(:disabled):active{ transform:scale(0.98); }
    cual sea el alto de la pantalla. */
 #s-niaz .ob-sound   { right: calc(50% - 10.125vh + 8px); top: calc(env(safe-area-inset-top, 0px) + 14px); }
 #s-niaz .ob-repetir { right: calc(50% - 10.125vh + 58px); top: calc(env(safe-area-inset-top, 0px) + 14px); }
+
+/* Ale, igual que Cecilia y Niaz: ENTERA. Se quedo con el recorte compartido
+   (object-fit: cover anclado arriba) y el 9:16 de su video se comia por abajo
+   justo lo que hay que ver: la perra que lleva al lado (founder, 9-sep-2026:
+   "retrasala mas como hiciste con Niaz para que se vea la perra"). Es la misma
+   regla del 30-ago: los videos salen enteros. Su video es 576x1024, o sea
+   0,5625, los mismos numeros que el de Cecilia. */
+#s-ale .ob-video {
+  width: auto; max-width: 100%; height: 36vh; max-height: 36vh;
+  margin: calc(env(safe-area-inset-top, 0px) + 4px) auto 0; display: block;
+  object-fit: contain; object-position: center center;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  background: #07100c;
+}
+#s-ale .ob-wrap { background: #07100c; }
+/* Los controles se quedan en la esquina de la pantalla, NO pegados al video
+   como en Cecilia y Niaz: el video de Ale es estrecho (36vh x 0,5625 = 164 px)
+   y ella esta centrada en el encuadre, asi que pegarlos al borde derecho de la
+   imagen los planta sobre su cara. Comprobado en pantalla, no deducido. */
+/* Y el panel deja de solaparse: los -52px heredados volverian a tapar por
+   abajo lo mismo que acabamos de destapar. */
+#s-ale .ob-panel { margin-top: 0; background: none; }
+#al-typed { padding-top: 16px; }
 .ob-typed .ob-caret {
   display: inline-block; width: 2px; height: 1.05em; margin-left: 2px;
   background: #5ec8e6; vertical-align: -0.16em; animation: obBlink 1s steps(1) infinite;
@@ -10748,7 +10772,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
       <button class="tc-back" onclick="goTo('s-home')" aria-label="Volver">&#8592;</button>
       <div class="tc-header-text">
         <p class="tc-eyebrow" data-i18n="pupr_eyebrow">Escuela Cachorros</p>
-        <h1 class="tc-title" id="pupr-title" data-i18n="pupr_title">El plan de tu cachorro</h1>
+        <h1 class="tc-title" id="pupr-title" data-i18n="pupr_title_h1">El plan de tu cachorro</h1>
       </div>
     </header>
     <article id="pupr-content" class="tr-content"></article>
@@ -21825,9 +21849,13 @@ window.submitPuppySchool = async function() {
     var cont = document.getElementById('pupr-content');
     if (cont) cont.innerHTML = window._mdToHtml(md);
     var tit = document.getElementById('pupr-title');
-    if (tit) tit.textContent = (data.tipo === 'analisis_funcional')
-      ? _i18nText('pupr_title_abc', 'El análisis de ' + d.dog_name)
-      : _i18nText('pupr_title', 'El plan de ' + d.dog_name);
+    /* El título lleva el nombre del perro, así que la traducción va con hueco
+       y se rellena aquí. Y la clave NO es la misma que la del <h1> genérico:
+       si lo fuera, cambiar de idioma con el plan abierto borraría el nombre. */
+    if (tit) tit.textContent = ((data.tipo === 'analisis_funcional')
+      ? _i18nText('pupr_title_abc_dog', 'El análisis de {dog}')
+      : _i18nText('pupr_title_dog',     'El plan de {dog}')
+    ).replace('{dog}', d.dog_name || '');
     var sb = document.getElementById('pupr-save-btn'); if (sb) sb.style.display = '';
     window._lastPuppyData = d;
     window._lastPuppyPlan = md;
@@ -23143,6 +23171,7 @@ function endTourIntro() {
       n2_body:                 'Los Aigents son avatars de IA muy especializados. No sirven para generar an\u00e1lisis de conducta pero te ayudan en tu d\u00eda a d\u00eda con tu perro.',
       n2_cta:                  'Conoce a Los Aigents',
       n2_script:               'Uy, perdona, me estaba reseteando. Hola, soy Niaz, tu Aigent de lujo y lifestyle canino. Y estoy aqu\u00ed para ayudarte con peluquer\u00eda, hoteles, productos premium, restaurantes y viajes. Solo lo mejor para tu perro.',
+      al_script:               'Hola, soy Ale, la Aigent con más buena onda. ¿Has probado la feature de paseos? Estés donde estés puedo trazar tres rutas para pasear con tu perro, dando prioridad a las zonas verdes, lugares sin excesiva acumulación de gente o tráfico, incluso, y dependiendo de la hora del día, elegir rutas con más sombra y más seguras y agradables para tu perro. Ponme a prueba y pulsa aquí.',
       al_cta:                  'Buscar rutas con mi perro',
       al_cta2:                 'Problema de comportamiento',
       aw_title:                 'Welcome a The Dogs’ Mind',
@@ -23299,6 +23328,42 @@ function endTourIntro() {
       pupr_save:       'Guardar',
       pupr_btn_pdf:    'Descargar PDF',
       pupr_home:       'Volver al inicio',
+      /* Estos 26 estaban PEDIDOS por el codigo y no existian en ningun
+         diccionario, asi que caia siempre el literal castellano de la funcion:
+         un italiano que se equivocaba rellenando el formulario del cachorro
+         leia el error en espanol. Mismo agujero que tenia el subtitulo de Ale
+         (9-sep-2026). */
+      pup_err_name:      'Falta el nombre.',
+      pup_err_dob:       'Falta la fecha de nacimiento.',
+      pup_err_age:       'Revisa la edad en semanas.',
+      pup_err_breed:     'Falta la tipología racial.',
+      pup_err_origin:    'Marca si es adoptado o de criadero.',
+      pup_err_wean:      'Marca a qué edad se separó de su madre.',
+      pup_err_athome:    '¿Cuántas semanas lleva en casa?',
+      pup_err_athome_gt: 'No puede llevar en casa más semanas de las que tiene.',
+      pup_err_dogs:      'Dinos si convive con otros perros.',
+      pup_err_dogs_ages: 'Pon las edades de los otros perros.',
+      pup_err_kids:      'Dinos si hay niños en casa.',
+      pup_err_kids_ages: 'Pon las edades de los niños.',
+      pup_err_alone:     '¿Cuántas horas pasa solo al día?',
+      pup_err_walks:     '¿Cuántos paseos al día?',
+      pup_err_sleep:     'Marca dónde duerme.',
+      pup_err_want:      'Marca qué buscas.',
+      pup_err_area:      'Elige por dónde empezamos.',
+      pup_err_problem:   'Describe la conducta problema con algo más de detalle.',
+      pup_err_vax:       'Marca si el calendario de vacunación está completo.',
+      pup_err_network:   'No se pudo conectar. Comprueba tu red e inténtalo de nuevo.',
+      pup_saving:        'Guardando…',
+      pup_saved:         'Plan guardado',
+      pupr_title_h1:      'El plan de tu cachorro',
+      pupr_title_dog:     'El plan de {dog}',
+      pupr_title_abc_dog: 'El análisis de {dog}',
+      rec_lang_badge_title: 'Este caso está en otro idioma. El contenido se mantiene en su idioma original.',
+      ps_err_invite_already_pro: 'Tu cuenta ya es Profesional.',
+      ps_err_invite_invalid:     'Código de invitación Profesional inválido. Verifícalo o continúa con el pago estándar.',
+      ps_err_invite_unexpected:  'No se pudo activar la cuenta.',
+      ps_invite_label: 'Código de invitación Profesional <span style="color:var(--ps-text3,#777);font-size:11px;font-weight:400;">(opcional)</span>',
+      ps_invite_hint:  'Con código válido la activación es gratuita y sin datos de empresa.',
       pw_title:   'Elige tu plan',
       pw_sub:     'Créditos que se renuevan cada mes',
       pw_balance: 'Tu saldo',
@@ -24312,6 +24377,7 @@ function endTourIntro() {
       n2_body:                 'Aigents are highly specialised AI avatars. They do not generate behavioural analyses, but they help you day to day with your dog.',
       n2_cta:                  'Meet the Aigents',
       n2_script:               'Oops, sorry, I was rebooting. Hi, I\u2019m Niaz, your luxury and canine lifestyle Aigent. And I\u2019m here to help you with grooming, hotels, premium products, restaurants and travel. Only the best for your dog.',
+      al_script:               'Hi, I am Ale, the easy-going Aigent. Have you tried the walks feature? Wherever you are I can map out three routes to walk your dog, giving priority to green areas and places without too many people or traffic, and, depending on the time of day, choose routes with more shade that are safer and more pleasant for your dog. Put me to the test and tap here.',
       al_cta:                  'Find routes with my dog',
       al_cta2:                 'Behaviour problem',
       aw_title:                 'Welcome to The Dogs’ Mind',
@@ -24467,6 +24533,38 @@ function endTourIntro() {
       pupr_save:       'Save',
       pupr_btn_pdf:    'Download PDF',
       pupr_home:       'Back to home',
+      pup_err_name:      'The name is missing.',
+      pup_err_dob:       'The date of birth is missing.',
+      pup_err_age:       'Check the age in weeks.',
+      pup_err_breed:     'The breed type is missing.',
+      pup_err_origin:    'Tick whether the puppy was adopted or came from a breeder.',
+      pup_err_wean:      'Tick at what age the puppy was separated from its mother.',
+      pup_err_athome:    'How many weeks has the puppy been at home?',
+      pup_err_athome_gt: 'The puppy cannot have been at home for more weeks than its age.',
+      pup_err_dogs:      'Tell us whether the puppy lives with other dogs.',
+      pup_err_dogs_ages: 'Enter the ages of the other dogs.',
+      pup_err_kids:      'Tell us whether there are children at home.',
+      pup_err_kids_ages: 'Enter the children’s ages.',
+      pup_err_alone:     'How many hours a day is the puppy alone?',
+      pup_err_walks:     'How many walks a day?',
+      pup_err_sleep:     'Tick where the puppy sleeps.',
+      pup_err_want:      'Tick what you are looking for.',
+      pup_err_area:      'Choose where we start.',
+      pup_err_problem:   'Describe the problem behaviour in a little more detail.',
+      pup_err_vax:       'Tick whether the vaccination schedule is complete.',
+      pup_err_network:   'Could not connect. Check your network and try again.',
+      pup_saving:        'Saving…',
+      pup_saved:         'Plan saved',
+      pupr_title_h1:      'Your puppy’s plan',
+      pupr_title_dog:     '{dog}’s plan',
+      pupr_title_abc_dog: '{dog}’s analysis',
+      rec_lang_badge_title: 'This case is in another language. The content stays in its original language.',
+      ps_err_invite_already_pro: 'Your account is already Professional.',
+      ps_err_invite_invalid:     'Invalid Professional invitation code. Check it or continue with the standard payment.',
+      ps_err_invite_unexpected:  'The account could not be activated.',
+      ps_invite_label: 'Professional invitation code <span style="color:var(--ps-text3,#777);font-size:11px;font-weight:400;">(optional)</span>',
+      ps_invite_hint:  'With a valid code the activation is free and no company details are needed.',
+      ps_forgot_link:  'Forgotten your password? We will send you a link',
       pw_title:   'Choose your plan',
       pw_sub:     'Credits that renew every month',
       pw_balance: 'Your balance',
@@ -25480,6 +25578,7 @@ function endTourIntro() {
           n2_body:                 'Gli Aigents sono avatar di IA molto specializzati. Non servono a generare analisi del comportamento, ma ti aiutano ogni giorno con il tuo cane.',
           n2_cta:                  'Conosci gli Aigents',
           n2_script:               'Ops, scusa, mi stavo riavviando. Ciao, sono Niaz, la tua Aigent di lusso e lifestyle canino. E sono qui per aiutarti con toelettatura, hotel, prodotti premium, ristoranti e viaggi. Solo il meglio per il tuo cane.',
+          al_script:               'Ciao, sono Ale, l’Aigent più alla mano. Hai provato la feature delle passeggiate? Ovunque tu sia posso tracciare tre percorsi per passeggiare con il tuo cane, dando priorità alle zone verdi, ai luoghi senza troppa gente o traffico e, a seconda dell’ora del giorno, scegliere percorsi più ombreggiati, più sicuri e più piacevoli per il tuo cane. Mettimi alla prova e premi qui.',
           al_cta:                  'Cerca percorsi con il mio cane',
           al_cta2:                 'Problema di comportamento',
           aw_title:                 'Welcome in The Dogs’ Mind',
@@ -25636,6 +25735,38 @@ function endTourIntro() {
           pupr_save:       'Salva',
           pupr_btn_pdf:    'Scarica PDF',
           pupr_home:       'Torna alla home',
+          pup_err_name:      'Manca il nome.',
+          pup_err_dob:       'Manca la data di nascita.',
+          pup_err_age:       'Controlla l’età in settimane.',
+          pup_err_breed:     'Manca la tipologia razziale.',
+          pup_err_origin:    'Indica se è adottato o proviene da un allevamento.',
+          pup_err_wean:      'Indica a che età è stato separato dalla madre.',
+          pup_err_athome:    'Da quante settimane è in casa?',
+          pup_err_athome_gt: 'Non può essere in casa da più settimane di quante ne ha.',
+          pup_err_dogs:      'Dicci se convive con altri cani.',
+          pup_err_dogs_ages: 'Inserisci l’età degli altri cani.',
+          pup_err_kids:      'Dicci se ci sono bambini in casa.',
+          pup_err_kids_ages: 'Inserisci l’età dei bambini.',
+          pup_err_alone:     'Quante ore al giorno resta solo?',
+          pup_err_walks:     'Quante passeggiate al giorno?',
+          pup_err_sleep:     'Indica dove dorme.',
+          pup_err_want:      'Indica che cosa cerchi.',
+          pup_err_area:      'Scegli da dove iniziamo.',
+          pup_err_problem:   'Descrivi il comportamento problematico con qualche dettaglio in più.',
+          pup_err_vax:       'Indica se il calendario vaccinale è completo.',
+          pup_err_network:   'Non è stato possibile connettersi. Controlla la rete e riprova.',
+          pup_saving:        'Salvataggio…',
+          pup_saved:         'Piano salvato',
+          pupr_title_h1:      'Il piano del tuo cucciolo',
+          pupr_title_dog:     'Il piano di {dog}',
+          pupr_title_abc_dog: 'L’analisi di {dog}',
+          rec_lang_badge_title: 'Questo caso è in un’altra lingua. Il contenuto resta nella lingua originale.',
+          ps_err_invite_already_pro: 'Il tuo account è già Professionale.',
+          ps_err_invite_invalid:     'Codice di invito Professionale non valido. Controllalo oppure prosegui con il pagamento standard.',
+          ps_err_invite_unexpected:  'Non è stato possibile attivare l’account.',
+          ps_invite_label: 'Codice di invito Professionale <span style="color:var(--ps-text3,#777);font-size:11px;font-weight:400;">(opzionale)</span>',
+          ps_invite_hint:  'Con un codice valido l’attivazione è gratuita e senza dati aziendali.',
+          ps_forgot_link:  'Non ricordi la password? Ti inviamo un link',
           pw_title:   'Scegli il tuo piano',
           pw_sub:     'Crediti che si rinnovano ogni mese',
           pw_balance: 'Il tuo saldo',

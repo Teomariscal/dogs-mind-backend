@@ -30,6 +30,57 @@ Lista viva. Se actualiza en cuanto algo entra o sale. Última revisión: 1-sep-2
 | Backend | vía cognitivista de Odette | **DESPLEGADO** el 7-sep |
 | Web | pantalla y canal estanco | **EN VIVO** el 7-sep, comprobado en thedogsmind.net |
 
+## 1.0.19 — dónde está cada tienda (9-sep-2026)
+
+| tienda | qué | estado |
+|---|---|---|
+| App Store | **1.0.19 (build 54)** | **WAITING_FOR_REVIEW**, con `releaseType: AFTER_APPROVAL` — sale sola al aprobarse. También asignado al grupo Internal → visible en TestFlight |
+| Google Play | **versionCode 37** | **PUBLICADO en producción al 100 %**. Medido con `tracks().list`: `production completed vc=['37']`. Sustituye a la vc 33 |
+
+Lo que lleva: el subtítulo de Ale traducido, Ale entera con su perra, y los 26
+textos que se quedaban en español fuera del español. Verificado sobre el IPA
+(md5 `6ab9661072927e0d3de6b294f3469bac`, idéntico en las dos tiendas), no sobre
+la copia de trabajo.
+
+### CÓMO SE SUBE A GOOGLE PLAY — estaba solo en mi cabeza
+
+Es lo que faltaba por escribir y me costó media hora encontrarlo. La credencial
+vive **fuera del repositorio**, como la `.p8` de Apple:
+
+    /Users/teomariscal/Desktop/PLAY-STORE-subir/CREDENCIAL-REVENUECAT.json
+    cuenta de servicio: tdm-play-billing@tdm-play-billing.iam.gserviceaccount.com
+    paquete:            net.thedogsmind.app
+
+El nombre del fichero engaña: pone REVENUECAT, pero esa cuenta tiene permisos de
+publicación en Play Console. Se usa con `googleapiclient` (ya instalado), y el
+camino es siempre el mismo: `edits().insert` → `bundles().upload` (el AAB de
+`mobile/android/app/build/outputs/bundle/release/`) → `tracks().update` con
+`track='production'` → `edits().commit`.
+
+**El `status` del release decide si sale o no**: `'draft'` lo deja subido y
+guardado sin tocar a nadie; `'completed'` lo publica a todos. Subir y publicar
+son dos cosas distintas y en Play se separan con esa palabra.
+
+Y para mirar sin tocar: `edits().insert` → `tracks().list` → `edits().delete`.
+Un edit sin commit no cambia nada.
+
+## 9-sep — 1.0.18 (build 53) COMPROBADA POR EL FOUNDER EN EL IPHONE
+
+Primer build que él prueba de verdad desde el 31-ago, porque es el segundo que
+se asigna al grupo `Internal` (el 52 fue el primero). Sus palabras: *"en test
+flight esta bien"* y *"todo ok"*. Confirmado por él, en el teléfono, no por mí
+contra el repositorio:
+
+| qué | estado |
+|---|---|
+| Selector **Analisi ABA / Analisi Cognitivista** en italiano | SALE |
+| El inicio se ve unos segundos tras el vídeo del perro en la playa | SÍ — el `intro-overlay` ya no deja contar la quietud |
+| El botón pequeño pone **"Don't show"** | SÍ |
+
+Con esto se cierran los tres fallos abiertos de la semana: la vía cognitivista
+que rompí el 7-sep con el `dm_account_type` (revertida), Niaz 2 saltando detrás
+del vídeo de bienvenida, y el silencio sin marcha atrás.
+
 **8-sep: la vía de Odette YA VA EN LAS APPS.** Apple aprobó la 1.0.15 y eso
 desbloqueó la 1.0.16: **Google Play publicada (vc 33)** y **App Store build 51
 en revisión**, con salida automática al aprobarse. Verificada sobre el binario:
@@ -293,6 +344,35 @@ tienen que mirar es el render final.
   paseo sale gratis (`catch { return true }`). Previo y parece deliberado.
 - [ ] `/analysis/video` sin latidos: ya era async y maneja ficheros subidos, es
   otra estructura. Es el unico de los cuatro que genera con IA sin proteger.
+- [x] **Los textos que se quedaban en español en inglés y en italiano: CERRADO
+  el 9-sep-2026.** Salieron al auditar el fallo de Ale: eran claves pedidas con
+  `_i18nText` que no existían en NINGUNO de los tres diccionarios, así que caía
+  siempre el literal castellano escrito dentro de la función. Añadidas las 26 en
+  los tres idiomas: los **20 errores de validación del formulario de cachorro**,
+  `pup_saving`, `pup_saved`, el título del plan, `rec_lang_badge_title`, los 3
+  del código de invitación y `ps_invite_label` / `ps_invite_hint`; más
+  `ps_forgot_link`, que solo faltaba en inglés e italiano.
+  Dos cosas que hubo que desenredar, no es solo traducir:
+  · `pupr_title` servía A LA VEZ al `<h1>` genérico (por `data-i18n`) y al
+    título con el nombre del perro (por JS). Metiéndola en el diccionario,
+    cambiar de idioma con el plan abierto habría borrado el nombre. Ahora son
+    tres claves: `pupr_title_h1`, `pupr_title_dog` y `pupr_title_abc_dog`, y las
+    dos últimas llevan hueco `{dog}`.
+  · `ps_err_invite_unexpected` se pedía desde dos sitios con literales distintos
+    ('la cuenta' y 'la cuenta cortesía'). Con una sola clave los dos dicen lo
+    mismo; si hace falta distinguirlos, hay que partir la clave en dos.
+  `abc_intro_petowner` y `desc_` son falsos positivos: la primera ya trae sus
+  tres idiomas dentro de la llamada y la segunda es un prefijo dinámico.
+  **Auditoría reproducible**, y conviene repetirla al añadir textos: extraer las
+  claves de `_i18nText('...')` y de `data-i18n` y cruzarlas con los tres
+  diccionarios de `TRANSLATIONS`. Ahora mismo: 987 claves usadas, 0 huecos.
+- [ ] **Un "resfriado" ABA en el inicio italiano cognitivista.** `sin-fugas-vivo`
+  sobre el binario de la 1.0.19 da 30 casos y **0 fugas CZ** (la dirección que
+  importa), pero anota una en sentido contrario: con `it + cognitive`, la
+  pantalla de inicio enseña *"Revisione esperta e analisi funzionale"*
+  (`home_teo_sub`). Es previo, no lo trae ningún cambio del 9-sep, y por la
+  asimetría del 4-sep es resfriado y no Ébola. `rinforzo`, que sale en el mismo
+  aviso, **está permitido** desde el 7-sep. No se toca sin OK: es copy.
 - [ ] Mensajes 402 del backend solo en español (la app pone los suyos traducidos,
   así que hoy no se ven).
 - [ ] Vídeos por idioma de Cecilia y Niaz (EN/IT) servidos desde nuestro dominio.

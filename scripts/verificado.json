@@ -1,14 +1,13 @@
 {
-  "md5_frontend": "6ab9661072927e0d3de6b294f3469bac",
-  "verificado_el": "2026-09-10T04:15:20",
+  "md5_frontend": "82e7ca00abc369ed2e4817b390c35dd7",
+  "verificado_el": "2026-09-11T22:08:14",
   "pruebas": [
-    "subtitulo de Ale traducido en es/en/it, leido del IPA",
-    "Ale entera: video 164x292 contenido, la perra se ve completa",
-    "cabe sin scroll en 375x812 y en 375x667 (ultimo enlace en el pixel 639 de 667)",
-    "controles fuera de su cara, en la esquina de la pantalla",
-    "formulario de cachorro en italiano: 'Manca il nome.'",
-    "auditoria i18n sobre el binario: 987 claves usadas, 0 huecos en los tres diccionarios",
-    "sin-fugas.py estatico: SIN FUGAS, puerta con 4 condiciones y 4 salidas en False",
-    "sin-fugas-vivo sobre el binario: 30 casos, 0 fugas CZ"
+    "Cecilia 2 dentro del IPA y del AAB: video de 5.963.577 bytes y pantalla s-cecilia2",
+    "subtitulo y boton en es/en/it, leidos del binario",
+    "video 237x422 en 393x852, entera, 40 px de margen abajo y sin scroll en los tres idiomas",
+    "sorteo 34/33/33 verificado con el codigo del sorteo, 300.000 tiradas: 34,13 / 32,94 / 32,93",
+    "auditoria i18n sobre el binario: 989 claves usadas, 0 huecos en los tres diccionarios",
+    "Ale (173x307) y Niaz 2 (300x256) sin tocar y sin scroll",
+    "sin-fugas.py estatico: SIN FUGAS"
   ]
 }

@@ -30,6 +30,13 @@ Lista viva. Se actualiza en cuanto algo entra o sale. Última revisión: 1-sep-2
 | Backend | vía cognitivista de Odette | **DESPLEGADO** el 7-sep |
 | Web | pantalla y canal estanco | **EN VIVO** el 7-sep, comprobado en thedogsmind.net |
 
+## 1.0.19 — CERRADA: las dos tiendas iguales (11-sep-2026)
+
+Medido en las dos APIs el 11-sep: **App Store `READY_FOR_SALE`** (Apple la aprobó
+y salió sola, con `AFTER_APPROVAL`) y **Google Play `production completed
+vc=['37']`** al 100 %. Es la primera vez en dos semanas que iOS y Android llevan
+lo mismo.
+
 ## 1.0.19 — dónde está cada tienda (9-sep-2026)
 
 | tienda | qué | estado |
@@ -172,7 +179,9 @@ pasar en revisión aunque no lleve paseos, en vez de sacarla y rehacerla.
   bienvenida, mensajes de saldo y páginas legales.
   Web v288 · Google Play 1.0.12 (26) publicada · App Store 1.0.12 en revisión.
 
-- [ ] **Paseos: arreglado en web (v288), falta en las apps → va en la 1.0.13.**
+- [x] **Paseos: CERRADO.** El founder los dio por buenos en la app el 6-sep-2026
+  (*"ya funcionan los planes de cobro y los paseos"*). Se deja abajo la causa
+  porque explica el fallo y porque el plan B por rumbo sigue en el código.
   Causa real, medida el 1-sep: **los tres servidores de Overpass caídos a la vez**
   (el principal corta la conexión, los dos espejos dan 502). No cambió nada del
   código; se cayó el servicio público gratuito que busca parques. OSRM, que es
@@ -216,9 +225,10 @@ pasar en revisión aunque no lleve paseos, en vez de sacarla y rehacerla.
 
 ## Acciones del founder
 
-- [ ] **Clasificación por edades (redes sociales), Apple.** Límite 7-sep-2026, y
-  ya se ha enviado una versión, así que puede exigirlo antes.
-  https://appstoreconnect.apple.com/apps/6777848632/appinfo
+- [x] **Clasificación por edades (redes sociales), Apple: CERRADO.** Medido el
+  11-sep-2026 sobre `ageRatingDeclaration` de la 1.0.19: **0 campos sin
+  rellenar**. Y la prueba práctica es que Apple aceptó la 1.0.19 a revisión, que
+  no lo habría hecho con la declaración incompleta.
 
 - [ ] **Copy legal de fondo**: `terms.html` apartado 4 y `privacy.html` ya dicen
   "créditos", pero el texto es mío adaptado del suyo. Que lo revise.
@@ -316,10 +326,53 @@ Su primera respuesta decia que el espanol si esta admitido y que la vista previa
 funciona: eso ya lo sabiamos y es justo lo que hace sospechoso el fallo. Lo que
 tienen que mirar es el render final.
 
-- [ ] Vídeo `aigents-cecilia2.mp4` — **esperando a que HeyGen desbloquee el render**
-- [ ] Guion en inglés e italiano — **lo escribe el founder** (no se inventa copy)
-- [ ] Pantalla `s-cecilia2` y su entrada en el sorteo a 1/3 — se enciende el día
-      que el vídeo esté en `frontend/`
+### DESBLOQUEADO Y MONTADO — 11-sep-2026
+
+HeyGen soltó el render sin explicar qué pasaba. Lo que había era además otra
+cosa: el borrador estaba abierto en dos ventanas a la vez y HeyGen lo bloquea
+(*"The draft is being edited"*). El founder cerró la suya y generó.
+
+- [x] **Vídeo `aigents-cecilia2.mp4`** — en `frontend/`. Descargado a 1080x1920
+      y 19 MB, recodificado al formato de sus hermanos: H.264 + AAC, 1080x1920,
+      29,87 s, **6,0 MB** (va dentro del binario de las dos tiendas, el peso
+      cuenta). Comprobado por fotograma: sin fusta, el shih tzu en el brazo
+      derecho y el casco en el izquierdo.
+- [x] **Pantalla `s-cecilia2`** — misma mecánica que Ale: vídeo mudo, voz escrita
+      a máquina al ritmo del vídeo, y se completa de golpe al tocar el texto.
+- [x] **En el sorteo, al 34 %** (Niaz 2 y Ale al 33 %). Medido con el propio
+      código del sorteo, 300.000 tiradas: 34,13 / 32,94 / 32,93.
+- [x] **Guion en inglés e italiano** — escritos y **PENDIENTES DE TU VISTO BUENO**.
+      Son traducción de tu texto, no copy nuevo, igual que se hizo con Ale.
+
+Dos cosas que salieron al comprobar, y que no eran de Cecilia:
+
+1. **No existe ninguna regla `#s-ale .ob-sound`.** A Ale los controles le quedan
+   bien de casualidad, porque cae la regla base que los manda a la esquina de la
+   pantalla. Le copié a Cecilia la regla de Niaz —que los pega al vídeo— y se le
+   montaban en la cara. Quitada: ahora usa la base, como Ale. Medido: vídeo de
+   105 a 270, botón de 319 a 361.
+2. **El hueco del subtítulo hay que medirlo, no estimarlo.** Con `box-sizing:
+   border-box` el `min-height` se come el `padding-top`, así que reservaba 16 px
+   de menos y el botón bajaba justo al terminar ella de hablar. A 16,1em el
+   botón no se mueve ni un píxel en los tres idiomas.
+3. **El tamaño del vídeo no puede ir en `vh` a secas.** Founder: *"ponla de tal
+   manera que se vea bien el vídeo completo"*. Con 36vh se veía entera pero
+   pequeña; con 46vh se salía por abajo en un iPhone de 667 y "Don't show" caía
+   bajo el pliegue; y con `flex: 1 1 auto` se ENCOGÍA, porque compite con el
+   texto. Lo que funciona es atarlo al hueco real:
+   `height: min(52vh, calc(100vh - 430px))`, donde 430 px es lo que ocupan
+   debajo el subtítulo (249, nueve líneas medidas), el botón y los dos enlaces.
+   Medido en tres pantallas, con 40 px de margen abajo en las tres y sin scroll:
+
+   | pantalla | vídeo |
+   |---|---|
+   | 375 x 667 | 133 x 237 |
+   | 390 x 844 | 233 x 414 |
+   | 393 x 852 | **237 x 422** |
+
+   Comprobado además que Ale (173x307) y Niaz 2 (300x256) siguen igual y sin
+   scroll. **Ale tiene 262 px de negro debajo**: se le puede aplicar lo mismo el
+   día que lo pidas.
 
 ## Menor / arrastrado
 
@@ -333,8 +386,12 @@ tienen que mirar es el render final.
   por caducadas, así que quien llevaba semanas silenciado la recupera.
   Probado: 7 casos de la función y 3 ciclos completos.
 
-- [ ] `teo-mariscal-v3.html`: copia del 26-may que sigue publicándose, indexable,
-  con 182 menciones a "tokens". Nadie la enlaza desde la app. No se borra sin OK.
+- [x] **`teo-mariscal-v3.html`: NO HAY NADA QUE BORRAR.** El founder dio el OK
+  para borrarla el 11-sep-2026 y al ir a hacerlo resultó que ya no existe:
+  no está en el repositorio, no la enlaza ningún fichero, y en producción
+  `https://thedogsmind.net/teo-mariscal-v3.html` devuelve **404** (medido, igual
+  que `teo-mariscal.html` y que el `sitemap.xml`). La entrada llevaba tiempo
+  siendo falsa: la página desapareció en algún deploy y nadie lo apuntó.
 - [ ] Código muerto `checkVideoTokens` (`index.html` ~12659): cadena entera
   inalcanzable; si alguien la engancha, muestra tokens en vez de créditos.
 - [ ] `payments.py:881` dice "añadir tokens" a propósito: ese endpoint de admin

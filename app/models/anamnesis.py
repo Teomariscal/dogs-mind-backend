@@ -115,6 +115,11 @@ class RetrievedChunk(BaseModel):
     source: str          # filename or document title
     page: Optional[int]
     score: float
+    # Autoria del documento. Solo la trae la RAG B (corpus cognitivo): los casos
+    # de Odette llevan su nombre en el payload desde el 11-sep-2026, para que el
+    # informe cognitivista pueda citarla. En la RAG A queda a None y no cambia
+    # nada de lo conductual.
+    author: Optional[str] = None
 
 
 class AnalysisResponse(BaseModel):

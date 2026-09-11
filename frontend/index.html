@@ -350,7 +350,8 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
    comía los botones de decidir y el usuario no podía avanzar (founder, 27-ago). */
 #s-onboarding.active ~ #global-nav, #s-onboarding.active + #global-nav,
 #s-niaz.active ~ #global-nav, #s-niaz.active + #global-nav,
-#s-ale.active ~ #global-nav, #s-ale.active + #global-nav { display:none !important; }
+#s-ale.active ~ #global-nav, #s-ale.active + #global-nav,
+#s-cecilia2.active ~ #global-nav, #s-cecilia2.active + #global-nav { display:none !important; }
 
 /* OLD SPLASH CSS REMOVED — ahora está al final del bloque <style> en versión vibrant */
 .btn-green{
@@ -9020,7 +9021,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
    usuario no los veía y parecía que la app estaba rota (founder, 27-ago).
    Ahora el vídeo se lleva algo menos de la mitad y el resto es panel, que es
    lo único que scrollea si el texto se alarga. */
-#s-onboarding.active, #s-niaz.active, #s-ale.active {
+#s-onboarding.active, #s-niaz.active, #s-ale.active, #s-cecilia2.active {
   display: flex; flex-direction: column; overflow: hidden;
 }
 .ob-wrap {
@@ -9180,6 +9181,40 @@ button:not(:disabled):active{ transform:scale(0.98); }
    abajo lo mismo que acabamos de destapar. */
 #s-ale .ob-panel { margin-top: 0; background: none; }
 #al-typed { padding-top: 16px; }
+
+/* Cecilia 2 · mismo trato que Ale, y por el mismo motivo: lleva al shih tzu en
+   el brazo y con el recorte compartido se quedaria fuera. Su video es
+   1080x1920, o sea 0,5625, igual que el de onboarding. */
+/* LO MAS GRANDE QUE CABE, y entera (founder, 11-sep-2026: "ponla de tal manera
+   que se vea bien el video completo"). Con 36vh fijos se veia entera pero
+   pequenita y con medio movil en negro; con 46vh fijos se salia por abajo en un
+   iPhone de 667 y "Don't show" caia bajo el pliegue. El limite no es el mismo en
+   un movil alto que en uno corto, asi que se ata al hueco REAL:
+   430 px es lo que ocupan debajo su subtitulo (249, nueve lineas medidas), el
+   boton y los dos enlaces. Lo que sobra, es suyo, con tope de 52vh.
+   Medido: 667 -> 237 px · 812 -> 382 px · 852 -> 422 px, y en los tres cabe
+   todo sin scroll. 'contain' garantiza que no se corte nada nunca. */
+#s-cecilia2 .ob-video {
+  flex: 0 0 auto;
+  width: auto; max-width: 100%;
+  height: min(52vh, calc(100vh - 430px));
+  max-height: 52vh;
+  margin: calc(env(safe-area-inset-top, 0px) + 4px) auto 0; display: block;
+  object-fit: contain; object-position: center center;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  background: #07100c;
+}
+#s-cecilia2 .ob-wrap { background: #07100c; }
+/* Los controles NO se pegan al video, como en Niaz: aqui ella esta centrada y
+   le caian encima de la cara. Se quedan en la esquina de la pantalla, con la
+   regla base, que es exactamente donde estan los de Ale. Medido: video de 105
+   a 270 y el boton de 319 a 361, fuera. */
+#s-cecilia2 .ob-panel { margin-top: 0; background: none; }
+/* Su guion son 446 caracteres y a 375 px ocupa 9 lineas: 233 px de texto, que
+   a 15,5 px de fuente son 15em. Se reserva ese hueco desde el primer momento
+   para que el boton no vaya bajando mientras ella habla. Medido, no estimado. */
+#ce2-typed { padding-top: 16px; min-height: 16.1em; }
 .ob-typed .ob-caret {
   display: inline-block; width: 2px; height: 1.05em; margin-left: 2px;
   background: #5ec8e6; vertical-align: -0.16em; animation: obBlink 1s steps(1) infinite;
@@ -10326,6 +10361,57 @@ button:not(:disabled):active{ transform:scale(0.98); }
       </div>
     </div>
   </div><!-- /s-ale -->
+
+  <!-- ══ CECILIA 2 · "sin fusta y con el shih tzu" ═══════════════════════════
+       Tercera pantalla de la quietud del inicio (founder, 8-sep-2026), al 34 %
+       frente al 33 % de Niaz 2 y el 33 % de Ale (founder, 11-sep-2026).
+       Su guion lo escribio el founder y va LITERAL; termina en "Entra en nueva
+       consulta y compruebalo", asi que su boton lleva justo ahi. -->
+  <div id="s-cecilia2" class="screen">
+    <div class="ob-wrap">
+      <video id="ce2-video" class="ob-video" playsinline muted preload="none"
+             data-src="aigents-cecilia2.mp4" aria-hidden="true"></video>
+      <button id="ce2-repetir" class="ob-repetir" type="button" onclick="dmCecilia2Repetir()"
+              aria-label="Repetir">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>
+        </svg>
+      </button>
+      <button id="ce2-sound" class="ob-sound" type="button" onclick="dmCecilia2Sonido()"
+              aria-label="Activar sonido">
+        <svg id="ce2-sound-off" width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M11 5 6 9H2v6h4l5 4z"/><line x1="23" y1="9" x2="17" y2="15"/>
+          <line x1="17" y1="9" x2="23" y2="15"/>
+        </svg>
+        <svg id="ce2-sound-on" width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none;">
+          <path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/>
+          <path d="M18.5 5.5a9 9 0 0 1 0 13"/>
+        </svg>
+      </button>
+
+      <div class="ob-scroll">
+        <div class="ob-panel">
+          <p class="ob-typed" id="ce2-typed"></p>
+
+          <div class="ob-choice" id="ce2-choice">
+            <button class="ob-btn ob-btn--owner" type="button" onclick="dmCecilia2Consulta()">
+              <span data-i18n="ce2_cta">Entrar en nueva consulta</span>
+            </button>
+
+            <button class="ob-link" type="button" onclick="dmCecilia2AhoraNo()"
+                    data-i18n="nz_skip">Skip intro</button>
+            <button class="ob-link" type="button"
+                    style="opacity:.62;font-size:13px;margin-top:2px"
+                    onclick="dmCecilia2NoMostrarMas()"
+                    data-i18n="nz_never">Don’t show</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /s-cecilia2 -->
 
   <!-- ══ NIAZ 2 · "Conoce a tus Aigents" ═════════════════════════════════════
        Salta sola en el inicio, un 20 % de las veces que el usuario pasa mas de
@@ -12901,6 +12987,7 @@ function goTo(id) {
   if (id === 's-onboarding' && typeof dmObArrancar === 'function') dmObArrancar();
   if (id === 's-niaz' && typeof dmNiazArrancar === 'function') dmNiazArrancar();
   if (id === 's-ale'  && typeof dmAleArrancar  === 'function') dmAleArrancar();
+  if (id === 's-cecilia2' && typeof dmCecilia2Arrancar === 'function') dmCecilia2Arrancar();
   if (id === 's-niaz2' && typeof dmN2Arrancar === 'function') dmN2Arrancar();
   /* La lista de planes y el saldo los pinta dmCargarPlanes(). Antes solo se
      llamaba desde dmAbrirPlanes(), asi que las SEIS entradas que hacian
@@ -18015,6 +18102,9 @@ function getVal(id, fallback) {
      que siempre devuelve null: "No volver a mostrar" no callaba nada y la
      pantalla seguia saliendo. Si se mueve, tiene que quedar por encima. */
   var N2_SILENCIO_KEY = 'dm_niaz2_silencio';
+  /* Misma advertencia que la de arriba: esta llave la lee QUIETUD_PANTALLAS al
+     construirse, asi que tiene que quedar POR ENCIMA de la lista. */
+  var CE2_SILENCIO_KEY = 'dm_cecilia2_silencio';
 
   /* Lo que NO puede volver a pasar: el 3-sep se puso en 2 s y, como con sesion
      la app entra directa al inicio, Niaz 2 secuestraba la pantalla antes de que
@@ -18188,6 +18278,109 @@ function getVal(id, fallback) {
     dmAleAhoraNo();
   };
 
+  /* ══ CECILIA 2 ══════════════════════════════════════════════════════════
+     Misma mecanica que Ale: video mudo (iOS no deja otra cosa sin un toque
+     previo), la voz escrita a maquina al ritmo del video, y el texto se
+     completa de golpe si se toca. Su llave de silencio esta declarada arriba,
+     junto a QUIETUD_PANTALLAS, por el izado de 'var': si se declara aqui,
+     abajo, la lista la lee como undefined y "Don't show" no calla nada. Eso
+     paso de verdad con Niaz 2 hasta el 2-sep-2026. */
+
+  var _ce2Timer = null;
+
+  /* Guion del founder, palabra por palabra, y es EXACTAMENTE el audio que se
+     renderizo en HeyGen: 73 palabras, 29,2 s de linea de tiempo. */
+  function _ce2Texto() {
+    return _i18nText('ce2_script',
+      'Estás en una app sustentada por principios científicos. Tu herramienta ' +
+      'para solucionar un problema de conducta de tu perro, enseñarle un ejercicio ' +
+      'o crear un plan de educación temprana. A veces los términos abruman, sobre ' +
+      'todo si no eres profesional; para eso estoy yo durante todo el análisis. ' +
+      'Consúltame en cualquier momento y te lo explicaré de la forma más sencilla ' +
+      'posible. Has elegido una magnífica herramienta. Entra en nueva consulta y ' +
+      'compruébalo.');
+  }
+
+  function dmCecilia2Arrancar(repeticion) {
+    var t = document.getElementById('ce2-typed');
+    var v = document.getElementById('ce2-video');
+    dmVideosSoltarSalvo('ce2-video'); dmVideoCargar(v);
+    if (!t) return;
+    if (_ce2Timer) { clearInterval(_ce2Timer); _ce2Timer = null; }
+
+    var texto = _ce2Texto();
+    t.textContent = '';
+    var caret = document.createElement('span');
+    caret.className = 'ob-caret';
+    t.appendChild(caret);
+
+    function escribir() {
+      if (_ce2Timer) { clearInterval(_ce2Timer); _ce2Timer = null; }
+      /* 29,87 s es lo que dura su fichero. Sirve de respaldo si el metadato
+         todavia no ha cargado, para que el texto no se adelante ni se retrase. */
+      var dur = (v && v.duration && isFinite(v.duration) && v.duration > 2) ? v.duration : 29.87;
+      var paso = Math.max(16, (dur * 930) / texto.length);
+      var i = 0;
+      _ce2Timer = setInterval(function () {
+        i++;
+        t.textContent = texto.slice(0, i);
+        t.appendChild(caret);
+        if (i >= texto.length) { clearInterval(_ce2Timer); _ce2Timer = null; }
+      }, paso);
+    }
+
+    if (v) {
+      clearTimeout(v._esperaTexto);
+      v._ce2Sonar = function () { clearTimeout(v._esperaTexto); escribir(); };
+      v.addEventListener('playing', v._ce2Sonar, { once: true });
+      /* Red de seguridad: si el video no llega a reproducirse, el texto sale
+         igual a los 3 s. Nunca una pantalla muda y en blanco. */
+      v._esperaTexto = setTimeout(escribir, 3000);
+      try { v.currentTime = 0; if (!repeticion) v.muted = true; v.play().catch(function(){}); } catch (e) {}
+    } else {
+      escribir();
+    }
+
+    t.onclick = function () {
+      if (_ce2Timer) { clearInterval(_ce2Timer); _ce2Timer = null; }
+      t.textContent = texto;
+    };
+  }
+  window.dmCecilia2Arrancar = dmCecilia2Arrancar;
+
+  function _ce2Parar() {
+    if (_ce2Timer) { clearInterval(_ce2Timer); _ce2Timer = null; }
+    var v = document.getElementById('ce2-video');
+    clearTimeout(v && v._esperaTexto);
+    dmVideoSoltar(v);
+  }
+
+  window.dmCecilia2Sonido = function () {
+    var v = document.getElementById('ce2-video');
+    if (!v) return;
+    v.muted = !v.muted;
+    var off = document.getElementById('ce2-sound-off');
+    var on  = document.getElementById('ce2-sound-on');
+    if (off) off.style.display = v.muted ? '' : 'none';
+    if (on)  on.style.display  = v.muted ? 'none' : '';
+    if (!v.muted) dmCecilia2Repetir();
+  };
+  window.dmCecilia2Repetir = function () {
+    var v = document.getElementById('ce2-video');
+    if (v) { try { v.currentTime = 0; v.play().catch(function(){}); } catch (e) {} }
+    dmCecilia2Arrancar(true);
+  };
+
+  /* "Entra en nueva consulta y compruebalo": su boton lleva justo ahi. Es el
+     nucleo de la app y es lo que ella acaba de decir en voz alta. */
+  window.dmCecilia2Consulta = function () { _ce2Parar(); goTo('s-anamnesis'); };
+
+  window.dmCecilia2AhoraNo = function () { _ce2Parar(); goTo('s-home'); };
+  window.dmCecilia2NoMostrarMas = function () {
+    quietudCallar(CE2_SILENCIO_KEY);
+    dmCecilia2AhoraNo();
+  };
+
   /* Se llama al llegar al inicio. Espera un segundo y sortea. */
   /* ══ QUIETUD EN EL INICIO ════════════════════════════════════════════════
      Si el usuario pasa MÁS DE DOS SEGUNDOS en el inicio sin tocar nada, se
@@ -18202,7 +18395,10 @@ function getVal(id, fallback) {
   /* Ale y Niaz 2 a la mitad cada uno, "de momento" (founder, 6-sep-2026):
      provisional, mientras se ve como funciona Ale. Sustituye al 10/90 del
      5-sep. El sorteo reparte por tramos, asi que la suma debe dar 1.00. */
-  var AL_PROB_QUIETUD = 0.50;
+  /* A TRES desde el 11-sep-2026, con el video de Cecilia ya en su sitio
+     (founder: "34 % de las veces sale Cecilia, 33 % Niaz, 33 % Ale").
+     Sustituye al 50/50 del 6-sep. Los tramos suman 1.00. */
+  var AL_PROB_QUIETUD = 0.33;
   /* Ale no se asoma hasta que exista su vídeo. Hoy no lo hay: el original de
      su imagen tiene 300 px y HeyGen le inventaba la cara. Su pantalla está
      construida y probada; se enciende poniendo esto en true el día que
@@ -18229,7 +18425,8 @@ function getVal(id, fallback) {
      quietud entera sea una tirada: estuvo al 20 % y en la practica no salia
      nunca. Quien no la quiera ver tiene "No volver a mostrar", que desde el
      3-sep si funciona. */
-  var N2_PROB_QUIETUD = 0.50;
+  var N2_PROB_QUIETUD = 0.33;
+  var CE2_PROB_QUIETUD = 0.34;
   /* Pantallas que pueden asomarse en el inicio tras un rato de quietud
      (4 s siempre — ver _quietudEspera).
      Anadir una nueva es meter su linea aqui. La suma de 'prob' es la
@@ -18237,8 +18434,9 @@ function getVal(id, fallback) {
   var QUIETUD_PANTALLAS = [
     /* Se reparte por TRAMOS acumulados, asi que el ORDEN importa y la suma debe
        dar 1.00: Ale se lleva el primer 10 % y Niaz 2 el 90 % restante. */
-    { pantalla: 's-ale',   prob: AL_PROB_QUIETUD, llave: AL_SILENCIO_KEY },
-    { pantalla: 's-niaz2', prob: N2_PROB_QUIETUD, llave: N2_SILENCIO_KEY }
+    { pantalla: 's-ale',      prob: AL_PROB_QUIETUD,  llave: AL_SILENCIO_KEY },
+    { pantalla: 's-niaz2',    prob: N2_PROB_QUIETUD,  llave: N2_SILENCIO_KEY },
+    { pantalla: 's-cecilia2', prob: CE2_PROB_QUIETUD, llave: CE2_SILENCIO_KEY }
     /* Siguiente video: anadir aqui, y recolocar las probabilidades. */
   ];
 
@@ -23172,6 +23370,8 @@ function endTourIntro() {
       n2_cta:                  'Conoce a Los Aigents',
       n2_script:               'Uy, perdona, me estaba reseteando. Hola, soy Niaz, tu Aigent de lujo y lifestyle canino. Y estoy aqu\u00ed para ayudarte con peluquer\u00eda, hoteles, productos premium, restaurantes y viajes. Solo lo mejor para tu perro.',
       al_script:               'Hola, soy Ale, la Aigent con más buena onda. ¿Has probado la feature de paseos? Estés donde estés puedo trazar tres rutas para pasear con tu perro, dando prioridad a las zonas verdes, lugares sin excesiva acumulación de gente o tráfico, incluso, y dependiendo de la hora del día, elegir rutas con más sombra y más seguras y agradables para tu perro. Ponme a prueba y pulsa aquí.',
+      ce2_script:              'Estás en una app sustentada por principios científicos. Tu herramienta para solucionar un problema de conducta de tu perro, enseñarle un ejercicio o crear un plan de educación temprana. A veces los términos abruman, sobre todo si no eres profesional; para eso estoy yo durante todo el análisis. Consúltame en cualquier momento y te lo explicaré de la forma más sencilla posible. Has elegido una magnífica herramienta. Entra en nueva consulta y compruébalo.',
+      ce2_cta:                 'Entrar en nueva consulta',
       al_cta:                  'Buscar rutas con mi perro',
       al_cta2:                 'Problema de comportamiento',
       aw_title:                 'Welcome a The Dogs’ Mind',
@@ -24378,6 +24578,8 @@ function endTourIntro() {
       n2_cta:                  'Meet the Aigents',
       n2_script:               'Oops, sorry, I was rebooting. Hi, I\u2019m Niaz, your luxury and canine lifestyle Aigent. And I\u2019m here to help you with grooming, hotels, premium products, restaurants and travel. Only the best for your dog.',
       al_script:               'Hi, I am Ale, the easy-going Aigent. Have you tried the walks feature? Wherever you are I can map out three routes to walk your dog, giving priority to green areas and places without too many people or traffic, and, depending on the time of day, choose routes with more shade that are safer and more pleasant for your dog. Put me to the test and tap here.',
+      ce2_script:              'You are in an app grounded in scientific principles. Your tool for solving a behaviour problem in your dog, teaching them an exercise or building an early education plan. Sometimes the terms are overwhelming, above all if you are not a professional; that is what I am here for, right through the analysis. Ask me at any point and I will explain it in the simplest way I can. You have chosen a magnificent tool. Go into a new consultation and see for yourself.',
+      ce2_cta:                 'Start a new consultation',
       al_cta:                  'Find routes with my dog',
       al_cta2:                 'Behaviour problem',
       aw_title:                 'Welcome to The Dogs’ Mind',
@@ -25579,6 +25781,8 @@ function endTourIntro() {
           n2_cta:                  'Conosci gli Aigents',
           n2_script:               'Ops, scusa, mi stavo riavviando. Ciao, sono Niaz, la tua Aigent di lusso e lifestyle canino. E sono qui per aiutarti con toelettatura, hotel, prodotti premium, ristoranti e viaggi. Solo il meglio per il tuo cane.',
           al_script:               'Ciao, sono Ale, l’Aigent più alla mano. Hai provato la feature delle passeggiate? Ovunque tu sia posso tracciare tre percorsi per passeggiare con il tuo cane, dando priorità alle zone verdi, ai luoghi senza troppa gente o traffico e, a seconda dell’ora del giorno, scegliere percorsi più ombreggiati, più sicuri e più piacevoli per il tuo cane. Mettimi alla prova e premi qui.',
+          ce2_script:              'Sei in un’app fondata su principi scientifici. Il tuo strumento per risolvere un problema di comportamento del tuo cane, insegnargli un esercizio o creare un piano di educazione precoce. A volte i termini sovrastano, soprattutto se non sei un professionista; per questo ci sono io durante tutta l’analisi. Chiedimi in qualsiasi momento e te lo spiegherò nel modo più semplice possibile. Hai scelto uno strumento magnifico. Entra in nuovo consulto e verificalo.',
+          ce2_cta:                 'Entra in nuovo consulto',
           al_cta:                  'Cerca percorsi con il mio cane',
           al_cta2:                 'Problema di comportamento',
           aw_title:                 'Welcome in The Dogs’ Mind',

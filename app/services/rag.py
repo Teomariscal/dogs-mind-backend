@@ -99,6 +99,10 @@ def retrieve_cognitive(query: str, top_k: Optional[int] = None) -> list[Retrieve
             source=payload.get("filename", "unknown"),
             page=payload.get("page_start"),
             score=round(hit.score, 4),
+            # Solo la RAG B trae autoria. Los 9 casos de Odette la llevan en el
+            # payload; el resto del corpus (Marchesini, papers, libros) no, y
+            # sale sin firma en vez de atribuirse a nadie.
+            author=payload.get("author"),
         )
 
     core = [_to_chunk(h) for h in pool if _is_core_cognitive((h.payload or {}).get("filename", ""))]
@@ -132,6 +136,11 @@ def build_rag_context_block(chunks: list[RetrievedChunk]) -> str:
     lines = ["<retrieved_knowledge>"]
     for i, chunk in enumerate(chunks, start=1):
         source_info = chunk.source
+        # La autoria, cuando la hay, va DELANTE del nombre del fichero: lo que
+        # el veterinario italiano tiene que leer es "Dott.ssa Odette Abramovich
+        # Terol", no un nombre de PDF. Solo la traen los casos de la RAG B.
+        if getattr(chunk, "author", None):
+            source_info = f"{chunk.author} — {source_info}"
         if chunk.page is not None:
             source_info += f", p. {chunk.page}"
         lines.append(f"[{i}] Source: {source_info}")

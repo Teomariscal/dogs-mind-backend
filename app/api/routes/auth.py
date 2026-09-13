@@ -14,6 +14,7 @@ from pydantic import BaseModel, EmailStr
 from app.database import get_db
 from app.models.user import User
 from app.models.delegation import Delegation
+from app.models.invite import Invite
 from app.models.usage_log import UsageLog
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -207,6 +208,24 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(user)
 
+    # ── Códigos de INVITACIÓN, ya con la cuenta creada ───────────────────────
+    # Viven en otra tabla (`invites`) y hasta el 13-sep-2026 el registro NO los
+    # miraba: solo se canjeaban desde dentro de la app, con sesión abierta. Pero
+    # el campo del formulario se llama "Código de invitación Profesional", así
+    # que todo el mundo los mete AQUÍ. Una clienta de Odette se quedó fuera por
+    # esto. Va después del commit porque el canje necesita una cuenta viva a la
+    # que abonarle el plan, y falla en silencio a propósito: si el código está
+    # gastado o caducado, la cuenta se crea igual y el usuario ya lo reintenta
+    # desde dentro. Registrarse nunca se rompe por un código.
+    if invite_clean and delegation_obj is None:
+        try:
+            from app.api.routes.invites import canjear_codigo
+            if canjear_codigo(invite_clean, user, db) is not None:
+                db.refresh(user)
+        except Exception:
+            db.rollback()
+            db.refresh(user)
+
     return AuthResponse(
         token=create_token(str(user.id)),
         user_id=str(user.id),
@@ -291,6 +310,24 @@ def validate_invite(
             label=delegation.name or delegation.code,
             tokens=DEFAULT_TOKENS + int(delegation.welcome_bonus_tokens or 0),
         )
+
+    # Codigos de INVITACION (tabla `invites`): los de equipo, los de invitado y
+    # los profesionales. Hasta el 13-sep-2026 este endpoint NO los miraba, asi
+    # que el formulario de registro decia "no valido" a un codigo perfectamente
+    # vivo. Paso de verdad: una clienta de Odette metio ODETTEINV-FH928Z en el
+    # registro —donde el campo se llama "Codigo de invitacion Profesional"— y se
+    # quedo fuera. Se normaliza a mayusculas igual que en el canje.
+    inv = db.query(Invite).filter(Invite.code == code.upper()).first()
+    if inv is not None and getattr(inv, "activo", True):
+        caducado = bool(inv.expires_at and datetime.utcnow() > inv.expires_at)
+        gastado = bool((inv.tipo or "") != "abierto" and inv.used_by_id)
+        if not caducado and not gastado:
+            return ValidateInviteResponse(
+                valid=True,
+                type="invite",
+                label=(inv.note or inv.code),
+                tokens=None,
+            )
 
     # Ambassador después
     if AMBASSADOR_CODE and code == AMBASSADOR_CODE:

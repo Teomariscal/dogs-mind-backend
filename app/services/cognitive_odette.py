@@ -22,6 +22,7 @@ Si la vía cognitivista no consigue una salida utilizable, NUNCA se degrada a la
 conductual (founder, 2026-07-08): antes un error y la devolución del cobro.
 """
 import logging
+import time
 import re
 from typing import Optional
 
@@ -171,8 +172,17 @@ def redactar_relazione(
     if not texto_anamnesi.strip():
         raise CognitiveReexpressionError("Anamnesi vacía.")
 
+    # Cuánto tarda esto NO se puede seguir deduciendo. El 12-sep-2026 el
+    # founder se quedó mirando una pantalla de espera sin saber si seguía viva,
+    # y el log de uvicorn no sirve: con StreamingResponse la línea 200 OK se
+    # escribe cuando ARRANCAN los latidos (20 s), no cuando termina el trabajo.
+    # Estos tiempos son la única medida real de las dos pasadas.
+    _t0 = time.monotonic()
+
     # ── PASADA 1 — el arnés ABA, oculto ─────────────────────────────────
     analisis = _pasada_1_aba(texto_anamnesi)
+    _log.info("[cognitiva] pasada 1 (ABA oculto): %.1f s · %d caracteres",
+              time.monotonic() - _t0, len(analisis))
 
     # ── Corpus cognitivista (RAG B). Si cae, se sigue: el prompt lleva el
     #    glosario esencial embebido.
@@ -204,6 +214,7 @@ def redactar_relazione(
     restos: list = []
 
     for _ in range(INTENTOS):  # _ = numero de intento, se usa en los avisos
+        _t_int = time.monotonic()
         mensaje = base
         if restos:
             mensaje += ("\n\nATTENZIONE — il tentativo precedente conteneva termini "
@@ -234,15 +245,19 @@ def redactar_relazione(
             continue
 
         restos = find_blacklisted(salida)
+        _log.info("[cognitiva] pasada 2, intento %d: %.1f s · %d caracteres · restos=%s",
+                  _ + 1, time.monotonic() - _t_int, len(salida),
+                  ", ".join(restos) if restos else "ninguno")
         if not restos:
+            _log.info("[cognitiva] TOTAL %.1f s", time.monotonic() - _t0)
             return salida, tipo, analisis
 
         if mejor is None or len(restos) < len(mejor_restos):
             mejor, mejor_restos = salida, restos
 
     if mejor is not None:
-        _log.warning("Informe cognitivista entregado con restos conductuales: %s",
-                     ", ".join(mejor_restos))
+        _log.warning("Informe cognitivista entregado con restos conductuales: %s "
+                     "(TOTAL %.1f s)", ", ".join(mejor_restos), time.monotonic() - _t0)
         return mejor, tipo, analisis
 
     raise CognitiveReexpressionError(

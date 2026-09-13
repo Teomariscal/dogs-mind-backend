@@ -9205,6 +9205,19 @@ button:not(:disabled):active{ transform:scale(0.98); }
   box-shadow: 0 10px 30px rgba(0,0,0,0.45);
   background: #07100c;
 }
+/* El anillo de la pantalla de espera cognitivista. Gira: es la senal de vida
+   que faltaba (founder, 12-sep-2026: "da la sensacion de no estar haciendo
+   nada"). Se respeta a quien pide menos movimiento en el sistema. */
+.czr-anello {
+  width: 46px; height: 46px; margin: 0 auto; border-radius: 50%;
+  border: 3px solid rgba(94,200,230,0.22); border-top-color: #5ec8e6;
+  animation: czr-gira 0.9s linear infinite;
+}
+@keyframes czr-gira { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .czr-anello { animation-duration: 2.6s; }
+}
+
 #s-cecilia2 .ob-wrap { background: #07100c; }
 /* Los controles NO se pegan al video, como en Niaz: aqui ella esta centrada y
    le caian encima de la cara. Se quedan en la esquina de la pantalla, con la
@@ -11256,6 +11269,40 @@ button:not(:disabled):active{ transform:scale(0.98); }
       <div id="cz-relazione" style="margin-top:26px;white-space:pre-wrap;font-size:14px;line-height:1.7;"></div>
     </div>
   </div>
+
+  <!-- Pantalla propia para la espera y para la relazione. Founder, 12-sep-2026:
+       "deberia llevarnos a una pagina que diga lo que dice abajo pero que te
+       saque de anamnesis, porque da la sensacion de no estar haciendo nada".
+       El aviso vivia al pie del formulario, debajo del pliegue, y el usuario se
+       quedaba mirando sus propias respuestas sin senal de vida.
+       OJO: es la SEGUNDA pantalla del canal estanco. Las tres guardas de goTo
+       y applyLang miran la lista _CZ_PANTALLAS, no un id suelto: si se anade
+       una tercera, se anade ahi y en ningun otro sitio. -->
+  <div id="s-relazione-cz" class="screen" style="overflow-y:auto;">
+    <div style="padding:20px 20px 40px;max-width:640px;margin:0 auto;">
+
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
+        <button onclick="dmCZVolver()" aria-label="Indietro" style="width:42px;height:42px;border-radius:50%;border:none;background:rgba(255,255,255,0.08);color:inherit;font-size:20px;cursor:pointer;font-family:inherit;">&#8592;</button>
+        <div>
+          <p style="margin:0;font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.6;">Analisi Cognitivista</p>
+          <h1 style="margin:2px 0 0;font-size:20px;font-weight:700;">Relazione</h1>
+        </div>
+      </div>
+
+      <!-- Estado de trabajo: se oculta en cuanto llega la relazione. -->
+      <div id="czr-lavoro" style="text-align:center;padding:34px 10px;">
+        <div class="czr-anello" aria-hidden="true"></div>
+        <p style="margin:22px 0 0;font-size:15px;font-weight:600;">Sto redigendo la relazione</p>
+        <p id="czr-paso" style="margin:8px 0 0;font-size:13.5px;line-height:1.6;opacity:.8;"></p>
+        <p id="czr-tempo" style="margin:14px 0 0;font-size:12.5px;opacity:.55;font-variant-numeric:tabular-nums;"></p>
+        <p style="margin:20px auto 0;max-width:24em;font-size:12.5px;line-height:1.6;opacity:.6;">Non chiudere l'app. Il lavoro continua anche se blocchi lo schermo.</p>
+      </div>
+
+      <div id="czr-errore" style="display:none;margin-top:10px;padding:16px 18px;border-radius:14px;background:rgba(255,120,100,0.10);border:1px solid rgba(255,120,100,0.30);font-size:13.5px;line-height:1.6;"></div>
+
+      <div id="czr-testo" style="white-space:pre-wrap;font-size:14px;line-height:1.7;"></div>
+    </div>
+  </div>
   <!-- == FIN VIA COGNITIVISTA == -->
 
   <!-- s-records: Behavioral Records -->
@@ -12939,6 +12986,13 @@ function dmLoadingSteps(mode, dogName) {
   }, 12000);
 }
 
+/* Las pantallas del CANAL ESTANCO cognitivista. Vive aqui arriba, fuera de
+   cualquier bloque, porque goTo() la consulta en cada navegacion y si llegara
+   undefined se rompe la app entera. Anadir una pantalla cognitivista es
+   anadirla A ESTA LISTA: las tres guardas (entrar, salir y cambiar de idioma)
+   leen de aqui y de ningun otro sitio. */
+window._CZ_PANTALLAS = ['s-anamnesi-cognitiva', 's-relazione-cz'];
+
 function goTo(id) {
   // Deep-link del campus: si hay un ejercicio pendiente (?ej=) y sesión iniciada,
   // la 1ª vez que iríamos a Home redirigimos a la ficha de Entrenamiento Específico.
@@ -12968,14 +13022,20 @@ function goTo(id) {
      CIERRA el canal: la via vuelve a conductual y hay que volver a entrar a
      proposito pulsando "Analisi Cognitivista". Nadie se queda en cognitivista
      paseando por el resto de la app. */
+  /* El canal son DOS pantallas desde el 12-sep-2026: el formulario y la
+     relazione. Moverse ENTRE ellas no cierra nada; salir de las dos, si.
+     Antes era un id suelto y al llevar al usuario a la pantalla de espera el
+     canal se habria cerrado en mitad del trabajo, devolviendolo a conductual
+     con la peticion cognitivista todavia en vuelo. */
   try {
     var _act_prev = document.querySelector('.screen.active');
-    if (_act_prev && _act_prev.id === 's-anamnesi-cognitiva' && id !== 's-anamnesi-cognitiva') {
+    if (_act_prev && window._CZ_PANTALLAS.indexOf(_act_prev.id) >= 0
+        && window._CZ_PANTALLAS.indexOf(id) < 0) {
       window._tdmStance = 'behavioral';
       if (typeof window.dmSellosRefrescar === 'function') window.dmSellosRefrescar();
     }
   } catch (e) {}
-  if (id === 's-anamnesi-cognitiva') {
+  if (window._CZ_PANTALLAS.indexOf(id) >= 0) {
     var _cz_lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
     if (_cz_lang !== 'it' || window._tdmStance !== 'cognitive') {
       id = 's-anamnesis';
@@ -26584,7 +26644,7 @@ function endTourIntro() {
        reevaluar. (detector en vivo, 6-sep-2026) */
     try {
       var _act = document.querySelector('.screen.active');
-      if (_act && _act.id === 's-anamnesi-cognitiva' && lang !== 'it') {
+      if (_act && window._CZ_PANTALLAS.indexOf(_act.id) >= 0 && lang !== 'it') {
         window._tdmStance = 'behavioral';
         goTo('s-anamnesis');
       }
@@ -27695,8 +27755,46 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
       return;
     }
     boton.disabled = true;
-    estado.textContent = 'Redazione della relazione in corso. Può richiedere un minuto…';
+    estado.textContent = '';
     salida.textContent = '';
+
+    /* Fuera de la anamnesis: el usuario deja de mirar sus propias respuestas y
+       ve que la app esta trabajando. La pantalla es del canal, asi que goTo NO
+       cierra la via (ver window._CZ_PANTALLAS). */
+    var lavoro = document.getElementById('czr-lavoro');
+    var errore = document.getElementById('czr-errore');
+    var testo  = document.getElementById('czr-testo');
+    var paso   = document.getElementById('czr-paso');
+    var tempo  = document.getElementById('czr-tempo');
+    lavoro.style.display = '';
+    errore.style.display = 'none';
+    errore.textContent = '';
+    testo.textContent = '';
+    goTo('s-relazione-cz');
+
+    /* Dos pasadas largas: el analisis clinico y luego la relazione. Los pasos
+       van por reloj porque el servidor manda espacios, no eventos; sirven para
+       que se vea movimiento, y el cronometro para que nadie tenga que adivinar
+       si sigue vivo. */
+    var t0 = Date.now();
+    var PASOS = [
+      [0,   'Lettura dell’anamnesi e inquadramento del caso.'],
+      [45,  'Analisi clinica del caso.'],
+      [120, 'Consultazione del corpus cognitivo-zooantropologico.'],
+      [210, 'Stesura della relazione secondo la struttura di Odette.'],
+      [420, 'Revisione del lessico e chiusura della relazione.']
+    ];
+    function tic() {
+      var s = Math.floor((Date.now() - t0) / 1000);
+      var m = Math.floor(s / 60);
+      tempo.textContent = m > 0 ? (m + ' min ' + (s % 60) + ' s') : (s + ' s');
+      var txt = PASOS[0][1];
+      for (var i = 0; i < PASOS.length; i++) { if (s >= PASOS[i][0]) txt = PASOS[i][1]; }
+      paso.textContent = txt;
+    }
+    tic();
+    var reloj = setInterval(tic, 1000);
+
     try {
       var r = await fetch(API_URL + '/analysis/cognitiva', {
         method: 'POST',
@@ -27704,18 +27802,36 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
                    'Authorization': 'Bearer ' + (localStorage.getItem('dm_jwt') || '') },
         body: JSON.stringify(d)
       });
-      var j = await r.json();
+      var crudo = await r.text();
+      var j = null;
+      try { j = JSON.parse(crudo); } catch (eParse) {
+        /* Con latidos la respuesta empieza por espacios y termina en JSON. Si
+           ni asi parsea, el cuerpo llego cortado: se dice, en vez de dejar la
+           pantalla en blanco sin explicacion. */
+        throw new Error('Risposta incompleta dal server (' + crudo.length + ' byte). Il lavoro potrebbe essersi completato: riprova tra poco, non verra addebitato due volte.');
+      }
       if (!r.ok) throw new Error(j && j.detail ? j.detail : ('errore ' + r.status));
+      if (j && j.detail && !j.relazione) throw new Error(j.detail);
+      if (!j || !j.relazione) throw new Error('Il server ha risposto senza relazione.');
       /* `fatti` viaja en la respuesta para poder auditarla desde fuera, pero
          NO se pinta nunca: es el analisis oculto. */
-      salida.textContent = j.relazione || '';
-      estado.textContent = '';
+      lavoro.style.display = 'none';
+      testo.textContent = j.relazione;
+      salida.textContent = j.relazione;   /* la anamnesis la conserva al volver */
     } catch (e) {
-      estado.textContent = String(e.message || e);
+      lavoro.style.display = 'none';
+      errore.style.display = '';
+      errore.textContent = String(e.message || e);
     } finally {
+      clearInterval(reloj);
       boton.disabled = false;
     }
   };
+
+  /* Volver deja la relazione donde esta: se sale al inicio, no a la anamnesis,
+     porque el formulario ya se ha enviado. Y al salir de las dos pantallas del
+     canal, goTo cierra la via cognitivista, que es lo que debe pasar. */
+  window.dmCZVolver = function () { goTo('s-home'); };
 })();
 </script>
 <!-- == FIN VIA COGNITIVISTA == -->

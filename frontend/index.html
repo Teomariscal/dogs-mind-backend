@@ -6443,6 +6443,34 @@ button:not(:disabled):active{ transform:scale(0.98); }
     linear-gradient(180deg, #0a1a14 0%, #122a23 28%, #1a3b34 55%, #2e4a3a 80%, #4a6741 100%);
 }
 #s-training-result.active { display: block; }
+/* Tablas, avisos y divisorias del Markdown. No existian porque hasta el
+   14-sep-2026 el renderizador no los generaba: salian en crudo. Se definen
+   para .tr-content, que es el envoltorio que comparten el plan conductual y la
+   relazione cognitivista. La tabla va en una caja con scroll propio: el diario
+   di bordo tiene seis columnas y en un movil no cabe de otra forma. */
+.md-tabla-caja { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 12px 0 16px;
+  max-width: 100%; width: 100%; }
+/* Sin esto la tabla empuja al contenedor y la pantalla entera se va a la
+   derecha: el titulo sale cortado. Lo unico que puede desplazarse en
+   horizontal es la caja de la tabla, nunca la pantalla. */
+.tr-content { min-width: 0; max-width: 100%; overflow-wrap: break-word; }
+.md-tabla { border-collapse: collapse; width: 100%; font-size: 13px; }
+.md-tabla th, .md-tabla td {
+  border: 1px solid rgba(94,200,230,0.22);
+  padding: 7px 10px; text-align: left; vertical-align: top;
+}
+.md-tabla th { background: rgba(94,200,230,0.10); font-weight: 700; white-space: nowrap; }
+.md-aviso {
+  margin: 14px 0; padding: 12px 16px;
+  border-left: 3px solid #5ec8e6; border-radius: 0 12px 12px 0;
+  background: rgba(94,200,230,0.08);
+}
+.md-aviso p { margin: 6px 0; }
+.md-aviso p:first-child { margin-top: 0; }
+.md-aviso p:last-child { margin-bottom: 0; }
+.md-hr { border: none; border-top: 1px solid rgba(243,241,234,0.16); margin: 20px 0; }
+.tr-content h1 { font-family: var(--ff-serif); font-size: 22px; font-weight: 700; margin: 6px 0 10px; line-height: 1.25; }
+
 .tr-content {
   padding: 0 22px 24px;
   font-family: 'Jost', sans-serif;
@@ -11265,16 +11293,16 @@ button:not(:disabled):active{ transform:scale(0.98); }
        OJO: es la SEGUNDA pantalla del canal estanco. Las tres guardas de goTo
        y applyLang miran la lista _CZ_PANTALLAS, no un id suelto: si se anade
        una tercera, se anade ahi y en ningun otro sitio. -->
-  <div id="s-relazione-cz" class="screen" style="overflow-y:auto;">
-    <div style="padding:20px 20px 40px;max-width:640px;margin:0 auto;">
+  <div id="s-relazione-cz" class="screen" style="overflow-y:auto;overflow-x:hidden;">
+    <div style="padding:20px 20px 40px;max-width:640px;width:100%;box-sizing:border-box;margin:0 auto;">
 
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
-        <button onclick="dmCZVolver()" aria-label="Indietro" style="width:42px;height:42px;border-radius:50%;border:none;background:rgba(255,255,255,0.08);color:inherit;font-size:20px;cursor:pointer;font-family:inherit;">&#8592;</button>
-        <div>
-          <p style="margin:0;font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.6;">Analisi Cognitivista</p>
-          <h1 style="margin:2px 0 0;font-size:20px;font-weight:700;">Relazione</h1>
+      <header class="tc-header">
+        <button class="tc-back" onclick="dmCZVolver()" aria-label="Indietro">&#8592;</button>
+        <div class="tc-header-text">
+          <p class="tc-eyebrow">Analisi Cognitivista</p>
+          <h1 class="tc-title" id="czr-titolo">Relazione</h1>
         </div>
-      </div>
+      </header>
 
       <!-- Estado de trabajo. MISMO aspecto que la espera de los demas analisis
            (s-loading-analysis): spinner arriba, cinco pasos que se van marcando
@@ -11300,7 +11328,18 @@ button:not(:disabled):active{ transform:scale(0.98); }
 
       <div id="czr-errore" style="display:none;margin-top:10px;padding:16px 18px;border-radius:14px;background:rgba(255,120,100,0.10);border:1px solid rgba(255,120,100,0.30);font-size:13.5px;line-height:1.6;"></div>
 
-      <div id="czr-testo" style="white-space:pre-wrap;font-size:14px;line-height:1.7;"></div>
+      <!-- MISMO envoltorio que el plan conductual (`tr-content` + `tr-actions`):
+           cero CSS nuevo y el mismo lenguaje visual. Founder, 14-sep-2026:
+           "debe tener un diseño y UI similar al resto de planes de intervencion
+           conductuales". Y se pinta con _mdToHtml, NUNCA en crudo: el Markdown
+           no puede salir a pantalla. -->
+      <article id="czr-testo" class="tr-content"></article>
+
+      <div class="tr-actions" id="czr-azioni" style="display:none;flex-direction:column;gap:10px;">
+        <button id="czr-salva" class="tc-submit-btn" onclick="dmCZSalvare()">Salva il caso</button>
+        <button class="tc-submit-btn" onclick="dmCZVolver()"
+                style="background:transparent;color:var(--cyan, #5ec8e6);border:1.5px solid rgba(94,200,230,0.5);">Torna all'inizio</button>
+      </div>
     </div>
   </div>
   <!-- == FIN VIA COGNITIVISTA == -->
@@ -17339,7 +17378,13 @@ function getVal(id, fallback) {
             // (paleta vibrant Pro). Behavior/legacy: olivo (igual que antes, cero
             // regresión visual para clínicos). Se prioriza tipo de caso: training
             // muestra "Adiestramiento" en vez de "ABC Análisis".
-            (r.case_type === 'training'
+            (r.case_type === 'cognitiva'
+              /* Un caso cognitivista NO puede salir etiquetado "ABC Análisis":
+                 es exactamente el marco que esa vía no usa, y el detector en
+                 vivo lo cazó en s-records el 14-sep-2026. Etiqueta propia, y
+                 en italiano porque el caso es italiano por definición. */
+              ? '<span style="font-size:10px;background:rgba(94,200,230,0.12);color:#2a6f88;padding:3px 8px;border-radius:6px;font-weight:600;">Relazione Cognitivista</span>'
+              : r.case_type === 'training'
               ? '<span style="font-size:10px;background:rgba(94,200,230,0.12);color:#2a6f88;padding:3px 8px;border-radius:6px;font-weight:600;">' + _i18nText('rec_tag_training','Adiestramiento') + '</span>'
               : r.case_type === 'puppy'
               ? '<span style="font-size:10px;background:rgba(94,200,230,0.12);color:#2a6f88;padding:3px 8px;border-radius:6px;font-weight:600;">' + _i18nText('rec_tag_puppy','Escuela Cachorros') + '</span>'
@@ -21932,10 +21977,63 @@ window._mdToHtml = function(md) {
   function closeList(){
     if (inList) { out.push('</' + listType + '>'); inList = false; listType = null; }
   }
+  /* AÑADIDO 14-sep-2026 — REGLA DURA: el Markdown no puede salir a pantalla.
+     Faltaban cuatro cosas que el motor SÍ genera y que se veían en crudo: el
+     titulo de primer nivel, las TABLAS (el inquadramento y el diario di bordo
+     de la relazione cognitivista son tablas), las CITAS (el recuadro de
+     ATENCIÓN MÉDICA) y las lineas divisorias. Es additivo: lo que ya se
+     renderizaba bien se renderiza igual. */
+  function esSeparadorTabla(s) { return /^\s*\|?[\s:|-]*-[\s:|-]*\|?\s*$/.test(s) && s.indexOf('-') >= 0; }
+  function celdas(s) {
+    var c = s.trim().replace(/^\|/, '').replace(/\|$/, '').split('|');
+    return c.map(function (x) { return x.trim(); });
+  }
+
   for (var i = 0; i < lines.length; i++) {
     var ln = lines[i];
-    // Headings (h2, h3)
-    var mH = ln.match(/^(#{2,3})\s+(.*)$/);
+
+    // TABLA: cabecera + separador + filas.
+    if (ln.trim().indexOf('|') >= 0 && i + 1 < lines.length && esSeparadorTabla(lines[i + 1])) {
+      closeList();
+      var cab = celdas(ln);
+      var filas = [];
+      var k = i + 2;
+      while (k < lines.length && lines[k].trim().indexOf('|') >= 0) { filas.push(celdas(lines[k])); k++; }
+      var tb = '<table class="md-tabla"><thead><tr>';
+      for (var c1 = 0; c1 < cab.length; c1++) tb += '<th>' + cab[c1] + '</th>';
+      tb += '</tr></thead><tbody>';
+      for (var f = 0; f < filas.length; f++) {
+        tb += '<tr>';
+        for (var c2 = 0; c2 < cab.length; c2++) tb += '<td>' + (filas[f][c2] || '') + '</td>';
+        tb += '</tr>';
+      }
+      tb += '</tbody></table>';
+      out.push('<div class="md-tabla-caja">' + tb + '</div>');
+      i = k - 1;
+      continue;
+    }
+
+    // CITA: el recuadro de aviso. Ojo, el '>' ya viene escapado a &gt;.
+    if (/^\s*&gt;/.test(ln)) {
+      closeList();
+      var cita = [];
+      while (i < lines.length && (/^\s*&gt;/.test(lines[i]) || (cita.length && !lines[i].trim()))) {
+        if (!lines[i].trim()) { i++; continue; }
+        cita.push(lines[i].replace(/^\s*&gt;\s?/, ''));
+        i++;
+      }
+      i--;
+      var dentro = cita.filter(function (x) { return x.trim(); })
+                       .map(function (x) { return '<p>' + x + '</p>'; }).join('');
+      out.push('<blockquote class="md-aviso">' + dentro + '</blockquote>');
+      continue;
+    }
+
+    // Linea divisoria
+    if (/^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(ln)) { closeList(); out.push('<hr class="md-hr">'); continue; }
+
+    // Headings (h1, h2, h3)
+    var mH = ln.match(/^(#{1,3})\s+(.*)$/);
     if (mH) {
       closeList();
       var lvl = mH[1].length;
@@ -27897,7 +27995,12 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
         var jr = await q.json().catch(function () { return null; });
         if (jr && jr.relazione) {
           lavoro.style.display = 'none';
-          testo.textContent = jr.relazione;
+          testo.innerHTML = (typeof window._mdToHtml === 'function')
+            ? window._mdToHtml(jr.relazione) : jr.relazione;
+          window._czRelazione = jr.relazione;   /* el markdown, para guardar y PDF */
+          window._czTipo = jr.tipo || '';
+          var acc = document.getElementById('czr-azioni');
+          if (acc) acc.style.display = 'flex';
           if (salida) salida.textContent = jr.relazione;
           try { localStorage.removeItem('dm_cz_relazione'); } catch (e3) {}
           if (boton) boton.disabled = false;
@@ -27917,6 +28020,80 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
      porque el formulario ya se ha enviado. Y al salir de las dos pantallas del
      canal, goTo cierra la via cognitivista, que es lo que debe pasar. */
   window.dmCZVolver = function () { goTo('s-home'); };
+
+  /* Guardar el caso. Mismo camino que el plan conductual (acceptTrainingPlan):
+     entra en los registros locales y se migra al backend con /cases/migrate.
+     Eso es lo que hace que funcionen los EJERCICIOS DIARIOS: el seguimiento se
+     activa solo, de forma idempotente, con POST /daily-followup/init, que
+     necesita un caso en backend CON su plan. Sin caso guardado no hay
+     ejercicios, por eso una cosa no va sin la otra. */
+  window.dmCZSalvare = async function () {
+    var md = window._czRelazione || '';
+    var boton = document.getElementById('czr-salva');
+    if (!md) { try { showToast('Non c\u2019\u00e8 nessuna relazione da salvare.'); } catch (e) {} return; }
+    if (boton) { boton.disabled = true; boton.textContent = 'Salvataggio\u2026'; }
+
+    var d = (typeof recoger === 'function') ? recoger() : {};
+    var record = {
+      id: Date.now(),
+      date: new Date().toLocaleDateString('it-IT'),
+      dog_name: d.nome || 'Senza nome',
+      breed: d.specie_razza || '',
+      dog_age: d.eta || '',
+      problem: d.motivo_visita || '',
+      analysis: '',
+      plan: md,
+      status: 'active',
+      case_type: 'cognitiva',
+      lang: 'it'
+    };
+    try { var recs = getRecords(); recs.unshift(record); setRecords(recs); } catch (e) {}
+
+    var caseId = null;
+    try {
+      var jwt = localStorage.getItem('dm_jwt') || '';
+      if (jwt) {
+        var mres = await fetch(API_URL + '/cases/migrate', {
+          method: 'POST', headers: authHeaders(),
+          body: JSON.stringify({ records: [{
+            id: record.id, date: record.date,
+            dog_name: record.dog_name, breed: record.breed,
+            dog_age: record.dog_age, problem: record.problem,
+            analysis: null, plan: record.plan,
+            status: 'active', lang: 'it', case_type: 'cognitiva'
+          }]})
+        });
+        if (mres.ok) {
+          var md2 = await mres.json();
+          var r0 = (md2.results && md2.results[0]) || null;
+          if (r0 && r0.case_id) {
+            caseId = r0.case_id;
+            try {
+              var ru = getRecords();
+              var iu = ru.findIndex(function (x) { return x.id === record.id; });
+              if (iu >= 0) { ru[iu].backend_case_id = caseId; setRecords(ru); }
+            } catch (e) {}
+            /* Deja los ejercicios diarios listos desde ya, sin esperar a que
+               el usuario entre en el seguimiento. Es idempotente. */
+            try {
+              await fetch(API_URL + '/cases/' + encodeURIComponent(caseId) + '/daily-followup/init', {
+                method: 'POST', headers: authHeaders(),
+                body: JSON.stringify({ lang: 'it', intervention_plan_text: md })
+              });
+            } catch (e) {}
+          } else if (r0 && r0.status === 'skipped_quota') {
+            try { showToast(r0.detail || 'Hai raggiunto il limite di casi.'); } catch (e) {}
+          }
+        }
+      }
+    } catch (e) {}
+
+    if (boton) { boton.textContent = 'Caso salvato'; boton.disabled = true; }
+    try { localStorage.removeItem('dm_cz_relazione'); } catch (e) {}
+    /* Sale del canal a proposito: el caso ya vive en los registros, y quedarse
+       en cognitivista paseando por la app es justo lo que no puede pasar. */
+    setTimeout(function () { goTo('s-records'); }, 700);
+  };
 })();
 </script>
 <!-- == FIN VIA COGNITIVISTA == -->

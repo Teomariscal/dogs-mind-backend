@@ -177,11 +177,15 @@ def redactar_relazione(
     # y el log de uvicorn no sirve: con StreamingResponse la línea 200 OK se
     # escribe cuando ARRANCAN los latidos (20 s), no cuando termina el trabajo.
     # Estos tiempos son la única medida real de las dos pasadas.
+    # Van en WARNING y no en INFO a propósito: el proyecto no llama a
+    # logging.basicConfig en ningún sitio, así que el logger raíz se queda en
+    # WARNING y cualquier .info() se pierde sin dejar rastro. Me pasó el
+    # 13-sep-2026: instrumenté las dos pasadas y en el log no salía nada.
     _t0 = time.monotonic()
 
     # ── PASADA 1 — el arnés ABA, oculto ─────────────────────────────────
     analisis = _pasada_1_aba(texto_anamnesi)
-    _log.info("[cognitiva] pasada 1 (ABA oculto): %.1f s · %d caracteres",
+    _log.warning("[cognitiva] pasada 1 (ABA oculto): %.1f s · %d caracteres",
               time.monotonic() - _t0, len(analisis))
 
     # ── Corpus cognitivista (RAG B). Si cae, se sigue: el prompt lleva el
@@ -245,11 +249,11 @@ def redactar_relazione(
             continue
 
         restos = find_blacklisted(salida)
-        _log.info("[cognitiva] pasada 2, intento %d: %.1f s · %d caracteres · restos=%s",
+        _log.warning("[cognitiva] pasada 2, intento %d: %.1f s · %d caracteres · restos=%s",
                   _ + 1, time.monotonic() - _t_int, len(salida),
                   ", ".join(restos) if restos else "ninguno")
         if not restos:
-            _log.info("[cognitiva] TOTAL %.1f s", time.monotonic() - _t0)
+            _log.warning("[cognitiva] TOTAL %.1f s", time.monotonic() - _t0)
             return salida, tipo, analisis
 
         if mejor is None or len(restos) < len(mejor_restos):

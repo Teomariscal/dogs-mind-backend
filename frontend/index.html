@@ -9205,19 +9205,6 @@ button:not(:disabled):active{ transform:scale(0.98); }
   box-shadow: 0 10px 30px rgba(0,0,0,0.45);
   background: #07100c;
 }
-/* El anillo de la pantalla de espera cognitivista. Gira: es la senal de vida
-   que faltaba (founder, 12-sep-2026: "da la sensacion de no estar haciendo
-   nada"). Se respeta a quien pide menos movimiento en el sistema. */
-.czr-anello {
-  width: 46px; height: 46px; margin: 0 auto; border-radius: 50%;
-  border: 3px solid rgba(94,200,230,0.22); border-top-color: #5ec8e6;
-  animation: czr-gira 0.9s linear infinite;
-}
-@keyframes czr-gira { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) {
-  .czr-anello { animation-duration: 2.6s; }
-}
-
 #s-cecilia2 .ob-wrap { background: #07100c; }
 /* Los controles NO se pegan al video, como en Niaz: aqui ella esta centrada y
    le caian encima de la cara. Se quedan en la esquina de la pantalla, con la
@@ -11289,13 +11276,26 @@ button:not(:disabled):active{ transform:scale(0.98); }
         </div>
       </div>
 
-      <!-- Estado de trabajo: se oculta en cuanto llega la relazione. -->
-      <div id="czr-lavoro" style="text-align:center;padding:34px 10px;">
-        <div class="czr-anello" aria-hidden="true"></div>
-        <p style="margin:22px 0 0;font-size:15px;font-weight:600;">Sto redigendo la relazione</p>
-        <p id="czr-paso" style="margin:8px 0 0;font-size:13.5px;line-height:1.6;opacity:.8;"></p>
-        <p id="czr-tempo" style="margin:14px 0 0;font-size:12.5px;opacity:.55;font-variant-numeric:tabular-nums;"></p>
-        <p style="margin:20px auto 0;max-width:24em;font-size:12.5px;line-height:1.6;opacity:.6;">Non chiudere l'app. Il lavoro continua anche se blocchi lo schermo.</p>
+      <!-- Estado de trabajo. MISMO aspecto que la espera de los demas analisis
+           (s-loading-analysis): spinner arriba, cinco pasos que se van marcando
+           y el pie con el aviso. Founder, 13-sep-2026: "al pulsar debe salir
+           otra pantalla similar a los demas analisis diciendo que esta
+           analizando el caso, que puede tardar un par de minutos, que es una
+           herramienta de alta tecnologia". Reutiliza las clases .dm-ls-*, que
+           son solo estilo; los textos son propios y en italiano, porque esta
+           pantalla es del canal estanco y no pasa por los diccionarios. -->
+      <div id="czr-lavoro">
+        <div class="la-spinner" aria-hidden="true" style="width:32px;height:32px;border:3px solid rgba(243,241,234,0.25);border-top-color:#f3f1ea;border-radius:50%;animation:laSpin 0.85s linear infinite;margin:6px auto 12px;"></div>
+        <div style="font-family:var(--ff-serif);font-size:23px;font-weight:700;letter-spacing:-0.3px;line-height:1.2;text-align:center;">Sto analizzando il caso…</div>
+        <div style="font-size:12.5px;opacity:.7;text-align:center;margin:4px 0 16px;">Ecco esattamente che cosa sta succedendo</div>
+
+        <div id="czr-passi"></div>
+
+        <p id="czr-tempo" style="margin:16px 0 0;text-align:center;font-size:12.5px;opacity:.55;font-variant-numeric:tabular-nums;"></p>
+
+        <div style="margin-top:22px;border-top:1px solid rgba(243,241,234,0.15);padding-top:12px;">
+          <div style="font-size:11.5px;opacity:.65;line-height:1.5;font-style:italic;">Ogni relazione segue lo stesso percorso clinico, nel quadro cognitivo-zooantropologico. È uno strumento di alta tecnologia e richiede un paio di minuti — <strong>non chiudere l'app</strong>. Il lavoro continua anche se blocchi lo schermo.</div>
+        </div>
       </div>
 
       <div id="czr-errore" style="display:none;margin-top:10px;padding:16px 18px;border-radius:14px;background:rgba(255,120,100,0.10);border:1px solid rgba(255,120,100,0.30);font-size:13.5px;line-height:1.6;"></div>
@@ -13048,6 +13048,7 @@ function goTo(id) {
   if (id === 's-niaz' && typeof dmNiazArrancar === 'function') dmNiazArrancar();
   if (id === 's-ale'  && typeof dmAleArrancar  === 'function') dmAleArrancar();
   if (id === 's-cecilia2' && typeof dmCecilia2Arrancar === 'function') dmCecilia2Arrancar();
+  if (id === 's-relazione-cz' && typeof dmCZReanudar === 'function') dmCZReanudar();
   if (id === 's-niaz2' && typeof dmN2Arrancar === 'function') dmN2Arrancar();
   /* La lista de planes y el saldo los pinta dmCargarPlanes(). Antes solo se
      llamaba desde dmAbrirPlanes(), asi que las SEIS entradas que hacian
@@ -27764,7 +27765,6 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
     var lavoro = document.getElementById('czr-lavoro');
     var errore = document.getElementById('czr-errore');
     var testo  = document.getElementById('czr-testo');
-    var paso   = document.getElementById('czr-paso');
     var tempo  = document.getElementById('czr-tempo');
     lavoro.style.display = '';
     errore.style.display = 'none';
@@ -27772,61 +27772,146 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
     testo.textContent = '';
     goTo('s-relazione-cz');
 
-    /* Dos pasadas largas: el analisis clinico y luego la relazione. Los pasos
-       van por reloj porque el servidor manda espacios, no eventos; sirven para
-       que se vea movimiento, y el cronometro para que nadie tenga que adivinar
-       si sigue vivo. */
+    /* Cinco pasos, como en la espera de los demas analisis, pero con los de
+       ESTA via. Van por reloj y no por eventos porque el servidor manda
+       espacios, no progreso: son honestos en el orden, no en el instante. El
+       cronometro esta para que nadie tenga que adivinar si sigue vivo. */
     var t0 = Date.now();
     var PASOS = [
-      [0,   'Lettura dell’anamnesi e inquadramento del caso.'],
-      [45,  'Analisi clinica del caso.'],
-      [120, 'Consultazione del corpus cognitivo-zooantropologico.'],
-      [210, 'Stesura della relazione secondo la struttura di Odette.'],
-      [420, 'Revisione del lessico e chiusura della relazione.']
+      [0,   'Lettura dell’anamnesi',       'Inquadramento anagrafico e clinico del caso.'],
+      [40,  'Analisi clinica',              'Il piano misurabile su cui poggia la relazione.'],
+      [110, 'Corpus cognitivo-zooantropologico', 'Consultazione dei casi e della bibliografia CZ.'],
+      [190, 'Stesura della relazione',      'Le otto sezioni, nell’ordine di Odette.'],
+      [330, 'Revisione del lessico',        'Coerenza cognitivo-zooantropologica e chiusura.']
     ];
+    var cajaPasos = document.getElementById('czr-passi');
+    var htmlPasos = '';
+    for (var i = 0; i < PASOS.length; i++) {
+      htmlPasos += '<div class="dm-ls-step todo" id="czr-p' + i + '">'
+        + '<div class="dm-ls-ic">&#9675;</div>'
+        + '<div><b>' + PASOS[i][1] + '</b><span>' + PASOS[i][2] + '</span>'
+        + '<span class="dm-ls-pulse"></span></div></div>';
+    }
+    cajaPasos.innerHTML = htmlPasos;
+
     function tic() {
       var s = Math.floor((Date.now() - t0) / 1000);
       var m = Math.floor(s / 60);
       tempo.textContent = m > 0 ? (m + ' min ' + (s % 60) + ' s') : (s + ' s');
-      var txt = PASOS[0][1];
-      for (var i = 0; i < PASOS.length; i++) { if (s >= PASOS[i][0]) txt = PASOS[i][1]; }
-      paso.textContent = txt;
+      var actual = 0;
+      for (var k = 0; k < PASOS.length; k++) { if (s >= PASOS[k][0]) actual = k; }
+      for (var j = 0; j < PASOS.length; j++) {
+        var n = document.getElementById('czr-p' + j);
+        if (!n) continue;
+        n.className = 'dm-ls-step ' + (j < actual ? 'done' : j === actual ? 'doing' : 'todo');
+        n.querySelector('.dm-ls-ic').innerHTML = j < actual ? '&#10003;' : j === actual ? '&#9679;' : '&#9675;';
+      }
     }
     tic();
     var reloj = setInterval(tic, 1000);
 
     try {
+      /* El POST ya NO espera al informe: lanza el trabajo y vuelve al instante
+         con su identificador. Antes la relazione colgaba de esta conexion y en
+         el iPhone moria con "Load failed" — iOS suspende la red del WebView al
+         bloquear la pantalla, y esto tarda minutos (founder, 13-sep-2026). */
       var r = await fetch(API_URL + '/analysis/cognitiva', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json',
                    'Authorization': 'Bearer ' + (localStorage.getItem('dm_jwt') || '') },
         body: JSON.stringify(d)
       });
-      var crudo = await r.text();
-      var j = null;
-      try { j = JSON.parse(crudo); } catch (eParse) {
-        /* Con latidos la respuesta empieza por espacios y termina en JSON. Si
-           ni asi parsea, el cuerpo llego cortado: se dice, en vez de dejar la
-           pantalla en blanco sin explicacion. */
-        throw new Error('Risposta incompleta dal server (' + crudo.length + ' byte). Il lavoro potrebbe essersi completato: riprova tra poco, non verra addebitato due volte.');
-      }
+      var j = await r.json().catch(function () { return null; });
       if (!r.ok) throw new Error(j && j.detail ? j.detail : ('errore ' + r.status));
-      if (j && j.detail && !j.relazione) throw new Error(j.detail);
-      if (!j || !j.relazione) throw new Error('Il server ha risposto senza relazione.');
-      /* `fatti` viaja en la respuesta para poder auditarla desde fuera, pero
-         NO se pinta nunca: es el analisis oculto. */
-      lavoro.style.display = 'none';
-      testo.textContent = j.relazione;
-      salida.textContent = j.relazione;   /* la anamnesis la conserva al volver */
+      if (!j || !j.id) throw new Error('Il server non ha restituito un identificativo.');
+      /* Se guarda para poder RECUPERARLA: si cierra la app o se va, al volver
+         a esta pantalla se sigue preguntando por el mismo informe. */
+      try { localStorage.setItem('dm_cz_relazione', j.id); } catch (eLs) {}
+      await dmCZSeguir(j.id);
     } catch (e) {
       lavoro.style.display = 'none';
       errore.style.display = '';
       errore.textContent = String(e.message || e);
-    } finally {
       clearInterval(reloj);
       boton.disabled = false;
     }
   };
+
+  /* Pregunta cada pocos segundos hasta que la relazione esta. Vive aparte para
+     poder retomarla al volver a la pantalla. */
+  window.dmCZSeguir = async function (id) {
+    if (window._czSiguiendo === id) return;   /* ya se esta preguntando por esa */
+    window._czSiguiendo = id;
+    try { await _czSeguirBucle(id); } finally { window._czSiguiendo = null; }
+  };
+
+  /* Se llama al ENTRAR en la pantalla. Si quedo una relazione a medias —cerro
+     la app, se fue a otra cosa, se quedo sin cobertura— se retoma sola. Es lo
+     que convierte "no la pierdes" en verdad y no en una promesa del copy. */
+  window.dmCZReanudar = function () {
+    var id = '';
+    try { id = localStorage.getItem('dm_cz_relazione') || ''; } catch (e) { return; }
+    if (!id || window._czSiguiendo) return;
+    var testo = document.getElementById('czr-testo');
+    if (testo && testo.textContent) return;    /* ya esta pintada */
+    var lavoro = document.getElementById('czr-lavoro');
+    var errore = document.getElementById('czr-errore');
+    if (lavoro) lavoro.style.display = '';
+    if (errore) { errore.style.display = 'none'; errore.textContent = ''; }
+    window.dmCZSeguir(id);
+  };
+
+  async function _czSeguirBucle(id) {
+    var lavoro = document.getElementById('czr-lavoro');
+    var errore = document.getElementById('czr-errore');
+    var testo  = document.getElementById('czr-testo');
+    var salida = document.getElementById('cz-relazione');
+    var boton  = document.getElementById('cz-invia');
+    var CADA_MS = 4000;
+    var TOPE_MS = 15 * 60 * 1000;   /* a los 15 min se deja de preguntar */
+    var desde = Date.now();
+
+    while (true) {
+      await new Promise(function (res) { setTimeout(res, CADA_MS); });
+      var q = null;
+      try {
+        q = await fetch(API_URL + '/analysis/cognitiva/' + encodeURIComponent(id), {
+          headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('dm_jwt') || '') }
+        });
+      } catch (eRed) {
+        /* Sin cobertura o pantalla bloqueada: NO es un fallo. El trabajo sigue
+           en el servidor; se vuelve a preguntar en la siguiente vuelta. */
+        if (Date.now() - desde > TOPE_MS) { break; }
+        continue;
+      }
+      if (q.status === 503) {
+        var je = await q.json().catch(function () { return null; });
+        lavoro.style.display = 'none';
+        errore.style.display = '';
+        errore.textContent = (je && je.detail) ? je.detail : 'Errore nella redazione.';
+        try { localStorage.removeItem('dm_cz_relazione'); } catch (e2) {}
+        if (boton) boton.disabled = false;
+        return;
+      }
+      if (q.ok) {
+        var jr = await q.json().catch(function () { return null; });
+        if (jr && jr.relazione) {
+          lavoro.style.display = 'none';
+          testo.textContent = jr.relazione;
+          if (salida) salida.textContent = jr.relazione;
+          try { localStorage.removeItem('dm_cz_relazione'); } catch (e3) {}
+          if (boton) boton.disabled = false;
+          return;
+        }
+        /* {stato:'lavorando'} — sigue trabajando. */
+      }
+      if (Date.now() - desde > TOPE_MS) { break; }
+    }
+    lavoro.style.display = 'none';
+    errore.style.display = '';
+    errore.textContent = 'La relazione sta ancora richiedendo piu tempo del previsto. Non e andata persa: torna qui tra qualche minuto e la troverai.';
+    if (boton) boton.disabled = false;
+  }
 
   /* Volver deja la relazione donde esta: se sale al inicio, no a la anamnesis,
      porque el formulario ya se ha enviado. Y al salir de las dos pantallas del

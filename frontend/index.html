@@ -11281,7 +11281,11 @@ button:not(:disabled):active{ transform:scale(0.98); }
       <button id="cz-invia" onclick="dmCZInviare()" style="width:100%;padding:15px;margin-top:22px;background:var(--green2);color:#fff;border:none;border-radius:100px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">Redigi la relazione</button>
       <div id="cz-stato" style="margin-top:14px;font-size:13px;line-height:1.6;text-align:center;opacity:.85;"></div>
 
-      <div id="cz-relazione" style="margin-top:26px;white-space:pre-wrap;font-size:14px;line-height:1.7;"></div>
+      <!-- Aqui vivia una SEGUNDA copia de la relazione, en Markdown crudo y al
+           pie del formulario. La deje yo el 12-sep "por si volvia a la
+           anamnesis" y el resultado fue que el informe salia dos veces: una
+           renderizada en su pantalla y otra en bruto aqui debajo (founder,
+           14-sep-2026: "sale ahora abajo"). La relazione tiene UN solo sitio. -->
     </div>
   </div>
 
@@ -27844,7 +27848,6 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
   window.dmCZInviare = async function () {
     var estado = document.getElementById('cz-stato');
     var boton  = document.getElementById('cz-invia');
-    var salida = document.getElementById('cz-relazione');
     var d = recoger();
     var faltan = ['specie_razza','nome','eta','motivo_visita'].filter(function (k) { return !d[k]; });
     if (faltan.length) {
@@ -27855,7 +27858,6 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
     }
     boton.disabled = true;
     estado.textContent = '';
-    salida.textContent = '';
 
     /* Fuera de la anamnesis: el usuario deja de mirar sus propias respuestas y
        ve que la app esta trabajando. La pantalla es del canal, asi que goTo NO
@@ -27963,7 +27965,6 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
     var lavoro = document.getElementById('czr-lavoro');
     var errore = document.getElementById('czr-errore');
     var testo  = document.getElementById('czr-testo');
-    var salida = document.getElementById('cz-relazione');
     var boton  = document.getElementById('cz-invia');
     var CADA_MS = 4000;
     var TOPE_MS = 15 * 60 * 1000;   /* a los 15 min se deja de preguntar */
@@ -28001,7 +28002,6 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
           window._czTipo = jr.tipo || '';
           var acc = document.getElementById('czr-azioni');
           if (acc) acc.style.display = 'flex';
-          if (salida) salida.textContent = jr.relazione;
           try { localStorage.removeItem('dm_cz_relazione'); } catch (e3) {}
           if (boton) boton.disabled = false;
           return;

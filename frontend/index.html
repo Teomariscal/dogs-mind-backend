@@ -13252,9 +13252,21 @@ function registerUser() {
       // Auto-switch to login if email is already registered
       if (d.indexOf('registrad') !== -1 || d.indexOf('already') !== -1 || d.indexOf('exists') !== -1 || d.indexOf('exist') !== -1) {
         var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
-        alert(lang === 'en'
-          ? 'This email is already registered. Sign in instead.'
-          : 'Este email ya está registrado. Inicia sesión.');
+        /* Si traia un CODIGO, no se pierde: se guarda y se canjea solo en
+           cuanto entre. Un codigo solo se canjea con la sesion abierta, asi que
+           quien YA tiene cuenta y recibe uno se estrellaba aqui sin que nadie
+           le dijera que hacer — le paso a una clienta de Odette el 14-sep-2026
+           con PROINV-A04748, y le puede pasar a cualquiera de los 1.663
+           usuarios ya registrados. */
+        if (inviteCode) {
+          try { localStorage.setItem('dm_codigo_pendiente', inviteCode); } catch (e) {}
+          alert(_i18nText('cod_ya_tienes_cuenta',
+            'Ya tienes cuenta con este email. Entra y te aplico el código automáticamente.'));
+        } else {
+          alert(lang === 'en'
+            ? 'This email is already registered. Sign in instead.'
+            : 'Este email ya está registrado. Inicia sesión.');
+        }
         // Pre-fill login email and reveal the login form
         var loginEmail = document.getElementById('login-email');
         if (loginEmail) loginEmail.value = email;
@@ -17709,6 +17721,30 @@ function getVal(id, fallback) {
       if (typeof loadMyDogs === 'function') loadMyDogs();
     if (typeof loadAccountInfo === 'function') loadAccountInfo();
       showToast('¡Bienvenido!');
+      /* Codigo que quedo pendiente al intentar registrarse teniendo ya cuenta:
+         se canjea AHORA, que es cuando por fin hay sesion. Falla en silencio a
+         proposito —si el codigo esta gastado o caducado, entrar no se rompe—
+         pero el exito si se dice, porque cambia lo que el usuario puede hacer. */
+      try {
+        var _cod = localStorage.getItem('dm_codigo_pendiente') || '';
+        if (_cod) {
+          localStorage.removeItem('dm_codigo_pendiente');
+          fetch(API_URL + '/subscription/redeem-code', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json',
+                       'Authorization': 'Bearer ' + res.data.token },
+            body: JSON.stringify({ code: _cod })
+          }).then(function (rr) {
+            if (rr.ok) {
+              showToast(_i18nText('cod_aplicado', 'Código aplicado. Ya tienes tu plan.'));
+              if (typeof loadAccountInfo === 'function') loadAccountInfo();
+              if (typeof fetchBalance === 'function') fetchBalance();
+            } else {
+              showToast(_i18nText('cod_fallido', 'No se ha podido aplicar el código. Inténtalo desde Planes.'));
+            }
+          }).catch(function () {});
+        }
+      } catch (e) {}
       // Si veníamos del flujo "Activar Profesional" sin sesión, reanudar.
       if (window._pendingActivatePro && typeof _consumePendingActivatePro === 'function') {
         _consumePendingActivatePro();
@@ -24005,6 +24041,9 @@ function endTourIntro() {
       ps_err_city:             'Indica la ciudad.',
       ps_err_country:          'Indica el país.',
       ps_err_email_exists:     'Este email ya está registrado. Inicia sesión y vuelve a Activar Profesional.',
+      cod_ya_tienes_cuenta:    'Ya tienes cuenta con este email. Entra y te aplico el código automáticamente.',
+      cod_aplicado:            'Código aplicado. Ya tienes tu plan.',
+      cod_fallido:             'No se ha podido aplicar el código. Inténtalo desde Planes.',
       ps_forgot_link:          '¿No recuerdas la contraseña? Te enviamos un enlace',
       ps_err_register:         'No se pudo crear la cuenta.',
       ps_err_company:          'No se pudieron guardar los datos de empresa.',
@@ -25209,6 +25248,9 @@ function endTourIntro() {
       ps_err_city:             'Enter the city.',
       ps_err_country:          'Enter the country.',
       ps_err_email_exists:     'This email is already registered. Sign in and try Activate Professional again.',
+      cod_ya_tienes_cuenta:    'You already have an account with this email. Sign in and we will apply your code automatically.',
+      cod_aplicado:            'Code applied. Your plan is active.',
+      cod_fallido:             'The code could not be applied. Try it from the Plans screen.',
       ps_err_register:         'Could not create the account.',
       ps_err_company:          'Could not save the company details.',
       ps_err_checkout:         'Could not start the payment.',
@@ -26414,6 +26456,9 @@ function endTourIntro() {
           ps_err_city:             'Indica la città.',
           ps_err_country:          'Indica il Paese.',
           ps_err_email_exists:     'Questa email è già registrata. Accedi e torna ad Attivare Professionale.',
+          cod_ya_tienes_cuenta:    'Hai già un account con questa email. Accedi e applicheremo il tuo codice automaticamente.',
+          cod_aplicado:            'Codice applicato. Il tuo piano è attivo.',
+          cod_fallido:             'Non è stato possibile applicare il codice. Provalo dalla schermata Piani.',
           ps_err_register:         'Impossibile creare l’account.',
           ps_err_company:          'Impossibile salvare i dati dell’azienda.',
           ps_err_checkout:         'Impossibile avviare il pagamento.',

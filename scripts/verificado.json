@@ -1,14 +1,13 @@
 {
-  "md5_frontend": "28cbd61a1ce2c7ea63bdfb04fb71e252",
-  "verificado_el": "2026-09-14T00:19:54",
+  "md5_frontend": "4f2194cb53605cdd4ddd7be62c574257",
+  "verificado_el": "2026-09-14T16:57:33",
   "pruebas": [
-    "la relazione se pinta en UN solo sitio: cz-relazione tiene 0 apariciones en el binario",
-    "Markdown renderizado sobre el informe real de 44.445 caracteres: 0 crudos, 3 tablas, 2 avisos",
-    "la pantalla NO desborda en 393x852 (la tabla de 6 columnas scrollea dentro de su caja)",
-    "boton Salva il caso con el MISMO estilo calculado que Guardar plan del plan conductual",
-    "guardado probado de punta a punta: /cases/migrate -> /daily-followup/init -> s-records",
-    "el caso guardado lleva case_type=cognitiva, lang=it, plan y backend_case_id",
-    "canal estanco: abierto entre las dos pantallas, cerrado al salir",
-    "sin-fugas.py estatico SIN FUGAS · detector en vivo 30 casos 0 fugas CZ"
+    "Italia en la lista de paises, comprobado en el binario (country_it presente)",
+    "orden alfabetico por idioma activo, leido en vivo: es Italia entre Estados Unidos y Japon · en Italy entre Colombia y Japan · it Italia entre Giappone y Messico",
+    "el marcador de posicion queda primero y Otro/Other/Altro ultimo en los tres",
+    "se conserva la eleccion al cambiar de idioma: Italia en es sigue siendo Italia en it",
+    "auditoria i18n: 990 claves, 0 huecos",
+    "puerta cognitivista: 3 condiciones y 3 salidas en False, falla cerrada",
+    "sin-fugas.py estatico SIN FUGAS"
   ]
 }

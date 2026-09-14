@@ -13,7 +13,7 @@ aunque alguien lo llamara desde otro sitio en el futuro.
 import hashlib
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 
 from sqlalchemy import text
@@ -125,6 +125,20 @@ def _sincrono(
 # ════════════════════════════════════════════════════════════════════════
 
 ENDPOINT = "/analysis/cognitiva"
+
+# Cuánto puede estar un trabajo en "lavorando" antes de darlo por MUERTO.
+#
+# Sin esto, un trabajo que se corta —un despliegue a mitad, un reinicio del
+# contenedor, un proceso que se cae— deja su fila en "lavorando" para siempre.
+# Y como la huella de una anamnesi es SIEMPRE la misma, cada intento posterior
+# encontraba esa fila y devolvía "en curso" sin relanzar nada: el usuario se
+# quedaba sin poder reintentar salvo que cambiara una coma del formulario.
+# Lo introduje yo el 13-sep-2026 al pasar esto a segundo plano.
+#
+# 12 minutos: la generación son dos pasadas y el techo del sondeo del cliente
+# son 15, así que da margen de sobra a un trabajo lento sin dejar a nadie
+# atrapado. Al relanzar NO se vuelve a cobrar: ese cobro ya se hizo.
+LAVORO_MUERTO_MIN = 12
 
 
 def _huella(anamnesi: AnamnesiCognitivaInput, user_id: Optional[str]) -> Optional[str]:
@@ -241,10 +255,35 @@ def crear_relazione_cognitiva(
     if not huella:
         raise HTTPException(status_code=401, detail="Sessione non valida.")
 
-    # Ya hecha o ya en marcha: ni se cobra otra vez ni se lanza dos veces.
+    # Ya hecha: se devuelve sin cobrar. Es la idempotencia.
     previo = _leer(db, huella)
-    if previo and previo.get("stato") in ("pronta", "lavorando"):
-        return {"stato": previo["stato"], "id": huella}
+    if previo and previo.get("stato") == "pronta":
+        return {"stato": "pronta", "id": huella}
+
+    # En marcha: se respeta… salvo que lleve demasiado tiempo, en cuyo caso el
+    # trabajo murió y hay que relanzarlo. Sin cobrar: ya se cobró al lanzarlo.
+    if previo and previo.get("stato") == "lavorando":
+        muerto = True
+        try:
+            desde = datetime.fromisoformat(
+                str(previo.get("iniziato", "")).replace("Z", ""))
+            muerto = (datetime.utcnow() - desde) > timedelta(minutes=LAVORO_MUERTO_MIN)
+        except Exception:
+            # Sin marca de tiempo legible no se puede saber: se da por vivo, que
+            # es el lado seguro (no relanzar dos veces el mismo trabajo).
+            muerto = False
+        if not muerto:
+            return {"stato": "lavorando", "id": huella}
+        _log.warning("[cognitiva] trabajo colgado mas de %d min: se relanza sin cobrar (%s)",
+                     LAVORO_MUERTO_MIN, huella[:12])
+        _escribir(db, huella, user_id, {
+            "stato": "lavorando",
+            "iniziato": datetime.utcnow().isoformat() + "Z",
+            "rilanciato": True,
+        })
+        background_tasks.add_task(_trabajar, huella, anamnesi, account_type,
+                                  user_id, authorization)
+        return {"stato": "lavorando", "id": huella}
 
     deduct_token(authorization, db, amount=COSTE_TOKENS, require_auth=True)
     _escribir(db, huella, user_id, {

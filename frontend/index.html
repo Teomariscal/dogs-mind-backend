@@ -10100,6 +10100,12 @@ button:not(:disabled):active{ transform:scale(0.98); }
           <select class="sel" id="reg-country" style="width:100%;">
             <option value="" data-i18n="country_placeholder">Selecciona tu país...</option>
             <option value="España" data-i18n="country_es">España</option>
+            <!-- Italia faltaba (founder, 14-sep-2026: "en la lista de paises no esta
+                 Italia"). Con la via cognitivista italiana entera montada, Odette,
+                 Michele y SIUA, un italiano no podia decir de donde era. Va detras
+                 de Espana porque es el segundo mercado, no por orden alfabetico:
+                 esta lista esta ordenada por mercado. -->
+            <option value="Italia" data-i18n="country_it">Italia</option>
             <option value="México" data-i18n="country_mx">México</option>
             <option value="Argentina" data-i18n="country_ar">Argentina</option>
             <option value="Colombia" data-i18n="country_co">Colombia</option>
@@ -23454,6 +23460,7 @@ function endTourIntro() {
       analyze_cost_notice_video: 'Este análisis con vídeo consume 400 créditos',
       country_placeholder:   'Selecciona tu país...',
       country_es:            'España',
+      country_it:            'Italia',
       country_mx:            'México',
       country_ar:            'Argentina',
       country_co:            'Colombia',
@@ -24663,6 +24670,7 @@ function endTourIntro() {
       analyze_cost_notice_video: 'This video analysis uses 400 credits',
       country_placeholder:   'Select your country...',
       country_es:            'Spain',
+      country_it:            'Italy',
       country_mx:            'Mexico',
       country_ar:            'Argentina',
       country_co:            'Colombia',
@@ -25865,6 +25873,7 @@ function endTourIntro() {
           analyze_cost_notice_video: 'Questa analisi con video consuma 400 crediti',
           country_placeholder:   'Seleziona il tuo Paese...',
           country_es:            'Spagna',
+          country_it:            'Italia',
           country_mx:            'Messico',
           country_ar:            'Argentina',
           country_co:            'Colombia',

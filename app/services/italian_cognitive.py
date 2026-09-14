@@ -58,13 +58,26 @@ def cognitive_path_applies(
     account_type: Optional[str],
     stance: Optional[str],
 ) -> bool:
-    """Las cuatro puertas. Falla cerrado: ante la duda, NO se aplica la vía cognitiva."""
+    """Las TRES puertas. Falla cerrado: ante la duda, NO se aplica la vía cognitiva.
+
+    Eran cuatro hasta el 14-sep-2026. La cuarta exigía `account_type ==
+    'professional'` y la quitó el founder: *"la vía cognitivista es tanto
+    particular como profesional"*.
+
+    `account_type` se sigue recibiendo a propósito, aunque ya no decida: los
+    cuatro llamantes lo pasan y quitarlo del contrato obligaría a tocarlos
+    todos, que es justo la clase de cambio ancho que no toca hacer en una
+    puerta de seguridad. Queda como dato, no como condición.
+
+    Y lo que NO cambia: el aislamiento. Lo que separa lo cognitivista de lo
+    conductual es el IDIOMA y la VÍA elegida, nunca el tipo de cuenta. El
+    vocabulario CZ sigue existiendo solo en `it + cognitive`, así que abrir
+    esto a particulares no acerca ni una palabra a la parte conductual.
+    """
     settings = get_settings()
     if not getattr(settings, "it_cognitive_enabled", False):
         return False
     if (lang or "").strip().lower() != "it":
-        return False
-    if (account_type or "").strip().lower() != "professional":
         return False
     if (stance or "").strip().lower() != "cognitive":
         return False

@@ -13,8 +13,8 @@ corriendo en los tres idiomas y las dos vías— es `scripts/sin-fugas-vivo.js`.
   1. FRONTEND: el vocabulario cognitivista solo puede aparecer dentro de la
      region cognitivista marcada. Fuera de ella, ni una palabra.
   2. BACKEND: los prompts cognitivistas solo pueden importarse desde servicios
-     que consultan la puerta de cuatro condiciones.
-  3. PUERTA: la puerta sigue teniendo sus cuatro condiciones y sigue fallando
+     que consultan la puerta de tres condiciones.
+  3. PUERTA: la puerta sigue teniendo sus tres condiciones y sigue fallando
      CERRADA (cualquier duda -> conductual).
 
 Uso:
@@ -165,7 +165,7 @@ def comprobar_prompt_odette():
 
 
 def comprobar_puerta():
-    print("\n3. PUERTA — cuatro condiciones y falla cerrada")
+    print("\n3. PUERTA — tres condiciones y falla cerrada")
     p = RAIZ / "app/services/italian_cognitive.py"
     if not p.exists():
         fallos.append("no existe app/services/italian_cognitive.py")
@@ -173,10 +173,12 @@ def comprobar_puerta():
     t = p.read_text(encoding="utf-8")
     cuerpo = t[t.find("def cognitive_path_applies"):]
     cuerpo = cuerpo[:cuerpo.find("\ndef ", 10)] if "\ndef " in cuerpo[10:] else cuerpo
+    # TRES desde el 14-sep-2026. La cuarta exigia cuenta profesional y la quito
+    # el founder: la via cognitivista es tanto particular como profesional. Lo
+    # que aisla es el IDIOMA y la VIA, no el tipo de cuenta.
     exigencias = {
         "flag encendida": "enabled" in cuerpo or "IT_COGNITIVE" in cuerpo,
         "lang == it": '"it"' in cuerpo or "'it'" in cuerpo,
-        "cuenta profesional": "professional" in cuerpo,
         "stance == cognitive": "cognitive" in cuerpo,
     }
     for nombre, ok in exigencias.items():
@@ -184,9 +186,9 @@ def comprobar_puerta():
         if not ok:
             fallos.append(f"la puerta ya no exige: {nombre}")
     negativos = cuerpo.count("return False")
-    print(f"   {verde('✓') if negativos >= 4 else rojo('✗')} falla cerrada "
-          f"({negativos} salidas en False; hacen falta 4)")
-    if negativos < 4:
+    print(f"   {verde('✓') if negativos >= 3 else rojo('✗')} falla cerrada "
+          f"({negativos} salidas en False; hacen falta 3)")
+    if negativos < 3:
         fallos.append(f"la puerta solo tiene {negativos} salidas en False")
 
 

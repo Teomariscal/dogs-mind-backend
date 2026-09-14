@@ -1,13 +1,14 @@
 {
-  "md5_frontend": "398854e0c7c8a45d9422f72736006e81",
-  "verificado_el": "2026-09-13T23:36:16",
+  "md5_frontend": "28cbd61a1ce2c7ea63bdfb04fb71e252",
+  "verificado_el": "2026-09-14T00:19:54",
   "pruebas": [
-    "relazione ASINCRONA sobre el binario: 3 sondeos, pinta el informe y borra la llave",
-    "sobrevive a un corte de red a mitad del sondeo (no rompe, reintenta)",
-    "un 503 del servidor muestra el motivo real y dice que los creditos se devolvieron",
-    "canal estanco con DOS pantallas: entrar, pasar entre ellas, salir, y rebote desde es",
-    "pantalla de espera con los 5 pasos, cronometro y aviso, sin scroll en 393x852",
-    "sin-fugas.py estatico: SIN FUGAS",
-    "detector en vivo: 30 casos, 0 fugas CZ"
+    "la relazione se pinta en UN solo sitio: cz-relazione tiene 0 apariciones en el binario",
+    "Markdown renderizado sobre el informe real de 44.445 caracteres: 0 crudos, 3 tablas, 2 avisos",
+    "la pantalla NO desborda en 393x852 (la tabla de 6 columnas scrollea dentro de su caja)",
+    "boton Salva il caso con el MISMO estilo calculado que Guardar plan del plan conductual",
+    "guardado probado de punta a punta: /cases/migrate -> /daily-followup/init -> s-records",
+    "el caso guardado lleva case_type=cognitiva, lang=it, plan y backend_case_id",
+    "canal estanco: abierto entre las dos pantallas, cerrado al salir",
+    "sin-fugas.py estatico SIN FUGAS · detector en vivo 30 casos 0 fugas CZ"
   ]
 }

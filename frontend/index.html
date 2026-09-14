@@ -10100,11 +10100,9 @@ button:not(:disabled):active{ transform:scale(0.98); }
           <select class="sel" id="reg-country" style="width:100%;">
             <option value="" data-i18n="country_placeholder">Selecciona tu país...</option>
             <option value="España" data-i18n="country_es">España</option>
-            <!-- Italia faltaba (founder, 14-sep-2026: "en la lista de paises no esta
-                 Italia"). Con la via cognitivista italiana entera montada, Odette,
-                 Michele y SIUA, un italiano no podia decir de donde era. Va detras
-                 de Espana porque es el segundo mercado, no por orden alfabetico:
-                 esta lista esta ordenada por mercado. -->
+            <!-- Italia faltaba (founder, 14-sep-2026). El ORDEN de esta lista no se
+                 decide aqui: applyLang la ordena alfabeticamente segun el idioma
+                 activo, porque el alfabetico no es el mismo en los tres. -->
             <option value="Italia" data-i18n="country_it">Italia</option>
             <option value="México" data-i18n="country_mx">México</option>
             <option value="Argentina" data-i18n="country_ar">Argentina</option>
@@ -26707,6 +26705,29 @@ function endTourIntro() {
       var key = el.getAttribute('data-i18n');
       if (t[key] !== undefined) el.innerHTML = t[key];
     });
+
+    /* Los paises, en ORDEN ALFABETICO (founder, 14-sep-2026: "haz que salga en
+       su sitio alfabetico"). Se ordena AQUI y no en el HTML porque el orden
+       correcto depende del idioma: en espanol Italia va entre Estados Unidos y
+       Japon, en ingles Italy va entre Chile e Israel... El listado en el HTML
+       puede ir en cualquier orden; manda esto.
+       El marcador de posicion se queda SIEMPRE el primero y "Otro" SIEMPRE el
+       ultimo: no son paises. Y se conserva lo que el usuario tuviera elegido. */
+    try {
+      var _sel = document.getElementById('reg-country');
+      if (_sel) {
+        var _eleccion = _sel.value;
+        var _ops = Array.prototype.slice.call(_sel.options);
+        var _primero = _ops.filter(function (o) { return o.value === ''; });
+        var _ultimo  = _ops.filter(function (o) { return o.value === 'Otro'; });
+        var _medio   = _ops.filter(function (o) { return o.value !== '' && o.value !== 'Otro'; });
+        _medio.sort(function (a, b) {
+          return a.text.localeCompare(b.text, lang, { sensitivity: 'base' });
+        });
+        _primero.concat(_medio, _ultimo).forEach(function (o) { _sel.appendChild(o); });
+        _sel.value = _eleccion;
+      }
+    } catch (e) {}
 
     // Translate placeholder attributes
     document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {

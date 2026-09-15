@@ -169,6 +169,37 @@ Comprobado en produccion: camino rapido intacto (cacheado 0,18 s, cero latidos),
 **Al usuario:** que reintente con la MISMA anamnesis. La idempotencia le devuelve
 lo ya generado al instante y sin cobrar (medido: 0,17 s, 0 creditos).
 
+## ⚠️ ANTES DEL PROXIMO ENVIO A APPLE — las notas de revision mienten
+
+Medido el 15-sep-2026. El texto que Apple lee en `appStoreReviewDetail.notes`
+describe productos que YA NO EXISTEN, y no describe los que si:
+
+DICE                                  | REALIDAD HOY
+--------------------------------------|---------------------------------------
+"Token packs: 5 (EUR 4.99),           | No existen. Se sustituyeron el 1-sep
+ 20 (EUR 16.00), 60 (EUR 42.00)"      | por CUATRO suscripciones mensuales.
+"'Professional' is an auto-renewable  | RETIRADA el 3-sep por el founder. Esta
+ subscription (EUR 19.99/year)"       | en el codigo con display:none — un
+                                      | revisor que la busque NO la encuentra.
+(nada)                                | basico 5 EUR / 800 cr · medio 12 / 2.160
+                                      | pro 22 / 4.400 · max 75 / 17.250
+
+Es la forma clasica del rechazo 2.1 ("no hemos podido localizar la
+funcionalidad descrita"). Han pasado cuatro envios con estas notas sin que
+saltara, asi que no es seguro que salte — pero es una mina.
+
+DECISION DEL FOUNDER, 15-sep: con la 1.0.24 ya en WAITING_FOR_REVIEW se dejan
+como estan ("cruzamos los dedos"), porque corregirlas obliga a retirar el envio
+y perder las 21 horas de cola ya cumplidas. **Se corrigen ANTES de enviar la
+1.0.25.**
+
+Comprobado ademas el mismo dia, y todo correcto: build 58 VALID y
+APP_STORE_ELIGIBLE, cifrado declarado, releaseType AFTER_APPROVAL, y la cuenta
+demo del revisor VIVA (`appstore-review@thedogsmind.net`, professional, 21.695
+creditos) pasando el muro como heredada — simulado contra `access_state` real.
+
+---
+
 ## Prioridad
 
 **Los créditos van por delante de los paseos** (founder, 1-sep-2026): "los paseos

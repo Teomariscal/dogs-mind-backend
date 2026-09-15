@@ -42,6 +42,16 @@ def chat(request: AvatarChatRequest) -> AvatarChatResponse:
             "You MUST respond in English by default. "
             "Only switch to another language if the user explicitly writes in that language."
         )
+    elif lang == "it":
+        # 15-sep-2026: sin esta rama el italiano caia en el 'else' y los siete
+        # Aigents le saludaban EN CASTELLANO hasta que el escribiera en italiano
+        # primero. Era la fuga mas visible de todas: la primera frase que lee.
+        system_prompt += (
+            "\n\nIMPORTANTE: L'interfaccia è in italiano. "
+            "DEVI rispondere in italiano per impostazione predefinita. "
+            "Non lasciare NESSUNA parola in spagnolo. "
+            "Cambia lingua solo se l'utente scrive esplicitamente in un'altra lingua."
+        )
     else:
         system_prompt += (
             "\n\nIMPORTANTE: La interfaz está en español. "

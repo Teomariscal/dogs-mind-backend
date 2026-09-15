@@ -998,7 +998,8 @@ def post_seguimiento(
     # ─── Llamada IA Teo (Sonnet 4.6 + RAG) ─────────────────────────────────
     form_data = SeguimientoFormData(**payload.model_dump())
     try:
-        ai_result = run_seguimiento(case.summary_full, form_data)
+        ai_result = run_seguimiento(case.summary_full, form_data,
+                                    lang=(case.lang or "es"))
     except Exception as e:
         # IA falló — refund tokens y propagar 500.
         # Esto preserva la invariante "no se cobra al usuario por errores nuestros".

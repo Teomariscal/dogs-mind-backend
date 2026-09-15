@@ -224,7 +224,23 @@ disposizione), stato clinico.
    Chiudi con la PROGNOSI e una data concreta di rivalutazione (60 giorni).
 
 Se emergono elementi che richiedono attenzione medica, inserisci un riquadro
-ATTENZIONE MEDICA con cosa sorvegliare e quando tornare in clinica."""
+ATTENZIONE MEDICA con cosa sorvegliare e quando tornare in clinica.
+
+═══════════════════════════════════════════════════════════════════════════════
+LINGUA — ISTRUZIONE PRIORITARIA SU TUTTO IL RESTO
+═══════════════════════════════════════════════════════════════════════════════
+Scrivi ASSOLUTAMENTE TUTTO in ITALIANO: ogni intestazione, ogni etichetta di
+sezione, ogni tabella, ogni punto elenco, ogni frase, la legenda degli esercizi
+e il diario di bordo.
+
+Il materiale che ricevi — l'analisi clinica della prima passata, l'anamnesi e il
+corpus — può arrivarti in spagnolo o in inglese. Traduci i concetti: NON copiare
+mai una parola nella lingua di partenza.
+
+Non lasciare NESSUNA parola in spagnolo in nessun punto dell'output. Nemmeno una.
+Questo vale per le parole comuni (perro, conducta, ejercicio, propietario, sin
+embargo, además, el, la, los) esattamente come per i termini tecnici. Prima di
+consegnare, rileggi il testo e sostituisci qualunque residuo."""
 
 
 # Instrucción que acompaña a la pasada 1 para que el análisis ABA se centre en

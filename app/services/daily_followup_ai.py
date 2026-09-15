@@ -161,6 +161,22 @@ def generate_daily_checkin(
         DAILY_FOLLOWUP_COACH_PROMPT_EN if lang_norm == "en"
         else DAILY_FOLLOWUP_COACH_PROMPT_ES
     )
+    if lang_norm == "it":
+        # 15-sep-2026: solo habia dos ramas, 'en' y 'todo lo demas'. El italiano
+        # caia en el else y recibia la orden EN MAYUSCULAS de escribir en
+        # castellano, sobre su propio plan italiano. No era una fuga de una
+        # palabra: era el 100 % del ejercicio diario, todos los dias.
+        # El prompt ES se queda como ANDAMIO (define la estructura del coach,
+        # que no depende del idioma) y encima va la orden de idioma, que es la
+        # que manda. Mismo patron que clinical_ai.py.
+        system_prompt += (
+            "\n\nISTRUZIONE DI LINGUA (PRIORITARIA SU TUTTO IL RESTO): "
+            "scrivi TUTTO l'output in ITALIANO — titoli degli esercizi, "
+            "descrizioni, istruzioni, domanda teorica, opzioni e spiegazione. "
+            "Il piano di intervento qui sotto può essere in spagnolo o in "
+            "inglese: traduci i concetti, ma restituisci tutto in italiano. "
+            "Non lasciare NESSUNA parola in spagnolo in nessun punto dell'output."
+        )
     from app.services.tea_pilot import apply_tea_override
     system_prompt = apply_tea_override(system_prompt, plan_text, dog_name, gate_text)
 
@@ -184,6 +200,20 @@ def generate_daily_checkin(
             f"INTERVENTION PLAN:\n\n{plan_text.strip()}\n\n"
             f"PREVIOUS DAYS HISTORY:\n\n{history_block}\n\n"
             f"Generate today's check-in (day {day_index}, {today_iso}) as JSON, ALL FIELDS IN ENGLISH."
+        )
+    elif lang_norm == "it":
+        user_msg = (
+            f"ISTRUZIONE DI LINGUA CRITICA: tutto il tuo output (titoli degli "
+            f"esercizi, descrizioni, istruzioni, domanda teorica, opzioni e "
+            f"spiegazione) DEVE essere in ITALIANO. Il piano qui sotto può "
+            f"essere in spagnolo: traduci i concetti e restituisci tutto in "
+            f"italiano.\n\n"
+            f"Nome del cane: {dog_name}\n"
+            f"Tipo di diagnosi: {diagnosis_type}\n"
+            f"Oggi è il giorno {day_index} del monitoraggio (data locale: {today_iso}).\n\n"
+            f"PIANO DI INTERVENTO:\n\n{plan_text.strip()}\n\n"
+            f"STORICO DEI GIORNI PRECEDENTI:\n\n{history_block}\n\n"
+            f"Genera il check-in di oggi (giorno {day_index}, {today_iso}) in JSON, TUTTO IN ITALIANO."
         )
     else:
         user_msg = (
@@ -238,14 +268,22 @@ def generate_daily_checkin(
 
 # ── Helpers ──────────────────────────────────────────────────────────────
 def _format_history(history: list[dict[str, Any]], lang: str) -> str:
+    # El historico se le INYECTA al modelo, asi que si va en castellano le esta
+    # dando ejemplo de en que idioma escribir. Por eso lleva rama it (15-sep-2026).
     if not history:
-        return ("(no previous days)" if lang == "en" else "(no hay días previos)")
+        if lang == "en":
+            return "(no previous days)"
+        if lang == "it":
+            return "(nessun giorno precedente)"
+        return "(no hay días previos)"
+    _sin = {"en": "(not reported)", "it": "(non riportato)"}.get(lang, "(sin reportar)")
     lines = []
     for h in history[-HISTORY_DAYS_TO_FEED:]:
         day_n = h.get("day_n", "?")
         gen = h.get("exercises_generated") or []
         res = h.get("exercises_results") or []
-        lines.append(f"--- Día {day_n} ---" if lang != "en" else f"--- Day {day_n} ---")
+        _dia = {"en": "Day", "it": "Giorno"}.get(lang, "Día")
+        lines.append(f"--- {_dia} {day_n} ---")
         for i, ex in enumerate(gen):
             title = ex.get("title", "(sin título)")
             r = res[i] if i < len(res) else None
@@ -258,7 +296,7 @@ def _format_history(history: list[dict[str, Any]], lang: str) -> str:
                         r_text = chips[idx]
                 elif "result_text" in r and r["result_text"]:
                     r_text = r["result_text"]
-            lines.append(f"  {i+1}. {title} → {r_text or '(sin reportar)'}")
+            lines.append(f"  {i+1}. {title} → {r_text or _sin}")
     return "\n".join(lines)
 
 

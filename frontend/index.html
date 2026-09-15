@@ -16773,7 +16773,15 @@ function loadDailyTip() {
     var tipEl = document.querySelector('#s-home .insight-text');
     if (!tipEl) return;
     var lang = (window.currentLang || localStorage.getItem('dm_lang') || 'es').toLowerCase();
-    if (lang !== 'es' && lang !== 'en') lang = 'es';
+    /* 15-sep-2026: aqui ponia `if (lang !== 'es' && lang !== 'en') lang = 'es';`,
+       o sea que el italiano se degradaba a castellano A PROPOSITO, se pedia el
+       consejo en español y se pintaba ENCIMA del italiano que data-i18n acababa
+       de poner bien. En el INICIO, cambiando cada dia y guardado en cache: es
+       la mejor explicacion de "a veces salta una palabra en español".
+       El servidor lleva el italiano escrito desde siempre —prompt, mensaje y
+       respaldo (daily_tip_ai.py:102-111)—; el unico que lo tiraba era esto.
+       La rama 'it' del prefijo, tres lineas mas abajo, era codigo muerto. */
+    if (lang !== 'es' && lang !== 'en' && lang !== 'it') lang = 'es';
     var today = new Date().toISOString().slice(0, 10);  // YYYY-MM-DD UTC
     var cacheKey = 'dm_daily_tip_' + today + '_' + lang;
     var cached = null;
@@ -23575,6 +23583,10 @@ function endTourIntro() {
       n2_script:               'Uy, perdona, me estaba reseteando. Hola, soy Niaz, tu Aigent de lujo y lifestyle canino. Y estoy aqu\u00ed para ayudarte con peluquer\u00eda, hoteles, productos premium, restaurantes y viajes. Solo lo mejor para tu perro.',
       al_script:               'Hola, soy Ale, la Aigent con más buena onda. ¿Has probado la feature de paseos? Estés donde estés puedo trazar tres rutas para pasear con tu perro, dando prioridad a las zonas verdes, lugares sin excesiva acumulación de gente o tráfico, incluso, y dependiendo de la hora del día, elegir rutas con más sombra y más seguras y agradables para tu perro. Ponme a prueba y pulsa aquí.',
       ce2_script:              'Estás en una app sustentada por principios científicos. Tu herramienta para solucionar un problema de conducta de tu perro, enseñarle un ejercicio o crear un plan de educación temprana. A veces los términos abruman, sobre todo si no eres profesional; para eso estoy yo durante todo el análisis. Consúltame en cualquier momento y te lo explicaré de la forma más sencilla posible. Has elegido una magnífica herramienta. Entra en nueva consulta y compruébalo.',
+      pup_dogs_ages_ph: 'Por ejemplo: 4 años y 9 meses',
+      pup_kids_ages_ph: 'Por ejemplo: 4 y 9 años',
+      pup_problem_ph: 'Qué hace exactamente, cuándo empezó, en qué situaciones aparece y qué hacéis vosotros cuando ocurre',
+      ps_invite_ph: 'Si tienes un código, introdúcelo aquí',
       ce2_cta:                 'Entrar en nueva consulta',
       al_cta:                  'Buscar rutas con mi perro',
       al_cta2:                 'Problema de comportamiento',
@@ -24787,6 +24799,10 @@ function endTourIntro() {
       n2_script:               'Oops, sorry, I was rebooting. Hi, I\u2019m Niaz, your luxury and canine lifestyle Aigent. And I\u2019m here to help you with grooming, hotels, premium products, restaurants and travel. Only the best for your dog.',
       al_script:               'Hi, I am Ale, the easy-going Aigent. Have you tried the walks feature? Wherever you are I can map out three routes to walk your dog, giving priority to green areas and places without too many people or traffic, and, depending on the time of day, choose routes with more shade that are safer and more pleasant for your dog. Put me to the test and tap here.',
       ce2_script:              'You are in an app grounded in scientific principles. Your tool for solving a behaviour problem in your dog, teaching them an exercise or building an early education plan. Sometimes the terms are overwhelming, above all if you are not a professional; that is what I am here for, right through the analysis. Ask me at any point and I will explain it in the simplest way I can. You have chosen a magnificent tool. Go into a new consultation and see for yourself.',
+      pup_dogs_ages_ph: 'For example: 4 years and 9 months',
+      pup_kids_ages_ph: 'For example: 4 and 9 years old',
+      pup_problem_ph: 'What exactly they do, when it started, in which situations it appears and what you do when it happens',
+      ps_invite_ph: 'If you have a code, enter it here',
       ce2_cta:                 'Start a new consultation',
       al_cta:                  'Find routes with my dog',
       al_cta2:                 'Behaviour problem',
@@ -25994,6 +26010,10 @@ function endTourIntro() {
           n2_script:               'Ops, scusa, mi stavo riavviando. Ciao, sono Niaz, la tua Aigent di lusso e lifestyle canino. E sono qui per aiutarti con toelettatura, hotel, prodotti premium, ristoranti e viaggi. Solo il meglio per il tuo cane.',
           al_script:               'Ciao, sono Ale, l’Aigent più alla mano. Hai provato la feature delle passeggiate? Ovunque tu sia posso tracciare tre percorsi per passeggiare con il tuo cane, dando priorità alle zone verdi, ai luoghi senza troppa gente o traffico e, a seconda dell’ora del giorno, scegliere percorsi più ombreggiati, più sicuri e più piacevoli per il tuo cane. Mettimi alla prova e premi qui.',
           ce2_script:              'Sei in un’app fondata su principi scientifici. Il tuo strumento per risolvere un problema di comportamento del tuo cane, insegnargli un esercizio o creare un piano di educazione precoce. A volte i termini sovrastano, soprattutto se non sei un professionista; per questo ci sono io durante tutta l’analisi. Chiedimi in qualsiasi momento e te lo spiegherò nel modo più semplice possibile. Hai scelto uno strumento magnifico. Entra in nuovo consulto e verificalo.',
+          pup_dogs_ages_ph: 'Per esempio: 4 anni e 9 mesi',
+          pup_kids_ages_ph: 'Per esempio: 4 e 9 anni',
+          pup_problem_ph: 'Che cosa fa esattamente, quando è iniziato, in quali situazioni compare e che cosa fate voi quando succede',
+          ps_invite_ph: 'Se hai un codice, inseriscilo qui',
           ce2_cta:                 'Entra in nuovo consulto',
           al_cta:                  'Cerca percorsi con il mio cane',
           al_cta2:                 'Problema di comportamento',

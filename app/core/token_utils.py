@@ -13,12 +13,43 @@ _log = logging.getLogger(__name__)
 
 PRIVILEGED_ROLES = {"admin", "developer"}  # unlimited tokens, no deduction ever
 
+# 15-sep-2026: estos tres mensajes salian SIEMPRE en castellano. En casi toda la
+# app da igual, porque el frontend descarta el `detail` de los 402 y pinta el
+# suyo ya traducido. Pero la via cognitivista italiana SI lo pinta tal cual en
+# su caja roja, y ahi un veterinario italiano leia "Sin créditos. Recarga para
+# continuar." El idioma llega ahora por parametro, con el castellano de default
+# para que ningun llamante viejo cambie de comportamiento.
+_MSG = {
+    "login": {
+        "es": "Inicia sesión para realizar un análisis.",
+        "en": "Sign in to run an analysis.",
+        "it": "Accedi per effettuare un'analisi.",
+    },
+    "sin_saldo": {
+        "es": "Sin créditos. Recarga para continuar.",
+        "en": "No credits left. Top up to continue.",
+        "it": "Crediti esauriti. Ricarica per continuare.",
+    },
+    "error_saldo": {
+        "es": "Error al verificar el saldo.",
+        "en": "Could not verify your balance.",
+        "it": "Impossibile verificare il saldo.",
+    },
+}
+
+
+def _t(clave: str, lang: Optional[str]) -> str:
+    """Texto de usuario en el idioma pedido, con caída al castellano."""
+    fila = _MSG[clave]
+    return fila.get((lang or "es").lower(), fila["es"])
+
 
 def deduct_token(
     authorization: Optional[str],
     db: Session,
     amount: float = 1.0,
     require_auth: bool = False,
+    lang: Optional[str] = "es",
 ) -> Optional[float]:
     """
     Deduct `amount` tokens from the authenticated user.
@@ -32,7 +63,7 @@ def deduct_token(
         if require_auth:
             raise HTTPException(
                 status_code=401,
-                detail="Inicia sesión para realizar un análisis.",
+                detail=_t("login", lang),
             )
         return None
 
@@ -124,7 +155,7 @@ def deduct_token(
             estado = _subs.access_state(user, amount=amount)
             bloqueado = not estado["allowed"]
             motivo = estado["reason"]
-            mensaje = _subs.paywall_message(estado) if bloqueado else ""
+            mensaje = _subs.paywall_message(estado, lang or "es") if bloqueado else ""
         except Exception as exc:                      # noqa: BLE001
             _log.exception("deduct_token: fallo evaluando el muro — dejo pasar (%s)", exc)
             bloqueado, motivo, mensaje = False, "", ""
@@ -134,7 +165,7 @@ def deduct_token(
             raise HTTPException(status_code=402, detail=mensaje)
 
         if float(user.tokens) < amount:
-            raise HTTPException(status_code=402, detail="Sin créditos. Recarga para continuar.")
+            raise HTTPException(status_code=402, detail=_t("sin_saldo", lang))
 
         user.tokens = float(user.tokens) - amount
         db.commit()
@@ -146,7 +177,7 @@ def deduct_token(
     except Exception as exc:
         _log.exception("deduct_token: unexpected error — %s", exc)
         if require_auth:
-            raise HTTPException(status_code=500, detail="Error al verificar el saldo.")
+            raise HTTPException(status_code=500, detail=_t("error_saldo", lang))
         return None
 
 

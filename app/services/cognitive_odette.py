@@ -34,7 +34,7 @@ from app.core.anthropic_client import (
 from app.core.prompts.clinical import CLINICAL_SYSTEM_PROMPT
 from app.core.prompts.cognitive_odette import PASADA_1_AVISO, PASADA_2_INFORME
 from app.models.anamnesis_cognitiva import AnamnesiCognitivaInput
-from app.services.cognitive_blacklist import find_blacklisted
+from app.services.cognitive_blacklist import find_blacklisted, find_spanish
 from app.services.italian_cognitive import (
     CognitiveReexpressionError,
     cognitive_path_applies,
@@ -216,6 +216,10 @@ def redactar_relazione(
     mejor: Optional[str] = None
     mejor_restos: list = []
     restos: list = []
+    # 15-sep-2026: hasta hoy solo se auditaba el LEXICO CONDUCTUAL. El informe
+    # podia salir medio en castellano y nadie se enteraba, porque nada miraba el
+    # idioma. `espanol` es esa segunda auditoria.
+    espanol: list = []
 
     for _ in range(INTENTOS):  # _ = numero de intento, se usa en los avisos
         _t_int = time.monotonic()
@@ -225,6 +229,12 @@ def redactar_relazione(
                         "VIETATI: " + ", ".join(restos) + ". Riscrivi da capo "
                         "eliminandoli, senza perdere nessun criterio numerico né "
                         "nessuna istruzione eseguibile.")
+        if espanol:
+            mensaje += ("\n\nATTENZIONE — il tentativo precedente conteneva SPAGNOLO: "
+                        + ", ".join(espanol) + ". Riscrivi da capo TUTTO IN ITALIANO, "
+                        "senza perdere nessun criterio numerico né nessuna istruzione "
+                        "eseguibile. Rileggi prima di consegnare: non deve restare "
+                        "nemmeno una parola in spagnolo.")
         try:
             r2 = create_message_streaming_resilient(
                 model=settings.clinical_model,
@@ -249,18 +259,22 @@ def redactar_relazione(
             continue
 
         restos = find_blacklisted(salida)
-        _log.warning("[cognitiva] pasada 2, intento %d: %.1f s · %d caracteres · restos=%s",
+        espanol = find_spanish(salida)
+        _log.warning("[cognitiva] pasada 2, intento %d: %.1f s · %d caracteres · "
+                     "restos=%s · espanol=%s",
                   _ + 1, time.monotonic() - _t_int, len(salida),
-                  ", ".join(restos) if restos else "ninguno")
-        if not restos:
+                  ", ".join(restos) if restos else "ninguno",
+                  ", ".join(espanol) if espanol else "ninguno")
+        if not restos and not espanol:
             _log.warning("[cognitiva] TOTAL %.1f s", time.monotonic() - _t0)
             return salida, tipo, analisis
 
-        if mejor is None or len(restos) < len(mejor_restos):
-            mejor, mejor_restos = salida, restos
+        # El mejor es el que menos defectos suma de los dos tipos.
+        if mejor is None or (len(restos) + len(espanol)) < len(mejor_restos):
+            mejor, mejor_restos = salida, restos + espanol
 
     if mejor is not None:
-        _log.warning("Informe cognitivista entregado con restos conductuales: %s "
+        _log.warning("Informe cognitivista entregado con restos: %s "
                      "(TOTAL %.1f s)", ", ".join(mejor_restos), time.monotonic() - _t0)
         return mejor, tipo, analisis
 

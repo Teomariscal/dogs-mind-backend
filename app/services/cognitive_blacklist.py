@@ -74,3 +74,70 @@ def find_blacklisted(text: str) -> list[str]:
 def is_clean(text: str) -> bool:
     """True si el texto NO contiene ningún término conductual prohibido."""
     return not find_blacklisted(text)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DETECTOR DE CASTELLANO (15-sep-2026)
+#
+# Hasta hoy esta lista negra solo perseguía JERGA CONDUCTUAL, y de castellano
+# solo tres palabras — y las tres porque eran términos conductuales, no por
+# estar en español. Resultado: "il proprietario riferisce che el perro se queda
+# solo" pasaba el filtro entero sin que saltara nada.
+#
+# El motor razona por dentro en español/inglés y re-expresa en italiano. Cuando
+# la re-expresión se queda corta, lo que llega al veterinario italiano es
+# castellano. Esto lo detecta.
+#
+# CRITERIO: solo marcadores que NO PUEDEN ser italianos. Las dos lenguas se
+# parecen demasiado como para permitirse un falso positivo: cada falso positivo
+# obliga a regenerar un informe de 40.000 caracteres y cuesta dinero y minutos.
+# Por eso no entran aquí ni "normale", ni "totale", ni "piano", ni "animale".
+# ─────────────────────────────────────────────────────────────────────────────
+_SPAGNOLO_PATTERNS: list[tuple[str, str]] = [
+    # Signos y letras que el italiano no usa jamás
+    (r"ñ", "ñ (letra española)"),
+    (r"[¿¡]", "¿ o ¡ (signos españoles)"),
+    # Sufijos: el italiano hace -zione / -tà, nunca -ción / -dad
+    (r"\b\w{3,}ci[oó]n(?:es)?\b", "-ción (el italiano hace -zione)"),
+    (r"\b\w{4,}dad(?:es)?\b", "-dad (el italiano hace -tà)"),
+    # Artículos y pronombres que no existen en italiano
+    (r"\blos\b", "los"),
+    (r"\blas\b", "las"),
+    # Conectores inequívocos
+    (r"\bsin\s+embargo\b", "sin embargo"),
+    (r"\badem[aá]s\b", "además"),
+    (r"\btambi[eé]n\b", "también"),
+    (r"\bporque\b", "porque (it: perché)"),
+    (r"\bcuando\b", "cuando (it: quando)"),
+    (r"\bsiempre\b", "siempre (it: sempre)"),
+    (r"\bentonces\b", "entonces"),
+    (r"\bdesde\b", "desde"),
+    (r"\bhasta\b", "hasta"),
+    (r"\bhacia\b", "hacia"),
+    (r"\bmuy\b", "muy"),
+    # Léxico del dominio: las palabras que más veces se cuelan
+    (r"\bperr[oa]s?\b", "perro/perra"),
+    (r"\bdue[nñ]os?\b", "dueño"),
+    (r"\bpropietari[oa]s?\b", "propietario (it: proprietario)"),
+    (r"\bconduct[ao]s?\b", "conducta"),
+    (r"\bejercicios?\b", "ejercicio (it: esercizio)"),
+    (r"\badiestramiento\b", "adiestramiento"),
+    (r"\bse[nñ]ales?\b", "señal"),
+]
+
+_SPAGNOLO = [(re.compile(p, re.IGNORECASE), label) for p, label in _SPAGNOLO_PATTERNS]
+
+
+def find_spanish(text: str) -> list[str]:
+    """Devuelve las etiquetas de los marcadores de castellano hallados.
+
+    Pensado para el bucle de reintentos de la pasada 2: si devuelve algo, el
+    informe lleva español dentro y hay que regenerarlo.
+    """
+    if not text:
+        return []
+    hits: list[str] = []
+    for rx, label in _SPAGNOLO:
+        if rx.search(text) and label not in hits:
+            hits.append(label)
+    return hits

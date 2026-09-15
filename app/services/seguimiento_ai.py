@@ -41,7 +41,8 @@ class SeguimientoResult(BaseModel):
 
 
 # ── Helpers de prompt ────────────────────────────────────────────────────────
-def _build_user_message(case_summary_full: Optional[str], form: SeguimientoFormData, rag_block: str) -> str:
+def _build_user_message(case_summary_full: Optional[str], form: SeguimientoFormData,
+                        rag_block: str, lang: str = "es") -> str:
     """
     Compone el mensaje del usuario:
       1. Resumen del caso (summary_full)
@@ -62,13 +63,33 @@ def _build_user_message(case_summary_full: Optional[str], form: SeguimientoFormD
         f"- Información extra: {form.informacion_extra or '(ninguna)'}\n"
     )
 
+    # 15-sep-2026: este servicio no recibia el idioma. El prompt dice "responde
+    # en el mismo idioma que use el usuario (español por defecto si los datos
+    # del formulario están en español)" — y el andamio del formulario que se ve
+    # arriba SIEMPRE esta en español, asi que un italiano recibia castellano
+    # siempre. La orden de idioma va al final, que es donde mas pesa.
+    _l = (lang or "es").lower()
+    if _l == "en":
+        cierre = ("CRITICAL LANGUAGE INSTRUCTION: write the ENTIRE follow-up "
+                  "response in ENGLISH. The case summary and the form above may "
+                  "be in Spanish: translate the concepts, but write in English.\n"
+                  "Now generate the follow-up response in the format defined in your prompt.")
+    elif _l == "it":
+        cierre = ("ISTRUZIONE DI LINGUA CRITICA: scrivi l'INTERA risposta di "
+                  "monitoraggio in ITALIANO. Il riepilogo del caso e il modulo "
+                  "qui sopra possono essere in spagnolo: traduci i concetti, ma "
+                  "scrivi in italiano. Non lasciare NESSUNA parola in spagnolo.\n"
+                  "Ora genera la risposta seguendo il formato definito nel tuo prompt.")
+    else:
+        cierre = "Genera la respuesta de seguimiento siguiendo el formato definido en tu prompt."
+
     return (
         "RESUMEN DEL CASO\n"
         "==================\n"
         f"{summary}\n\n"
         f"{form_section}\n"
         f"{rag_block}\n\n"
-        "Genera la respuesta de seguimiento siguiendo el formato definido en tu prompt."
+        f"{cierre}"
     )
 
 
@@ -84,7 +105,8 @@ def _build_rag_query(form: SeguimientoFormData) -> str:
 
 
 # ── API pública del servicio ─────────────────────────────────────────────────
-def run_seguimiento(case_summary_full: Optional[str], form: SeguimientoFormData) -> SeguimientoResult:
+def run_seguimiento(case_summary_full: Optional[str], form: SeguimientoFormData,
+                    lang: str = "es") -> SeguimientoResult:
     """
     Ejecuta una consulta de seguimiento clínico y devuelve la respuesta IA.
 
@@ -109,10 +131,18 @@ def run_seguimiento(case_summary_full: Optional[str], form: SeguimientoFormData)
             rag_block = ""
 
     # 2. Construir prompt
-    user_message = _build_user_message(case_summary_full, form, rag_block)
+    user_message = _build_user_message(case_summary_full, form, rag_block, lang)
     from app.services.tea_pilot import apply_tea_override
+    _seg_sys = SEGUIMIENTO_SYSTEM_PROMPT
+    if (lang or "es").lower() == "it":
+        _seg_sys += (
+            "\n\nISTRUZIONE DI LINGUA (PRIORITARIA SU TUTTO IL RESTO): scrivi "
+            "TUTTO in ITALIANO. Il riepilogo del caso e il modulo possono "
+            "arrivare in spagnolo: traduci i concetti e rispondi in italiano. "
+            "Non lasciare NESSUNA parola in spagnolo in nessun punto dell'output."
+        )
     _seg_sys = apply_tea_override(
-        SEGUIMIENTO_SYSTEM_PROMPT, case_summary_full,
+        _seg_sys, case_summary_full,
         getattr(form, 'motivo_consulta_resumido', ''), getattr(form, 'descripcion_evolucion', ''),
         getattr(form, 'dificultades', ''), getattr(form, 'informacion_extra', ''),
     )

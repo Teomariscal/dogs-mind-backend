@@ -65,7 +65,7 @@ def _sincrono(
             detail="Questa via è riservata all'analisi cognitivista italiana per account professionali.",
         )
 
-    deduct_token(authorization, db, amount=COSTE_TOKENS, require_auth=True)
+    deduct_token(authorization, db, amount=COSTE_TOKENS, require_auth=True, lang="it")
 
     try:
         relazione, tipo, analisis = redactar_relazione(anamnesi, account_type=account_type)
@@ -285,7 +285,7 @@ def crear_relazione_cognitiva(
                                   user_id, authorization)
         return {"stato": "lavorando", "id": huella}
 
-    deduct_token(authorization, db, amount=COSTE_TOKENS, require_auth=True)
+    deduct_token(authorization, db, amount=COSTE_TOKENS, require_auth=True, lang="it")
     _escribir(db, huella, user_id, {
         "stato": "lavorando",
         "iniziato": datetime.utcnow().isoformat() + "Z",

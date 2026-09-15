@@ -45,7 +45,8 @@ def generate_daily_tasks(
     if not intervention_plan_text or not intervention_plan_text.strip():
         raise ValueError("intervention_plan_text vacío.")
     if not dog_name or not dog_name.strip():
-        dog_name = "tu perro" if lang == "es" else "your dog"
+        dog_name = {"en": "your dog", "it": "il tuo cane"}.get(
+            (lang or "es").lower(), "tu perro")
 
     settings = get_settings()
     client = get_anthropic_client()
@@ -55,11 +56,29 @@ def generate_daily_tasks(
         DAILY_TASKS_SYSTEM_PROMPT_EN if lang_norm == "en"
         else DAILY_TASKS_SYSTEM_PROMPT_ES
     )
+    if lang_norm == "it":
+        # 15-sep-2026: el italiano caia en el else y las 30 micro-tareas salian
+        # en castellano. El prompt ES se queda de andamio y la orden de idioma
+        # va encima (mismo patron que clinical_ai.py y daily_followup_ai.py).
+        system_prompt += (
+            "\n\nISTRUZIONE DI LINGUA (PRIORITARIA SU TUTTO IL RESTO): "
+            "scrivi TUTTE le micro-attività in ITALIANO — titoli, descrizioni "
+            "e istruzioni. Il piano qui sotto può essere in spagnolo: traduci "
+            "i concetti e restituisci tutto in italiano. Non lasciare NESSUNA "
+            "parola in spagnolo in nessun punto dell'output."
+        )
 
     if lang_norm == "en":
         user_msg = (
             f"Dog's name: {dog_name.strip()}\n\n"
             f"Intervention plan to convert into 30 daily micro-tasks:\n\n"
+            f"{intervention_plan_text.strip()}"
+        )
+    elif lang_norm == "it":
+        user_msg = (
+            f"Nome del cane: {dog_name.strip()}\n\n"
+            f"Piano di intervento da convertire in 30 micro-attività quotidiane "
+            f"(scrivile TUTTE in italiano):\n\n"
             f"{intervention_plan_text.strip()}"
         )
     else:

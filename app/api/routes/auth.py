@@ -137,7 +137,14 @@ async def get_current_user(
     db: Session = Depends(get_db)
 ) -> User:
     if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Token requerido")
+        # 15-sep-2026: esto ponia "Token requerido" y se le ensenaba TAL CUAL al
+        # usuario en la caja de canjear codigo de la pantalla de Planes. Ese
+        # "token" era el de sesion, jerga nuestra — pero en este producto
+        # "token" es la MONEDA, asi que la gente lo leia como "te faltan
+        # creditos". Florencia Dzisko, del grupo IAA, escribio literalmente:
+        # "dice token requerido, ya estaria activado?". No podia entrar, y el
+        # mensaje la mandaba a mirar su saldo en vez de a iniciar sesion.
+        raise HTTPException(status_code=401, detail="Inicia sesión para continuar.")
     token = authorization.split(" ", 1)[1]
     user_id = decode_token(token)
     user = db.query(User).filter(User.id == user_id).first()

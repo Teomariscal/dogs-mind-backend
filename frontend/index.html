@@ -19856,8 +19856,25 @@ function getVal(id, fallback) {
       msg.style.border = '1px solid ' + (ok ? 'rgba(126,184,106,.45)' : 'rgba(224,189,140,.42)');
       msg.style.color = ok ? '#a9d69a' : '#e0bd8c';
     }
+    /* SIN SESION NO SE LLAMA AL SERVIDOR (15-sep-2026).
+       Esta caja esta a la vista tambien sin haber entrado, y al pulsar Canjear
+       se llamaba igual con el Bearer vacio. El servidor contestaba 401
+       "Token requerido" y ESO se pintaba tal cual bajo el campo. Ese "token"
+       era el de sesion, pero en esta app "token" es la moneda: la gente lo leia
+       como "te faltan creditos" y se quedaba fuera sin saber que le faltaba
+       entrar. Paso de verdad, con varios del grupo IAA.
+       Ahora el codigo se guarda y se aplica solo al iniciar sesion — el canje
+       diferido ya existe mas abajo, en el exito del login. */
+    var jwt = localStorage.getItem('dm_jwt') || '';
+    if (!jwt) {
+      try { localStorage.setItem('dm_codigo_pendiente', codigo); } catch (e) {}
+      try { localStorage.setItem('dm_login_dest', 's-planes'); } catch (e) {}
+      decir(_i18nText('cod_entra_primero',
+        'Para usar un código tienes que entrar en tu cuenta. Te llevo y te lo aplico solo.'), true);
+      setTimeout(function () { try { goTo('s-login'); } catch (e) {} }, 1500);
+      return;
+    }
     try {
-      var jwt = localStorage.getItem('dm_jwt') || '';
       var r = await fetch(API_URL + '/subscription/redeem-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
@@ -23583,6 +23600,7 @@ function endTourIntro() {
       n2_script:               'Uy, perdona, me estaba reseteando. Hola, soy Niaz, tu Aigent de lujo y lifestyle canino. Y estoy aqu\u00ed para ayudarte con peluquer\u00eda, hoteles, productos premium, restaurantes y viajes. Solo lo mejor para tu perro.',
       al_script:               'Hola, soy Ale, la Aigent con más buena onda. ¿Has probado la feature de paseos? Estés donde estés puedo trazar tres rutas para pasear con tu perro, dando prioridad a las zonas verdes, lugares sin excesiva acumulación de gente o tráfico, incluso, y dependiendo de la hora del día, elegir rutas con más sombra y más seguras y agradables para tu perro. Ponme a prueba y pulsa aquí.',
       ce2_script:              'Estás en una app sustentada por principios científicos. Tu herramienta para solucionar un problema de conducta de tu perro, enseñarle un ejercicio o crear un plan de educación temprana. A veces los términos abruman, sobre todo si no eres profesional; para eso estoy yo durante todo el análisis. Consúltame en cualquier momento y te lo explicaré de la forma más sencilla posible. Has elegido una magnífica herramienta. Entra en nueva consulta y compruébalo.',
+      cod_entra_primero: 'Para usar un código tienes que entrar en tu cuenta. Te llevo y te lo aplico solo.',
       pup_dogs_ages_ph: 'Por ejemplo: 4 años y 9 meses',
       pup_kids_ages_ph: 'Por ejemplo: 4 y 9 años',
       pup_problem_ph: 'Qué hace exactamente, cuándo empezó, en qué situaciones aparece y qué hacéis vosotros cuando ocurre',
@@ -24799,6 +24817,7 @@ function endTourIntro() {
       n2_script:               'Oops, sorry, I was rebooting. Hi, I\u2019m Niaz, your luxury and canine lifestyle Aigent. And I\u2019m here to help you with grooming, hotels, premium products, restaurants and travel. Only the best for your dog.',
       al_script:               'Hi, I am Ale, the easy-going Aigent. Have you tried the walks feature? Wherever you are I can map out three routes to walk your dog, giving priority to green areas and places without too many people or traffic, and, depending on the time of day, choose routes with more shade that are safer and more pleasant for your dog. Put me to the test and tap here.',
       ce2_script:              'You are in an app grounded in scientific principles. Your tool for solving a behaviour problem in your dog, teaching them an exercise or building an early education plan. Sometimes the terms are overwhelming, above all if you are not a professional; that is what I am here for, right through the analysis. Ask me at any point and I will explain it in the simplest way I can. You have chosen a magnificent tool. Go into a new consultation and see for yourself.',
+      cod_entra_primero: 'To use a code you need to sign in first. I will take you there and apply it for you.',
       pup_dogs_ages_ph: 'For example: 4 years and 9 months',
       pup_kids_ages_ph: 'For example: 4 and 9 years old',
       pup_problem_ph: 'What exactly they do, when it started, in which situations it appears and what you do when it happens',
@@ -26010,6 +26029,7 @@ function endTourIntro() {
           n2_script:               'Ops, scusa, mi stavo riavviando. Ciao, sono Niaz, la tua Aigent di lusso e lifestyle canino. E sono qui per aiutarti con toelettatura, hotel, prodotti premium, ristoranti e viaggi. Solo il meglio per il tuo cane.',
           al_script:               'Ciao, sono Ale, l’Aigent più alla mano. Hai provato la feature delle passeggiate? Ovunque tu sia posso tracciare tre percorsi per passeggiare con il tuo cane, dando priorità alle zone verdi, ai luoghi senza troppa gente o traffico e, a seconda dell’ora del giorno, scegliere percorsi più ombreggiati, più sicuri e più piacevoli per il tuo cane. Mettimi alla prova e premi qui.',
           ce2_script:              'Sei in un’app fondata su principi scientifici. Il tuo strumento per risolvere un problema di comportamento del tuo cane, insegnargli un esercizio o creare un piano di educazione precoce. A volte i termini sovrastano, soprattutto se non sei un professionista; per questo ci sono io durante tutta l’analisi. Chiedimi in qualsiasi momento e te lo spiegherò nel modo più semplice possibile. Hai scelto uno strumento magnifico. Entra in nuovo consulto e verificalo.',
+          cod_entra_primero: 'Per usare un codice devi prima accedere. Ti porto io e te lo applico da solo.',
           pup_dogs_ages_ph: 'Per esempio: 4 anni e 9 mesi',
           pup_kids_ages_ph: 'Per esempio: 4 e 9 anni',
           pup_problem_ph: 'Che cosa fa esattamente, quando è iniziato, in quali situazioni compare e che cosa fate voi quando succede',

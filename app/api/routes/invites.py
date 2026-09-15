@@ -130,15 +130,39 @@ def canjear_codigo(codigo: str, current_user: User, db: Session):
               codigo, current_user.email, plan["id"], dias)
 
     nombre = (plan.get("name") or {}).get("es", plan["id"])
+
+    # EL MENSAJE TIENE QUE DECIR LA VERDAD (15-sep-2026).
+    #
+    # Hasta hoy este texto prometia SIEMPRE los creditos del plan, incluso
+    # cuando `ya_este_ciclo` habia impedido abonarlos. Un profesional agotado
+    # que volvia a canjear leia en verde "Listo. Tienes el plan Medio durante
+    # 30 dias, con 2160 creditos" y se quedaba con CERO. Comprobado en
+    # produccion: saldo antes 0, mensaje prometiendo 2160, saldo despues 0.
+    # Es peor que un error: es una confirmacion falsa. El usuario cierra la
+    # app convencido de que ya puede trabajar.
+    #
+    # La app pinta este texto tal cual, asi que arreglarlo aqui llega a todo
+    # el mundo hoy, sin pasar por las tiendas.
+    creditos_abonados = 0 if ya_este_ciclo else int(plan["credits"])
+    if ya_este_ciclo:
+        mensaje = (f"Tu plan {nombre} sigue activo y queda renovado hasta el "
+                   f"{hasta.strftime('%d/%m/%Y')}. Los créditos de este código "
+                   f"ya se te abonaron antes, así que no se suman otra vez. "
+                   f"Si te has quedado sin créditos, entra en Planes y recarga.")
+    else:
+        mensaje = (f"Listo. Tienes el plan {nombre} durante {dias} días, "
+                   f"con {plan['credits']} créditos.")
+
     return {
         "ok": True,
         "plan": plan["id"],
         "plan_name": nombre,
         "days": dias,
-        "credits": int(plan["credits"]),
+        "credits": creditos_abonados,
+        "credits_plan": int(plan["credits"]),
+        "already_granted": bool(ya_este_ciclo),
         "expires_at": hasta.isoformat() + "Z",
-        "message": f"Listo. Tienes el plan {nombre} durante {dias} días, "
-                   f"con {plan['credits']} créditos.",
+        "message": mensaje,
     }
 
 

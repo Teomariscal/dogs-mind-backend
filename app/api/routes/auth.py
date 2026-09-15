@@ -329,11 +329,26 @@ def validate_invite(
         caducado = bool(inv.expires_at and datetime.utcnow() > inv.expires_at)
         gastado = bool((inv.tipo or "") != "abierto" and inv.used_by_id)
         if not caducado and not gastado:
+            # 15-sep-2026: esto devolvia tokens=None y el formulario de registro
+            # pintaba literalmente "Código aplicado · ? créditos de bienvenida".
+            # Un interrogante donde va la cifra da la sensacion de que algo ha
+            # fallado, justo en el momento en que el usuario esta decidiendo si
+            # se fia. El dato existe: son los creditos del plan del codigo, mas
+            # los de bienvenida, que es exactamente lo que va a recibir.
+            _tk = None
+            try:
+                from app.core import subscriptions as _subs
+                _plan = _subs.plan_by_id(inv.plan_id)
+                if _plan:
+                    _tk = DEFAULT_TOKENS + (
+                        float(_plan["credits"]) / _subs.CREDITS_PER_TOKEN)
+            except Exception:
+                _tk = None          # sin cifra antes que con una cifra falsa
             return ValidateInviteResponse(
                 valid=True,
                 type="invite",
                 label=(inv.note or inv.code),
-                tokens=None,
+                tokens=_tk,
             )
 
     # Ambassador después

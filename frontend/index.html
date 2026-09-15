@@ -12850,11 +12850,20 @@ async function validateInviteCode() {
     var data = await res.json();
     if (data && data.valid) {
       fb.style.color = '#2d5a2d';
-      var prefix = (lang === 'en') ? 'Code applied' : 'Código aplicado';
-      var suffix = (lang === 'en') ? 'welcome credits' : 'créditos de bienvenida';
+      var prefix = (lang === 'en') ? 'Code applied'
+                 : (lang === 'it') ? 'Codice applicato' : 'Código aplicado';
+      var suffix = (lang === 'en') ? 'welcome credits'
+                 : (lang === 'it') ? 'crediti di benvenuto' : 'créditos de bienvenida';
       /* data.tokens viene en tokens; en pantalla siempre creditos. */
-      var _cr = data.tokens ? Math.round(Number(data.tokens) * CREDITOS_POR_TOKEN).toLocaleString('es-ES') : '?';
-      fb.textContent = '✓ ' + prefix + ' · ' + _cr + ' ' + suffix;
+      /* Si el servidor no manda cifra, NO se pinta un interrogante donde va un
+         numero: da la sensacion de que ha fallado algo justo cuando el usuario
+         esta decidiendo si se fia. Se dice que el codigo vale, y ya. */
+      var _cr = data.tokens
+        ? Math.round(Number(data.tokens) * CREDITOS_POR_TOKEN).toLocaleString(
+            lang === 'en' ? 'en-US' : (lang === 'it' ? 'it-IT' : 'es-ES'))
+        : '';
+      fb.textContent = _cr ? ('✓ ' + prefix + ' · ' + _cr + ' ' + suffix)
+                           : ('✓ ' + prefix);
     } else {
       fb.style.color = '#a04040';
       fb.textContent = (lang === 'en')
@@ -19884,7 +19893,28 @@ function getVal(id, fallback) {
       if (r.ok) {
         decir(d.message || 'Listo.', true);
         if (inp) inp.value = '';
+        /* El saldo de ESTA pantalla no se refrescaba solo: seguia diciendo el
+           viejo mientras la cabecera ya decia el nuevo, y quien se quedaba
+           mirando la tarjeta creia que no se habia aplicado. Se refresca todo
+           lo que enseña saldo, no solo la lista de planes. */
+        try { if (typeof loadAccountInfo === 'function') loadAccountInfo(); } catch (e) {}
+        try { if (typeof fetchBalance === 'function') fetchBalance(); } catch (e) {}
         dmCargarPlanes();
+      } else if (r.status === 401) {
+        /* SESION CADUCADA — la otra puerta del mismo fallo (15-sep-2026).
+           Arriba ya se corto el caso de no haber entrado nunca, pero quien
+           entro hace dias y se le murio la sesion llegaba hasta aqui, y este
+           `decir(d.detail)` le pintaba en crudo lo que dijera el servidor:
+           "Token inválido o expirado". Misma palabra, misma confusion —
+           "token" es la moneda para el usuario— y mismo final: se queda fuera.
+           Le pasa justo a quien lleva dias sin abrir la app, que es el perfil
+           de la gente del grupo IAA a la que se le repartio el codigo.
+           Se trata igual que no tener sesion: se guarda y se aplica al entrar. */
+        try { localStorage.setItem('dm_codigo_pendiente', codigo); } catch (e) {}
+        try { localStorage.setItem('dm_login_dest', 's-planes'); } catch (e) {}
+        decir(_i18nText('cod_entra_primero',
+          'Para usar un código tienes que entrar en tu cuenta. Te llevo y te lo aplico solo.'), true);
+        setTimeout(function () { try { goTo('s-login'); } catch (e) {} }, 1500);
       } else {
         decir(d.detail || 'Ese código no es válido.', false);
       }

@@ -10026,7 +10026,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
     </div>
 
     <!-- ── Sección 2: Nuevo Usuario (registro) ── -->
-    <div style="padding:0 20px 20px;">
+    <div id="reg-nuevo-usuario" style="padding:0 20px 20px;">
       <div class="login-section-header" style="margin-bottom:12px;">
         <span class="login-step-num">2</span>
         <span data-i18n="form_new_user">Nuevo Usuario</span>
@@ -12092,7 +12092,12 @@ button, a, [onclick], input, select, textarea, .n-btn, .cm-btn-primary,
         <span class="pro-mid-auth-label" data-i18n="pro_mid_auth_label">¿Estás registrado?</span>
         <button class="pro-mid-auth-btn" onclick="goToProLogin()" data-i18n="pro_mid_auth_btn">Log in</button>
       </div>
-      <p class="pro-mid-auth-hint" data-i18n="pro_mid_auth_hint">¿No estás registrado? Elige tu plan</p>
+      <!-- Era un <p> muerto que solo decia "elige tu plan", y los planes de
+           abajo tampoco llevaban a ningun alta. Ahora es el boton que crea la
+           cuenta (15-sep-2026). -->
+      <button type="button" class="pro-mid-auth-hint" onclick="dmAltaProfesional()"
+              style="background:none;border:none;font-family:inherit;cursor:pointer;text-decoration:underline;"
+              data-i18n="pro_mid_auth_hint">¿No estás registrado? Crea tu cuenta</button>
     </section>
 
     <section class="pro-section">
@@ -12227,7 +12232,19 @@ button, a, [onclick], input, select, textarea, .n-btn, .cm-btn-primary,
 
     <div class="ps-footer">
       <button id="pl-submit-btn" class="ps-pay-btn" type="button" onclick="plSubmit()" data-i18n="pl_submit">Iniciar sesión</button>
-      <button type="button" class="pl-noaccount" onclick="goTo('s-pro-area')" data-i18n="pl_noaccount">¿No tienes cuenta? Elige tu plan</button>
+      <!-- 15-sep-2026: esto hacia goTo('s-pro-area'), o sea DEVOLVIA A LA PAGINA
+           DE LA QUE VIENES. Bucle cerrado: area profesional → "Iniciar sesion /
+           Crear cuenta" → esta pantalla, que solo deja iniciar sesion → "¿No
+           tienes cuenta?" → area profesional → y otra vez. Un profesional nuevo
+           NO PODIA registrarse ni meter su codigo por este camino, y es el
+           camino que elige cualquiera que se considere profesional.
+           Se descubrio recorriendo la app a mano, no leyendo codigo. Explica
+           por que del grupo IAA, con 19 personas y el codigo repartido desde el
+           3-sep, solo habia entrado UNA.
+           Ahora lleva al alta que SI funciona, con el tipo ya puesto en
+           Profesional: se reutiliza el formulario bueno en vez de resucitar el
+           de la membresia de 19,99 que el founder retiro. -->
+      <button type="button" class="pl-noaccount" onclick="dmAltaProfesional()" data-i18n="pl_noaccount">¿No tienes cuenta? Crea la tuya</button>
     </div>
   </div><!-- /s-pro-login -->
 
@@ -14765,6 +14782,49 @@ async function onActivateProClick() {
   goTo('s-pro-signup');
 }
 window.onActivateProClick = onActivateProClick;
+
+/* ── ALTA PROFESIONAL — la salida del bucle (15-sep-2026) ────────────────────
+   El area profesional no tenia NINGUNA forma de crear cuenta. Sus dos salidas
+   para quien no la tiene se devolvian la una a la otra:
+
+       s-pro-area  →  "Iniciar sesion / Crear cuenta"
+                   →  s-pro-login (SOLO inicia sesion, sin campo de codigo)
+                   →  "¿No tienes cuenta? Elige tu plan"
+                   →  s-pro-area   ← y vuelta a empezar
+
+   Se cerro solo el 3-sep al ocultar la tarjeta de la membresia de 19,99: esa
+   tarjeta llevaba el unico boton que abria el alta profesional con su hueco de
+   codigo. No fue una decision, fue dano colateral.
+
+   El arreglo NO resucita aquella pantalla —el founder retiro ese producto— sino
+   que manda al formulario de alta que SI funciona, con el tipo ya puesto en
+   Profesional. Es el mismo por el que hoy entra todo el mundo, lleva su campo
+   "Codigo de invitacion", y el codigo manda sobre el tipo de cuenta de todas
+   formas: quien mete PROINV-* acaba professional aunque el selector dijera otra
+   cosa (comprobado en base de datos el 15-sep).
+
+   Se deja tiempo al `goTo` antes de tocar el select y de bajar: la pantalla se
+   pinta primero, y si no el scroll ocurre sobre algo que aun no esta en su
+   sitio. */
+function dmAltaProfesional() {
+  try { goTo('s-login'); } catch (e) { return; }
+  setTimeout(function () {
+    try {
+      var tipo = document.getElementById('reg-type');
+      if (tipo) {
+        tipo.value = 'pro';
+        /* El onchange no salta al asignar por codigo; hay que llamarlo a mano
+           o el formulario se queda con la cara de particular. */
+        if (typeof toggleProfessional === 'function') toggleProfessional('pro');
+      }
+      var bloque = document.getElementById('reg-nuevo-usuario');
+      if (bloque && bloque.scrollIntoView) {
+        bloque.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } catch (e) {}
+  }, 220);
+}
+window.dmAltaProfesional = dmAltaProfesional;
 
 // Cuando el usuario inicia sesión / se registra y venía del flujo "Activar
 // Profesional" (flag _pendingActivatePro), retomamos automáticamente:
@@ -19743,8 +19803,32 @@ function getVal(id, fallback) {
     var lista = document.getElementById('planes-lista');
     if (lista) lista.innerHTML = '<div style="padding:26px 4px;text-align:center;color:rgba(232,239,234,0.74);' +
                                  'font-size:13.5px;">' + _txtPlanes('wait') + '</div>';
+    var jwt = localStorage.getItem('dm_jwt') || '';
+    /* SIN SESION ESTA PANTALLA NO PUEDE CARGAR NADA, y hasta hoy lo contaba como
+       una averia: "No se han podido cargar los planes. Inténtalo en un minuto."
+       El usuario esperaba y volvia, y seguia igual, porque no era un fallo de
+       red: es que no habia entrado. Se llega aqui desde "Ver planes" del area
+       profesional sin sesion, que era otra de las salidas muertas de ese
+       camino (15-sep-2026). Ahora se le dice lo que pasa y se le da el boton. */
+    if (!jwt) {
+      if (lista) {
+        lista.innerHTML =
+          '<div style="padding:26px 4px;text-align:center;color:rgba(232,239,234,.82);' +
+          'font-size:13.5px;line-height:1.65;">' +
+          _i18nText('pw_need_login', 'Entra en tu cuenta para ver tus planes y usar tu código.') +
+          '</div>';
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = _i18nText('pw_go_login', 'Entrar o crear cuenta');
+        b.style.cssText = 'display:block;margin:0 auto;padding:12px 22px;border-radius:12px;' +
+          'border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;' +
+          'font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;';
+        b.onclick = function () { try { goTo('s-login'); } catch (e) {} };
+        lista.appendChild(b);
+      }
+      return;
+    }
     try {
-      var jwt = localStorage.getItem('dm_jwt') || '';
       var r = await fetch(API_URL + '/subscription/status', { headers: { 'Authorization': 'Bearer ' + jwt } });
       if (!r.ok) throw new Error('status ' + r.status);
       renderPlanes(await r.json());
@@ -23630,6 +23714,8 @@ function endTourIntro() {
       n2_script:               'Uy, perdona, me estaba reseteando. Hola, soy Niaz, tu Aigent de lujo y lifestyle canino. Y estoy aqu\u00ed para ayudarte con peluquer\u00eda, hoteles, productos premium, restaurantes y viajes. Solo lo mejor para tu perro.',
       al_script:               'Hola, soy Ale, la Aigent con más buena onda. ¿Has probado la feature de paseos? Estés donde estés puedo trazar tres rutas para pasear con tu perro, dando prioridad a las zonas verdes, lugares sin excesiva acumulación de gente o tráfico, incluso, y dependiendo de la hora del día, elegir rutas con más sombra y más seguras y agradables para tu perro. Ponme a prueba y pulsa aquí.',
       ce2_script:              'Estás en una app sustentada por principios científicos. Tu herramienta para solucionar un problema de conducta de tu perro, enseñarle un ejercicio o crear un plan de educación temprana. A veces los términos abruman, sobre todo si no eres profesional; para eso estoy yo durante todo el análisis. Consúltame en cualquier momento y te lo explicaré de la forma más sencilla posible. Has elegido una magnífica herramienta. Entra en nueva consulta y compruébalo.',
+      pw_need_login: 'Entra en tu cuenta para ver tus planes y usar tu código.',
+      pw_go_login: 'Entrar o crear cuenta',
       cod_entra_primero: 'Para usar un código tienes que entrar en tu cuenta. Te llevo y te lo aplico solo.',
       pup_dogs_ages_ph: 'Por ejemplo: 4 años y 9 meses',
       pup_kids_ages_ph: 'Por ejemplo: 4 y 9 años',
@@ -24059,7 +24145,7 @@ function endTourIntro() {
       pro_logout_link:         'Cerrar sesión',
       pro_mid_auth_label:      '¿Estás registrado?',
       pro_mid_auth_btn:        'Log in',
-      pro_mid_auth_hint:       '¿No estás registrado? Elige tu plan',
+      pro_mid_auth_hint:       '¿No estás registrado? Crea tu cuenta',
 
       // ── S-PRO-SIGNUP ──
       ps_eyebrow:              'Membresía Profesional',
@@ -24118,7 +24204,7 @@ function endTourIntro() {
       pl_password:             'Contraseña',
       pl_forgot:               '¿Olvidaste tu contraseña?',
       pl_submit:               'Iniciar sesión',
-      pl_noaccount:            '¿No tienes cuenta? Elige tu plan',
+      pl_noaccount:            '¿No tienes cuenta? Crea la tuya',
       pl_err_password_empty:   'Introduce tu contraseña.',
       pl_err_invalid:          'Email o contraseña incorrectos.',
       pl_err_generic:          'No se pudo iniciar sesión.',
@@ -24847,6 +24933,8 @@ function endTourIntro() {
       n2_script:               'Oops, sorry, I was rebooting. Hi, I\u2019m Niaz, your luxury and canine lifestyle Aigent. And I\u2019m here to help you with grooming, hotels, premium products, restaurants and travel. Only the best for your dog.',
       al_script:               'Hi, I am Ale, the easy-going Aigent. Have you tried the walks feature? Wherever you are I can map out three routes to walk your dog, giving priority to green areas and places without too many people or traffic, and, depending on the time of day, choose routes with more shade that are safer and more pleasant for your dog. Put me to the test and tap here.',
       ce2_script:              'You are in an app grounded in scientific principles. Your tool for solving a behaviour problem in your dog, teaching them an exercise or building an early education plan. Sometimes the terms are overwhelming, above all if you are not a professional; that is what I am here for, right through the analysis. Ask me at any point and I will explain it in the simplest way I can. You have chosen a magnificent tool. Go into a new consultation and see for yourself.',
+      pw_need_login: 'Sign in to see your plans and use your code.',
+      pw_go_login: 'Sign in or create an account',
       cod_entra_primero: 'To use a code you need to sign in first. I will take you there and apply it for you.',
       pup_dogs_ages_ph: 'For example: 4 years and 9 months',
       pup_kids_ages_ph: 'For example: 4 and 9 years old',
@@ -25271,7 +25359,7 @@ function endTourIntro() {
       pro_logout_link:         'Sign out',
       pro_mid_auth_label:      'Are you registered?',
       pro_mid_auth_btn:        'Log in',
-      pro_mid_auth_hint:       'Not registered? Choose your plan',
+      pro_mid_auth_hint:       'Not registered? Create your account',
 
       // ── S-PRO-SIGNUP ──
       ps_eyebrow:              'Professional Membership',
@@ -25329,7 +25417,7 @@ function endTourIntro() {
       pl_password:             'Password',
       pl_forgot:               'Forgot your password?',
       pl_submit:               'Sign in',
-      pl_noaccount:            'Don’t have an account? Choose your plan',
+      pl_noaccount:            'Don’t have an account? Create one',
       pl_err_password_empty:   'Enter your password.',
       pl_err_invalid:          'Invalid email or password.',
       pl_err_generic:          'Could not sign in.',
@@ -26059,6 +26147,8 @@ function endTourIntro() {
           n2_script:               'Ops, scusa, mi stavo riavviando. Ciao, sono Niaz, la tua Aigent di lusso e lifestyle canino. E sono qui per aiutarti con toelettatura, hotel, prodotti premium, ristoranti e viaggi. Solo il meglio per il tuo cane.',
           al_script:               'Ciao, sono Ale, l’Aigent più alla mano. Hai provato la feature delle passeggiate? Ovunque tu sia posso tracciare tre percorsi per passeggiare con il tuo cane, dando priorità alle zone verdi, ai luoghi senza troppa gente o traffico e, a seconda dell’ora del giorno, scegliere percorsi più ombreggiati, più sicuri e più piacevoli per il tuo cane. Mettimi alla prova e premi qui.',
           ce2_script:              'Sei in un’app fondata su principi scientifici. Il tuo strumento per risolvere un problema di comportamento del tuo cane, insegnargli un esercizio o creare un piano di educazione precoce. A volte i termini sovrastano, soprattutto se non sei un professionista; per questo ci sono io durante tutta l’analisi. Chiedimi in qualsiasi momento e te lo spiegherò nel modo più semplice possibile. Hai scelto uno strumento magnifico. Entra in nuovo consulto e verificalo.',
+          pw_need_login: 'Accedi al tuo account per vedere i piani e usare il tuo codice.',
+          pw_go_login: 'Accedi o crea un account',
           cod_entra_primero: 'Per usare un codice devi prima accedere. Ti porto io e te lo applico da solo.',
           pup_dogs_ages_ph: 'Per esempio: 4 anni e 9 mesi',
           pup_kids_ages_ph: 'Per esempio: 4 e 9 anni',
@@ -26484,7 +26574,7 @@ function endTourIntro() {
           pro_logout_link:         'Esci',
           pro_mid_auth_label:      'Sei registrato?',
           pro_mid_auth_btn:        'Log in',
-          pro_mid_auth_hint:       'Non sei registrato? Scegli il tuo piano',
+          pro_mid_auth_hint:       'Non sei registrato? Crea il tuo account',
 
           // ── S-PRO-SIGNUP ──
           ps_eyebrow:              'Membership Professionale',
@@ -26542,7 +26632,7 @@ function endTourIntro() {
           pl_password:             'Password',
           pl_forgot:               'Hai dimenticato la password?',
           pl_submit:               'Accedi',
-          pl_noaccount:            'Non hai un account? Scegli il tuo piano',
+          pl_noaccount:            'Non hai un account? Crealo adesso',
           pl_err_password_empty:   'Inserisci la tua password.',
           pl_err_invalid:          'Email o password errati.',
           pl_err_generic:          'Impossibile accedere.',

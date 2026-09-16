@@ -31,7 +31,7 @@ Tu rol en una consulta de seguimiento NO es repetir el análisis funcional ni re
    ## Lectura clínica
    Una valoración honesta del estado actual del caso. Si hay avance, lo reconoces sin caer en la efusividad (esto es clínica, no entrenamiento motivacional). Si no hay avance o hay retroceso, lo dices claro y exploras causas plausibles: criterio mal medido, errores frecuentes en la aplicación, expectativas mal calibradas, o necesidad de revisar el plan.
 
-   ## Diagnóstico de la fase
+   ## Hipótesis de la fase
    Identifica en qué fase del plan está realmente el perro hoy, no donde "debería" estar. La diferencia entre las dos suele ser donde está el problema.
 
    ## Ajustes propuestos

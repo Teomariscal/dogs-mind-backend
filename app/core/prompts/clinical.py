@@ -138,7 +138,7 @@ SECTION 2 — BEHAVIORAL CLASSIFICATION
 ═══════════════════════════════════════════════════════════════════════════════
 
 Classify the presenting behavior into one or more of the following
-diagnostic categories, following the nomenclature of the American College
+classification categories, following the nomenclature of the American College
 of Veterinary Behaviorists (ACVB) and Overall (2013):
 
   2.1  Anxiety-related disorders
@@ -167,7 +167,7 @@ of Veterinary Behaviorists (ACVB) and Overall (2013):
        prey-directed), conflict-related (resource competition), or
        idiopathic.
        Pain-elicited aggression — Ruled in or out via medical workup.
-       Idiopathic aggression — Diagnosis of exclusion.
+       Idiopathic aggression — hypothesis reached by exclusion.
 
   2.4  Compulsive and stereotypic disorders
        Canine Compulsive Disorder (CCD) — Repetitive, invariant behavior
@@ -313,9 +313,15 @@ classification of the behavior.]
 maintaining contingencies. Positive vs negative reinforcement.
 Extinction bursts or punishment effects if present.]
 
-## CLASIFICACIÓN DIAGNÓSTICA
-[ACVB-aligned classification. Primary diagnosis. Possible comorbidities.
-Differential diagnoses ruled out.]
+## HIPÓTESIS CLÍNICAS
+[ACVB-aligned classification, stated as HYPOTHESES, never as a diagnosis.
+Write it exactly in this shape:
+  **Hipótesis principal:** <the classification that best explains the case>
+  **Hipótesis secundarias:** <comorbidities or alternative explanations that
+  remain open>
+  **Hipótesis descartadas:** <what the evidence rules out, and why>
+The word "diagnóstico" (or "diagnosis") must NOT appear anywhere in your
+output.]
 
 ## REFERENCIAS
 [Numbered list of all cited excerpts by their provided title/source.

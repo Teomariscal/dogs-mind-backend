@@ -77,7 +77,30 @@
       pidiendo:'Pidiendo tu ubicación…',
       sin_geo:'Tu navegador no da la ubicación.',
       sin_permiso:'No nos has dado permiso de ubicación. Escribe una ciudad.',
-      vais_a_ver:'Lo que vais a ver', abrir_mapas:'Abrir en mi app de mapas'
+      vais_a_ver:'Lo que vais a ver', abrir_mapas:'Abrir en mi app de mapas',
+      lug_park:'Zona verde', lug_dog:'Zona de perros', lug_agua:'Fuente de agua', lug_tienda:'Tienda de animales',
+      g_izq:'gira a la izquierda', g_der:'gira a la derecha',
+      g_lig_izq:'ligeramente a la izquierda', g_lig_der:'ligeramente a la derecha',
+      g_cer_izq:'giro cerrado a la izquierda', g_cer_der:'giro cerrado a la derecha',
+      g_recto:'sigue recto', g_vuelta:'da la vuelta',
+      g_por:' por ', g_rotonda:'En la rotonda, toma la salida',
+      niv_bajo:'Poco activo', niv_bajo_d:'cuartil bajo del estudio',
+      niv_medio:'Normal', niv_medio_d:'mediana del estudio',
+      niv_alto:'Muy activo', niv_alto_d:'cuartil alto del estudio',
+      cruza:'Cruza ', zv_de:'las zonas verdes de ', con_:'Con ', a_la_vista:' a la vista.',
+      hay_:'Hay ', miradores_rec:' miradores en el recorrido.', un_mirador:'Hay un mirador en el recorrido.',
+      antes_atardecer:' antes del atardecer (unas ', veces_arbolado:' veces la altura del arbolado)',
+      buscando_zonas:'Buscando zonas verdes y servicios…',
+      mapa_no_responde:'El mapa de zonas verdes no responde ahora mismo. Te trazamos rutas a pie igualmente.',
+      sin_zonas:'No hay zonas verdes registradas cerca. Te trazamos rutas a pie por el entorno.',
+      calculando:'Calculando rutas a pie…',
+      prueba_pueblo:'Prueba a escribir un pueblo o ciudad cercana. No te hemos cobrado nada.',
+      rutas_datos:' rutas a pie sobre datos de Google Maps',
+      con_zv:'con las zonas verdes y los servicios que hay de verdad alrededor.',
+      mapa_error:'No se ha podido cargar el mapa.',
+      suelto_y:'Suelto y ', recorre_aprox:': tu perro recorre alrededor de un <b>',
+      atado:'Atado a tu lado recorre <b>tu misma distancia</b>. Marca la casilla si va suelto.',
+      buscando_q:'Buscando «', del_camino:'Del camino · ', fotos_n:' fotos'
     },
     en: {
       jardin:'Garden', sigue:'continue',
@@ -109,7 +132,30 @@
       pidiendo:'Asking for your location…',
       sin_geo:'Your browser does not provide location.',
       sin_permiso:'You have not given us location permission. Type a city.',
-      vais_a_ver:'What you will see', abrir_mapas:'Open in my maps app'
+      vais_a_ver:'What you will see', abrir_mapas:'Open in my maps app',
+      lug_park:'Green space', lug_dog:'Dog park', lug_agua:'Drinking fountain', lug_tienda:'Pet shop',
+      g_izq:'turn left', g_der:'turn right',
+      g_lig_izq:'slightly left', g_lig_der:'slightly right',
+      g_cer_izq:'sharp left', g_cer_der:'sharp right',
+      g_recto:'carry straight on', g_vuelta:'turn around',
+      g_por:' along ', g_rotonda:'At the roundabout, take the exit',
+      niv_bajo:'Not very active', niv_bajo_d:'lower quartile of the study',
+      niv_medio:'Normal', niv_medio_d:'median of the study',
+      niv_alto:'Very active', niv_alto_d:'upper quartile of the study',
+      cruza:'You cross ', zv_de:'the green spaces of ', con_:'With ', a_la_vista:' in view.',
+      hay_:'There are ', miradores_rec:' viewpoints along the route.', un_mirador:'There is a viewpoint along the route.',
+      antes_atardecer:' before sunset (about ', veces_arbolado:' times the height of the trees)',
+      buscando_zonas:'Looking for green spaces and services…',
+      mapa_no_responde:'The green-space map is not responding right now. We will plan walking routes anyway.',
+      sin_zonas:'No green spaces registered nearby. We will plan walking routes around the area.',
+      calculando:'Working out walking routes…',
+      prueba_pueblo:'Try typing a nearby town or city. We have not charged you anything.',
+      rutas_datos:' walking routes based on Google Maps data',
+      con_zv:'with the green spaces and services that really are around you.',
+      mapa_error:'The map could not be loaded.',
+      suelto_y:'Off the lead and ', recorre_aprox:': your dog covers about <b>',
+      atado:'On the lead beside you it covers <b>the same distance as you</b>. Tick the box if it walks off the lead.',
+      buscando_q:'Searching for \u201c', del_camino:'Along the way · ', fotos_n:' photos'
     },
     it: {
       jardin:'Giardino', sigue:'prosegui',
@@ -141,7 +187,30 @@
       pidiendo:'Sto chiedendo la tua posizione…',
       sin_geo:'Il tuo browser non fornisce la posizione.',
       sin_permiso:'Non ci hai dato il permesso di posizione. Scrivi una città.',
-      vais_a_ver:'Che cosa vedrete', abrir_mapas:'Apri nella mia app di mappe'
+      vais_a_ver:'Che cosa vedrete', abrir_mapas:'Apri nella mia app di mappe',
+      lug_park:'Area verde', lug_dog:'Area cani', lug_agua:'Fontanella', lug_tienda:'Negozio per animali',
+      g_izq:'gira a sinistra', g_der:'gira a destra',
+      g_lig_izq:'leggermente a sinistra', g_lig_der:'leggermente a destra',
+      g_cer_izq:'svolta secca a sinistra', g_cer_der:'svolta secca a destra',
+      g_recto:'prosegui dritto', g_vuelta:'fai inversione',
+      g_por:' lungo ', g_rotonda:'Alla rotonda, prendi l\u2019uscita',
+      niv_bajo:'Poco attivo', niv_bajo_d:'quartile basso dello studio',
+      niv_medio:'Normale', niv_medio_d:'mediana dello studio',
+      niv_alto:'Molto attivo', niv_alto_d:'quartile alto dello studio',
+      cruza:'Attraversate ', zv_de:'le aree verdi di ', con_:'Con ', a_la_vista:' in vista.',
+      hay_:'Ci sono ', miradores_rec:' punti panoramici lungo il percorso.', un_mirador:'C\u2019\u00e8 un punto panoramico lungo il percorso.',
+      antes_atardecer:' prima del tramonto (circa ', veces_arbolado:' volte l\u2019altezza degli alberi)',
+      buscando_zonas:'Sto cercando aree verdi e servizi…',
+      mapa_no_responde:'La mappa delle aree verdi non risponde adesso. Tracciamo comunque i percorsi a piedi.',
+      sin_zonas:'Nessuna area verde registrata qui vicino. Tracciamo percorsi a piedi nei dintorni.',
+      calculando:'Sto calcolando i percorsi a piedi…',
+      prueba_pueblo:'Prova a scrivere un paese o una citt\u00e0 vicina. Non ti abbiamo addebitato nulla.',
+      rutas_datos:' percorsi a piedi su dati di Google Maps',
+      con_zv:'con le aree verdi e i servizi che ci sono davvero intorno a voi.',
+      mapa_error:'Non \u00e8 stato possibile caricare la mappa.',
+      suelto_y:'Libero e ', recorre_aprox:': il tuo cane percorre circa un <b>',
+      atado:'Al guinzaglio accanto a te percorre <b>la tua stessa distanza</b>. Spunta la casella se va libero.',
+      buscando_q:'Sto cercando \u00ab', del_camino:'Lungo il percorso · ', fotos_n:' foto'
     }
   };
   function T(k) { var d = DIC[L()] || DIC.es; return (k in d) ? d[k] : DIC.es[k]; }
@@ -243,11 +312,11 @@
   }
 
   var TIPOS = {
-    park:         { n: 'Zona verde',        c: '#7eb86a' },
-    dog_park:     { n: 'Zona de perros',    c: '#7eb86a' },
+    park:         { n: T('lug_park'),        c: '#7eb86a' },
+    dog_park:     { n: T('lug_dog'),    c: '#7eb86a' },
     veterinary:   { n: 'Veterinario',       c: '#5ec8e6' },
-    drinking_water:{ n: 'Fuente de agua',   c: '#5ec8e6' },
-    pet:          { n: 'Tienda de animales',c: '#80d6ee' },
+    drinking_water:{ n: T('lug_agua'),   c: '#5ec8e6' },
+    pet:          { n: T('lug_tienda'),c: '#80d6ee' },
     /* Founder 2026-08-17: "no solo buscar parques sino caminos, rutas de
        montaña o naturaleza". En un pueblo no hay parques etiquetados pero sí
        decenas de pistas y bosque — comprobado en Villamantilla: 0 parques,
@@ -301,18 +370,18 @@
 
   /* Traducción de las maniobras que devuelve OSRM (vienen en inglés) */
   var GIROS = {
-    left: 'gira a la izquierda', right: 'gira a la derecha',
-    'slight left': 'ligeramente a la izquierda', 'slight right': 'ligeramente a la derecha',
-    'sharp left': 'giro cerrado a la izquierda', 'sharp right': 'giro cerrado a la derecha',
-    straight: 'sigue recto', uturn: 'da la vuelta'
+    left: T('g_izq'), right: T('g_der'),
+    'slight left': T('g_lig_izq'), 'slight right': T('g_lig_der'),
+    'sharp left': T('g_cer_izq'), 'sharp right': T('g_cer_der'),
+    straight: T('g_recto'), uturn: T('g_vuelta')
   };
   function instruccion(paso) {
     var m = paso.maneuver || {};
-    var via = paso.name ? ' por ' + paso.name : '';
+    var via = paso.name ? T('g_por') + paso.name : '';
     var d = paso.distance ? ' (' + Math.round(paso.distance) + ' m)' : '';
     if (m.type === 'depart')  return 'Sal' + via + d;
     if (m.type === 'arrive')  return 'Has llegado al punto de partida';
-    if (m.type === 'roundabout' || m.type === 'rotary') return 'En la rotonda, toma la salida' + via + d;
+    if (m.type === 'roundabout' || m.type === 'rotary') return T('g_rotonda') + via + d;
     var g = GIROS[m.modifier] || T('sigue');
     return g.charAt(0).toUpperCase() + g.slice(1) + via + d;
   }
@@ -463,7 +532,7 @@
       return;
     }
     cont.innerHTML =
-      '<div class="dmw-fotos-h">Del camino · ' + fotos.length + ' fotos</div>' +
+      '<div class="dmw-fotos-h">' + T('del_camino') + fotos.length + T('fotos_n') + '</div>' +
       '<div class="dmw-fotos-row">' + fotos.map(function (f) {
         return '<a class="dmw-foto" href="' + f.pagina + '" target="_blank" rel="noopener" title="' +
                f.titulo.replace(/"/g, '') + (f.autor ? ' — ' + f.autor.replace(/"/g, '') : '') + '">' +
@@ -483,9 +552,9 @@
      +17 % / +43 % / +99 %. Atado, el perro hace tu misma distancia.
      NO se inventa nada: cada nivel corresponde a un cuartil publicado. */
   var NIVELES = {
-    bajo:  { f: 1.17, n: 'Poco activo',  d: 'cuartil bajo del estudio' },
-    medio: { f: 1.43, n: 'Normal',       d: 'mediana del estudio' },
-    alto:  { f: 1.99, n: 'Muy activo',   d: 'cuartil alto del estudio' }
+    bajo:  { f: 1.17, get n(){return T('niv_bajo');},  get d(){return T('niv_bajo_d');} },
+    medio: { f: 1.43, get n(){return T('niv_medio');}, get d(){return T('niv_medio_d');} },
+    alto:  { f: 1.99, get n(){return T('niv_alto');},  get d(){return T('niv_alto_d');} }
   };
   function nivelActual() {
     var v = 'medio';
@@ -608,21 +677,21 @@
     if (!g) return '';
     var f = [];
     if (g.agua.length)   f.push(T('junto_a') + (g.agua.length > 1 ? T('a_') + g.agua.slice(0, 2).join(T('y_')) : T('al_') + g.agua[0]) + '.');
-    if (g.parques.length) f.push('Cruza ' + (g.parques.length > 1 ? 'las zonas verdes de ' + g.parques.slice(0, 2).join(' y ') : g.parques[0]) + '.');
-    if (g.montes.length) f.push('Con ' + g.montes.slice(0, 2).join(' y ') + ' a la vista.');
+    if (g.parques.length) f.push(T('cruza') + (g.parques.length > 1 ? T('zv_de') + g.parques.slice(0, 2).join(' y ') : g.parques[0]) + '.');
+    if (g.montes.length) f.push(T('con_') + g.montes.slice(0, 2).join(T('y_')) + T('a_la_vista'));
     if (g.historico.length) {
       var h = g.historico.slice(0, 2).map(function (x) { return x.n; }).join(' y ');
       f.push('De paso, ' + h + '.');
     }
-    if (g.miradores) f.push(g.miradores > 1 ? 'Hay ' + g.miradores + ' miradores en el recorrido.' : 'Hay un mirador en el recorrido.');
+    if (g.miradores) f.push(g.miradores > 1 ? T('hay_') + g.miradores + T('miradores_rec') : T('un_mirador'));
     if (g.bosque || g.arboles) {
       var sombra = centro ? mejorHoraSombra(centro.lat, centro.lon) : null;
       var base = g.bosque ? T('bosque_si') : T('bosque_no');
       f.push(base + (sombra ? T('sombra_larga') + sombra.antes +
-             ' antes del atardecer (unas ' + sombra.sombra + ' veces la altura del arbolado)' : '') + '.');
+             T('antes_atardecer') + sombra.sombra + T('veces_arbolado') : '') + '.');
     }
     if (!f.length) return '';
-    return '<div class="dmw-relato"><div class="dmw-relato-h">Lo que vais a ver</div>' +
+    return '<div class="dmw-relato"><div class="dmw-relato-h">' + T('vais_a_ver') + '</div>' +
            '<p>' + f.join(' ') + '</p>' +
            '<div class="dmw-relato-f">Lugares reales sobre el recorrido, segun Google Maps. ' +
            T('sombra_sol') + '</div></div>';
@@ -680,7 +749,7 @@
           '</ol>'
         : '<div class="dmw-nav-vacio">Sin indicaciones detalladas para esta ruta.</div>') +
       '<div class="dmw-nav-btns">' +
-        (g ? '<a class="dmw-nav-btn" href="' + g + '" target="_blank" rel="noopener">Abrir en mi app de mapas</a>' : '') +
+        (g ? '<a class="dmw-nav-btn" href="' + g + '" target="_blank" rel="noopener">' + T('abrir_mapas') + '</a>' : '') +
         /* El enlace a OpenStreetMap se retira: ya no es nuestra fuente (4-sep-2026). */
       '</div>' +
       '<div class="dmw-nav-nota">Se abre tu app de mapas con esta ruta ya elegida — ' +
@@ -722,7 +791,7 @@
        público gratuito— el usuario pagaba los créditos, veía "no se han podido
        consultar los datos" y volvía a pagar en cada reintento. */
     estado.centro = centro;
-    estadoTexto('Buscando zonas verdes y servicios…');
+    estadoTexto(T('buscando_zonas'));
     capaRutas.clearLayers(); capaPois.clearLayers();
     estado.rutas = [];
     mapa.setCenter({ lat: centro.lat, lng: centro.lon });
@@ -758,8 +827,8 @@
     }
     if (!pois.length) {
       estadoTexto(falloMapa
-        ? 'El mapa de zonas verdes no responde ahora mismo. Te trazamos rutas a pie igualmente.'
-        : 'No hay zonas verdes registradas cerca. Te trazamos rutas a pie por el entorno.');
+        ? T('mapa_no_responde')
+        : T('sin_zonas'));
     }
     estado.pois = pois;
 
@@ -769,7 +838,7 @@
         p.nombre + ' · ' + TIPOS[p.tipo].n, capaPois);
     });
 
-    estadoTexto('Calculando rutas a pie…');
+    estadoTexto(T('calculando'));
     var objetivos = [
       { nombre: T('r_corta'),  m: 1500, por: T('r_corta_p') },
       { nombre: T('r_media'),    m: 3000, por: T('r_media_p') },
@@ -833,13 +902,13 @@
       var vac = document.getElementById('dmw-walk-lista');
       if (vac) vac.innerHTML = '<div class="dmw-walk-vacio">No hemos podido trazar rutas ' +
         T('sin_caminos') +
-        'Prueba a escribir un pueblo o ciudad cercana. No te hemos cobrado nada.</div>';
+        T('prueba_pueblo') + '</div>';
       return;
     }
     /* Ya hay rutas de verdad: ahora sí se cobra. */
     if (!(await cobrarPaseo())) return;
     pintarLista(document.getElementById('dmw-walk-lista'));
-    estadoTexto(estado.rutas.length + ' rutas a pie sobre datos de Google Maps');
+    estadoTexto(estado.rutas.length + T('rutas_datos'));
     if (estado.rutas.length) seleccionar(0);
   }
 
@@ -851,14 +920,14 @@
           '<button class="dmw-walk-btn" id="dmw-walk-geo">' + T('usar_ubic') + '</button>' +
           '<div class="dmw-walk-sep">o</div>' +
           '<input class="dmw-walk-in" id="dmw-walk-q" placeholder="' + T('escribe_ciudad') + '">' +
-          '<button class="dmw-walk-btn alt" id="dmw-walk-go">Buscar</button>' +
+          '<button class="dmw-walk-btn alt" id="dmw-walk-go">' + T('buscar') + '</button>' +
         '</div>' +
-        '<button class="dmw-walk-cta" id="dmw-walk-rutas">Buscar mis tres rutas</button>' +
+        '<button class="dmw-walk-cta" id="dmw-walk-rutas">' + T('buscar_tres') + '</button>' +
         '<div class="dmw-walk-body">' +
           '<div id="dmw-walk-map" class="dmw-walk-map"></div>' +
           '<div class="dmw-rutas" id="dmw-walk-lista">' +
             '<div class="dmw-walk-vacio">' + T('dinos_donde') +
-            'con las zonas verdes y los servicios que hay de verdad alrededor.</div>' +
+            T('con_zv') + '</div>' +
           '</div>' +
         '</div>' +
         '<div class="dmw-walk-relato" id="dmw-walk-relato"></div>' +
@@ -871,14 +940,14 @@
               return '<button data-n="' + k + '">' + NIVELES[k].n + '</button>';
             }).join('') +
           '</div>' +
-          '<label class="dmw-suelto"><input type="checkbox" id="dmw-suelto"> Va suelto durante el paseo</label>' +
+          '<label class="dmw-suelto"><input type="checkbox" id="dmw-suelto"> ' + T('suelto') + '</label>' +
           '<div class="dmw-perfil-nota" id="dmw-perfil-nota"></div>' +
         '</div>' +
-        '<div class="dmw-walk-f"><span id="dmw-walk-estado">Datos y rutas a pie de Google Maps</span></div>' +
+        '<div class="dmw-walk-f"><span id="dmw-walk-estado">' + T('rutas_datos').trim() + '</span></div>' +
       '</div>';
 
     try { await cargarGoogleMaps(); }
-    catch (e) { estadoTexto('No se ha podido cargar el mapa.'); return; }
+    catch (e) { estadoTexto(T('mapa_error')); return; }
     mapa = new google.maps.Map(document.getElementById('dmw-walk-map'), {
       center: { lat: 40.4168, lng: -3.7038 }, zoom: 13,
       styles: ESTILO_OSCURO, disableDefaultUI: true, zoomControl: true,
@@ -898,9 +967,9 @@
       });
       chk.checked = s;
       nota.innerHTML = s
-        ? 'Suelto y ' + NIVELES[n].n.toLowerCase() + ': tu perro recorre alrededor de un <b>' +
+        ? T('suelto_y') + NIVELES[n].n.toLowerCase() + T('recorre_aprox') +
           Math.round((NIVELES[n].f - 1) * 100) + ' %</b>' + T('mas_que_tu') + NIVELES[n].d + ').'
-        : 'Atado a tu lado recorre <b>tu misma distancia</b>. Marca la casilla si va suelto.';
+        : T('atado');
       if (estado.rutas.length) pintarLista(document.getElementById('dmw-walk-lista'));
     }
     ops.querySelectorAll('button').forEach(function (b) {
@@ -927,7 +996,7 @@
     var buscar = async function () {
       var q = (document.getElementById('dmw-walk-q').value || '').trim();
       if (!q) return;
-      estadoTexto('Buscando «' + q + '»…');
+      estadoTexto(T('buscando_q') + q + '\u00bb…');
       try {
         var d = await pedir('/walks/buscar?q=' + encodeURIComponent(q));
         generar({ lat: d.lat, lon: d.lon }, (d.nombre || q).split(',')[0]);

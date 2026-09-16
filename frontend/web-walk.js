@@ -30,6 +30,122 @@
     if (!_nativo && (!document.body || !document.body.classList.contains('dm-web'))) return;
   } catch (e) { return; }
 
+  /* ── IDIOMA (15-sep-2026) ──────────────────────────────────────────────────
+     Este fichero tenia CERO traduccion: 835 lineas y todo el texto visible en
+     castellano. La tarjeta que lleva aqui SI esta traducida —"La passeggiata di
+     oggi" sale del diccionario— asi que un italiano pulsaba un titulo en su
+     idioma y caia en una pantalla entera en español. El founder lo vio en
+     TestFlight y mando la captura.
+
+     No se enchufa a TRANSLATIONS a proposito: este fichero se carga bajo
+     demanda y puede llegar antes o despues que el diccionario. Lleva el suyo,
+     como ya hacia web-paseo.js, que es el patron de la casa aqui. */
+  function L() {
+    try {
+      return ((window.getCurrentLang ? window.getCurrentLang() : '') ||
+              localStorage.getItem('dm_lang') || 'es').toLowerCase().slice(0, 2);
+    } catch (e) { return 'es'; }
+  }
+  var DIC = {
+    es: {
+      jardin:'Jardín', sigue:'continúa',
+      creditos_wiki:'Fotografías de Wikimedia Commons',
+      sin_entorno:'suficientes en el entorno para proponer rutas. Prueba con otra ubicación.',
+      recorrera_a:'recorrerá tu perro', estimado:'estimado',
+      estimado_t:'Estimación sobre datos publicados (Foltin & Ganslosser)',
+      junto_a:'Caminaréis junto ', y_:' y ', al_:'al ', a_:'a ',
+      bosque_si:'Tramos arbolados donde parar a la sombra',
+      bosque_no:'Hileras de árboles a lo largo del camino',
+      sombra_larga:'; la sombra más larga llega unas ',
+      sombra_sol:'Hora de sombra calculada con la posición real del sol.',
+      como_empezar:'Cómo empezar · ',
+      y_mas:'y ', indicaciones_mas:' indicaciones más durante el paseo',
+      salida_vuelta:'salida, paradas y vuelta — y la sigues desde ahí con tu GPS.',
+      sin_creditos:'Te has quedado sin créditos para el paseo.',
+      estais_aqui:'Estáis aquí',
+      r_corta:'Vuelta corta', r_corta_p:'Paseo rápido por el entorno cercano.',
+      r_media:'Ruta media',   r_media_p:'Equilibrio entre distancia y zonas verdes.',
+      r_larga:'Ruta larga',   r_larga_p:'Para cuando tenéis tiempo y ganas de kilómetros.',
+      sin_rutas:'Sin rutas disponibles aquí. No te hemos cobrado nada.',
+      sin_caminos:'a pie aquí: por esta zona no hay caminos suficientes en el mapa. ',
+      usar_ubic:'Usar mi ubicación',
+      escribe_ciudad:'Escribe una ciudad o dirección…',
+      buscar:'Buscar', buscar_tres:'Buscar mis tres rutas',
+      dinos_donde:'Dinos dónde estáis y calculamos tres rutas a pie ',
+      como_es:'¿Cómo es tu perro?', suelto:'Va suelto durante el paseo',
+      mas_que_tu:' más que tú (',
+      pidiendo:'Pidiendo tu ubicación…',
+      sin_geo:'Tu navegador no da la ubicación.',
+      sin_permiso:'No nos has dado permiso de ubicación. Escribe una ciudad.',
+      vais_a_ver:'Lo que vais a ver', abrir_mapas:'Abrir en mi app de mapas'
+    },
+    en: {
+      jardin:'Garden', sigue:'continue',
+      creditos_wiki:'Photographs from Wikimedia Commons',
+      sin_entorno:'enough around here to suggest routes. Try another location.',
+      recorrera_a:'your dog will cover', estimado:'estimated',
+      estimado_t:'Estimate based on published data (Foltin & Ganslosser)',
+      junto_a:'You will walk beside ', y_:' and ', al_:'the ', a_:'the ',
+      bosque_si:'Tree-lined stretches where you can stop in the shade',
+      bosque_no:'Rows of trees along the way',
+      sombra_larga:'; the longest shade arrives in about ',
+      sombra_sol:'Shade time calculated from the real position of the sun.',
+      como_empezar:'How to start · ',
+      y_mas:'and ', indicaciones_mas:' more directions along the walk',
+      salida_vuelta:'start, stops and return — and you follow it from there with your GPS.',
+      sin_creditos:'You have run out of credits for the walk.',
+      estais_aqui:'You are here',
+      r_corta:'Short loop',  r_corta_p:'A quick walk around the area.',
+      r_media:'Medium route', r_media_p:'A balance between distance and green space.',
+      r_larga:'Long route',  r_larga_p:'For when you have time and want the miles.',
+      sin_rutas:'No routes available here. We have not charged you anything.',
+      sin_caminos:'on foot here: there are not enough paths on the map in this area. ',
+      usar_ubic:'Use my location',
+      escribe_ciudad:'Type a city or address…',
+      buscar:'Search', buscar_tres:'Find my three routes',
+      dinos_donde:'Tell us where you are and we will work out three walking routes ',
+      como_es:'What is your dog like?', suelto:'Walks off the lead',
+      mas_que_tu:' more than you (',
+      pidiendo:'Asking for your location…',
+      sin_geo:'Your browser does not provide location.',
+      sin_permiso:'You have not given us location permission. Type a city.',
+      vais_a_ver:'What you will see', abrir_mapas:'Open in my maps app'
+    },
+    it: {
+      jardin:'Giardino', sigue:'prosegui',
+      creditos_wiki:'Fotografie da Wikimedia Commons',
+      sin_entorno:'a sufficienza nei dintorni per proporre percorsi. Prova un’altra posizione.',
+      recorrera_a:'percorrerà il tuo cane', estimado:'stimato',
+      estimado_t:'Stima su dati pubblicati (Foltin & Ganslosser)',
+      junto_a:'Camminerete lungo ', y_:' e ', al_:'il ', a_:'la ',
+      bosque_si:'Tratti alberati dove fermarsi all’ombra',
+      bosque_no:'Filari di alberi lungo il percorso',
+      sombra_larga:'; l’ombra più lunga arriva tra circa ',
+      sombra_sol:'Ora d’ombra calcolata con la posizione reale del sole.',
+      como_empezar:'Come iniziare · ',
+      y_mas:'e ', indicaciones_mas:' altre indicazioni durante la passeggiata',
+      salida_vuelta:'partenza, soste e ritorno — e lo segui da lì con il tuo GPS.',
+      sin_creditos:'Hai esaurito i crediti per la passeggiata.',
+      estais_aqui:'Siete qui',
+      r_corta:'Giro breve',    r_corta_p:'Passeggiata rapida nei dintorni.',
+      r_media:'Percorso medio', r_media_p:'Equilibrio tra distanza e aree verdi.',
+      r_larga:'Percorso lungo', r_larga_p:'Per quando avete tempo e voglia di chilometri.',
+      sin_rutas:'Nessun percorso disponibile qui. Non ti abbiamo addebitato nulla.',
+      sin_caminos:'a piedi qui: in questa zona non ci sono abbastanza percorsi sulla mappa. ',
+      usar_ubic:'Usa la mia posizione',
+      escribe_ciudad:'Scrivi una città o un indirizzo…',
+      buscar:'Cerca', buscar_tres:'Trova i miei tre percorsi',
+      dinos_donde:'Dicci dove siete e calcoliamo tre percorsi a piedi ',
+      como_es:'Com’è il tuo cane?', suelto:'Va libero durante la passeggiata',
+      mas_que_tu:' più di te (',
+      pidiendo:'Sto chiedendo la tua posizione…',
+      sin_geo:'Il tuo browser non fornisce la posizione.',
+      sin_permiso:'Non ci hai dato il permesso di posizione. Scrivi una città.',
+      vais_a_ver:'Che cosa vedrete', abrir_mapas:'Apri nella mia app di mappe'
+    }
+  };
+  function T(k) { var d = DIC[L()] || DIC.es; return (k in d) ? d[k] : DIC.es[k]; }
+
   /* SIEMPRE Google Maps, sin respaldo (founder, 2-sep-2026). OpenStreetMap queda
      anulado: fuera Overpass, OSRM, Nominatim y Leaflet.
      Los datos NO se piden desde aqui: van por nuestro backend (/walks/*), que es
@@ -143,7 +259,7 @@
     meadow:       { n: 'Prado',             c: '#9ecf86' },
     /* Tipos que aporta Google y no tenia OpenStreetMap. Comprobados contra la
        API el 4-sep-2026 en Madrid y en Villamantilla (pueblo). */
-    jardin:       { n: 'Jardín',            c: '#7eb86a' },
+    jardin:       { n: T('jardin'),            c: '#7eb86a' },
     plaza:        { n: 'Plaza',             c: '#b6dca0' },
     historico:    { n: 'Monumento',         c: '#e0bd8c' }
   };
@@ -197,7 +313,7 @@
     if (m.type === 'depart')  return 'Sal' + via + d;
     if (m.type === 'arrive')  return 'Has llegado al punto de partida';
     if (m.type === 'roundabout' || m.type === 'rotary') return 'En la rotonda, toma la salida' + via + d;
-    var g = GIROS[m.modifier] || 'continúa';
+    var g = GIROS[m.modifier] || T('sigue');
     return g.charAt(0).toUpperCase() + g.slice(1) + via + d;
   }
 
@@ -355,7 +471,7 @@
                  '<span>' + f.titulo + '</span>' +
                '</a>';
       }).join('') + '</div>' +
-      '<div class="dmw-fotos-cred">Fotografías de Wikimedia Commons</div>';
+      '<div class="dmw-fotos-cred">' + T('creditos_wiki') + '</div>';
   }
 
   /* ── Render ────────────────────────────────────────────────────────────── */
@@ -386,7 +502,7 @@
   function pintarLista(cont) {
     if (!estado.rutas.length) {
       cont.innerHTML = '<div class="dmw-walk-vacio">No hemos encontrado zonas verdes ni servicios ' +
-        'suficientes en el entorno para proponer rutas. Prueba con otra ubicación.</div>';
+        T('sin_entorno') + '</div>';
       return;
     }
     cont.innerHTML = estado.rutas.map(function (r, i) {
@@ -406,8 +522,8 @@
       }).join('');
       var perro = metrosPerro(r.metros);
       var extra = perro > r.metros
-        ? '<div class="dmw-perro-km"><b>' + km(perro) + '</b> recorrerá tu perro ' +
-          '<span title="Estimación sobre datos publicados (Foltin &amp; Ganslosser)">estimado</span></div>'
+        ? '<div class="dmw-perro-km"><b>' + km(perro) + '</b> ' + T('recorrera_a') + ' ' +
+          '<span title="' + T('estimado_t') + '">' + T('estimado') + '</span></div>'
         : '';
       return '<button class="dmw-ruta-c' + (i === 0 ? ' on' : '') + '" data-i="' + i + '">' +
                '<div class="dmw-ruta-top"><b>' + r.nombre + '</b><span>' + km(r.metros) + ' · ' + mins(r.metros) + '</span></div>' +
@@ -491,7 +607,7 @@
   function textoRasgos(g, centro) {
     if (!g) return '';
     var f = [];
-    if (g.agua.length)   f.push('Caminaréis junto ' + (g.agua.length > 1 ? 'a ' + g.agua.slice(0, 2).join(' y ') : 'al ' + g.agua[0]) + '.');
+    if (g.agua.length)   f.push(T('junto_a') + (g.agua.length > 1 ? T('a_') + g.agua.slice(0, 2).join(T('y_')) : T('al_') + g.agua[0]) + '.');
     if (g.parques.length) f.push('Cruza ' + (g.parques.length > 1 ? 'las zonas verdes de ' + g.parques.slice(0, 2).join(' y ') : g.parques[0]) + '.');
     if (g.montes.length) f.push('Con ' + g.montes.slice(0, 2).join(' y ') + ' a la vista.');
     if (g.historico.length) {
@@ -501,15 +617,15 @@
     if (g.miradores) f.push(g.miradores > 1 ? 'Hay ' + g.miradores + ' miradores en el recorrido.' : 'Hay un mirador en el recorrido.');
     if (g.bosque || g.arboles) {
       var sombra = centro ? mejorHoraSombra(centro.lat, centro.lon) : null;
-      var base = g.bosque ? 'Tramos arbolados donde parar a la sombra' : 'Hileras de árboles a lo largo del camino';
-      f.push(base + (sombra ? '; la sombra más larga llega unas ' + sombra.antes +
+      var base = g.bosque ? T('bosque_si') : T('bosque_no');
+      f.push(base + (sombra ? T('sombra_larga') + sombra.antes +
              ' antes del atardecer (unas ' + sombra.sombra + ' veces la altura del arbolado)' : '') + '.');
     }
     if (!f.length) return '';
     return '<div class="dmw-relato"><div class="dmw-relato-h">Lo que vais a ver</div>' +
            '<p>' + f.join(' ') + '</p>' +
            '<div class="dmw-relato-f">Lugares reales sobre el recorrido, segun Google Maps. ' +
-           'Hora de sombra calculada con la posición real del sol.</div></div>';
+           T('sombra_sol') + '</div></div>';
   }
 
   async function pintarRelato(i) {
@@ -556,11 +672,11 @@
     var pasos = (r.pasos || []).slice(0, 4);
     var g = urlNavegacion(r), o = urlOsm(r);
     cont.innerHTML =
-      '<div class="dmw-nav-h">Cómo empezar · ' + r.nombre + '</div>' +
+      '<div class="dmw-nav-h">' + T('como_empezar') + r.nombre + '</div>' +
       (pasos.length
         ? '<ol class="dmw-nav-pasos">' + pasos.map(function (p) { return '<li>' + p + '</li>'; }).join('') +
           (r.pasos.length > pasos.length
-            ? '<li class="mas">y ' + (r.pasos.length - pasos.length) + ' indicaciones más durante el paseo</li>' : '') +
+            ? '<li class="mas">' + T('y_mas') + (r.pasos.length - pasos.length) + T('indicaciones_mas') + '</li>' : '') +
           '</ol>'
         : '<div class="dmw-nav-vacio">Sin indicaciones detalladas para esta ruta.</div>') +
       '<div class="dmw-nav-btns">' +
@@ -568,7 +684,7 @@
         /* El enlace a OpenStreetMap se retira: ya no es nuestra fuente (4-sep-2026). */
       '</div>' +
       '<div class="dmw-nav-nota">Se abre tu app de mapas con esta ruta ya elegida — ' +
-      'salida, paradas y vuelta — y la sigues desde ahí con tu GPS.</div>';
+      T('salida_vuelta') + '</div>';
   }
 
   function estadoTexto(t) {
@@ -592,7 +708,7 @@
       });
       if (r.status === 402) {
         if (typeof showRechargeNotice === 'function') showRechargeNotice(0.25);
-        else estadoTexto('Te has quedado sin créditos para el paseo.');
+        else estadoTexto(T('sin_creditos'));
         return false;
       }
       if (r.ok && typeof fetchBalance === 'function') { try { fetchBalance(); } catch (e) {} }
@@ -614,7 +730,7 @@
     if (marcadorYo) { try { marcadorYo.setMap(null); } catch (e) {} }
     marcadorYo = gPunto(centro.lat, centro.lon,
       { radius: 8, color: '#fff', weight: 3, fillColor: '#5ec8e6', fillOpacity: 1 },
-      etiqueta || 'Estáis aquí');
+      etiqueta || T('estais_aqui'));
 
     /* Radio creciente: en ciudad sobra con 1,6 km; en campo abierto hay que
        abrirse para encontrar las pistas. Nos paramos en cuanto hay material. */
@@ -655,9 +771,9 @@
 
     estadoTexto('Calculando rutas a pie…');
     var objetivos = [
-      { nombre: 'Vuelta corta',  m: 1500, por: 'Paseo rápido por el entorno cercano.' },
-      { nombre: 'Ruta media',    m: 3000, por: 'Equilibrio entre distancia y zonas verdes.' },
-      { nombre: 'Ruta larga',    m: 5000, por: 'Para cuando tenéis tiempo y ganas de kilómetros.' }
+      { nombre: T('r_corta'),  m: 1500, por: T('r_corta_p') },
+      { nombre: T('r_media'),    m: 3000, por: T('r_media_p') },
+      { nombre: T('r_larga'),    m: 5000, por: T('r_larga_p') }
     ];
     for (var k = 0; k < objetivos.length; k++) {
       var o = objetivos[k];
@@ -713,10 +829,10 @@
     }
     /* Sin rutas no hay nada que entregar: no se cobra. */
     if (!estado.rutas.length) {
-      estadoTexto('Sin rutas disponibles aquí. No te hemos cobrado nada.');
+      estadoTexto(T('sin_rutas'));
       var vac = document.getElementById('dmw-walk-lista');
       if (vac) vac.innerHTML = '<div class="dmw-walk-vacio">No hemos podido trazar rutas ' +
-        'a pie aquí: por esta zona no hay caminos suficientes en el mapa. ' +
+        T('sin_caminos') +
         'Prueba a escribir un pueblo o ciudad cercana. No te hemos cobrado nada.</div>';
       return;
     }
@@ -732,16 +848,16 @@
     cont.innerHTML =
       '<div class="dmw-walk">' +
         '<div class="dmw-walk-h">' +
-          '<button class="dmw-walk-btn" id="dmw-walk-geo">Usar mi ubicación</button>' +
+          '<button class="dmw-walk-btn" id="dmw-walk-geo">' + T('usar_ubic') + '</button>' +
           '<div class="dmw-walk-sep">o</div>' +
-          '<input class="dmw-walk-in" id="dmw-walk-q" placeholder="Escribe una ciudad o dirección…">' +
+          '<input class="dmw-walk-in" id="dmw-walk-q" placeholder="' + T('escribe_ciudad') + '">' +
           '<button class="dmw-walk-btn alt" id="dmw-walk-go">Buscar</button>' +
         '</div>' +
         '<button class="dmw-walk-cta" id="dmw-walk-rutas">Buscar mis tres rutas</button>' +
         '<div class="dmw-walk-body">' +
           '<div id="dmw-walk-map" class="dmw-walk-map"></div>' +
           '<div class="dmw-rutas" id="dmw-walk-lista">' +
-            '<div class="dmw-walk-vacio">Dinos dónde estáis y calculamos tres rutas a pie ' +
+            '<div class="dmw-walk-vacio">' + T('dinos_donde') +
             'con las zonas verdes y los servicios que hay de verdad alrededor.</div>' +
           '</div>' +
         '</div>' +
@@ -749,7 +865,7 @@
         '<div class="dmw-walk-nav" id="dmw-walk-nav"></div>' +
         '<div class="dmw-walk-fotos" id="dmw-walk-fotos"></div>' +
         '<div class="dmw-perfil">' +
-          '<div class="dmw-perfil-h">¿Cómo es tu perro?</div>' +
+          '<div class="dmw-perfil-h">' + T('como_es') + '</div>' +
           '<div class="dmw-perfil-ops" id="dmw-perfil-ops">' +
             Object.keys(NIVELES).map(function (k) {
               return '<button data-n="' + k + '">' + NIVELES[k].n + '</button>';
@@ -783,7 +899,7 @@
       chk.checked = s;
       nota.innerHTML = s
         ? 'Suelto y ' + NIVELES[n].n.toLowerCase() + ': tu perro recorre alrededor de un <b>' +
-          Math.round((NIVELES[n].f - 1) * 100) + ' %</b> más que tú (' + NIVELES[n].d + ').'
+          Math.round((NIVELES[n].f - 1) * 100) + ' %</b>' + T('mas_que_tu') + NIVELES[n].d + ').'
         : 'Atado a tu lado recorre <b>tu misma distancia</b>. Marca la casilla si va suelto.';
       if (estado.rutas.length) pintarLista(document.getElementById('dmw-walk-lista'));
     }
@@ -800,11 +916,11 @@
     pintaPerfil();
 
     document.getElementById('dmw-walk-geo').onclick = function () {
-      estadoTexto('Pidiendo tu ubicación…');
-      if (!navigator.geolocation) { estadoTexto('Tu navegador no da la ubicación.'); return; }
+      estadoTexto(T('pidiendo'));
+      if (!navigator.geolocation) { estadoTexto(T('sin_geo')); return; }
       navigator.geolocation.getCurrentPosition(
-        function (p) { generar({ lat: p.coords.latitude, lon: p.coords.longitude }, 'Estáis aquí'); },
-        function () { estadoTexto('No nos has dado permiso de ubicación. Escribe una ciudad.'); },
+        function (p) { generar({ lat: p.coords.latitude, lon: p.coords.longitude }, T('estais_aqui')); },
+        function () { estadoTexto(T('sin_permiso')); },
         { enableHighAccuracy: true, timeout: 10000 }
       );
     };
@@ -823,7 +939,7 @@
        parece que solo centra el mapa (founder 2026-08-17: "no encuentro el
        botón para pedir que te dé rutas"). */
     document.getElementById('dmw-walk-rutas').onclick = function () {
-      if (estado.centro) { generar(estado.centro, 'Estáis aquí'); return; }
+      if (estado.centro) { generar(estado.centro, T('estais_aqui')); return; }
       document.getElementById('dmw-walk-geo').click();
     };
     document.getElementById('dmw-walk-q').addEventListener('keydown', function (e) {

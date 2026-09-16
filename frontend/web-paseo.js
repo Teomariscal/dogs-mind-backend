@@ -173,9 +173,25 @@
            localStorage.getItem('dm_lang') || 'es').toLowerCase().slice(0, 2);
     } catch (e) {}
     var D = {
-      es: { titulo:'El paseo de hoy', sub:'Tres rutas cerca de ti', corta:'corta', media:'media', larga:'larga' },
-      en: { titulo:'Today\u2019s walk',  sub:'Three routes near you',  corta:'short', media:'medium', larga:'long' },
-      it: { titulo:'La passeggiata di oggi', sub:'Tre percorsi vicino a te', corta:'corta', media:'media', larga:'lunga' }
+      /* 15-sep-2026: la TARJETA ya estaba traducida, pero la PANTALLA que abre
+         no. Un italiano pulsaba "La passeggiata di oggi" y caia en una cabecera
+         entera en castellano. El copy es del founder: aqui solo se traduce,
+         no se reescribe. */
+      es: { titulo:'El paseo de hoy', sub:'Tres rutas cerca de ti', corta:'corta', media:'media', larga:'larga',
+            rol:'Tu Aigent de paseos',
+            claim:'Estés en el lugar del mundo que estés, te ayudamos a elegir las mejores y más seguras rutas para pasear con tu perro.',
+            reto:'Antes, encontrar dónde pasear en una ciudad desconocida era el <b>reto</b>. Ahora el único <b>reto</b> es que tu perro disfrute como nunca, y seguro.',
+            alt_hero:'Escaparate en Soho, Nueva York', alt_ale:'Ale con su perra' },
+      en: { titulo:'Today\u2019s walk',  sub:'Three routes near you',  corta:'short', media:'medium', larga:'long',
+            rol:'Your walks Aigent',
+            claim:'Wherever in the world you are, we help you choose the best and safest routes to walk your dog.',
+            reto:'Finding somewhere to walk in an unfamiliar city used to be the <b>challenge</b>. Now the only <b>challenge</b> is your dog enjoying it like never before, safely.',
+            alt_hero:'Shop window in Soho, New York', alt_ale:'Ale with her dog' },
+      it: { titulo:'La passeggiata di oggi', sub:'Tre percorsi vicino a te', corta:'corta', media:'media', larga:'lunga',
+            rol:'Il tuo Aigent delle passeggiate',
+            claim:'Ovunque tu sia nel mondo, ti aiutiamo a scegliere i percorsi migliori e più sicuri per portare a spasso il tuo cane.',
+            reto:'Prima, trovare dove passeggiare in una città sconosciuta era la <b>sfida</b>. Adesso l’unica <b>sfida</b> è che il tuo cane si diverta come mai prima, e in sicurezza.',
+            alt_hero:'Vetrina a Soho, New York', alt_ale:'Ale con la sua cagnolina' }
     };
     return (D[l] || D.es)[clave];
   }
@@ -191,17 +207,15 @@
     /* Cabecera: hero + Ale presentando la sección (copy del founder) */
     var cab = document.createElement('div');
     cab.innerHTML =
-      '<div class="pf-hero"><img src="assets/images/soho-paseo.webp?v=2" alt="Escaparate en Soho, Nueva York">' +
+      '<div class="pf-hero"><img src="assets/images/soho-paseo.webp?v=2" alt="' + _t('alt_hero') + '">' +
         '<span class="pf-hero-cap">Soho · Nueva York</span></div>' +
       '<div class="pf-intro">' +
         '<div class="pf-intro-top">' +
-          '<span class="pf-intro-ale"><img src="aig-ale.webp" alt="Ale con su perra"></span>' +
-          '<span class="pf-intro-n">Ale<small>Tu Aigent de paseos</small></span>' +
+          '<span class="pf-intro-ale"><img src="aig-ale.webp" alt="' + _t('alt_ale') + '"></span>' +
+          '<span class="pf-intro-n">Ale<small>' + _t('rol') + '</small></span>' +
         '</div>' +
-        '<p class="pf-claim">Estés en el lugar del mundo que estés, te ayudamos a elegir ' +
-        'las mejores y más seguras rutas para pasear con tu perro.</p>' +
-        '<p class="pf-challenge">Antes, encontrar dónde pasear en una ciudad desconocida era ' +
-        'el <b>reto</b>. Ahora el único <b>reto</b> es que tu perro disfrute como nunca, y seguro.</p>' +
+        '<p class="pf-claim">' + _t('claim') + '</p>' +
+        '<p class="pf-challenge">' + _t('reto') + '</p>' +
       '</div>';
     host.appendChild(cab);
 
@@ -209,7 +223,7 @@
     host.appendChild(caja);
     if (window.dmwWalkMontar) { window.dmwWalkMontar(caja); return; }
     var s = document.createElement('script');
-    s.src = 'web-walk.js?v=16';
+    s.src = 'web-walk.js?v=17';
     s.onload = function () { if (window.dmwWalkMontar) window.dmwWalkMontar(caja); };
     document.head.appendChild(s);
   }

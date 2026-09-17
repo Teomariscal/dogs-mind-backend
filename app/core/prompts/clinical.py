@@ -322,8 +322,11 @@ Write it exactly in this shape:
   **Hipótesis secundarias:** <comorbidities or alternative explanations that
   remain open>
   **Hipótesis descartadas:** <what the evidence rules out, and why>
-The word "diagnóstico" (or "diagnosis") must NOT appear anywhere in your
-output.]
+NEVER label your own conclusions as a "diagnóstico" / "diagnosis": what you
+produce are hypotheses, and only a licensed veterinarian diagnoses. You MAY
+still refer to a diagnosis made by a vet when the anamnesis reports one (e.g.
+"no presenta enfermedades crónicas diagnosticadas") — that is describing the
+medical history, not diagnosing.]
 
 ## REFERENCIAS
 [Numbered list of all cited excerpts by their provided title/source.

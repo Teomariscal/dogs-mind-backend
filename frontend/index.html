@@ -8720,6 +8720,16 @@ button:not(:disabled):active{ transform:scale(0.98); }
       <div style="font-size:11px;color:var(--grey);line-height:1.6;text-align:center;padding:8px 4px;" data-i18n="account_legal_note">
         Al usar The Dogs’ Mind aceptas nuestra <a href="#" onclick="goTo('s-privacy');return false;" style="color:var(--green);text-decoration:underline;">Política de Privacidad</a> y <a href="#" onclick="goTo('s-terms');return false;" style="color:var(--green);text-decoration:underline;">Términos de Servicio</a>.
       </div>
+
+      <!-- LA VERSION, VISIBLE (17-sep-2026).
+           La app no la enseñaba por ningun lado, y eso nos costo TRES cacerias
+           de fallos que no existian: el 6-sep el muro de pago "vacio" (tenia
+           una version anterior al arreglo), el 8-sep "Niaz 2 no sale" (tenia el
+           build 42, de diez atras) y el 13-sep la relazione. En los tres casos
+           el codigo estaba bien y lo que fallaba era saber QUE BINARIO tenia
+           delante. Una linea aqui habria contestado esa pregunta en un segundo.
+           `dm-version` la rellena dmPintarVersion() al arrancar. -->
+      <div id="dm-version" style="font-size:10.5px;color:var(--grey);opacity:.55;text-align:center;padding:2px 4px 14px;letter-spacing:.3px;"></div>
     </div>
 
   </div><!-- /s-tokens -->
@@ -16837,6 +16847,39 @@ window.dmRcRestore = dmRcRestore;
 // ── DAILY TIP (Consejo del día generado por backend) ─────────────────────
 // Fetch /tip/today para el lang actual, cachea en localStorage por fecha.
 // Si falla la red o timeout > 3s, deja el texto estatico actual (data-i18n).
+/* ── LA VERSION, VISIBLE (17-sep-2026) ───────────────────────────────────────
+   Sin plugin de Capacitor a proposito: anadir @capacitor/app obliga a tocar lo
+   nativo y a recompilar, y esto no lo merece. El valor lo SELLA el script de
+   compilacion dentro de la copia que va al binario (scripts/compilar-apps.sh);
+   en la web ese sello no existe y se enseña la version del service worker, que
+   es la que identifica un despliegue.
+   Existe porque no saberlo nos costo tres cacerias de fallos inexistentes. */
+window.DM_VERSION_SELLO = '__DM_VERSION__';   /* lo reemplaza compilar-apps.sh */
+
+function dmPintarVersion() {
+  var el = document.getElementById('dm-version');
+  if (!el) return;
+  var sello = window.DM_VERSION_SELLO || '';
+  if (sello && sello.indexOf('__DM_') !== 0) {   /* sellado -> es un binario */
+    el.textContent = 'v' + sello;
+    return;
+  }
+  /* Web: la version del service worker identifica el despliegue. */
+  try {
+    fetch('service-worker.js', { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.text() : ''; })
+      .then(function (t) {
+        var m = t.match(/dogs-mind-v(\d+)/);
+        el.textContent = m ? ('web v' + m[1]) : 'web';
+      })
+      .catch(function () { el.textContent = 'web'; });
+  } catch (e) { el.textContent = 'web'; }
+}
+window.dmPintarVersion = dmPintarVersion;
+/* Se pinta una vez al arrancar; el hueco vive en Mis Creditos y no cambia. */
+if (document.readyState !== 'loading') dmPintarVersion();
+else document.addEventListener('DOMContentLoaded', dmPintarVersion);
+
 function loadDailyTip() {
   try {
     var tipEl = document.querySelector('#s-home .insight-text');

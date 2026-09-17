@@ -39,6 +39,26 @@ paso "Metiendo el frontend en las dos"
 npx cap sync ios >/dev/null && npx cap sync android >/dev/null
 ok "sincronizado"
 
+# ── SELLO DE VERSION (17-sep-2026) ──────────────────────────────────────────
+# La app no enseñaba su version por ningun lado y eso costo TRES cacerias de
+# fallos inexistentes (6-sep muro de pago, 8-sep Niaz 2, 13-sep relazione): en
+# los tres el codigo estaba bien y lo que faltaba era saber que binario tenia
+# el founder delante. Se sella AQUI, en la copia que va al binario, y no en
+# `frontend/` — asi la web sigue enseñando su propia version de despliegue y
+# los dos binarios siguen siendo identicos entre si, que es lo que comprueba
+# el paso de abajo.
+paso "Sellando la version dentro del binario"
+# Cada tienda lleva SU numero de build: en Android el versionCode y en iOS el
+# suyo, que no coinciden. Si se sellara el mismo en las dos, quien abre la app
+# en Android leeria un numero de iOS — peor que no enseñar nada, porque miente.
+sed -i '' "s|__DM_VERSION__|$VERSION ($IOS_BUILD)|g" ios/App/App/public/index.html
+sed -i '' "s|__DM_VERSION__|$VERSION ($AND_VC)|g"    android/app/src/main/assets/public/index.html
+grep -q "$VERSION ($IOS_BUILD)" ios/App/App/public/index.html \
+  || malo "no se pudo sellar la version en iOS"
+grep -q "$VERSION ($AND_VC)" android/app/src/main/assets/public/index.html \
+  || malo "no se pudo sellar la version en Android"
+ok "sellado: iOS $VERSION ($IOS_BUILD) · Android $VERSION ($AND_VC)"
+
 paso "Compilando Android"
 ( cd android && ./gradlew bundleRelease -q )
 AAB=android/app/build/outputs/bundle/release/app-release.aab
@@ -59,9 +79,14 @@ cp /tmp/rama_ios/Payload/App.app/public/index.html /tmp/rama_ios.html
 ok "IPA lista ($(du -h /tmp/DMexport/App.ipa | cut -f1))"
 
 paso "LA COMPROBACION QUE IMPORTA"
-if cmp -s /tmp/rama_ios.html /tmp/rama_android.html; then
-  ok "las dos tiendas llevan EXACTAMENTE el mismo frontend"
-  ok "md5: $(md5 -q /tmp/rama_ios.html)"
+# El sello de version es el UNICO byte que puede diferir, y a proposito: lleva
+# el numero de build de cada tienda. Se normaliza antes de comparar para que la
+# comprobacion siga siendo byte a byte en todo lo demas, que es lo que importa.
+sed "s|$VERSION ($IOS_BUILD)|__DM_VERSION__|g" /tmp/rama_ios.html     > /tmp/rama_ios_n.html
+sed "s|$VERSION ($AND_VC)|__DM_VERSION__|g"    /tmp/rama_android.html > /tmp/rama_android_n.html
+if cmp -s /tmp/rama_ios_n.html /tmp/rama_android_n.html; then
+  ok "las dos tiendas llevan EXACTAMENTE el mismo frontend (sello de version aparte)"
+  ok "md5: $(md5 -q /tmp/rama_ios_n.html)"
 else
   malo "iOS y Android llevan frontends DISTINTOS — no subir"
 fi

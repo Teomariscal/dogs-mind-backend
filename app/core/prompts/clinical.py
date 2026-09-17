@@ -313,8 +313,10 @@ classification of the behavior.]
 maintaining contingencies. Positive vs negative reinforcement.
 Extinction bursts or punishment effects if present.]
 
-## HIPÓTESIS CLÍNICAS
-[ACVB-aligned classification, stated as HYPOTHESES, never as a diagnosis.
+## HIPÓTESIS DE CONDUCTA
+[ACVB-aligned behavioural classification, stated as HYPOTHESES, never as a
+diagnosis. The heading is "HIPÓTESIS DE CONDUCTA" and must NOT be confused with
+the earlier "HIPÓTESIS FUNCIONAL" section, which is the A→B→C synthesis.
 Write it exactly in this shape:
   **Hipótesis principal:** <the classification that best explains the case>
   **Hipótesis secundarias:** <comorbidities or alternative explanations that

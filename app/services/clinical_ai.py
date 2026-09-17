@@ -17,7 +17,11 @@ import anthropic
 from typing import Optional
 
 from app.config import get_settings
+import logging
+
 from app.core.anthropic_client import get_anthropic_client, create_message_resilient
+
+_log = logging.getLogger("clinical_ai")
 from app.core.prompts.clinical import CLINICAL_SYSTEM_PROMPT
 from app.core.prompts.petowner_clinical import PETOWNER_CLINICAL_SYSTEM_PROMPT
 from app.services.tea_pilot import apply_tea_override
@@ -237,6 +241,34 @@ analysis. Follow the output format defined in your instructions exactly.
         analysis_text = maybe_apply_italian_veneer(
             analysis_text, lang=lang, account_type=account_type, kind="analysis"
         )
+        # ── EL VETO QUE FALTABA (founder, 11-sep-2026; montado el 17-sep) ────
+        #   "todas las palabras cognitivistas de la RAG B están prohibidas en
+        #    el análisis ABA"
+        #
+        # Hasta hoy solo se auditaba la dirección contraria. Ésta es la que el
+        # founder llama el Ébola en su asimetría del 4-sep: que se cuele algo
+        # conductual en lo cognitivista es un resfriado; que el vocabulario
+        # cognitivista aparezca en el análisis conductual —el producto
+        # principal, en los tres idiomas— no.
+        #
+        # NO se regenera ni se rompe el análisis del usuario por esto: el coste
+        # de un falso positivo (repetir un análisis que ya está bien, y cobrarlo
+        # o hacerle esperar otro minuto) es peor que el de un aviso. Se registra
+        # a nivel WARNING, que es el que sí se ve —este proyecto nunca llama a
+        # logging.basicConfig, así que los info() se tragan— para poder medir si
+        # ocurre de verdad y con qué frecuencia antes de endurecerlo.
+        # El try es solo para que un fallo DEL VETO no tumbe un analisis ya
+        # pagado. Pero se registra: un veto que falla en silencio es peor que
+        # no tenerlo, porque da una seguridad que no existe.
+        try:
+            from app.services.cognitive_blacklist import find_cognitive
+            _fugas = find_cognitive(analysis_text)
+            if _fugas:
+                _log.warning(
+                    "FUGA COGNITIVISTA en analisis conductual (lang=%s): %s",
+                    lang, ", ".join(_fugas))
+        except Exception as _e:
+            _log.warning("el veto cognitivista no pudo ejecutarse: %s", _e)
 
     cache_hit = (response.usage.cache_read_input_tokens or 0) > 0
 

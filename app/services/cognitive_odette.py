@@ -34,7 +34,8 @@ from app.core.anthropic_client import (
 from app.core.prompts.clinical import CLINICAL_SYSTEM_PROMPT
 from app.core.prompts.cognitive_odette import PASADA_1_AVISO, PASADA_2_INFORME
 from app.models.anamnesis_cognitiva import AnamnesiCognitivaInput
-from app.services.cognitive_blacklist import find_blacklisted, find_spanish
+from app.services.cognitive_blacklist import (find_blacklisted, find_spanish,
+                                             find_blacklisted_con_equivalente)
 from app.services.italian_cognitive import (
     CognitiveReexpressionError,
     cognitive_path_applies,
@@ -225,10 +226,22 @@ def redactar_relazione(
         _t_int = time.monotonic()
         mensaje = base
         if restos:
+            # 17-sep-2026: antes decia solo "quita estos terminos". Vetar sin
+            # ofrecer alternativa es lo que empujaba al modelo a la vaguedad,
+            # que es justo lo que el founder queria evitar con su regla del
+            # 11-sep. Ahora se le dice CON QUE sustituir cada uno.
+            lineas = []
+            for etiqueta, equivalente in find_blacklisted_con_equivalente(salida or ""):
+                if equivalente:
+                    lineas.append("  · «%s» → usa invece: %s" % (etiqueta, equivalente))
+                else:
+                    lineas.append("  · «%s» → non deve comparire" % etiqueta)
+            detalle = "\n".join(lineas) if lineas else "  · " + ", ".join(restos)
             mensaje += ("\n\nATTENZIONE — il tentativo precedente conteneva termini "
-                        "VIETATI: " + ", ".join(restos) + ". Riscrivi da capo "
-                        "eliminandoli, senza perdere nessun criterio numerico né "
-                        "nessuna istruzione eseguibile.")
+                        "VIETATI. Sostituiscili cosi:\n" + detalle +
+                        "\n\nRiscrivi da capo. NON impoverire il testo per evitarli: "
+                        "usa l'equivalente indicato e mantieni ogni criterio numerico "
+                        "e ogni istruzione eseguibile.")
         if espanol:
             mensaje += ("\n\nATTENZIONE — il tentativo precedente conteneva SPAGNOLO: "
                         + ", ".join(espanol) + ". Riscrivi da capo TUTTO IN ITALIANO, "

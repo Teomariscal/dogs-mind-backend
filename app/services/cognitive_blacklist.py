@@ -17,47 +17,90 @@ a secas, al condenarla) NO se prohíben en bruto — solo sus formas técnicas
 
 import re
 
-# Cada patrón es regex case-insensitive con límites de palabra.
-_BLACKLIST_PATTERNS: list[tuple[str, str]] = [
-    # Núcleo operante
-    # "rinforzo" SI se puede usar (founder, 7-sep-2026). No es exclusiva del
-    # marco conductual: en italiano corriente y en el cognitivismo se usa
-    # igual. Estaba prohibida y sobrevivia a los tres intentos, obligando a
-    # entregar el informe con un aviso de resto. Ya no se persigue.
-    # (r"\brinforz\w*", "rinforzo/rinforzare"),
-    (r"\bestinzion\w*", "estinzione"),
-    (r"\bcondizionament\w*", "condizionamento (operante/classico)"),
-    (r"\bcontingenz\w*", "contingenza"),
-    (r"\boperant[ei]\b", "operante/operanti"),
-    (r"\brispondent[ei]\b", "rispondente (condizionamento)"),
+# ─────────────────────────────────────────────────────────────────────────────
+# REGLA DEL FOUNDER, 11-sep-2026, aplicada por fin el 17-sep:
+#
+#   "No hay palabras prohibidas en cognitivismo si no hay traducción a lenguaje
+#    cognitivista, y todas las palabras cognitivistas de la RAG B están
+#    prohibidas en el análisis ABA."
+#
+# Hasta hoy esta lista vetaba EN BLOQUE, sin mirar si el término tenía
+# equivalente. Eso hacía justo el daño que el founder quería evitar: el modelo
+# no podía nombrar el concepto, no se le ofrecía con qué sustituirlo, y acababa
+# escribiendo vaguedades — mutilando el informe que lee el veterinario.
+#
+# Ahora cada entrada lleva SU EQUIVALENTE, sacado de la tabla §1 de
+# ITALIAN_COGNITIVE_MAPPING_DRAFT.md (yo no invento terminología clínica
+# italiana; la tabla es la que hay).
+#
+#   · equivalente = str  → prohibido, y al regenerar SE LE DICE qué usar.
+#   · equivalente = None → NO se persigue. Antes que quedarse vago, que use el
+#                          término llano (palabras del founder).
+#   · marca = True       → prohibido SIEMPRE, tenga o no equivalente. No son
+#                          conceptos que traducir: son el nombre de la escuela
+#                          (ABA, ABC, comportamentismo). Que aparezcan delata
+#                          el motor de debajo, que es justo lo que el canal
+#                          estanco existe para esconder.
+# ─────────────────────────────────────────────────────────────────────────────
+# (patrón, etiqueta, equivalente cognitivista, es_marca)
+# (sin anotacion de union: el repo tiene que correr igual en 3.9 y en 3.11)
+_BLACKLIST_PATTERNS = [
+    # "rinforzo" SI se puede usar (founder, 7-sep-2026): no es exclusiva del
+    # marco conductual, en italiano corriente y en cognitivismo se usa igual.
+    # Núcleo operante — todos con equivalente validado en la tabla
+    (r"\bestinzion\w*", "estinzione",
+     "riduzione della condotta per venir meno del vantaggio", False),
+    (r"\bcondizionament\w*", "condizionamento (operante/classico)",
+     "associazione appresa tra situazione, condotta ed esito", False),
+    (r"\bcontingenz\w*", "contingenza",
+     "relazione tra situazione, condotta e conseguenza", False),
+    (r"\boperant[ei]\b", "operante/operanti",
+     "descrivi la relazione situazione–condotta–esito senza nominare il meccanismo", False),
+    (r"\brispondent[ei]\b", "rispondente (condizionamento)",
+     "associazione appresa tra stimoli", False),
     # Estímulo discriminativo
-    (r"\bstimolo\s+discriminant\w*", "stimolo discriminante"),
-    (r"\bdiscriminativ\w*", "discriminativo"),
-    (r"\bstimolo\s+delta\b", "stimolo delta"),
-    # Marcas de escuela
-    (r"\bABA\b", "ABA"),
-    (r"\bABC\b", "ABC (analisi a tre termini)"),
-    (r"\banalisi\s+funzional\w*", "analisi funzionale"),
-    (r"\bcomportamentism\w*", "comportamentismo"),
-    (r"\bcomportamentist\w*", "comportamentista"),
-    (r"\bbehavior\s*analysis\b", "behavior analysis"),
+    (r"\bstimolo\s+discriminant\w*", "stimolo discriminante",
+     "attivatore / contesto-innesco / situazione che orienta la condotta", False),
+    (r"\bdiscriminativ\w*", "discriminativo",
+     "attivatore / contesto-innesco", False),
+    # "stimolo delta" no figura en la tabla validada. Sin equivalente, no se
+    # persigue: regla del founder.
+    (r"\bstimolo\s+delta\b", "stimolo delta", None, False),
+    # MARCAS DE ESCUELA — prohibidas siempre
+    (r"\bABA\b", "ABA", None, True),
+    (r"\bABC\b", "ABC (analisi a tre termini)", None, True),
+    (r"\banalisi\s+funzional\w*", "analisi funzionale",
+     "lettura del comportamento / analisi etologico-cognitiva", True),
+    (r"\bcomportamentism\w*", "comportamentismo", None, True),
+    (r"\bcomportamentist\w*", "comportamentista", None, True),
+    (r"\bbehavior\s*analysis\b", "behavior analysis", None, True),
     # Procedimientos operantes
-    (r"\bDR[AIO]\b", "DRA/DRI/DRO"),
-    (r"\bcontrollo\s+dello\s+stimolo\b", "controllo dello stimolo"),
-    (r"\boperazione\s+(motivante|stabilente)\b", "operazione motivante"),
-    (r"\bpunizione\s+(positiva|negativa)\b", "punizione positiva/negativa"),
-    (r"\bmodellaggio\b", "modellaggio (shaping)"),
-    (r"\bshaping\b", "shaping"),
-    (r"\bconcatenamento\b", "concatenamento (chaining)"),
-    (r"\bchaining\b", "chaining"),
-    (r"\btoken\s+economy\b", "token economy"),
-    # Fugas del castellano (el motor razona en es/en por dentro)
-    (r"\brefuerzo\w*", "refuerzo (ES)"),
-    (r"\bextinci[oó]n\b", "extinción (ES)"),
-    (r"\best[ií]mulo\s+discriminativo\b", "estímulo discriminativo (ES)"),
+    (r"\bDR[AIO]\b", "DRA/DRI/DRO",
+     "costruzione di una condotta alternativa o incompatibile", False),
+    (r"\bcontrollo\s+dello\s+stimolo\b", "controllo dello stimolo",
+     "gestione del contesto e degli attivatori", False),
+    (r"\boperazione\s+(motivante|stabilente)\b", "operazione motivante",
+     "stato motivazionale / predisposizione del momento", False),
+    # Sin equivalente en la tabla, pero LIMA prohibe el aversivo: no es una
+    # cuestion de lexico, no puede aparecer en ningun caso.
+    (r"\bpunizione\s+(positiva|negativa)\b", "punizione positiva/negativa", None, True),
+    # Sin equivalente validado: antes que quedarse vago, termino llano.
+    (r"\bmodellaggio\b", "modellaggio (shaping)", None, False),
+    (r"\bshaping\b", "shaping", None, False),
+    (r"\bconcatenamento\b", "concatenamento (chaining)", None, False),
+    (r"\bchaining\b", "chaining", None, False),
+    (r"\btoken\s+economy\b", "token economy", None, False),
 ]
 
-_COMPILED = [(re.compile(p, re.IGNORECASE), label) for p, label in _BLACKLIST_PATTERNS]
+# Solo se persigue lo que tiene equivalente, o lo que es marca de escuela.
+_COMPILED = [(re.compile(p, re.IGNORECASE), label, eq)
+             for p, label, eq, marca in _BLACKLIST_PATTERNS
+             if (eq is not None or marca)]
+
+# Lo que se deja pasar a proposito, para poder auditarlo de un vistazo.
+SE_PERMITEN = [label for _p, label, eq, marca in _BLACKLIST_PATTERNS
+               if eq is None and not marca]
+
 
 
 def find_blacklisted(text: str) -> list[str]:
@@ -65,7 +108,7 @@ def find_blacklisted(text: str) -> list[str]:
     if not text:
         return []
     hits: list[str] = []
-    for rx, label in _COMPILED:
+    for rx, label, _eq in _COMPILED:
         if rx.search(text) and label not in hits:
             hits.append(label)
     return hits
@@ -141,3 +184,79 @@ def find_spanish(text: str) -> list[str]:
         if rx.search(text) and label not in hits:
             hits.append(label)
     return hits
+
+
+def find_blacklisted_con_equivalente(text: str):
+    """Como find_blacklisted, pero devuelve (término, equivalente).
+
+    Sirve para que el reintento no diga solo "quita esto", sino "usa esto otro".
+    Esa era la mitad que faltaba de la regla del founder: vetar sin ofrecer
+    alternativa es lo que empujaba al modelo a la vaguedad.
+    """
+    if not text:
+        return []
+    out = []
+    vistos = set()
+    for rx, label, eq in _COMPILED:
+        if rx.search(text) and label not in vistos:
+            vistos.add(label)
+            out.append((label, eq))
+    return out
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# LA SEGUNDA MITAD DE LA REGLA (founder, 11-sep-2026):
+#   "todas las palabras cognitivistas de la RAG B están prohibidas en el
+#    análisis ABA"
+#
+# Esta dirección NO EXISTÍA. La lista de arriba solo auditaba el lado
+# cognitivista; el lado conductual no se miraba, y es el que más importa según
+# la asimetría del 4-sep: que se cuele algo conductual en lo cognitivista es un
+# resfriado; que se cuele vocabulario cognitivista en el análisis ABA —el
+# producto principal, en tres idiomas— es el Ébola.
+#
+# CRITERIO, el mismo que con el castellano: solo lo INEQUÍVOCO. Un falso
+# positivo aquí obliga a regenerar el análisis del producto principal, que es
+# caro y lento. Por eso NO entran términos que la etología y la psicología
+# comparada usan con normalidad y que aparecen legítimamente en un análisis
+# conductual: `arousal`, `neotenia`, `motivazione sociale`, `motivazione
+# predatoria` — comprobado que `arousal` sale en análisis ABA reales.
+#
+# Lo que sí entra es lo que solo se dice desde el marco cognitivo-zooantropológico,
+# tomado del §3 de ITALIAN_COGNITIVE_MAPPING_DRAFT.md.
+# ─────────────────────────────────────────────────────────────────────────────
+_COGNITIVISTA_PATTERNS: list = [
+    (r"\bzooantropolog\w*", "zooantropologia / zooantropologico"),
+    (r"\bzoo-?antropolog\w*", "zoo-antropologico"),
+    (r"\bcognitivo-?zooantropolog\w*", "cognitivo-zooantropologico"),
+    (r"\bUmwelt\b", "Umwelt (von Uexküll)"),
+    (r"\bmondo\s+percettivo\s+di\s+specie\b", "mondo percettivo di specie"),
+    (r"\b(et-?)?epimeletic\w*", "comportamento epimeletico"),
+    (r"\bpedomorfos\w*", "pedomorfosi"),
+    (r"\bmotivazione\s+perlustrativ\w*", "motivazione perlustrativa"),
+    (r"\bperlustrativ\w*", "perlustrativo"),
+    (r"\breferenza\s+sociale\b", "referenza sociale"),
+]
+
+_COGNITIVISTA = [(re.compile(p, re.IGNORECASE), label)
+                 for p, label in _COGNITIVISTA_PATTERNS]
+
+
+def find_cognitive(text: str) -> list:
+    """Términos cognitivistas hallados en un texto que NO debería llevarlos.
+
+    Se usa sobre la salida de la vía CONDUCTUAL (los tres idiomas). Si devuelve
+    algo, el corpus cognitivista se ha filtrado al lado que no toca.
+    """
+    if not text:
+        return []
+    hits = []
+    for rx, label in _COGNITIVISTA:
+        if rx.search(text) and label not in hits:
+            hits.append(label)
+    return hits
+
+
+def aba_is_clean(text: str) -> bool:
+    """True si el análisis conductual NO lleva vocabulario cognitivista."""
+    return not find_cognitive(text)

@@ -70,9 +70,14 @@
     /* Switcher de idioma: por defecto se ve ES y se oculta EN. Cuando html lang="en",
        se ve EN y se oculta ES. IMPORTANTE: scope a section[lang=...] para NO impactar
        al propio elemento <html lang=...>, que si se ve afectado colapsa la página. */
-    section[lang="en"]{display:none;}
+    /* 18-sep-2026: entra el italiano. Estamos vivos en Italia desde julio y
+       estas dos paginas solo existian en es/en; el detector mandaba 'it' a
+       ingles. Apple y Play esperan legales en el idioma en el que publicas. */
+    section[lang="en"], section[lang="it"]{display:none;}
     html[lang="en"] section[lang="en"]{display:block;}
     html[lang="en"] section[lang="es"]{display:none;}
+    html[lang="it"] section[lang="it"]{display:block;}
+    html[lang="it"] section[lang="es"]{display:none;}
     @media print{
       .langbar{display:none;}
       body{background:#fff;color:#000;}
@@ -86,6 +91,7 @@
     <div class="langbar" role="tablist" aria-label="Language selector">
       <button type="button" class="langbtn active" data-lang="es" onclick="setLang('es')" aria-pressed="true">Español</button>
       <button type="button" class="langbtn" data-lang="en" onclick="setLang('en')" aria-pressed="false">English</button>
+      <button type="button" class="langbtn" data-lang="it" onclick="setLang('it')" aria-pressed="false">Italiano</button>
     </div>
 
     <!-- ── ES ── -->
@@ -168,6 +174,46 @@
       </div>
     </section>
 
+    <!-- ── IT ── -->
+    <section lang="it">
+      <h1>Termini di Servizio</h1>
+      <p class="subtitle">The Dogs Mind · Ultimo aggiornamento: settembre 2026</p>
+      <p class="intro">Usando The Dogs Mind accetti questi termini. Leggili con attenzione prima di creare il tuo account.</p>
+
+      <h2>1. Chi eroga il servizio</h2>
+      <p>The Dogs Mind è un servizio creato da <strong>Teodoro Mariscal Diaz</strong> (Spagna). Per contatti, scrivi a <a href="mailto:info@thedogsmind.net">info@thedogsmind.net</a>.</p>
+
+      <h2>2. Natura del servizio</h2>
+      <p>The Dogs Mind offre analisi comportamentali e piani d&rsquo;intervento generati da intelligenza artificiale. <strong>Il contenuto è orientativo, può contenere errori e NON sostituisce la diagnosi né il trattamento di un medico veterinario esperto in comportamento.</strong> In caso di aggressività, condotte autolesive o emergenze mediche, rivolgiti immediatamente a un professionista qualificato.</p>
+
+      <h2>3. Account e requisiti</h2>
+      <p>Devi avere almeno 18 anni per creare un account. Sei responsabile della veridicità dei dati che inserisci e della sicurezza della tua password. Un account = una persona fisica.</p>
+
+      <h2>4. Crediti e pagamenti</h2>
+      <p>L&rsquo;accesso ad analisi e piani consuma crediti. I crediti si acquistano in pacchetti e non scadono. I pagamenti sono gestiti tramite Stripe (web), Apple In-App Purchase (iOS) o Google Play (Android). I crediti non sono rimborsabili, salvo errore tecnico a noi imputabile o obbligo di legge applicabile. Le ricariche sono definitive dopo la conferma.</p>
+      <p><strong>Abbonamenti:</strong> i piani sono mensili e si rinnovano automaticamente salvo disdetta. Su iOS l&rsquo;addebito avviene sul tuo account Apple alla conferma dell&rsquo;acquisto e a ogni rinnovo, e si gestisce da Impostazioni &rsaquo; Apple ID &rsaquo; Abbonamenti. Su Android si gestisce da Google Play &rsaquo; Pagamenti e abbonamenti. Sul web si gestisce tramite Stripe. La disdetta ferma il rinnovo; il piano resta attivo fino alla fine del periodo già pagato.</p>
+
+      <h2>5. Uso consentito</h2>
+      <p>Non puoi usare il servizio per fini illeciti, dannosi o lesivi di diritti di terzi. Non puoi tentare di estrarre modelli, fare reverse engineering, né rivendere il servizio senza autorizzazione scritta.</p>
+
+      <h2>6. Cancellazione dell&rsquo;account</h2>
+      <p>Puoi eliminare il tuo account in qualsiasi momento dalla schermata &laquo;I miei crediti &rarr; Elimina il mio account&raquo;. I tuoi dati personali vengono cancellati immediatamente. I registri di pagamento si conservano in forma anonimizzata per 4 anni per obbligo fiscale (Spagna).</p>
+
+      <h2>7. Limitazione di responsabilità</h2>
+      <p>Il servizio è fornito &laquo;così com&rsquo;è&raquo;. The Dogs Mind non garantisce risultati specifici sul comportamento del tuo cane e non risponde dei danni derivanti dall&rsquo;uso delle analisi o dei piani generati. Ciò non esclude gli obblighi di legge inderogabili.</p>
+
+      <h2>8. Modifiche ai termini</h2>
+      <p>Possiamo aggiornare questi termini. Ti avviseremo via email o dentro l&rsquo;app in caso di modifiche sostanziali. L&rsquo;uso continuato dopo l&rsquo;avviso implica accettazione.</p>
+
+      <h2>9. Legge applicabile e foro competente</h2>
+      <p>Questi termini sono regolati dalla legge spagnola. Ogni controversia sarà devoluta ai tribunali di Madrid (Spagna), salvo che la normativa a tutela dei consumatori del tuo Paese stabilisca un foro diverso.</p>
+
+      <div class="box">
+        <div class="box-label">Contatti</div>
+        <p class="box-text">Domande su questi termini? Scrivici a <a href="mailto:info@thedogsmind.net">info@thedogsmind.net</a>.</p>
+      </div>
+    </section>
+
     <div class="footer">
       <a href="/">← The Dogs Mind</a> &nbsp;·&nbsp;
       <a href="/privacy.html">Privacy Policy</a>
@@ -179,14 +225,15 @@
     (function(){
       function detect(){
         try{
-          var s = (localStorage.getItem('dm_lang') || '').toLowerCase();
-          if (s === 'es' || s === 'en') return s;
+          var s = (localStorage.getItem('dm_lang') || '').toLowerCase().slice(0,2);
+          if (s === 'es' || s === 'en' || s === 'it') return s;
         }catch(e){}
         var n = (navigator.language || navigator.userLanguage || 'es').toLowerCase();
+        if (n.indexOf('it') === 0) return 'it';
         return n.indexOf('es') === 0 ? 'es' : 'en';
       }
       window.setLang = function(lang){
-        if (lang !== 'es' && lang !== 'en') lang = 'es';
+        if (lang !== 'es' && lang !== 'en' && lang !== 'it') lang = 'es';
         document.documentElement.setAttribute('lang', lang);
         try{ localStorage.setItem('dm_lang', lang); }catch(e){}
         document.querySelectorAll('.langbtn').forEach(function(b){
@@ -194,7 +241,9 @@
           b.classList.toggle('active', active);
           b.setAttribute('aria-pressed', active ? 'true' : 'false');
         });
-        document.title = (lang === 'en') ? 'Terms of Service · The Dogs Mind' : 'Términos de Servicio · The Dogs Mind';
+        document.title = (lang === 'en') ? 'Terms of Service · The Dogs Mind'
+                       : (lang === 'it') ? 'Termini di Servizio · The Dogs Mind'
+                       : 'Términos de Servicio · The Dogs Mind';
       };
       setLang(detect());
     })();

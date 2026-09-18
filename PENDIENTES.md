@@ -200,6 +200,29 @@ creditos) pasando el muro como heredada — simulado contra `access_state` real.
 
 ---
 
+## ✅ CERRADO EL 17-18 SEP — el lote que pidió el founder ("aplica todo")
+
+| Qué | Dónde llega |
+|---|---|
+| **Regla de la lista negra del 11-sep, LAS DOS MITADES.** En cognitivismo se veta solo si hay equivalente, y el reintento dice CUÁL usar; en ABA, escáner nuevo `find_cognitive()` contra el vocabulario de la RAG B. | Backend — a todos, hoy |
+| **Los análisis hablan de hipótesis, no de diagnóstico.** `## HIPÓTESIS DE CONDUCTA` con principal / secundarias / descartadas. Verificado con un análisis real: 0 apariciones de la palabra. | Backend — a todos, hoy |
+| **La app enseña su versión.** Sellada por `compilar-apps.sh` en cada binario, por plataforma. | Necesita build |
+| **Planificador de paseos traducido** (`web-walk.js` + `web-paseo.js`, 63 cadenas). | Web ya · app en el próximo build |
+| **Pantalla de Adiestramiento Avanzado**, 31 claves, las 21 marcas `TODO i18n` retiradas. | Web ya · app en el próximo build |
+| **Los 44 ternarios** `en ? inglés : castellano` → helper `_L3(es, en, it)` en los que pintan texto visible. | Web ya · app en el próximo build |
+| **Términos y privacidad en italiano**, con su botón y detector que ya reconoce `it`. | Web ya · app en el próximo build |
+| **Web de escritorio traducida** (`web-desktop.js`, 19 cadenas, sin tocar sus arrays de datos). | Web (solo aplica ahí) |
+
+**PENDIENTE de ese lote, por decisión del founder:** las voces de los avatares en
+inglés e italiano. Los cuatro (Ale, Cecilia, Niaz 1 y Niaz 2) hablan en
+castellano con subtítulo traducido. Hace falta abrir HeyGen; el founder no
+podía en ese momento. El guion ya está escrito y traducido en los tres idiomas.
+
+**OJO:** todo lo marcado "app en el próximo build" NO está en el build 61, que
+es el que está en revisión de Apple. Se compiló antes.
+
+---
+
 ## Prioridad
 
 **Los créditos van por delante de los paseos** (founder, 1-sep-2026): "los paseos

@@ -42,6 +42,76 @@
            'stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>';
   }
 
+
+  /* ── IDIOMA (18-sep-2026) ───────────────────────────────────────────────────
+     Este fichero tenia CERO traduccion: 502 lineas y toda la cascara de la web
+     de escritorio en castellano. Un italiano o un ingles que entren por
+     ordenador veian la navegacion entera en español.
+
+     Se traduce SIN reestructurar los arrays de datos: el diccionario va del
+     castellano —que es la clave— a los otros dos idiomas, y se envuelve en el
+     punto de pintado. Asi no se toca ni una linea de ACCIONES, SECCIONES ni
+     TARJETAS, que es donde estaba el riesgo de romper algo.
+
+     El copy es del founder: aqui solo se traduce, no se reescribe. */
+  function _dlang() {
+    try {
+      return ((window.getCurrentLang ? window.getCurrentLang() : '') ||
+              localStorage.getItem('dm_lang') || 'es').toLowerCase().slice(0, 2);
+    } catch (e) { return 'es'; }
+  }
+  var TRAD = {
+    en: {
+      'Problema de conducta': 'Behaviour problem',
+      'Educación y entrenamiento': 'Education and training',
+      'Inspiración Profesional': 'Professional Inspiration',
+      'Registros de conducta': 'Behaviour records',
+      'Novedades': 'What’s new',
+      'Suscríbete a TDM': 'Subscribe to TDM',
+      'Proyectos': 'Projects',
+      'Founders y Comité Científico': 'Founders and Scientific Committee',
+      'Método': 'Method',
+      'Tu trabajo': 'Your work',
+      'Cómo funciona': 'How it works',
+      'La ruta te marca': 'The route shows you',
+      'Pasea acompañado': 'Walk with company',
+      'Y te avisa de peligros y molestias': 'And warns you of hazards and nuisances',
+      'Historial de casos, informes y seguimiento.': 'History of cases, reports and follow-up.',
+      'Consulta con los Aigents del equipo sobre el caso abierto.': 'Ask the team’s Aigents about the open case.',
+      'Genera la sesión de trabajo de hoy a partir de tu objetivo.': 'Generate today’s working session from your goal.',
+      'Programa por fases con criterios de avance y registro diario del progreso.': 'A phased programme with progression criteria and a daily progress log.',
+      'Anamnesis estructurada y análisis funcional del caso: antecedentes, conducta y consecuencias.': 'Structured anamnesis and functional analysis of the case: antecedents, behaviour and consequences.'
+    },
+    it: {
+      'Problema de conducta': 'Problema di comportamento',
+      'Educación y entrenamiento': 'Educazione e addestramento',
+      'Inspiración Profesional': 'Ispirazione Professionale',
+      'Registros de conducta': 'Registri di comportamento',
+      'Novedades': 'Novità',
+      'Suscríbete a TDM': 'Abbonati a TDM',
+      'Proyectos': 'Progetti',
+      'Founders y Comité Científico': 'Founder e Comitato Scientifico',
+      'Método': 'Metodo',
+      'Tu trabajo': 'Il tuo lavoro',
+      'Cómo funciona': 'Come funziona',
+      'La ruta te marca': 'Il percorso ti segnala',
+      'Pasea acompañado': 'Passeggia in compagnia',
+      'Y te avisa de peligros y molestias': 'E ti avvisa di pericoli e fastidi',
+      'Historial de casos, informes y seguimiento.': 'Storico dei casi, relazioni e monitoraggio.',
+      'Consulta con los Aigents del equipo sobre el caso abierto.': 'Chiedi agli Aigent del team sul caso aperto.',
+      'Genera la sesión de trabajo de hoy a partir de tu objetivo.': 'Genera la sessione di lavoro di oggi a partire dal tuo obiettivo.',
+      'Programa por fases con criterios de avance y registro diario del progreso.': 'Programma per fasi con criteri di avanzamento e registro quotidiano dei progressi.',
+      'Anamnesis estructurada y análisis funcional del caso: antecedentes, conducta y consecuencias.': 'Anamnesi strutturata e lettura funzionale del caso: antecedenti, condotta e conseguenze.'
+    }
+  };
+  /* Los nombres propios NO se traducen a proposito: "The Dogs Aigents",
+     "World Wide Dog Walking", "TDM Certified Professionals", "Partners",
+     "Tour", "The Dogs' Mind". Son marca. */
+  function TD(txt) {
+    var d = TRAD[_dlang()];
+    return (d && d[txt]) ? d[txt] : txt;
+  }
+
   /* ── Barra superior ────────────────────────────────────────────────────── */
   var ACCIONES = [
     { label: 'Problema de conducta',      screen: 's-anamnesis' },
@@ -114,7 +184,7 @@
 
     var nav = el('nav', 'dmw-nav');
     ACCIONES.forEach(function (b) {
-      var n = el('button', 'dmw-btn dmw-btn-accion', b.label);
+      var n = el('button', 'dmw-btn dmw-btn-accion', TD(b.label));
       n.onclick = function () { irA(b.screen); };
       nav.appendChild(n);
     });
@@ -147,8 +217,8 @@
     var row2 = el('div', 'dmw-bar2');
     var in2 = el('div', 'dmw-bar2-in');
     SECCIONES.forEach(function (b) {
-      var n = el('button', 'dmw-btn dmw-btn-sec', b.label);
-      n.onclick = function () { b.screen ? irA(b.screen) : abrirPanel(b.panel, b.label); };
+      var n = el('button', 'dmw-btn dmw-btn-sec', TD(b.label));
+      n.onclick = function () { b.screen ? irA(b.screen) : abrirPanel(b.panel, TD(b.label)); };
       in2.appendChild(n);
     });
     row2.appendChild(in2);
@@ -193,15 +263,15 @@
     var grid = el('div', 'dmw-grid');
     TARJETAS.forEach(function (c) {
       if (c.h) {
-        grid.appendChild(el('div', 'dmw-sec-h', '<h2>' + c.h + '</h2>'));
+        grid.appendChild(el('div', 'dmw-sec-h', '<h2>' + TD(c.h) + '</h2>'));
         return;
       }
       var cls = 'dmw-card' + (c.span === 6 ? ' dmw-card-wide' : '') + (c.span === 12 ? ' dmw-card-full' : '');
       var card = el('button', cls,
         (c.tag ? '<span class="dmw-card-tag">' + c.tag + '</span>' : '') +
         '<span class="dmw-card-ic">' + svg(c.ic) + '</span>' +
-        '<h3>' + c.t + '</h3>' +
-        (c.d ? '<p>' + c.d + '</p>' : ''));
+        '<h3>' + TD(c.t) + '</h3>' +
+        (c.d ? '<p>' + TD(c.d) + '</p>' : ''));
       if (c.span === 3) card.style.gridColumn = 'span 3';
       card.onclick = function () { c.screen ? irA(c.screen) : abrirPanel(c.panel, c.t); };
       grid.appendChild(card);
@@ -280,7 +350,7 @@
       }).join('') + '</div>';
     }
     c.bloques.forEach(function (b) {
-      h += '<h3 class="dmw-h3">' + b.t + '</h3>';
+      h += '<h3 class="dmw-h3">' + TD(b.t) + '</h3>';
       if (b.tipo === 'bien') {
         h += '<div class="dmw-poi">' + b.items.map(function (it) {
           return '<div class="dmw-poi-i"><span class="dmw-poi-ic">' + svg(it[1]) + '</span>' + it[0] + '</div>';

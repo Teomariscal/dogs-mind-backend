@@ -12484,73 +12484,73 @@ button, a, [onclick], input, select, textarea, .n-btn, .cm-btn-primary,
         <div class="tr-hero-scrim"></div>
         <div class="tr-hero-top">
           <button class="tr-back" onclick="goTo('s-home')" aria-label="Volver">&#8249;</button>
-          <span class="tr-badge">Profesional</span><!-- TODO i18n -->
+          <span class="tr-badge" data-i18n="tr_badge">Profesional</span>
         </div>
         <div class="tr-hero-copy">
-          <h1>Adiestramiento Avanzado</h1><!-- TODO i18n -->
-          <p class="tr-tag">Si eres profesional, la IA te ayuda a generar miles de clases con ideas nuevas para conseguir tus objetivos.</p><!-- TODO i18n -->
+          <h1 data-i18n="tr_title">Adiestramiento Avanzado</h1>
+          <p class="tr-tag" data-i18n="tr_tag">Si eres profesional, la IA te ayuda a generar miles de clases con ideas nuevas para conseguir tus objetivos.</p>
         </div>
       </div>
 
       <div class="tr-sheet">
         <!-- TODO i18n -->
-        <div class="tr-gate">Esta opción está destinada a adiestramiento profesional. Si tienes un caso de modificación de conducta, vuelve a Inicio y pulsa <b>"Nueva Consulta"</b>.</div>
+        <div class="tr-gate" data-i18n="tr_gate">Esta opción está destinada a adiestramiento profesional. Si tienes un caso de modificación de conducta, vuelve a Inicio y pulsa <b>"Nueva Consulta"</b>.</div>
 
         <div class="tr-body">
-          <div class="tr-label">Objetivo de hoy <span class="tr-req">*</span></div><!-- TODO i18n -->
-          <textarea class="tr-textarea" id="tr-goal" placeholder="p. ej. mejorar la llamada con distracciones"></textarea><!-- TODO i18n -->
+          <div class="tr-label"><span data-i18n="tr_goal">Objetivo de hoy</span> <span class="tr-req">*</span></div>
+          <textarea class="tr-textarea" id="tr-goal" data-i18n-placeholder="tr_goal_ph" placeholder="p. ej. mejorar la llamada con distracciones"></textarea><!-- TODO i18n -->
 
           <div class="tr-adjust" id="tr-adj">
             <button type="button" class="tr-adjust-head" onclick="document.getElementById('tr-adj').classList.toggle('open')" aria-expanded="false">
-              <span>Ajustes (opcional)</span><!-- TODO i18n -->
+              <span data-i18n="tr_adjust">Ajustes (opcional)</span>
               <span class="tr-chev">&#9662;</span>
             </button>
             <div class="tr-adjust-body">
 
               <div class="tr-field">
-                <div class="tr-flabel">Nivel del perro</div><!-- TODO i18n -->
-                <div class="tr-seg"><button type="button">Básico</button><button type="button" class="on">Medio</button><button type="button">Avanzado</button></div>
+                <div class="tr-flabel" data-i18n="tr_dog_level">Nivel del perro</div>
+                <div class="tr-seg"><button type="button" data-i18n="tr_lv_basic">Básico</button><button type="button" class="on" data-i18n="tr_lv_mid">Medio</button><button type="button" data-i18n="tr_lv_adv">Avanzado</button></div>
               </div>
 
               <div class="tr-field">
-                <div class="tr-flabel">Nivel de los guías</div><!-- TODO i18n -->
-                <div class="tr-seg"><button type="button">Básico</button><button type="button" class="on">Medio</button><button type="button">Avanzado</button></div>
+                <div class="tr-flabel" data-i18n="tr_handler_level">Nivel de los guías</div>
+                <div class="tr-seg"><button type="button" data-i18n="tr_lv_basic">Básico</button><button type="button" class="on" data-i18n="tr_lv_mid">Medio</button><button type="button" data-i18n="tr_lv_adv">Avanzado</button></div>
               </div>
 
               <div class="tr-field">
-                <div class="tr-flabel">Tiempo disponible</div><!-- TODO i18n -->
+                <div class="tr-flabel" data-i18n="tr_time">Tiempo disponible</div>
                 <div class="tr-seg"><button type="button">15</button><button type="button" class="on">30</button><button type="button">45</button><button type="button">60 min</button></div>
               </div>
 
               <div class="tr-field">
-                <div class="tr-flabel">Dónde será la clase</div><!-- TODO i18n -->
+                <div class="tr-flabel" data-i18n="tr_where">Dónde será la clase</div>
                 <div class="tr-chips">
-                  <div class="tr-chip">Interior</div>
-                  <div class="tr-chip on">Ext. tranquilo</div>
-                  <div class="tr-chip">Ext. con distracciones</div>
-                  <div class="tr-chip">Pista</div>
+                  <div class="tr-chip" data-i18n="tr_w_in">Interior</div>
+                  <div class="tr-chip on" data-i18n="tr_w_calm">Ext. tranquilo</div>
+                  <div class="tr-chip" data-i18n="tr_w_dist">Ext. con distracciones</div>
+                  <div class="tr-chip" data-i18n="tr_w_track">Pista</div>
                 </div>
               </div>
 
               <div class="tr-field">
-                <div class="tr-flabel">Recursos disponibles</div><!-- TODO i18n -->
+                <div class="tr-flabel" data-i18n="tr_res">Recursos disponibles</div>
                 <div class="tr-checks">
-                  <label class="tr-chk on"><span class="tr-box"></span>Clicker</label>
-                  <label class="tr-chk"><span class="tr-box"></span>Mordedor</label>
-                  <label class="tr-chk on"><span class="tr-box"></span>Correa larga</label>
-                  <label class="tr-chk on"><span class="tr-box"></span>Comida</label>
-                  <label class="tr-chk"><span class="tr-box"></span>Otro</label>
+                  <label class="tr-chk on"><span class="tr-box"></span><span data-i18n="tr_r_clicker">Clicker</span></label>
+                  <label class="tr-chk"><span class="tr-box"></span><span data-i18n="tr_r_tug">Mordedor</span></label>
+                  <label class="tr-chk on"><span class="tr-box"></span><span data-i18n="tr_r_line">Correa larga</span></label>
+                  <label class="tr-chk on"><span class="tr-box"></span><span data-i18n="tr_r_food">Comida</span></label>
+                  <label class="tr-chk"><span class="tr-box"></span><span data-i18n="tr_r_other">Otro</span></label>
                 </div>
               </div>
 
               <div class="tr-field">
-                <div class="tr-flabel">Reforzadores más válidos para el perro</div><!-- TODO i18n -->
+                <div class="tr-flabel" data-i18n="tr_reinf">Reforzadores más válidos para el perro</div>
                 <div class="tr-checks">
-                  <label class="tr-chk on"><span class="tr-box"></span>Comida</label>
-                  <label class="tr-chk on"><span class="tr-box"></span>Pelota</label>
-                  <label class="tr-chk"><span class="tr-box"></span>Mordedor</label>
-                  <label class="tr-chk"><span class="tr-box"></span>Otro juguete</label>
-                  <label class="tr-chk"><span class="tr-box"></span>Caricias</label>
+                  <label class="tr-chk on"><span class="tr-box"></span><span data-i18n="tr_r_food">Comida</span></label>
+                  <label class="tr-chk on"><span class="tr-box"></span><span data-i18n="tr_r_ball">Pelota</span></label>
+                  <label class="tr-chk"><span class="tr-box"></span><span data-i18n="tr_r_tug">Mordedor</span></label>
+                  <label class="tr-chk"><span class="tr-box"></span><span data-i18n="tr_r_toy">Otro juguete</span></label>
+                  <label class="tr-chk"><span class="tr-box"></span><span data-i18n="tr_r_pet">Caricias</span></label>
                 </div>
               </div>
 
@@ -12559,7 +12559,7 @@ button, a, [onclick], input, select, textarea, .n-btn, .cm-btn-primary,
         </div>
 
         <div class="tr-cta">
-          <button type="button" onclick="trGenerate()">Generar 5 ejercicios</button><!-- TODO i18n -->
+          <button type="button" onclick="trGenerate()" data-i18n="tr_generate">Generar 5 ejercicios</button>
         </div>
       </div>
     </div><!-- /tr-form -->
@@ -12568,7 +12568,7 @@ button, a, [onclick], input, select, textarea, .n-btn, .cm-btn-primary,
     <div class="tr-result">
       <div class="tr-nav">
         <button class="tr-back" onclick="trShowForm()" aria-label="Volver">&#8249;</button>
-        <div class="tr-nav-title">Sesión de hoy</div><!-- TODO i18n -->
+        <div class="tr-nav-title" data-i18n="tr_session">Sesión de hoy</div>
         <div class="tr-dot"></div>
       </div>
 
@@ -12583,7 +12583,7 @@ button, a, [onclick], input, select, textarea, .n-btn, .cm-btn-primary,
       <div class="tr-ex"><div class="tr-n">5</div><div class="tr-ex-c"><div class="tr-t">Llamada con un distractor en movimiento: una pelota rodando a distancia controlada.</div><div class="tr-why">Sube el criterio: el movimiento, lo más difícil.</div></div></div>
 
       <div class="tr-res-actions">
-        <button type="button" class="tr-btn-ghost" onclick="trShowForm()">Regenerar</button><!-- TODO i18n -->
+        <button type="button" class="tr-btn-ghost" onclick="trShowForm()" data-i18n="tr_regen">Regenerar</button>
         <!-- "Guardar sesión" eliminado en v1: era botón sin handler (control muerto, riesgo 2.1).
              Reintroducir con handler real (guardar la sesión) en v1.1 al reactivar el módulo. -->
       </div>
@@ -12725,7 +12725,7 @@ button, a, [onclick], input, select, textarea, .n-btn, .cm-btn-primary,
             var badgeId = '_applied_badge_' + id;
             if (!document.getElementById(badgeId)) {
               var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
-              var label = (lang === 'en') ? 'Code applied' : 'Código aplicado';
+              var label = _L3('Código aplicado', 'Code applied', 'Codice applicato');
               var badge = document.createElement('div');
               badge.id = badgeId;
               badge.style.cssText = 'display:flex;align-items:center;gap:6px;background:#4a6741;color:#fffaf0;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;width:fit-content;margin-bottom:6px;';
@@ -12847,7 +12847,7 @@ async function validateInviteCode() {
 
   // Loading state — no spinner pesado, solo un texto sutil
   fb.style.color = 'var(--grey)';
-  fb.textContent = (lang === 'en') ? 'Checking…' : 'Comprobando…';
+  fb.textContent = _L3('Comprobando…', 'Checking…', 'Sto verificando…');
 
   // Cancelamos vuelo previo si el usuario edita rápido
   var thisCall = (window._inviteValidateInFlight = Math.random());
@@ -14638,7 +14638,7 @@ function _plSetBusy(busy) {
   btn.disabled = !!busy;
   var _lang = (typeof window.getCurrentLang === 'function') ? window.getCurrentLang() : 'es';
   if (busy) {
-    btn.textContent = (_lang === 'en' ? 'Signing in…' : 'Iniciando sesión…');
+    btn.textContent = _L3('Iniciando sesión…', 'Signing in…', 'Accesso in corso…');
   } else {
     btn.textContent = _i18nText('pl_submit', 'Iniciar sesión');
   }
@@ -14953,7 +14953,7 @@ function psUpdateTotal() {
   if (totalEl) totalEl.textContent = _psFmtEur(total);
   if (btnEl) {
     var _lang = (typeof window.getCurrentLang === 'function') ? window.getCurrentLang() : 'es';
-    btnEl.textContent = (_lang === 'en' ? 'Pay ' : 'Pagar ') + _psFmtEur(total);
+    btnEl.textContent = _L3('Pagar ', 'Pay ', 'Paga ') + _psFmtEur(total);
   }
 }
 window.psUpdateTotal = psUpdateTotal;
@@ -15039,7 +15039,7 @@ function _psSetBusy(busy) {
   btn.dataset.origLabel = btn.dataset.origLabel || btn.textContent;
   if (busy) {
     var _lang = (typeof window.getCurrentLang === 'function') ? window.getCurrentLang() : 'es';
-    btn.textContent = (_lang === 'en' ? 'Processing…' : 'Procesando…');
+    btn.textContent = _L3('Procesando…', 'Processing…', 'Elaborazione…');
   } else if (btn.dataset.origLabel) {
     psUpdateTotal();
   }
@@ -15657,7 +15657,7 @@ function confirmAvatar() {
     _avatarHistory = [{ role: 'assistant', content: _intro }];
   }
   var ta = document.getElementById('chat-ta');
-  if (ta) ta.placeholder = (_lang === 'en' ? 'Write to ' : 'Escríbele a ') + av.name + '…';
+  if (ta) ta.placeholder = _L3('Escríbele a ', 'Write to ', 'Scrivi a ') + av.name + '…';
   goTo('s-chat');
 }
 
@@ -15841,7 +15841,7 @@ function _anamRequiredCheck(el) {
       var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
       err.textContent = _i18nText(
         'anam_required_err',
-        lang === 'en' ? 'This field is required' : 'Este campo es obligatorio'
+        _L3('Este campo es obligatorio', 'This field is required', 'Campo obbligatorio')
       );
     }
   }
@@ -16856,6 +16856,22 @@ window.dmRcRestore = dmRcRestore;
    Existe porque no saberlo nos costo tres cacerias de fallos inexistentes. */
 window.DM_VERSION_SELLO = '__DM_VERSION__';   /* lo reemplaza compilar-apps.sh */
 
+/* ── _L3: el idioma que faltaba (17-sep-2026) ────────────────────────────────
+   Habia 44 sitios con la forma `lang === 'en' ? ingles : castellano`. El
+   italiano cae siempre en el "si no", asi que veia español bajo una interfaz
+   traducida. No van al diccionario porque muchos llevan datos dentro (nombres,
+   cifras) y applyLang los borraria al repintar; lo que necesitan es elegir
+   idioma en el momento, que es justo esto. */
+function _L3(es, en, it) {
+  var l = 'es';
+  try {
+    l = ((window.getCurrentLang ? window.getCurrentLang() : '') ||
+         localStorage.getItem('dm_lang') || 'es').toLowerCase().slice(0, 2);
+  } catch (e) {}
+  return l === 'en' ? en : (l === 'it' ? it : es);
+}
+window._L3 = _L3;
+
 function dmPintarVersion() {
   var el = document.getElementById('dm-version');
   if (!el) return;
@@ -17807,7 +17823,7 @@ function getVal(id, fallback) {
     .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
     .then(function(res) {
       if (!res.ok) {
-        alert(res.data.detail || (lang === 'en' ? 'Could not send the email. Try again later.' : 'No se pudo enviar el email. Inténtalo más tarde.'));
+        alert(res.data.detail || _L3('No se pudo enviar el email. Inténtalo más tarde.', 'Could not send the email. Try again later.', 'Non è stato possibile inviare l’email. Riprova più tardi.'));
         return;
       }
       alert(lang === 'en'
@@ -17815,7 +17831,7 @@ function getVal(id, fallback) {
         : 'Revisa tu correo. Te hemos enviado una nueva contraseña (revisa también spam).');
     })
     .catch(function() {
-      alert(lang === 'en' ? 'Connection error.' : 'Error de conexión.');
+      alert(_L3('Error de conexión.', 'Connection error.', 'Errore di connessione.'));
     });
   }
   window.forgotPassword = forgotPassword;
@@ -20682,7 +20698,7 @@ async function analyzeWithAI() {
   }
   if (_firstBad) {
     var _rl = (window.getCurrentLang ? window.getCurrentLang() : 'es');
-    showToast(_i18nText('anam_required_err', _rl === 'en' ? 'This field is required' : 'Este campo es obligatorio'));
+    showToast(_i18nText('anam_required_err', _L3('Este campo es obligatorio', 'This field is required', 'Campo obbligatorio')));
     try { _firstBad.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(_) {}
     return;
   }
@@ -21758,7 +21774,7 @@ async function trGenerate() {
   var objetivo = goalEl ? (goalEl.value || '').trim() : '';
   if (!objetivo) {
     if (typeof showToast === 'function') {
-      showToast(lang === 'en' ? 'Write today\'s goal first.' : 'Escribe primero el objetivo de hoy.');
+      showToast(_L3('Escribe primero el objetivo de hoy.', 'Write today\'s goal first.', 'Scrivi prima l’obiettivo di oggi.'));
     }
     if (goalEl) goalEl.focus();
     return;
@@ -21778,7 +21794,7 @@ async function trGenerate() {
   // Botón en estado "Generando…"
   var btn = scr.querySelector('.tr-cta button');
   var btnTxt = btn ? btn.textContent : '';
-  if (btn) { btn.disabled = true; btn.textContent = (lang === 'en' ? 'Generating…' : 'Generando…'); }
+  if (btn) { btn.disabled = true; btn.textContent = _L3('Generando…', 'Generating…', 'Sto generando…'); }
 
   try {
     var res = await fetch(API_BASE + '/training/daily-session', {
@@ -21800,13 +21816,13 @@ async function trGenerate() {
       var detail = '';
       try { var ed = await res.json(); detail = ed.detail || ''; } catch(e) {}
       if (res.status === 401) {
-        if (typeof showToast === 'function') showToast(_i18nText('session_expired', lang === 'en' ? 'Session expired.' : 'Sesión caducada.'));
+        if (typeof showToast === 'function') showToast(_i18nText('session_expired', _L3('Sesión caducada.', 'Session expired.', 'Sessione scaduta.')));
       } else if (res.status === 402) {
         showRechargeNotice(0.25);
       } else if (res.status === 403) {
-        if (typeof showToast === 'function') showToast(detail || (lang === 'en' ? 'Professionals only.' : 'Solo profesionales.'));
+        if (typeof showToast === 'function') showToast(detail || _L3('Solo profesionales.', 'Professionals only.', 'Solo professionisti.'));
       } else {
-        if (typeof showToast === 'function') showToast(detail || (lang === 'en' ? 'Could not generate the session.' : 'No se pudo generar la sesión.'));
+        if (typeof showToast === 'function') showToast(detail || _L3('No se pudo generar la sesión.', 'Could not generate the session.', 'Non è stato possibile generare la sessione.'));
       }
       return; // no cambia de vista
     }
@@ -21814,7 +21830,7 @@ async function trGenerate() {
     var data = await res.json();
     var ejercicios = (data && data.ejercicios) || [];
     if (!ejercicios.length) {
-      if (typeof showToast === 'function') showToast(lang === 'en' ? 'Could not generate the session.' : 'No se pudo generar la sesión.');
+      if (typeof showToast === 'function') showToast_L3('No se pudo generar la sesión.', 'Could not generate the session.', 'Non è stato possibile generare la sessione.');
       return;
     }
 
@@ -21827,7 +21843,7 @@ async function trGenerate() {
     window.scrollTo(0, 0);
   } catch (e) {
     console.error('training/daily-session:', e);
-    if (typeof showToast === 'function') showToast(lang === 'en' ? 'Network error. Try again.' : 'Error de red. Inténtalo de nuevo.');
+    if (typeof showToast === 'function') showToast(_L3('Error de red. Inténtalo de nuevo.', 'Network error. Try again.', 'Errore di rete. Riprova.'));
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = btnTxt; }
   }
@@ -21851,8 +21867,8 @@ function _trRenderResult(scr, objetivo, ejercicios, meta) {
       return { basico: 'básico', medio: 'medio', avanzado: 'avanzado' }[k] || k;
     };
     var parts = [];
-    parts.push((meta.lang === 'en' ? 'Dog: ' : 'Perro: ') + levelLabel(meta.nivelPerro));
-    parts.push((meta.lang === 'en' ? 'Handlers: ' : 'Guías: ') + levelLabel(meta.nivelGuias));
+    parts.push(_L3('Perro: ', 'Dog: ', 'Cane: ') + levelLabel(meta.nivelPerro));
+    parts.push(_L3('Guías: ', 'Handlers: ', 'Conduttori: ') + levelLabel(meta.nivelGuias));
     if (meta.donde) parts.push(meta.donde);
     if (meta.tiempo) parts.push(meta.tiempo + ' min');
     sub.textContent = parts.join(' · ');
@@ -23757,6 +23773,37 @@ function endTourIntro() {
       n2_script:               'Uy, perdona, me estaba reseteando. Hola, soy Niaz, tu Aigent de lujo y lifestyle canino. Y estoy aqu\u00ed para ayudarte con peluquer\u00eda, hoteles, productos premium, restaurantes y viajes. Solo lo mejor para tu perro.',
       al_script:               'Hola, soy Ale, la Aigent con más buena onda. ¿Has probado la feature de paseos? Estés donde estés puedo trazar tres rutas para pasear con tu perro, dando prioridad a las zonas verdes, lugares sin excesiva acumulación de gente o tráfico, incluso, y dependiendo de la hora del día, elegir rutas con más sombra y más seguras y agradables para tu perro. Ponme a prueba y pulsa aquí.',
       ce2_script:              'Estás en una app sustentada por principios científicos. Tu herramienta para solucionar un problema de conducta de tu perro, enseñarle un ejercicio o crear un plan de educación temprana. A veces los términos abruman, sobre todo si no eres profesional; para eso estoy yo durante todo el análisis. Consúltame en cualquier momento y te lo explicaré de la forma más sencilla posible. Has elegido una magnífica herramienta. Entra en nueva consulta y compruébalo.',
+      tr_badge: 'Profesional',
+      tr_title: 'Adiestramiento Avanzado',
+      tr_tag: 'Si eres profesional, la IA te ayuda a generar miles de clases con ideas nuevas para conseguir tus objetivos.',
+      tr_gate: 'Esta opción está destinada a adiestramiento profesional. Si tienes un caso de modificación de conducta, vuelve a Inicio y pulsa <b>"Nueva Consulta"</b>.',
+      tr_goal: 'Objetivo de hoy',
+      tr_goal_ph: 'p. ej. mejorar la llamada con distracciones',
+      tr_adjust: 'Ajustes (opcional)',
+      tr_dog_level: 'Nivel del perro',
+      tr_handler_level: 'Nivel de los guías',
+      tr_time: 'Tiempo disponible',
+      tr_where: 'Dónde será la clase',
+      tr_res: 'Recursos disponibles',
+      tr_reinf: 'Reforzadores más válidos para el perro',
+      tr_generate: 'Generar 5 ejercicios',
+      tr_session: 'Sesión de hoy',
+      tr_regen: 'Regenerar',
+      tr_lv_basic: 'Básico',
+      tr_lv_mid: 'Medio',
+      tr_lv_adv: 'Avanzado',
+      tr_w_in: 'Interior',
+      tr_w_calm: 'Ext. tranquilo',
+      tr_w_dist: 'Ext. con distracciones',
+      tr_w_track: 'Pista',
+      tr_r_clicker: 'Clicker',
+      tr_r_tug: 'Mordedor',
+      tr_r_line: 'Correa larga',
+      tr_r_food: 'Comida',
+      tr_r_other: 'Otro',
+      tr_r_ball: 'Pelota',
+      tr_r_toy: 'Otro juguete',
+      tr_r_pet: 'Caricias',
       pw_need_login: 'Entra en tu cuenta para ver tus planes y usar tu código.',
       pw_go_login: 'Entrar o crear cuenta',
       cod_entra_primero: 'Para usar un código tienes que entrar en tu cuenta. Te llevo y te lo aplico solo.',
@@ -24976,6 +25023,37 @@ function endTourIntro() {
       n2_script:               'Oops, sorry, I was rebooting. Hi, I\u2019m Niaz, your luxury and canine lifestyle Aigent. And I\u2019m here to help you with grooming, hotels, premium products, restaurants and travel. Only the best for your dog.',
       al_script:               'Hi, I am Ale, the easy-going Aigent. Have you tried the walks feature? Wherever you are I can map out three routes to walk your dog, giving priority to green areas and places without too many people or traffic, and, depending on the time of day, choose routes with more shade that are safer and more pleasant for your dog. Put me to the test and tap here.',
       ce2_script:              'You are in an app grounded in scientific principles. Your tool for solving a behaviour problem in your dog, teaching them an exercise or building an early education plan. Sometimes the terms are overwhelming, above all if you are not a professional; that is what I am here for, right through the analysis. Ask me at any point and I will explain it in the simplest way I can. You have chosen a magnificent tool. Go into a new consultation and see for yourself.',
+      tr_badge: 'Professional',
+      tr_title: 'Advanced Training',
+      tr_tag: 'If you are a professional, the AI helps you generate thousands of classes with fresh ideas to reach your goals.',
+      tr_gate: 'This option is meant for professional training. If you have a behaviour-modification case, go back to Home and tap <b>"New consultation"</b>.',
+      tr_goal: 'Today’s goal',
+      tr_goal_ph: 'e.g. improve recall with distractions',
+      tr_adjust: 'Settings (optional)',
+      tr_dog_level: 'Dog’s level',
+      tr_handler_level: 'Handlers’ level',
+      tr_time: 'Time available',
+      tr_where: 'Where the class will be',
+      tr_res: 'Available equipment',
+      tr_reinf: 'Most effective reinforcers for the dog',
+      tr_generate: 'Generate 5 exercises',
+      tr_session: 'Today’s session',
+      tr_regen: 'Regenerate',
+      tr_lv_basic: 'Basic',
+      tr_lv_mid: 'Intermediate',
+      tr_lv_adv: 'Advanced',
+      tr_w_in: 'Indoors',
+      tr_w_calm: 'Quiet outdoors',
+      tr_w_dist: 'Outdoors with distractions',
+      tr_w_track: 'Training field',
+      tr_r_clicker: 'Clicker',
+      tr_r_tug: 'Tug toy',
+      tr_r_line: 'Long line',
+      tr_r_food: 'Food',
+      tr_r_other: 'Other',
+      tr_r_ball: 'Ball',
+      tr_r_toy: 'Another toy',
+      tr_r_pet: 'Petting',
       pw_need_login: 'Sign in to see your plans and use your code.',
       pw_go_login: 'Sign in or create an account',
       cod_entra_primero: 'To use a code you need to sign in first. I will take you there and apply it for you.',
@@ -26190,6 +26268,37 @@ function endTourIntro() {
           n2_script:               'Ops, scusa, mi stavo riavviando. Ciao, sono Niaz, la tua Aigent di lusso e lifestyle canino. E sono qui per aiutarti con toelettatura, hotel, prodotti premium, ristoranti e viaggi. Solo il meglio per il tuo cane.',
           al_script:               'Ciao, sono Ale, l’Aigent più alla mano. Hai provato la feature delle passeggiate? Ovunque tu sia posso tracciare tre percorsi per passeggiare con il tuo cane, dando priorità alle zone verdi, ai luoghi senza troppa gente o traffico e, a seconda dell’ora del giorno, scegliere percorsi più ombreggiati, più sicuri e più piacevoli per il tuo cane. Mettimi alla prova e premi qui.',
           ce2_script:              'Sei in un’app fondata su principi scientifici. Il tuo strumento per risolvere un problema di comportamento del tuo cane, insegnargli un esercizio o creare un piano di educazione precoce. A volte i termini sovrastano, soprattutto se non sei un professionista; per questo ci sono io durante tutta l’analisi. Chiedimi in qualsiasi momento e te lo spiegherò nel modo più semplice possibile. Hai scelto uno strumento magnifico. Entra in nuovo consulto e verificalo.',
+          tr_badge: 'Professionale',
+          tr_title: 'Addestramento Avanzato',
+          tr_tag: 'Se sei un professionista, l’IA ti aiuta a generare migliaia di lezioni con idee nuove per raggiungere i tuoi obiettivi.',
+          tr_gate: 'Questa opzione è pensata per l’addestramento professionale. Se hai un caso di modifica del comportamento, torna alla Home e premi <b>"Nuovo consulto"</b>.',
+          tr_goal: 'Obiettivo di oggi',
+          tr_goal_ph: 'es. migliorare il richiamo con le distrazioni',
+          tr_adjust: 'Impostazioni (facoltativo)',
+          tr_dog_level: 'Livello del cane',
+          tr_handler_level: 'Livello dei conduttori',
+          tr_time: 'Tempo a disposizione',
+          tr_where: 'Dove si terrà la lezione',
+          tr_res: 'Attrezzatura disponibile',
+          tr_reinf: 'Rinforzi più efficaci per il cane',
+          tr_generate: 'Genera 5 esercizi',
+          tr_session: 'Sessione di oggi',
+          tr_regen: 'Rigenera',
+          tr_lv_basic: 'Base',
+          tr_lv_mid: 'Intermedio',
+          tr_lv_adv: 'Avanzato',
+          tr_w_in: 'Al chiuso',
+          tr_w_calm: 'Esterno tranquillo',
+          tr_w_dist: 'Esterno con distrazioni',
+          tr_w_track: 'Campo',
+          tr_r_clicker: 'Clicker',
+          tr_r_tug: 'Gioco da tira e molla',
+          tr_r_line: 'Longhina',
+          tr_r_food: 'Cibo',
+          tr_r_other: 'Altro',
+          tr_r_ball: 'Palla',
+          tr_r_toy: 'Un altro gioco',
+          tr_r_pet: 'Coccole',
           pw_need_login: 'Accedi al tuo account per vedere i piani e usare il tuo codice.',
           pw_go_login: 'Accedi o crea un account',
           cod_entra_primero: 'Per usare un codice devi prima accedere. Ti porto io e te lo applico da solo.',
@@ -27858,7 +27967,7 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
       if (!data.daily_followup_enabled) return;
       if (data.already_completed_today) return;
 
-      _dfInviteShow(candidate.backend_case_id, candidate.dog_name || (_lang() === 'en' ? 'your dog' : 'tu perro'));
+      _dfInviteShow(candidate.backend_case_id, candidate.dog_name || _L3('tu perro', 'your dog', 'il tuo cane'));
     } catch(e){}
   }
 

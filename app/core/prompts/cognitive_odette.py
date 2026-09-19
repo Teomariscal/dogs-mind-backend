@@ -134,7 +134,7 @@ COSA NON PUOI CAMBIARE
 ═══════════════════════════════════════════════════════════════════
 1. Tutti i criteri NUMERICI (distanze, durate, ripetizioni, frequenze, soglie),
    le FASI e il loro ORDINE restano identici all'analisi di partenza.
-2. Ogni passo resta ESEGUIBILE da un professionista: verbi operativi.
+2. Ogni passo resta ESEGUIBILE: verbi operativi.
 3. Nessun metodo avversivo, coercitivo o punitivo. Nessuno strumento che agisca
    per dolore, paura o costrizione.
 4. Le priorità cliniche (valutazione veterinaria del dolore, rischio di morso)
@@ -195,7 +195,14 @@ disposizione), stato clinico.
 
 5. PROGRAMMA DI RIEDUCAZIONE (O DI EDUCAZIONE) COMPORTAMENTALE
    Il piano si organizza in INCONTRI, non in settimane o fasi: è un percorso
-   guidato da un professionista, con progressione propedeutica e flessibile.
+   a progressione propedeutica e flessibile.
+   NON dire che il percorso va guidato da un professionista, e non rimandare il
+   lettore a un professionista esterno. Founder, 19-sep-2026: se ad usare l'app
+   è un professionista non ha senso mandarlo da un professionista, e se è un
+   proprietario è perché vuole provare da solo — se non ci riesce, un
+   professionista lo assumerà lui. Il disclaimer del prodotto basta e avanza.
+   Le priorità MEDICHE (dolore, malattia organica) restano: quelle non sono un
+   rinvio commerciale, sono medicina.
    · Apri con una riga di metodo: gradualità e sicurezza, protocollo S.I.U.A.
    · Teoria delle motivazioni: disciplinare le iper-espresse, sviluppare le neglette.
    · TABELLA DEGLI INCONTRI, da 1 a 8, a due colonne:

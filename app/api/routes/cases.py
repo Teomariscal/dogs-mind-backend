@@ -236,9 +236,16 @@ class LegacyRecord(BaseModel):
     # Distinción de flujo: 'behavior' (ABC clínico, default) | 'training' (consulta
     # de Entrenamiento Específico). Optional; NULL/missing → default Case.case_type
     # ('behavior') y comportamiento idéntico al previo (cero regresión).
-    case_type: Optional[Literal["behavior", "training", "puppy"]] = Field(
+    # 19-sep-2026: faltaba 'cognitiva' y por eso NO SE GUARDABA NINGUN CASO de
+    # la via cognitivista italiana. El frontend manda case_type='cognitiva' desde
+    # el 12-sep; Pydantic devolvia 422, `mres.ok` era false, el bloque entero
+    # estaba dentro de un try/catch mudo y el boton decia igualmente "Caso
+    # salvato". El caso vivia solo en el localStorage de ESE movil: sin backend
+    # no hay ejercicios diarios (daily-followup/init necesita el case_id) ni PDF
+    # ni sincronizacion. Falla de verdad reportada por el founder.
+    case_type: Optional[Literal["behavior", "training", "puppy", "cognitiva"]] = Field(
         None,
-        description="'behavior' (ABC clínico) | 'training' (Adiestramiento Pro) | 'puppy' (Escuela Cachorros). NULL → 'behavior'.",
+        description="'behavior' (ABC clínico) | 'training' (Adiestramiento Pro) | 'puppy' (Escuela Cachorros) | 'cognitiva' (relazione de Odette). NULL → 'behavior'.",
     )
 
 
@@ -855,6 +862,50 @@ def export_puppy_pdf(
 
     pdf_bytes = build_puppy_pdf(case, user, db)
     filename = build_simple_pdf_filename(case, db, kind="puppy")
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Length": str(len(pdf_bytes)),
+            "Cache-Control": "private, max-age=0, must-revalidate",
+        },
+    )
+
+
+@router.get("/{case_id}/cognitiva/pdf")
+def export_cognitiva_pdf(
+    case_id: str,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """PDF de la relazione cognitivista (`case_type='cognitiva'`).
+
+    Sin coste en créditos: solo formatea la relazione ya redactada y guardada,
+    que vive como `CaseEntry.type='intervention'` (es donde la deja
+    `/cases/migrate` al recibir el campo `plan`).
+    """
+    from app.services.pdf_export import (
+        build_cognitiva_pdf, build_simple_pdf_filename,
+    )
+
+    case = _get_owned_case(case_id, user, db)
+
+    cached = (
+        db.query(CaseEntry)
+        .filter(CaseEntry.case_id == case.id, CaseEntry.type == "intervention")
+        .order_by(CaseEntry.created_at.desc())
+        .first()
+    )
+    if not cached or not cached.content:
+        raise HTTPException(
+            status_code=404,
+            detail="Non hai ancora salvato la relazione di questo caso.",
+        )
+
+    pdf_bytes = build_cognitiva_pdf(case, user, db)
+    filename = build_simple_pdf_filename(case, db, kind="cognitiva")
 
     return Response(
         content=pdf_bytes,

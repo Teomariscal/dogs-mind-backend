@@ -10737,6 +10737,12 @@ button:not(:disabled):active{ transform:scale(0.98); }
            de guardar. Sin coste de tokens. -->
       <button id="tr-pdf-btn" class="tc-submit-btn" onclick="trDownloadPdf()" data-i18n="tr_btn_pdf"
               style="display:none;">Descargar PDF</button>
+      <!-- Cecilia (founder, 19-sep-2026): "cecilia debe estar en cachorros y no
+           en cognitivista", "y en consulta ABA", "y adiestramiento". Estaba solo
+           en el flujo ABC y en el seguimiento. -->
+      <button class="tc-submit-btn" onclick="askCeciliaDesde('tr-content','s-training-result')"
+              data-i18n="ask_cecilia_btn"
+              style="background:transparent;color:var(--cyan, #5ec8e6);border:1.5px solid rgba(94,200,230,0.5);">Chat con Cecilia</button>
       <button class="tc-submit-btn" onclick="goToConsultType()" data-i18n="tr_new_consult"
               style="background:transparent;color:var(--cyan, #5ec8e6);border:1.5px solid rgba(94,200,230,0.5);">Nueva consulta</button>
     </div>
@@ -10910,6 +10916,10 @@ button:not(:disabled):active{ transform:scale(0.98); }
            guardado en backend (endpoint /cases/{id}/puppy/pdf, sin coste). -->
       <button id="pupr-pdf-btn" class="tc-submit-btn" onclick="pupDownloadPdf()" data-i18n="pupr_btn_pdf"
               style="display:none;">Descargar PDF</button>
+      <!-- Cecilia, igual que en Adiestramiento (founder, 19-sep-2026). -->
+      <button class="tc-submit-btn" onclick="askCeciliaDesde('pupr-content','s-puppy-result')"
+              data-i18n="ask_cecilia_btn"
+              style="background:transparent;color:var(--cyan, #5ec8e6);border:1.5px solid rgba(94,200,230,0.5);">Chat con Cecilia</button>
       <button class="tc-submit-btn" onclick="goTo('s-home')" data-i18n="pupr_home"
               style="background:transparent;color:var(--cyan, #5ec8e6);border:1.5px solid rgba(94,200,230,0.5);">Volver al inicio</button>
     </div>
@@ -11355,6 +11365,10 @@ button:not(:disabled):active{ transform:scale(0.98); }
 
       <div class="tr-actions" id="czr-azioni" style="display:none;flex-direction:column;gap:10px;">
         <button id="czr-salva" class="tc-submit-btn" onclick="dmCZSalvare()">Salva il caso</button>
+        <!-- 19-sep-2026: la via cognitivista era la UNICA sin PDF. No es que
+             fallara: no existia ni el boton ni el endpoint. Aparece cuando el
+             caso ya esta en el servidor, que es lo que el PDF necesita. -->
+        <button id="czr-pdf" class="tc-submit-btn" onclick="dmCZPdf()" style="display:none;background:transparent;color:var(--cyan, #5ec8e6);border:1.5px solid rgba(94,200,230,0.5);">Scarica il PDF</button>
         <button class="tc-submit-btn" onclick="dmCZVolver()"
                 style="background:transparent;color:var(--cyan, #5ec8e6);border:1.5px solid rgba(94,200,230,0.5);">Torna all'inizio</button>
       </div>
@@ -13460,6 +13474,23 @@ function askCecilia(context) {
   else if (context === 'analysis') window._chat_return_to = 's-abc';
 }
 window.askCecilia = askCecilia;
+
+/* Cecilia desde Adiestramiento y Escuela de Cachorros (founder, 19-sep-2026).
+   `askCecilia('plan')` lee `_lastInterventionPlan`, que en esos dos flujos no
+   siempre esta puesto; aqui se toma el texto que el usuario tiene DELANTE, que
+   es justo sobre lo que va a preguntar. Y la vuelta del chat va a su propia
+   pantalla, no al seguimiento conductual.
+   En la via cognitivista NO se pone a proposito: es canal estanco y Cecilia
+   explica en lenguaje conductual — meterla ahi seria la fuga del 4-sep. */
+window.askCeciliaDesde = function (idContenido, pantallaVuelta) {
+  try {
+    var el = document.getElementById(idContenido);
+    var txt = (el && el.textContent) ? el.textContent.trim() : '';
+    if (txt) window._lastInterventionPlan = txt;
+  } catch (e) {}
+  askCecilia('plan');
+  window._chat_return_to = pantallaVuelta;
+};
 
 // Botón "atrás" del chat. Si venimos del flujo clínico (askCecilia con
 // contexto plan/análisis), volvemos al sitio del que vinimos — sin esto, el
@@ -17381,9 +17412,19 @@ function getVal(id, fallback) {
     // Postura del caso: si el record la guardó, la usamos; si no (casos antiguos),
     // la deducimos del texto (marcadores cognitivo-zooantropológicos). Determina si
     // se muestra la pantalla ABC (conductual) o se va directo al análisis (cognitivo).
-    window._tdmStance = r.stance ||
-      (/evocator|motivazional|lettura cognitiv|attività emendativ|profilo rappresentazional/i.test(r.analysis || '')
-        ? 'cognitive' : 'behavioral');
+    /* 19-sep-2026 — el fallo que reportó el founder. La deducción miraba SOLO
+       `r.analysis`, y un caso cognitivista lo guarda vacío a propósito: el texto
+       va en `r.plan`. Resultado: postura 'behavioral' → pantalla ABC → y como
+       tampoco había análisis con el que repintarla, se quedaba a la vista el
+       ABA del caso ANTERIOR. Él abrió la relazione de Olivia y leyó el análisis
+       conductual de Choco. Ahora se pregunta por este orden: lo que guardó el
+       propio record, el tipo de caso (que es el dato duro), y sólo al final el
+       léxico — y el léxico se busca en el análisis Y en el plan. */
+    var _txtCaso = (r.analysis || '') + '\n' + (r.plan || '');
+    window._tdmStance = r.stance
+      || ((r.case_type === 'cognitiva') ? 'cognitive'
+      : (/evocator|motivazional|lettura cognitiv|attività emendativ|profilo rappresentazional/i.test(_txtCaso)
+          ? 'cognitive' : 'behavioral'));
 
     // Repoblar s-abc con el análisis archivado (función ya existente)
     if (typeof fillABCScreen === 'function' && r.analysis) {
@@ -17400,7 +17441,20 @@ function getVal(id, fallback) {
 
     // Navegar al análisis funcional. Cognitivo → directo al análisis completo
     // (sin pantalla ABC, andamiaje conductual); conductual → pantalla ABC de siempre.
-    if (window._tdmStance === 'cognitive') { goTo('s-full-analysis'); }
+    /* Cognitivista → su propia pantalla, con la relazione GUARDADA repintada.
+       Nunca s-abc: ahí no hay nada suyo que enseñar y lo que queda es de otro
+       perro. Conductual sin análisis (records sincronizados que sólo traen
+       summaries) → tampoco s-abc por lo mismo; se enseña el plan guardado. */
+    if (window._tdmStance === 'cognitive'
+        && typeof window.dmCZAbrirArchivado === 'function') {
+      window.dmCZAbrirArchivado(r);
+    }
+    else if (window._tdmStance === 'cognitive') { goTo('s-full-analysis'); }
+    else if (!(r.analysis || '').trim() && (r.plan || '').trim()
+             && typeof renderInterventionPlan === 'function') {
+      try { renderInterventionPlan(r.plan, r.dog_name || ''); }
+      catch (e) { goTo('s-abc'); }
+    }
     else { goTo('s-abc'); }
   }
   window.openRecord = openRecord;
@@ -28387,6 +28441,14 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
             ? window._mdToHtml(jr.relazione) : jr.relazione;
           window._czRelazione = jr.relazione;   /* el markdown, para guardar y PDF */
           window._czTipo = jr.tipo || '';
+          /* Relazione NUEVA: el boton de guardar vuelve a estar, y el de PDF no
+             —todavia no hay caso en el servidor que exportar—. Hay que
+             reponerlos a mano porque abrir un caso archivado los deja al reves. */
+          window._czArchivado = null;
+          var _bs = document.getElementById('czr-salva');
+          if (_bs) { _bs.style.display = ''; _bs.disabled = false; _bs.textContent = 'Salva il caso'; }
+          var _bp = document.getElementById('czr-pdf');
+          if (_bp) _bp.style.display = 'none';
           var acc = document.getElementById('czr-azioni');
           if (acc) acc.style.display = 'flex';
           try { localStorage.removeItem('dm_cz_relazione'); } catch (e3) {}
@@ -28407,6 +28469,71 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
      porque el formulario ya se ha enviado. Y al salir de las dos pantallas del
      canal, goTo cierra la via cognitivista, que es lo que debe pasar. */
   window.dmCZVolver = function () { goTo('s-home'); };
+
+  /* Descarga del PDF de la relazione. Reutiliza el mismo helper que el resto de
+     PDFs de la app (vale para iOS/Android nativos, no solo para la web). */
+  window.dmCZPdf = function () {
+    var id = window._czArchivado || window._lastArchiveCaseId || null;
+    if (!id) {
+      try { showToast('Salva prima il caso per scaricare il PDF.'); } catch (e) {}
+      return;
+    }
+    if (typeof _downloadAccessiblePdf !== 'function') return;
+    _downloadAccessiblePdf({
+      caseId: id, endpoint: 'cognitiva', fallbackFilename: 'relazione.pdf',
+    });
+  };
+
+  /* Abrir una relazione YA GUARDADA desde los registros. Founder, 19-sep-2026:
+     "tiene que salir estrictamente el plan de intervencion diseñado y guardado
+     para siempre". Asi que aqui no se regenera nada ni se pide nada al modelo:
+     se repinta el markdown que se guardo, tal cual. */
+  window.dmCZAbrirArchivado = function (r) {
+    var md = (r && r.plan) || '';
+    if (!md.trim()) {
+      /* Sin texto guardado no hay nada que enseñar — pero tampoco se cae en la
+         pantalla ABC, que es justo el fallo que se esta arreglando. */
+      try { showToast('Questo caso non ha una relazione salvata.'); } catch (e) {}
+      goTo('s-records');
+      return;
+    }
+
+    /* El canal estanco solo pinta s-relazione-cz con la app en italiano. Si el
+       veterinario la tiene en otro idioma NO se le esconde su propio caso: se
+       enseña en la pantalla neutra del plan, que no nombra ABC ni marco
+       conductual. Lo que nunca puede ocurrir es acabar en s-abc. */
+    var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
+    if (lang !== 'it') {
+      if (typeof renderInterventionPlan === 'function') {
+        try { renderInterventionPlan(md, (r && r.dog_name) || ''); return; } catch (e) {}
+      }
+    }
+
+    window._tdmStance = 'cognitive';
+    window._czRelazione = md;
+    window._czArchivado = (r && r.backend_case_id) || null;
+    window._czSiguiendo = false;
+
+    var testo  = document.getElementById('czr-testo');
+    var lavoro = document.getElementById('czr-lavoro');
+    var errore = document.getElementById('czr-errore');
+    var acc    = document.getElementById('czr-azioni');
+    var salva  = document.getElementById('czr-salva');
+    var pdf    = document.getElementById('czr-pdf');
+
+    if (lavoro) lavoro.style.display = 'none';
+    if (errore) { errore.style.display = 'none'; errore.textContent = ''; }
+    if (testo) {
+      testo.innerHTML = (typeof window._mdToHtml === 'function')
+        ? window._mdToHtml(md) : md;
+    }
+    /* Ya esta guardado: el boton de guardar sobra y confundiria. */
+    if (salva) salva.style.display = 'none';
+    if (pdf)   pdf.style.display = window._czArchivado ? '' : 'none';
+    if (acc)   acc.style.display = 'flex';
+
+    goTo('s-relazione-cz');
+  };
 
   /* Guardar el caso. Mismo camino que el plan conductual (acceptTrainingPlan):
      entra en los registros locales y se migra al backend con /cases/migrate.
@@ -28432,13 +28559,22 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
       plan: md,
       status: 'active',
       case_type: 'cognitiva',
+      /* 19-sep-2026: sin esta linea el caso se guardaba SIN postura, y al
+         reabrirlo `openRecord` deducia la postura del campo `analysis` —que en
+         un caso cognitivista va vacio a proposito— y caia en 'behavioral'. El
+         founder abria su relazione de Olivia y se encontraba el analisis ABA de
+         OTRO perro: la pantalla ABC conservaba el contenido del caso anterior
+         porque no habia nada con que repintarla. */
+      stance: 'cognitive',
       lang: 'it'
     };
     try { var recs = getRecords(); recs.unshift(record); setRecords(recs); } catch (e) {}
 
     var caseId = null;
+    var jwt_presente = false;
     try {
       var jwt = localStorage.getItem('dm_jwt') || '';
+      jwt_presente = !!jwt;
       if (jwt) {
         var mres = await fetch(API_URL + '/cases/migrate', {
           method: 'POST', headers: authHeaders(),
@@ -28475,7 +28611,22 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
       }
     } catch (e) {}
 
+    /* 19-sep-2026: este bloque avisaba de NADA. El backend llevaba una semana
+       devolviendo 422 (no aceptaba case_type='cognitiva') y el boton decia
+       "Caso salvato" igual: el caso vivia solo en este movil, sin ejercicios
+       diarios y sin PDF, y nadie se enteraba. Si el servidor no lo acepta, se
+       dice. */
+    if (jwt_presente && !caseId) {
+      try { showToast('Salvato su questo dispositivo. Non ho potuto sincronizzarlo: riprova piu tardi.'); } catch (e) {}
+    }
+
     if (boton) { boton.textContent = 'Caso salvato'; boton.disabled = true; }
+    /* Con el caso ya en el servidor, el PDF pasa a estar disponible. */
+    if (caseId) {
+      window._czArchivado = caseId;
+      var _bp2 = document.getElementById('czr-pdf');
+      if (_bp2) _bp2.style.display = '';
+    }
     try { localStorage.removeItem('dm_cz_relazione'); } catch (e) {}
     /* Sale del canal a proposito: el caso ya vive en los registros, y quedarse
        en cognitivista paseando por la app es justo lo que no puede pasar. */

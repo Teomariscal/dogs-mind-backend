@@ -622,6 +622,28 @@ def build_puppy_pdf(case: Case, user: User, db: Session) -> bytes:
     )
 
 
+def build_cognitiva_pdf(case: Case, user: User, db: Session) -> bytes:
+    """PDF de la relazione cognitivista de Odette (`case_type='cognitiva'`).
+
+    19-sep-2026: la via cognitivista era la UNICA sin PDF — la pantalla de la
+    relazione no tenia siquiera boton. El texto se guarda como entrada
+    `intervention` (es lo que hace `/cases/migrate` con el campo `plan`), igual
+    que el plan de entrenamiento.
+
+    El rotulo va en italiano y SIN vocabulario conductual: este documento es del
+    canal estanco y no puede nombrar el marco ABA ni por el titulo.
+    """
+    body = _latest_entry_content(case.id, "intervention", db)
+    if not body:
+        raise ValueError("El caso no tiene aún relazione cognitivista guardada.")
+    return _build_simple_pdf(
+        case, user, db,
+        section_title="Relazione",
+        body_md=body,
+        pdf_title_prefix="Relazione",
+    )
+
+
 def build_simple_pdf_filename(case: Case, db: Session, *, kind: str) -> str:
     """Filename para los PDFs accesibles. kind ∈ {'plan-simple','abc-explained'}."""
     dog_label = _resolve_dog_label(case, db)
@@ -631,5 +653,8 @@ def build_simple_pdf_filename(case: Case, db: Session, *, kind: str) -> str:
         "abc-explained": "analisis_explicado",
         "training": "plan_entrenamiento",
         "puppy": "escuela_cachorros",
+        # El fichero que descarga el veterinario italiano no puede llamarse en
+        # castellano: es lo primero que ve al guardarlo.
+        "cognitiva": "relazione",
     }.get(kind, "informe")
     return f"{prefix}_{slug}_{datetime.utcnow().strftime('%Y%m%d')}.pdf"

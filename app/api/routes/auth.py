@@ -105,7 +105,12 @@ class ValidateInviteResponse(BaseModel):
     valid: bool
     type: Optional[str] = None       # 'delegation' | 'ambassador' | None
     label: Optional[str] = None      # nombre legible ("Bocalán Chile", "Embajador")
-    tokens: Optional[int] = None     # total welcome tokens si valid
+    # 19-sep-2026: era `int` y reventaba con un 500. Los tokens del sistema son
+    # FRACCIONARIOS (1 tk = 100 creditos), asi que el plan Medio da 2160 cr =
+    # 21,6 tk, y 5 + 21,6 = 26,6 — que Pydantic rechaza contra un `int`. El
+    # formulario de registro se quedaba mudo al teclear PROINV-A04748: el 5xx
+    # cae en la rama que no pinta nada. Tipo correcto: float, como la columna.
+    tokens: Optional[float] = None   # total welcome tokens si valid
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────

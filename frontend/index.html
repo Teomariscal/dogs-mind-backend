@@ -17288,6 +17288,13 @@ function getVal(id, fallback) {
             plan: rec.plan || null,
             status: rec.status || 'active',
             lang: rec.lang || null,
+            /* 19-sep-2026: este reconciliador NO mandaba el tipo de caso, asi
+               que todo lo que subia por aqui aterrizaba en backend como
+               'behavior'. Los casos cognitivistas que quedaron huerfanos
+               mientras el backend rechazaba 'cognitiva' (hasta hoy) habrian
+               subido etiquetados como conductuales, con su relazione dentro de
+               un caso que dice ABC. Sube el tipo real. */
+            case_type: rec.case_type || null,
           }]})
         });
         if (!mres.ok) continue;  // 401/5xx → próximo arranque reintentará

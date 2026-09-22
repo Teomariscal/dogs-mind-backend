@@ -303,7 +303,7 @@ class TheoryQuestion(Base):
             name="ck_theory_questions_correct_idx",
         ),
         CheckConstraint(
-            "lang IN ('es','en')",
+            "lang IN ('es','en','it')",
             name="ck_theory_questions_lang",
         ),
     )
@@ -337,7 +337,7 @@ class DailyTip(Base):
 
     __table_args__ = (
         CheckConstraint(
-            "lang IN ('es','en')",
+            "lang IN ('es','en','it')",
             name="ck_daily_tips_lang",
         ),
     )

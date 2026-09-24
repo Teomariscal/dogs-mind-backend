@@ -8011,7 +8011,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
           </div>
         </div>
       </div>
-      <button class="splash-privacy" onclick="goTo('s-privacy')">Política de Privacidad</button>
+      <button class="splash-privacy" onclick="goTo('s-privacy')" data-i18n="rc_privacy_link">Política de Privacidad</button>
     </div>
   </div>
 
@@ -8341,7 +8341,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
           <div class="token-ring">
             <div class="token-inner">
               <div class="token-num" id="tok-home">5</div>
-              <div class="token-lbl">Créditos</div>
+              <div class="token-lbl" data-i18n="lbl_creditos">Créditos</div>
             </div>
           </div>
           <span class="token-recharge-label" data-i18n="recharge_tokens">Planes de suscripción</span>
@@ -8359,10 +8359,10 @@ button:not(:disabled):active{ transform:scale(0.98); }
       <div id="home-insp-btn" class="insp-card" style="display:none;" onclick="goTo('s-training')" role="button" tabindex="0" aria-label="Inspiración Profesional">
         <div class="insp-ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l1.7 4.6 4.6 1.7-4.6 1.7L12 15.1l-1.7-4.6L5.7 8.8l4.6-1.7z"/><path d="M18.5 13.5l.9 2.4 2.4.9-2.4.9-.9 2.4-.9-2.4-2.4-.9 2.4-.9z"/></svg></div>
         <div class="insp-tx">
-          <div class="insp-t1">Inspiración Profesional</div>
-          <div class="insp-t2">Genera la clase de hoy en segundos</div>
+          <div class="insp-t1" data-i18n="insp_t1">Inspiración Profesional</div>
+          <div class="insp-t2" data-i18n="insp_t2">Genera la clase de hoy en segundos</div>
         </div>
-        <span class="insp-tag">Profesional</span>
+        <span class="insp-tag" data-i18n="insp_tag">Profesional</span>
       </div>
 
       <!-- Bloque "Membresía activa · Usuario Profesional" eliminado 2026-06-17:
@@ -8538,7 +8538,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
         <span class="nav-icon nav-icon-tokens" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.5"/><path d="M12 8v8M8.5 12h7"/></svg>
         </span>
-        <span class="nav-label">Créditos</span>
+        <span class="nav-label" data-i18n="lbl_creditos">Créditos</span>
       </button>
       <button class="nav-item nav-item-teo active" onclick="goTo('s-profile')">
         <span class="nav-icon nav-icon-teo" aria-hidden="true">
@@ -8595,7 +8595,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
             <path d="M43.86,6.38 A56,56 0 0 1 58.78,4.01 L59.17,22.01 A38,38 0 0 0 49.05,23.61 Z" fill="#dc2626" filter="url(#tokenGlowBig)"/>
           </g>
           <text id="tokens-big" x="60" y="68" text-anchor="middle" class="token-ring-num">5</text>
-          <text x="60" y="84" text-anchor="middle" class="token-ring-num-lbl">CRÉDITOS</text>
+          <text x="60" y="84" text-anchor="middle" class="token-ring-num-lbl" data-i18n="lbl_creditos_may">CRÉDITOS</text>
         </svg>
       </div>
       <div style="margin-top:14px;font-size:14px;color:var(--text2);text-align:center;line-height:1.5;" data-i18n="tokens_note">
@@ -9379,7 +9379,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6"/><path d="M9 16h6"/></svg>
         </div>
         <div class="abc-card-text" id="abc-summary-text">
-          Completa el formulario de anamnesis y pulsa "Analizar con IA" para obtener la hipótesis funcional del caso.
+          <span data-i18n="abc_placeholder">Completa el formulario de anamnesis y pulsa "Analizar con IA" para obtener la hipótesis funcional del caso.</span>
         </div>
       </div>
 
@@ -9988,7 +9988,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
       </div>
 
       <button class="btn-green" onclick="confirmAvatar()" style="margin-top:6px;margin-bottom:16px">
-        Empezar a chatear →
+        <span data-i18n="av_start_chat">Empezar a chatear →</span>
       </button>
     </div>
   </div>
@@ -10059,8 +10059,8 @@ button:not(:disabled):active{ transform:scale(0.98); }
         <div>
           <label style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;" data-i18n="form_user_type">Tipo de usuario</label>
           <select class="sel" id="reg-type" onchange="toggleProfessional(this.value)" style="width:100%;">
-            <option value="pet">Pet Owner — Particular (hasta 2 perros)</option>
-            <option value="pro">Profesional (hasta 20 perros)</option>
+            <option value="pet" data-i18n="reg_opt_pet">Pet Owner — Particular (hasta 2 perros)</option>
+            <option value="pro" data-i18n="reg_opt_pro">Profesional (hasta 20 perros)</option>
           </select>
         </div>
 
@@ -17587,7 +17587,7 @@ function getVal(id, fallback) {
             '<span style="font-size:10px;font-weight:700;background:' + sl.bg + ';color:' + sl.color + ';padding:3px 10px;border-radius:100px;white-space:nowrap;">' + sl.text + '</span>' +
           '</div>' +
         '</div>' +
-        '<div style="font-size:12px;font-weight:600;color:var(--dark);margin-bottom:3px;">' + (r.problem || 'Sin descripción').substring(0,60) + '</div>' +
+        '<div style="font-size:12px;font-weight:600;color:var(--dark);margin-bottom:3px;">' + (r.problem || _i18nText('rec_sin_desc','Sin descripción')).substring(0,60) + '</div>' +
         '<div style="font-size:11px;color:var(--grey);line-height:1.5;margin-bottom:10px;">' + shortProblem + '</div>' +
         '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">' +
           '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
@@ -20528,9 +20528,9 @@ function getVal(id, fallback) {
         planHtml +
       '</div>' +
       '<div style="font-size:13px;line-height:1.75;color:#f3f1ea;padding:18px;background:rgba(255,255,255,0.05);border-radius:14px;border:1px solid rgba(94,200,230,0.18);margin-bottom:8px;">' +
-        'Si aceptas, tu caso quedará registrado en el registro de datos de conducta. Puedes volver a realizar tantas consultas como quieras sobre el mismo caso; cada vez que realices una nueva consulta estarás pidiendo una segunda opinión al equipo de expertos.' +
+        _i18nText('plan_acepta_1', 'Si aceptas, tu caso quedará registrado en el registro de datos de conducta. Puedes volver a realizar tantas consultas como quieras sobre el mismo caso.') +
         '<br><br>' +
-        'Nuestro porcentaje de acierto en los análisis funcionales y planes de intervención es muy alto, pero nunca está de más pedir una segunda opinión si algo no te convence.' +
+        _i18nText('plan_acepta_2', 'Nuestro porcentaje de acierto en los análisis funcionales y planes de intervención es muy alto, pero nunca está de más pedir una segunda opinión si algo no te convence.') +
       '</div>';
 
     if (loading) loading.style.display = 'none';
@@ -20542,7 +20542,7 @@ function getVal(id, fallback) {
 
   async function generateInterventionPlan() {
     if (!window._lastAnalysisText) {
-      alert('Por favor realiza primero un análisis funcional.');
+      alert(_i18nText('plan_err_sin_analisis', 'Por favor realiza primero un análisis funcional.'));
       return;
     }
     // Si venimos de un caso archivado (openRecord setea _loadedFromArchive),
@@ -24503,6 +24503,19 @@ function endTourIntro() {
       form_new_user:         'Nuevo Usuario',
       splash_home:           'Inicio',
       forgot_password_link:  '¿Olvidaste tu contraseña?',
+      insp_t1: 'Inspiración Profesional',
+      insp_t2: 'Genera la clase de hoy en segundos',
+      insp_tag: 'Profesional',
+      av_start_chat: 'Empezar a chatear →',
+      abc_placeholder: 'Completa el formulario de anamnesis y pulsa "Analizar con IA" para obtener la hipótesis funcional del caso.',
+      lbl_creditos: 'Créditos',
+      lbl_creditos_may: 'CRÉDITOS',
+      rec_sin_desc: 'Sin descripción',
+      plan_acepta_1: 'Si aceptas, tu caso quedará registrado en el registro de datos de conducta. Puedes volver a realizar tantas consultas como quieras sobre el mismo caso.',
+      plan_acepta_2: 'Nuestro porcentaje de acierto en los análisis funcionales y planes de intervención es muy alto, pero nunca está de más pedir una segunda opinión si algo no te convence.',
+      plan_err_sin_analisis: 'Por favor realiza primero un análisis funcional.',
+      reg_opt_pet: 'Pet Owner — Particular (hasta 2 perros)',
+      reg_opt_pro: 'Profesional (hasta 20 perros)',
       form_welcome_intro:    'Bienvenido a <strong style="color:var(--text)">The Dogs’ Mind</strong>. Puedes elegir dos modelos de suscripción: <strong style="color:var(--green)">Particular</strong> (hasta 2 perros) o <strong style="color:var(--green)">Profesional</strong> (hasta 20 perros).<br><br>Te invitamos a que descubras gratuitamente el funcionamiento de esta app, que irá creciendo y mejorando contigo. Tienes <strong style="color:var(--text)">500 créditos de regalo</strong>, y si haces tu primera consulta con nosotros te ponemos aparte los créditos que cueste: no gastas ni uno de los tuyos. Después recargas cuando lo necesites.',
       form_user_type:        'Tipo de usuario',
       form_full_name:        'Nombre y apellidos',
@@ -25747,6 +25760,19 @@ function endTourIntro() {
       form_new_user:         'New user',
       splash_home:           'Home',
       forgot_password_link:  'Forgot your password?',
+      insp_t1: 'Professional Inspiration',
+      insp_t2: 'Generate today’s class in seconds',
+      insp_tag: 'Professional',
+      av_start_chat: 'Start chatting →',
+      abc_placeholder: 'Fill in the anamnesis form and press "Analyse with AI" to get the functional hypothesis of the case.',
+      lbl_creditos: 'Credits',
+      lbl_creditos_may: 'CREDITS',
+      rec_sin_desc: 'No description',
+      plan_acepta_1: 'If you accept, your case will be stored in your behaviour records. You can run as many consultations as you like on the same case.',
+      plan_acepta_2: 'Our accuracy in functional analyses and intervention plans is very high, but it never hurts to ask for a second opinion if something does not convince you.',
+      plan_err_sin_analisis: 'Please run a functional analysis first.',
+      reg_opt_pet: 'Pet Owner — Private (up to 2 dogs)',
+      reg_opt_pro: 'Professional (up to 20 dogs)',
       form_welcome_intro:    'Welcome to <strong style="color:var(--text)">The Dogs’ Mind</strong>. You can choose between two subscription plans: <strong style="color:var(--green)">Pet Owner</strong> (up to 2 dogs) or <strong style="color:var(--green)">Professional</strong> (up to 20 dogs).<br><br>We invite you to discover for free how this app works — it will keep growing and improving with you. You have <strong style="color:var(--text)">5 free welcome credits</strong>, and if you do your first consultation with us we cover the credits it costs: you will not spend a single one of yours. After that you can top up whenever you need.',
       form_user_type:        'User type',
       form_full_name:        'Full name',
@@ -26993,6 +27019,19 @@ function endTourIntro() {
           form_new_user:         'Nuovo Utente',
           splash_home:           'Home',
           forgot_password_link:  'Hai dimenticato la password?',
+          insp_t1: 'Ispirazione Professionale',
+          insp_t2: 'Genera la lezione di oggi in pochi secondi',
+          insp_tag: 'Professionale',
+          av_start_chat: 'Inizia a chattare →',
+          abc_placeholder: 'Compila il modulo di anamnesi e premi "Analizza con IA" per ottenere l’ipotesi funzionale del caso.',
+          lbl_creditos: 'Crediti',
+          lbl_creditos_may: 'CREDITI',
+          rec_sin_desc: 'Senza descrizione',
+          plan_acepta_1: 'Se accetti, il caso resterà salvato nei tuoi registri di comportamento. Puoi fare tutte le consulenze che vuoi sullo stesso caso.',
+          plan_acepta_2: 'La nostra percentuale di successo nelle analisi funzionali e nei piani d’intervento è molto alta, ma non guasta mai chiedere un secondo parere se qualcosa non ti convince.',
+          plan_err_sin_analisis: 'Esegui prima un’analisi funzionale.',
+          reg_opt_pet: 'Pet Owner — Privato (fino a 2 cani)',
+          reg_opt_pro: 'Professionale (fino a 20 cani)',
           form_welcome_intro:    'Benvenuto in <strong style="color:var(--text)">The Dogs’ Mind</strong>. Puoi scegliere due modelli di abbonamento: <strong style="color:var(--green)">Privato</strong> (fino a 2 cani) o <strong style="color:var(--green)">Professionale</strong> (fino a 20 cani).<br><br>Ti invitiamo a scoprire gratuitamente il funzionamento di questa app, che crescerà e migliorerà insieme a te. Hai <strong style="color:var(--text)">500 crediti in regalo</strong>, e se fai il tuo primo consulto con noi ci mettiamo noi i credito che costa: non ne spendi nemmeno uno dei tuoi. Poi ricarichi quando ti serve.',
           form_user_type:        'Tipo di utente',
           form_full_name:        'Nome e cognome',
@@ -27202,7 +27241,19 @@ function endTourIntro() {
     } catch (e) {}
   }
 
-  window.setLang = function(lang) { applyLang(lang); };
+  window.setLang = function(lang) {
+    applyLang(lang);
+    /* 21-sep-2026: el aviso remoto se pintaba UNA vez, con el idioma que
+       hubiera en ese instante, y al cambiar de idioma se quedaba como estaba.
+       En la app en italiano salia en castellano aunque el backend manda el
+       texto italiano. Se quita y se vuelve a pintar con el idioma nuevo (si el
+       usuario ya lo cerro, dmRenderRemoteBanner lo respeta y no lo repinta). */
+    try {
+      var _bn = document.getElementById('dm-remote-banner');
+      if (_bn) _bn.remove();
+      if (typeof dmRenderRemoteBanner === 'function') dmRenderRemoteBanner();
+    } catch (e) {}
+  };
   window.toggleLang = function() { applyLang(_currentLang === 'es' ? 'en' : 'es'); };
   window.getCurrentLang = function() { return _currentLang; };
   window.TRANSLATIONS = TRANSLATIONS;

@@ -12842,6 +12842,22 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
 // feedback inline bajo el input. NO bloquea el submit: el backend re-valida
 // en /register, así que esto es solo UX. Si el input es readonly (vino vía
 // URL ?invite=), saltamos — ya está visualmente marcado como aplicado.
+/* Limpieza del codigo de invitacion (founder, 24-sep-2026). Escribio
+   `PROINV-A04748.` —con el punto con el que se termina una frase— y la app le
+   dijo "Codigo no reconocido" teniendo el codigo bueno delante. Al pegar desde
+   WhatsApp o desde el correo pasa lo mismo con comillas, espacios y con el
+   espacio no-separable. Se limpia aqui y tambien en el servidor, porque el
+   campo no es la unica puerta. Las mayusculas NO se tocan: los codigos de
+   delegacion se comparan tal cual a proposito. */
+function dmLimpiarCodigo(v) {
+  if (!v) return '';
+  return String(v)
+    .replace(/[\s\u00a0\u200b]+/g, '')
+    .replace(/^[.,;:!?"'\u00ab\u00bb\u201c\u201d\u2018\u2019()\[\]<>]+/, '')
+    .replace(/[.,;:!?"'\u00ab\u00bb\u201c\u201d\u2018\u2019()\[\]<>]+$/, '');
+}
+window.dmLimpiarCodigo = dmLimpiarCodigo;
+
 window._inviteValidateInFlight = null;
 async function validateInviteCode() {
   var inp = document.getElementById('reg-invite');
@@ -12850,7 +12866,9 @@ async function validateInviteCode() {
   // Si vino prellenado por URL (readonly) ya está marcado visualmente; no pegar contra el backend.
   if (inp.hasAttribute('readonly')) { fb.textContent = ''; return; }
 
-  var code = (inp.value || '').trim();
+  var code = dmLimpiarCodigo(inp.value);
+  /* Se le devuelve limpio al campo: asi VE que el punto sobraba. */
+  if (code && inp.value !== code) inp.value = code;
   var lang = (window.getCurrentLang ? window.getCurrentLang() : 'es');
 
   if (!code) {
@@ -13263,7 +13281,7 @@ function registerUser() {
   var email    = (document.getElementById('reg-email') ? document.getElementById('reg-email').value : '').trim();
   var phone    = (document.getElementById('reg-phone') ? document.getElementById('reg-phone').value : '').trim();
   var password = (document.getElementById('reg-password') ? document.getElementById('reg-password').value : '').trim();
-  var inviteCode = (document.getElementById('reg-invite') ? document.getElementById('reg-invite').value : '').trim();
+  var inviteCode = dmLimpiarCodigo(document.getElementById('reg-invite') ? document.getElementById('reg-invite').value : '');
   var dog1     = (document.getElementById('reg-dog1-name') ? document.getElementById('reg-dog1-name').value : '').trim();
 
   if (!email || !password) {
@@ -15145,7 +15163,8 @@ async function psSubmit() {
   // Detectar flujo cortesía: si hay invite_code rellenado, NO se cobra,
   // se llama a /payments/pro-activate-courtesy en lugar de Stripe.
   var inviteEl = document.getElementById('ps-invite');
-  var inviteCode = (inviteEl && inviteEl.value || '').trim();
+  var inviteCode = dmLimpiarCodigo(inviteEl && inviteEl.value || '');
+  if (inviteEl && inviteCode && inviteEl.value !== inviteCode) inviteEl.value = inviteCode;
   var isCourtesyFlow = !!inviteCode;
 
   _psSetBusy(true);
@@ -20059,7 +20078,8 @@ function getVal(id, fallback) {
   window.dmCanjearCodigo = async function() {
     var inp = document.getElementById('planes-codigo');
     var msg = document.getElementById('planes-codigo-msg');
-    var codigo = ((inp && inp.value) || '').trim().toUpperCase();
+    var codigo = dmLimpiarCodigo((inp && inp.value) || '').toUpperCase();
+    if (inp && codigo && inp.value !== codigo) inp.value = codigo;
     if (!codigo) return;
     function decir(texto, ok) {
       if (!msg) return;

@@ -31,6 +31,7 @@ from sqlalchemy.orm import Session
 from app.api.routes.auth import get_current_user
 from app.core import subscriptions as subs
 from app.database import get_db
+from app.core.invite_code import normalizar as normalizar_codigo
 from app.models.invite import Invite
 from app.models.user import User
 
@@ -62,7 +63,7 @@ def canjear_codigo(codigo: str, current_user: User, db: Session):
     que es al que llama la app. Tienen que hacer exactamente lo mismo, por eso
     la logica vive aqui y no duplicada (1-sep-2026).
     """
-    codigo = (codigo or "").strip().upper()
+    codigo = normalizar_codigo(codigo).upper()
     inv = db.query(Invite).filter(Invite.code == codigo).with_for_update().first()
     if not inv:
         return None

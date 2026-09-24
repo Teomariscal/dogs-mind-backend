@@ -12,6 +12,7 @@ from jose import jwt
 from pydantic import BaseModel, EmailStr
 
 from app.database import get_db
+from app.core.invite_code import normalizar as normalizar_codigo
 from app.models.user import User
 from app.models.delegation import Delegation
 from app.models.invite import Invite
@@ -179,8 +180,10 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
     #   3. Sin match → role=user, tokens=DEFAULT_TOKENS
     #
     # case-sensitive a propósito para evitar colisiones accidentales.
-    # Trim de espacios por defensa contra paste con whitespace.
-    invite_clean = (req.invite_code or "").strip()
+    # La limpieza (espacios, punto final, comillas al pegar) vive en
+    # app/core/invite_code: un punto de mas dejaba fuera a un usuario con el
+    # codigo bueno (founder, 24-sep-2026).
+    invite_clean = normalizar_codigo(req.invite_code)
     delegation_obj: Optional[Delegation] = None
     role = "user"
     tokens = DEFAULT_TOKENS
@@ -306,7 +309,7 @@ def validate_invite(
             headers={"Retry-After": str(retry_after)},
         )
 
-    code = (req.invite_code or "").strip()
+    code = normalizar_codigo(req.invite_code)
     if not code:
         return ValidateInviteResponse(valid=False)
 

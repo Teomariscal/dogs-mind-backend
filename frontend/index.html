@@ -11008,24 +11008,24 @@ button:not(:disabled):active{ transform:scale(0.98); }
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_sex">Sexo</div>
           <div style="display:flex;gap:8px;">
-            <button id="sexo-macho" onclick="anam_toggle('sexo-macho','sexo-hembra')" data-i18n="anam_btn_male" type="button" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Macho</button>
-            <button id="sexo-hembra" onclick="anam_toggle('sexo-hembra','sexo-macho')" data-i18n="anam_btn_female" type="button" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Hembra</button>
+            <button id="sexo-macho" data-anam-grupo="sexo" onclick="anam_toggle('sexo-macho','sexo-hembra')" data-i18n="anam_btn_male" type="button" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Macho</button>
+            <button id="sexo-hembra" data-anam-grupo="sexo" onclick="anam_toggle('sexo-hembra','sexo-macho')" data-i18n="anam_btn_female" type="button" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Hembra</button>
           </div>
         </div>
 
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_neutered">&iquest;Esterilizado?</div>
           <div style="display:flex;gap:8px;">
-            <button id="esteril-si" onclick="anam_toggle('esteril-si','esteril-no')" data-i18n="btn_yes" type="button" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
-            <button id="esteril-no" onclick="anam_toggle('esteril-no','esteril-si')" data-i18n="btn_no" type="button" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
+            <button id="esteril-si" data-anam-grupo="esteril" onclick="anam_toggle('esteril-si','esteril-no')" data-i18n="btn_yes" type="button" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
+            <button id="esteril-no" data-anam-grupo="esteril" onclick="anam_toggle('esteril-no','esteril-si')" data-i18n="btn_no" type="button" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
           </div>
         </div>
 
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_chronic">&iquest;Tiene alguna dolencia cr&oacute;nica?</div>
           <div style="display:flex;gap:8px;">
-            <button id="dolencia-no" onclick="anam_toggle('dolencia-no','dolencia-si')" data-i18n="btn_no" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
-            <button id="dolencia-si" onclick="anam_toggle_cond('dolencia-si','dolencia-no','inp-dolencia-wrap')" data-i18n="btn_yes" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
+            <button id="dolencia-no" data-anam-grupo="dolencia" onclick="anam_toggle('dolencia-no','dolencia-si')" data-i18n="btn_no" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
+            <button id="dolencia-si" data-anam-grupo="dolencia" onclick="anam_toggle_cond('dolencia-si','dolencia-no','inp-dolencia-wrap')" data-i18n="btn_yes" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
           </div>
           <div id="inp-dolencia-wrap" style="display:none;margin-top:8px;">
             <input id="inp-dolencia-detail" type="text" data-i18n-placeholder="ph_dolencia" placeholder="¿Cuál dolencia? (ej: displasia, epilepsia...)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;" />
@@ -11035,18 +11035,18 @@ button:not(:disabled):active{ transform:scale(0.98); }
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_living">&iquest;Vive dentro o fuera de casa?</div>
           <div style="display:flex;gap:8px;">
-            <button id="vive-dentro" onclick="anam_toggle3('vive-dentro','vive-fuera','vive-ambos')" data-i18n="anam_btn_indoor" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Dentro</button>
-            <button id="vive-fuera" onclick="anam_toggle3('vive-fuera','vive-dentro','vive-ambos')" data-i18n="anam_btn_outdoor" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Fuera</button>
-            <button id="vive-ambos" onclick="anam_toggle3('vive-ambos','vive-dentro','vive-fuera')" data-i18n="anam_btn_both" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Ambos</button>
+            <button id="vive-dentro" data-anam-grupo="vive" onclick="anam_toggle3('vive-dentro','vive-fuera','vive-ambos')" data-i18n="anam_btn_indoor" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Dentro</button>
+            <button id="vive-fuera" data-anam-grupo="vive" onclick="anam_toggle3('vive-fuera','vive-dentro','vive-ambos')" data-i18n="anam_btn_outdoor" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Fuera</button>
+            <button id="vive-ambos" data-anam-grupo="vive" onclick="anam_toggle3('vive-ambos','vive-dentro','vive-fuera')" data-i18n="anam_btn_both" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Ambos</button>
           </div>
         </div>
 
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_environment">&iquest;Entorno donde vive?</div>
           <div style="display:flex;gap:8px;">
-            <button id="entorno-campo" onclick="anam_toggle3('entorno-campo','entorno-periferia','entorno-ciudad')" data-i18n="anam_btn_country" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Campo</button>
-            <button id="entorno-periferia" onclick="anam_toggle3('entorno-periferia','entorno-campo','entorno-ciudad')" data-i18n="anam_btn_suburb" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Periferia</button>
-            <button id="entorno-ciudad" onclick="anam_toggle3('entorno-ciudad','entorno-campo','entorno-periferia')" data-i18n="anam_btn_city" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Ciudad</button>
+            <button id="entorno-campo" data-anam-grupo="entorno" onclick="anam_toggle3('entorno-campo','entorno-periferia','entorno-ciudad')" data-i18n="anam_btn_country" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Campo</button>
+            <button id="entorno-periferia" data-anam-grupo="entorno" onclick="anam_toggle3('entorno-periferia','entorno-campo','entorno-ciudad')" data-i18n="anam_btn_suburb" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Periferia</button>
+            <button id="entorno-ciudad" data-anam-grupo="entorno" onclick="anam_toggle3('entorno-ciudad','entorno-campo','entorno-periferia')" data-i18n="anam_btn_city" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Ciudad</button>
           </div>
         </div>
 
@@ -11085,8 +11085,8 @@ button:not(:disabled):active{ transform:scale(0.98); }
           <div>
             <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_kids">&iquest;Hay ni&ntilde;os?</div>
             <div style="display:flex;gap:8px;">
-              <button id="ninios-no" onclick="anam_toggle('ninios-no','ninios-si')" data-i18n="btn_no" style="padding:8px 16px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
-              <button id="ninios-si" onclick="anam_toggle('ninios-si','ninios-no')" data-i18n="btn_yes" style="padding:8px 16px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
+              <button id="ninios-no" data-anam-grupo="ninios" onclick="anam_toggle('ninios-no','ninios-si')" data-i18n="btn_no" style="padding:8px 16px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
+              <button id="ninios-si" data-anam-grupo="ninios" onclick="anam_toggle('ninios-si','ninios-no')" data-i18n="btn_yes" style="padding:8px 16px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
             </div>
           </div>
         </div>
@@ -11094,8 +11094,8 @@ button:not(:disabled):active{ transform:scale(0.98); }
         <div>
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_otherdogs">&iquest;Convive con otros perros?</div>
           <div style="display:flex;gap:8px;">
-            <button id="convive-no" onclick="anam_toggle('convive-no','convive-si')" data-i18n="btn_no" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
-            <button id="convive-si" onclick="anam_toggle_cond('convive-si','convive-no','inp-convive-wrap')" data-i18n="btn_yes" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
+            <button id="convive-no" data-anam-grupo="convive" onclick="anam_toggle('convive-no','convive-si')" data-i18n="btn_no" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
+            <button id="convive-si" data-anam-grupo="convive" onclick="anam_toggle_cond('convive-si','convive-no','inp-convive-wrap')" data-i18n="btn_yes" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
           </div>
           <div id="inp-convive-wrap" style="display:none;margin-top:8px;">
             <input id="inp-convive-detail" type="text" data-i18n-placeholder="ph_convive" placeholder="¿Cuántos y de qué raza? (ej: 2 labradores)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;" />
@@ -11108,15 +11108,10 @@ button:not(:disabled):active{ transform:scale(0.98); }
         <div style="font-size:10px;font-weight:700;color:var(--green2);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;" data-i18n="anam_sec_history">Historial y refuerzos</div>
 
         <div style="margin-bottom:12px;">
-          <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_other_problems">¿Qué otros problemas de conducta has tenido con él?</div>
-          <textarea id="inp-other-problems" data-i18n-placeholder="ph_other_problems" placeholder="Describe el problema o escribe 'ninguno'" rows="3" style="width:100%;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;resize:vertical;"></textarea>
-        </div>
-
-        <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_training">¿Ha visitado alguna escuela de educación canina?</div>
           <div style="display:flex;gap:8px;">
-            <button id="escuela-no" onclick="anam_choose_training(false)" data-i18n="btn_no" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
-            <button id="escuela-si" onclick="anam_choose_training(true)" data-i18n="btn_yes" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
+            <button id="escuela-no" data-anam-grupo="escuela" onclick="anam_choose_training(false)" data-i18n="btn_no" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
+            <button id="escuela-si" data-anam-grupo="escuela" onclick="anam_choose_training(true)" data-i18n="btn_yes" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
           </div>
           <div id="escuela-result-wrap" style="display:none;margin-top:8px;">
             <textarea id="inp-training-result" data-i18n-placeholder="ph_training_result" placeholder="Describe el resultado (ej: mejoró pero recayó, no notamos cambios, mejoró notablemente...)" rows="2" style="width:100%;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;resize:vertical;"></textarea>
@@ -11173,8 +11168,8 @@ button:not(:disabled):active{ transform:scale(0.98); }
         <div style="margin-bottom:12px;">
           <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_aggr">&iquest;Implica agresi&oacute;n?</div>
           <div style="display:flex;gap:8px;">
-            <button id="agresion-no" onclick="anam_toggle_cond('agresion-no','agresion-si','agresion-dist-wrap')" data-i18n="btn_no" style="padding:8px 20px;border-radius:100px;border:1.5px solid var(--green2);background:var(--green2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
-            <button id="agresion-si" onclick="anam_toggle_cond('agresion-si','agresion-no','agresion-dist-wrap')" data-i18n="btn_yes" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
+            <button id="agresion-no" data-anam-grupo="agresion" onclick="anam_toggle_cond('agresion-no','agresion-si','agresion-dist-wrap')" data-i18n="btn_no" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">No</button>
+            <button id="agresion-si" data-anam-grupo="agresion" onclick="anam_toggle_cond('agresion-si','agresion-no','agresion-dist-wrap')" data-i18n="btn_yes" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
           </div>
           <div id="agresion-dist-wrap" style="display:none;margin-top:8px;">
             <input id="inp-agresion-dist" type="number" data-i18n-placeholder="ph_agresion_dist" placeholder="Distancia a la que empieza la agresión (cm)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;" />
@@ -11243,6 +11238,15 @@ button:not(:disabled):active{ transform:scale(0.98); }
       <div style="margin-bottom:12px;">
         <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;" data-i18n="anam_lbl_prior_event">Antes de que comenzase el problema, ¿recuerdas algún cambio o evento importante que resaltar?</div>
         <textarea id="inp-evento-previo" data-i18n-placeholder="ph_evento_previo" placeholder="Contesta brevemente (mudanza, llegada de un bebé, fallecimiento, viaje, cambio de horario, etc.)" rows="3" style="width:100%;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;resize:vertical;"></textarea>
+      </div>
+
+      <!-- "Que otros problemas de conducta has tenido con el": movida aqui,
+           al FINAL del formulario (founder, 26-sep-2026). Estaba la primera
+           de "Historial y refuerzos", justo despues de cambiar de seccion, y
+           la gente metia ahi el problema principal por error. -->
+      <div style="margin-bottom:12px;">
+        <div style="font-size:10px;font-weight:600;color:var(--grey);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;" data-i18n="anam_lbl_other_problems">¿Qué otros problemas de conducta has tenido con él?</div>
+        <textarea id="inp-other-problems" data-i18n-placeholder="ph_other_problems" placeholder="Describe el problema o escribe 'ninguno'" rows="3" style="width:100%;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;resize:vertical;"></textarea>
       </div>
 
       <!-- submit -->
@@ -16387,6 +16391,7 @@ function _pendingTrainingDiscard() {
 // Se llama desde el botón "Guardar plan" en s-training-result. Idempotente: si el
 // usuario pulsa varias veces, crea un solo caso (backend deduplicación por id+user).
 async function acceptTrainingPlan() {
+  dmVibrar('confirma');
   var formData = window._lastTrainingData || {};
   var planMd = window._lastTrainingPlan || '';
   if (!planMd) {
@@ -16531,6 +16536,40 @@ window.dmIsAndroidNative = dmIsAndroidNative;
 // App nativa (iOS o Android): en ambas los bienes digitales van por IAP
 // (RevenueCat) y Stripe queda completamente oculto. Web sigue con Stripe.
 function dmIsNativeApp() { return dmIsIosNative() || dmIsAndroidNative(); }
+
+/* ── VIBRACION (founder, 25-sep-2026) ────────────────────────────────────────
+   "Medianamente aparente, no demasiado sutil ni demasiado largo. La duracion
+   que tiene por ejemplo en Revolut." Eso es un golpe seco y corto, no un
+   zumbido: en nativo se hace con el motor haptico del sistema (Haptics de
+   Capacitor, que en iPhone da el Taptic Engine) y en web con navigator.vibrate,
+   que el iPhone NO permite — ahi simplemente no pasa nada, y no debe fallar por
+   ello.
+
+   Cuatro toques y nada mas, para que signifiquen algo:
+     toque    un paso dado (enviar, marcar, elegir)
+     confirma algo queda guardado
+     logro    el resultado que el usuario esperaba (analisis, plan, codigo)
+     aviso    falta algo antes de poder seguir
+
+   Si molesta, se apaga entero poniendo DM_VIBRA en false. */
+var DM_VIBRA = true;
+var _DM_PATRON = { toque: [12], confirma: [18], logro: [14, 60, 22], aviso: [10, 45, 10] };
+var _DM_ESTILO = { toque: 'Light', confirma: 'Medium', logro: 'Heavy', aviso: 'Medium' };
+
+function dmVibrar(tipo) {
+  if (!DM_VIBRA) return;
+  var t = _DM_PATRON[tipo] ? tipo : 'toque';
+  try {
+    var H = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Haptics;
+    if (H && dmIsNativeApp()) {
+      if (t === 'logro' && H.notification) { H.notification({ type: 'SUCCESS' }); return; }
+      if (t === 'aviso' && H.notification) { H.notification({ type: 'WARNING' }); return; }
+      if (H.impact) { H.impact({ style: _DM_ESTILO[t] }); return; }
+    }
+    if (navigator && typeof navigator.vibrate === 'function') navigator.vibrate(_DM_PATRON[t]);
+  } catch (e) { /* nunca romper la pantalla por una vibracion */ }
+}
+window.dmVibrar = dmVibrar;
 window.dmIsNativeApp = dmIsNativeApp;
 
 // ════ Configuración remota (banner de avisos + paywall) ═══════════════════════
@@ -16996,9 +17035,24 @@ function loadDailyTip() {
 }
 
 // ── READ TOGGLE STATE (verde = activo) ───────────────
+/* Un boton de la anamnesis esta elegido cuando anam_toggle le pone el texto
+   en blanco. Esta funcion comparaba con el literal '#fff', y eso NUNCA es
+   cierto: al asignar el.style.color = "#fff", el navegador lo guarda
+   normalizado y al leerlo devuelve "rgb(255, 255, 255)". Comprobado el
+   26-sep-2026 en la version publicada: los ocho grupos de botones se ven
+   pulsados en pantalla y esta funcion contestaba false en los ocho.
+   Consecuencia: sexo, esterilizado, dolencia cronica, dentro/fuera, entorno,
+   niños, convivencia con otros perros y agresion no llegaban al analisis
+   nunca —iban con su valor por defecto— y los campos condicionales ("¿cual
+   dolencia?", el detalle de convivencia) no se mostraban jamas al pulsar Si,
+   porque anam_toggle_cond tambien pregunta por aqui.
+   Se comparan las formas en que un navegador puede devolverlo. */
 function isActive(id) {
   var el = document.getElementById(id);
-  return el ? el.style.color === '#fff' : false;
+  if (!el) return false;
+  var c = String(el.style.color || '').replace(/\s+/g, '').toLowerCase();
+  return c === '#fff' || c === '#ffffff' || c === 'white' ||
+         c === 'rgb(255,255,255)' || c === 'rgba(255,255,255,1)';
 }
 
 // ── HELPER: lee valor de un input/textarea de forma segura ──
@@ -20082,6 +20136,7 @@ function getVal(id, fallback) {
     if (inp && codigo && inp.value !== codigo) inp.value = codigo;
     if (!codigo) return;
     function decir(texto, ok) {
+      dmVibrar(ok ? 'logro' : 'aviso');
       if (!msg) return;
       msg.textContent = texto;
       msg.style.display = '';
@@ -20373,6 +20428,7 @@ function getVal(id, fallback) {
 
   // ────────────────────────────────────────────────────────────────────────────
   async function acceptIntervention() {
+    dmVibrar('confirma');
     // Guard anti doble-toque (bug triplicación 2026-07-28): sin esto, cada
     // toque hacía unshift de un record nuevo (id=Date.now()) y con el cupo
     // de casos lleno la migración fallaba en silencio → copias locales.
@@ -20778,12 +20834,14 @@ async function analyzeWithAI() {
     if (!(_re.value || '').trim() && !_firstBad) _firstBad = _re;
   }
   if (_firstBad) {
+    dmVibrar('aviso');
     var _rl = (window.getCurrentLang ? window.getCurrentLang() : 'es');
     showToast(_i18nText('anam_required_err', _L3('Este campo es obligatorio', 'This field is required', 'Campo obbligatorio')));
     try { _firstBad.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(_) {}
     return;
   }
 
+  dmVibrar('toque');           // el usuario acaba de lanzar el analisis
   // Collect text fields
   var dogName     = getVal('inp-dog-name', 'Sin nombre');
   var dogAge      = getVal('inp-dog-age',  'Desconocida');
@@ -23847,6 +23905,7 @@ function endTourIntro() {
          (founder, 6-sep-2026), igual que el "Welcome" del saludo. No es un
          olvido de traduccion: no tocarlos. */
       nz_skip:                 'Skip intro',
+      anam_skip:               'Skip',
       nz_never:                'Don\u2019t show',
       n2_title:                'Conoce a tus Aigents',
       n2_body:                 'Los Aigents son avatars de IA muy especializados. No sirven para generar an\u00e1lisis de conducta pero te ayudan en tu d\u00eda a d\u00eda con tu perro.',
@@ -25110,6 +25169,7 @@ function endTourIntro() {
          (founder, 6-sep-2026), igual que el "Welcome" del saludo. No es un
          olvido de traduccion: no tocarlos. */
       nz_skip:                 'Skip intro',
+      anam_skip:               'Skip',
       nz_never:                'Don\u2019t show',
       n2_title:                'Meet your Aigents',
       n2_body:                 'Aigents are highly specialised AI avatars. They do not generate behavioural analyses, but they help you day to day with your dog.',
@@ -26368,6 +26428,7 @@ function endTourIntro() {
          (founder, 6-sep-2026), igual que el "Welcome" del saludo. No es un
          olvido de traduccion: no tocarlos. */
           nz_skip:                 'Skip intro',
+          anam_skip:               'Skip',
           nz_never:                'Don\u2019t show',
           n2_title:                'Conosci i tuoi Aigents',
           n2_body:                 'Gli Aigents sono avatar di IA molto specializzati. Non servono a generare analisi del comportamento, ma ti aiutano ogni giorno con il tuo cane.',
@@ -27279,6 +27340,685 @@ function endTourIntro() {
   window.TRANSLATIONS = TRANSLATIONS;
 
   applyLang(_currentLang);
+})();
+</script>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     ANAMNESIS: PROGRESO POR TRAMOS + RELEVO DE AIGENT  (founder, 25-sep-2026)
+     "Un efecto entre pantalla y pantalla de Aigent y vibracion que refuerce
+     cada tercio de la anamnesis."
+     Y su limite, en sus palabras: "no quitar ni un solo campo de la anamnesis,
+     porque si lo quitas perdemos toda la capacidad de analisis; la app tiene
+     que ser util, y luego user-friendly, pero principalmente util".
+
+     Por eso esto NO parte el formulario, NO esconde campos y NO se pone encima
+     de nada: el scroll sigue siendo uno solo, con los mismos campos y en el
+     mismo orden. Lo unico que se añade es una barra pegada arriba, de ALTURA
+     FIJA, que dice por donde vas; y el relevo del Aigent ocurre DENTRO de esa
+     barra —la linea cambia unos segundos y vuelve— con su vibracion.
+     La primera version flotaba sobre el formulario y tapaba el aviso de los
+     300 creditos; el founder lo vio venir antes de que se publicara.
+     Las secciones se leen del DOM (data-i18n="anam_sec_*"), asi que si se
+     añaden campos o secciones nuevas —y las va a añadir— esto sigue solo.
+     ══════════════════════════════════════════════════════════════════════ -->
+<style>
+  /* OPACA y a ras. La primera version era translucida y se leia el formulario
+     por debajo: parecia contenido escondido. El founder pidio expresamente
+     comprobar que no hubiera nada escondido, y esto lo era. */
+  #anam-progreso{
+    display:none; padding:9px 16px 8px;
+    background:#10231C; background:var(--bg-anam, #10231C);
+    border:none; border-bottom:1px solid rgba(126,184,106,.22);
+    border-radius:0; margin:0; width:100%; box-shadow:0 6px 14px rgba(0,0,0,.22);
+  }
+  #anam-progreso.on{display:block}
+  #anam-progreso .tramos{display:flex; gap:5px; margin-bottom:7px}
+  #anam-progreso .tramos i{
+    flex:1; height:3px; border-radius:100px; background:rgba(255,255,255,.14);
+    transition:background 380ms ease;
+  }
+  #anam-progreso .tramos i.hecho{background:var(--green2, #4a6741)}
+  #anam-progreso .tramos i.aqui{background:var(--cyan, #5ec8e6)}
+  /* Altura fija para las dos caras de la linea: nunca empuja el formulario. */
+  #anam-progreso .linea{position:relative; height:34px}
+  #anam-progreso .cara{
+    position:absolute; inset:0; display:flex; align-items:center; gap:9px;
+    transition:opacity 300ms ease;
+  }
+  #anam-progreso .cara.oculta{opacity:0; pointer-events:none}
+  #anam-progreso .nombre{
+    font-size:10.5px; font-weight:700; letter-spacing:.9px; text-transform:uppercase;
+    color:#A7BCB0;
+  }
+  #anam-progreso .cuenta{
+    margin-left:auto; font-size:10.5px; font-weight:600; color:#7D948A;
+    font-variant-numeric:tabular-nums;
+  }
+  #anam-progreso .foto{
+    width:28px; height:28px; border-radius:50%; object-fit:cover; flex:none;
+    border:1.5px solid rgba(74,103,65,.45);
+  }
+  /* Dos lineas como maximo y con puntos suspensivos: "Empecemos por el:
+     nombre, raza y edad." no cabe en una sola a 375 px y se cortaba en seco
+     contra el borde derecho. Dos lineas a 12px x 1.3 = 31px, y la franja mide
+     34: sigue sin empujar ni un pixel del formulario. */
+  #anam-progreso .dice{
+    font-size:12px; line-height:1.3; color:#DCE6DE; min-width:0;
+    display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2;
+    overflow:hidden;
+  }
+  #anam-progreso .dice b{font-weight:700; color:#FFFFFF}
+
+  /* ── El relevo EN VIDEO ───────────────────────────────────────────────────
+     Hoja que sube desde abajo, se va sola al acabar el video y trae "Saltar"
+     desde el primer fotograma. No esconde nada de forma permanente: aparece,
+     habla y desaparece. El texto de lo que dice va SIEMPRE escrito al lado,
+     porque el video arranca en silencio (es la norma de los Aigents que ya
+     estan en la app) y porque en iOS el sonido no se puede encender solo. */
+  /* A PANTALLA COMPLETA, no conviviendo con el formulario (founder, 26-sep).
+     El motivo es del propio analisis: un discriminativo que no se atiende no
+     controla nada, y una tarjeta abajo mientras escribes es ignorable — miras
+     el campo, sigues tecleando y el estimulo no ha ocurrido de hecho. Tapando
+     la pantalla la atencion esta garantizada. Y no daña nada: un ED no
+     necesita seguir presente durante la respuesta.
+     z-index 95 porque el pomerania del paracaidas vuela a 80. */
+  #anam-relevo{
+    position:fixed; inset:0; z-index:95; display:none;
+    flex-direction:column; align-items:center; justify-content:center;
+    background:#07140F; opacity:0; transition:opacity 220ms ease;
+  }
+  #anam-relevo.on{display:flex; opacity:1}
+  /* contain, no cover: los videos de Aigent salen ENTEROS (founder, 9-sep,
+     por Ale y su perra). Recortarlos por abajo se come justo al perro. */
+  #anam-relevo video{
+    width:100%; max-width:560px; max-height:72vh; object-fit:contain; display:block;
+  }
+  #anam-relevo .pie{
+    width:100%; max-width:560px; padding:16px 20px calc(18px + env(safe-area-inset-bottom));
+    box-sizing:border-box;
+  }
+  #anam-relevo .rotulo{
+    display:block; font-size:11px; font-weight:700; letter-spacing:1.2px;
+    text-transform:uppercase; color:#5ec8e6; margin-bottom:7px;
+  }
+  #anam-relevo .frase{
+    font-size:16px; line-height:1.45; color:#EAF2EC; margin:0;
+  }
+  #anam-relevo .saltar{
+    position:absolute; top:calc(12px + env(safe-area-inset-top)); right:16px; z-index:2;
+    border:none; border-radius:100px; background:rgba(255,255,255,.10);
+    color:#EAF2EC; font-size:13px; font-weight:600; padding:8px 16px; cursor:pointer;
+  }
+  #anam-relevo .altavoz{
+    position:absolute; top:calc(12px + env(safe-area-inset-top)); left:16px; z-index:2;
+    width:38px; height:38px; border:none; border-radius:50%;
+    background:rgba(255,255,255,.10); color:#EAF2EC;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  #anam-relevo .barrita{
+    position:absolute; left:0; right:0; bottom:0; height:3px;
+    background:rgba(255,255,255,.12); overflow:hidden;
+  }
+  #anam-relevo .barrita i{
+    display:block; height:100%; width:0%;
+    background:var(--cyan, #5ec8e6); transition:width 200ms linear;
+  }
+  @media (max-height:640px){
+    #anam-relevo video{max-height:62vh}
+    #anam-relevo .frase{font-size:15px}
+  }
+</style>
+<script>
+(function(){
+  'use strict';
+  var PANT = 's-anamnesis';
+  var vistos = {}, montado = false, sec = [], actual = -1;
+  var campos = [], grupos = [], completados = {}, lineaVista = {}, vuelta = { scroll:0, campo:null };
+
+  /* ── PROGRAMA DE REFUERZO ────────────────────────────────────────────────
+     Founder, 26-sep-2026: "Niaz va a salir siempre la primera vez y despues
+     randomizada, en este caso con un programa de variable 5". Y antes, de Ale:
+     "yo sacaria a Ale randomizada con una razon variable 10 y siempre la
+     primera vez".
+     Razon variable = la primera vez seguro y, a partir de ahi, una tirada
+     independiente de 1/N en cada anamnesis nueva. Es RAZON, no intervalo: se
+     cuenta por veces que se llega al tramo, no por tiempo. Y es aleatoria de
+     verdad —puede tocar dos seguidas o tardar veinte—, que es justo lo que la
+     hace resistente a la extincion.
+     La razon de Cecilia NO la ha dicho: va a 5 como la de Niaz. Es un numero
+     y se cambia aqui.
+     OJO: esto rige solo el VIDEO. La linea escrita de la barra sale siempre,
+     en todos los tramos, porque es la que guia; el video es el refuerzo. */
+  /* razon:0 = continuo, sale siempre.
+     Cecilia va continua a proposito: no hay ninguna conducta delante de ella,
+     no refuerza nada — es ED puro, el que ocasiona la conducta mas cara, que
+     es empezar. Un ED intermitente no construye control de estimulo, lo
+     afloja. Niaz y Ale si son reforzador del tramo anterior ademas de ED del
+     suyo, y esos son los que van en razon variable, que es lo que el founder
+     pidio y para los unicos dos que dio numero.
+     vibra: el haptico acompaña a la ENTREGA DEL REFUERZO, asi que los dos que
+     refuerzan llevan el patron de logro y Cecilia, que solo señala, un toque. */
+  var PROGRAMA = {
+    anam_sec_dog:     { quien:'cecilia', razon:0,  vibra:'toque', video:'relevo-cecilia-es.mp4' },
+    anam_sec_family:  { quien:'niaz',    razon:5,  vibra:'logro', video:'relevo-niaz-es.mp4'    },
+    anam_sec_history: { quien:'ale',     razon:10, vibra:'logro', video:'relevo-ale-es.mp4'     }
+  };
+  var LLAVE = 'dm_relevo_vr';
+
+  function cuenta(){
+    try { return JSON.parse(localStorage.getItem(LLAVE) || '{}') || {}; }
+    catch(e){ return {}; }
+  }
+  function apunta(c){
+    try { localStorage.setItem(LLAVE, JSON.stringify(c)); } catch(e){}
+  }
+  /* Devuelve si en ESTA pasada toca video, y de paso apunta la ocasion. */
+  function toca(clave){
+    var p = PROGRAMA[clave];
+    if (!p) return false;
+    var c = cuenta();
+    var n = c[clave] || 0;
+    c[clave] = n + 1;
+    apunta(c);
+    if (!p.razon) return true;                // continuo (Cecilia, ED puro)
+    if (n === 0) return true;                 // siempre la primera vez
+    return Math.random() < (1 / p.razon);     // razon variable N
+  }
+
+  function guion(clave){
+    var G = {
+      /* Quien lleva cada tramo lo fijan los videos: Cecilia abre, Niaz la
+         familia, Ale el historial. Katja no se queda fuera: pasa al cuarto
+         tramo, que antes era de Cecilia y ahora seria repetirla. */
+      anam_sec_dog: { foto:'aig-cecilia-pixar.webp', quien:'Cecilia',
+        dice:_L3('Empecemos por él: nombre, raza y edad.',
+                 'Let’s start with him: name, breed and age.',
+                 'Partiamo da lui: nome, razza ed età.'),
+        /* Transcripcion literal del video, para leerla sin sonido. */
+        frase:_L3('Hola, soy Cecilia. Estoy aquí para ayudarte. Empecemos por saber más de tu perro.',
+                  'Hi, I’m Cecilia. I’m here to help you. Let’s start by getting to know your dog.',
+                  'Ciao, sono Cecilia. Sono qui per aiutarti. Partiamo col conoscere meglio il tuo cane.') },
+      anam_sec_family: { foto:'aig-niaz-pixar.webp', quien:'Niaz',
+        dice:_L3('Ahora con quién vive: el entorno explica mucho.',
+                 'Now who he lives with: the setting explains a lot.',
+                 'Ora con chi vive: il contesto spiega molto.'),
+        frase:_L3('Yo soy Niaz, no sé si me conoces. Cuenta conmigo para ayudarte a rellenar esta anamnesis. Dime, ahora ¿con quién vive?',
+                  'I’m Niaz, I don’t know if you know me. Count on me to help you fill in this history. Tell me, who does he live with?',
+                  'Io sono Niaz, non so se mi conosci. Conta su di me per compilare questa anamnesi. Dimmi, ora con chi vive?') },
+      anam_sec_history: { foto:'aig-ale-pixar.webp', quien:'Ale',
+        dice:_L3('Qué habéis probado ya: me dice qué no repetir.',
+                 'What you tried already: it tells me what not to repeat.',
+                 'Che cosa avete già provato: mi dice cosa non ripetere.'),
+        frase:_L3('No te ofendas, pero si hubiera funcionado no estarías aquí. Calma, que vamos a encontrar la solución. Te lo aseguro. Venga, dime qué cosas has probado.',
+                  'No offence, but if it had worked you wouldn’t be here. Easy — we’re going to find the answer. I promise. Come on, tell me what you’ve tried.',
+                  'Non offenderti, ma se avesse funzionato non saresti qui. Calma, troveremo la soluzione. Te lo assicuro. Dai, dimmi che cosa hai provato.') },
+      anam_sec_problem: { foto:'aig-katja-pixar.webp', quien:'Katja',
+        dice:_L3('Lo importante: qué hace exactamente.',
+                 'The important part: exactly what he does.',
+                 'La parte che conta: che cosa fa esattamente.') }
+    };
+    return G[clave] || null;
+  }
+
+  function monta(){
+    if (montado) return true;
+    var pant = document.getElementById(PANT);
+    if (!pant) return false;
+    sec = [].slice.call(pant.querySelectorAll('[data-i18n^="anam_sec_"]'));
+    if (!sec.length) return false;
+
+    /* Los campos de cada tramo se leen del DOM en orden de documento, igual
+       que las cabeceras: si el founder añade campos nuevos —y va a añadirlos—
+       esto se entera solo y no hay ninguna lista que mantener. */
+    campos = sec.map(function(){ return []; });
+    grupos = sec.map(function(){ return {}; });
+    var todo = [].slice.call(pant.querySelectorAll(
+      '[data-i18n^="anam_sec_"], input, select, textarea, [data-anam-grupo]'));
+    var cual = -1;
+    for (var q = 0; q < todo.length; q++) {
+      var e = todo[q];
+      if (e.getAttribute && /^anam_sec_/.test(e.getAttribute('data-i18n') || '')) { cual++; continue; }
+      if (cual < 0) continue;
+      var g = e.getAttribute && e.getAttribute('data-anam-grupo');
+      if (g) { (grupos[cual][g] = grupos[cual][g] || []).push(e); }
+      else campos[cual].push(e);
+    }
+
+    var barra = document.createElement('div');
+    barra.id = 'anam-progreso';
+    var marcas = '';
+    for (var i = 0; i < sec.length; i++) marcas += '<i></i>';
+    barra.innerHTML =
+      '<div class="tramos">' + marcas + '</div>' +
+      '<div class="linea">' +
+        '<div class="cara" id="anam-cara-nombre">' +
+          '<span class="nombre" id="anam-nombre"></span>' +
+          '<span class="cuenta" id="anam-cuenta"></span>' +
+        '</div>' +
+        '<div class="cara oculta" id="anam-cara-relevo">' +
+          '<img class="foto" id="anam-foto" src="" alt="">' +
+          '<span class="dice"><b id="anam-quien"></b> <span id="anam-dice"></span></span>' +
+        '</div>' +
+      '</div>';
+    /* position:sticky inline y con prioridad: una regla del tema pone
+       position:relative a los hijos de .screen y la barra se despegaba. */
+    /* Una regla del tema (#s-anamnesis > div) gana en especificidad y pintaba
+       la barra como tarjeta translucida y redondeada: se leia el formulario
+       por debajo. Se fuerza aqui, en el elemento, que es lo unico que gana. */
+    barra.style.setProperty('position', 'sticky', 'important');
+    barra.style.setProperty('z-index', '82', 'important');
+    barra.style.setProperty('background', '#10231C', 'important');
+    barra.style.setProperty('backdrop-filter', 'none', 'important');
+    barra.style.setProperty('-webkit-backdrop-filter', 'none', 'important');
+    barra.style.setProperty('border-radius', '0', 'important');
+    barra.style.setProperty('margin', '0', 'important');
+    barra.style.setProperty('width', '100%', 'important');
+    barra.style.setProperty('max-width', 'none', 'important');
+    barra.style.setProperty('box-shadow', '0 8px 16px rgba(0,0,0,.28)', 'important');
+    barra.style.setProperty('border', 'none', 'important');
+    barra.style.setProperty('border-bottom', '1px solid rgba(126,184,106,.22)', 'important');
+
+    var cab = pant.firstElementChild;
+    while (cab && cab.tagName === 'IMG') cab = cab.nextElementSibling;
+    /* La cabecera de la pantalla tambien se queda arriba: si la barra se pega
+       a 0 desaparece DEBAJO de ella. Se pega justo a su altura, medida, no
+       supuesta (la primera version se quedaba invisible al bajar). */
+    var altoCab = (cab && cab.offsetHeight) ? cab.offsetHeight : 0;
+    barra.style.setProperty('top', altoCab + 'px', 'important');
+    if (cab && cab.nextSibling) pant.insertBefore(barra, cab.nextSibling);
+    else pant.appendChild(barra);
+    barra.classList.add('on');
+    montado = true;
+    return true;
+  }
+
+  /* ── La hoja del video ─────────────────────────────────────────────────── */
+  var hoja = null, vid = null, cerrando = null;
+  var LLAVE_SON = 'dm_relevo_sonido';
+
+  /* ── COLA, y por que existe ──────────────────────────────────────────────
+     Medido el 26-sep en la pantalla real (375x812): "El perro" ocupa 830 px,
+     "Entorno familiar" 202, "Historial y refuerzos" 374 y "La conducta
+     problema" 1424. La pantalla son 812. O sea que UN SOLO gesto de scroll
+     cruza dos fronteras de tramo: en la prueba, Niaz y Ale saltaron con 50 px
+     de diferencia, uno encima del otro.
+     Dos consecuencias, las dos malas, y las dos se arreglan aqui:
+       1. dos Aigents seguidos sin respirar → SEPARACION minima entre relevos.
+       2. un tramo que se salta y no sale nunca → se ENCOLAN todos los tramos
+          cruzados, en orden, y ninguno se pierde. Esto es lo que mantiene en
+          pie la promesa de "siempre la primera vez": si se descartara el
+          tramo saltado, la primera de Niaz se perderia sin mas. */
+  var cola = [], ultimoCierre = 0, SEPARACION = 6000, sirviendo = null;
+
+  function encola(clave){
+    if (!clave || vistos[clave]) return;
+    vistos[clave] = true;
+    cola.push(clave);
+  }
+
+  function sirve(){
+    clearTimeout(sirviendo);
+    if (!cola.length) return;
+    if (hoja && hoja.classList.contains('on')) return;   // hay una puesta
+    var falta = SEPARACION - (Date.now() - ultimoCierre);
+    if (falta > 0) { sirviendo = setTimeout(sirve, falta + 40); return; }
+    var clave = cola.shift();
+    if (clave) relevo(clave);
+  }
+
+  /* El sonido va ENCENDIDO por defecto (founder, 26-sep). Solo se queda mudo
+     si el usuario lo apaga a proposito con el altavoz. */
+  function sonidoQuerido(){
+    try { return localStorage.getItem(LLAVE_SON) !== '0'; } catch(e){ return true; }
+  }
+
+  /* ── CEBAR EL SONIDO ──────────────────────────────────────────────────────
+     iOS no deja que un video empiece a sonar sin que el usuario haya tocado
+     algo antes. El truco: en el PRIMER toque que hace en la app, se llama a
+     play() sobre el elemento con el volumen a cero y se pausa al instante.
+     No se oye nada, pero a partir de ahi ese elemento queda desbloqueado y ya
+     puede sonar solo cuando toque. Por eso hay UN solo <video> reutilizado:
+     el desbloqueo es por elemento, y cebando uno quedan cebados los tres
+     relevos.
+     OJO, y es la unica parte que no puedo prometer: el SCROLL no sirve.
+     WebKit no lo cuenta como gesto de usuario para el audio; solo cuentan
+     toques y clics. En la practica da igual, porque a la anamnesis se entra
+     pulsando un boton, asi que siempre hay un toque antes. */
+  var cebado = false;
+  function cebaSonido(){
+    if (cebado || !vid) return;
+    cebado = true;
+    try {
+      var vol = vid.volume;
+      vid.muted = false; vid.volume = 0;
+      if (!vid.getAttribute('src')) vid.src = PROGRAMA.anam_sec_family.video;
+      var p = vid.play();
+      var apaga = function(){ try { vid.pause(); vid.currentTime = 0; vid.volume = vol; } catch(e){} };
+      if (p && typeof p.then === 'function') p.then(apaga, function(){ cebado = false; apaga(); });
+      else apaga();
+    } catch(e){ cebado = false; }
+  }
+
+  function montaHoja(){
+    if (hoja) return hoja;
+    hoja = document.createElement('div');
+    hoja.id = 'anam-relevo';
+    hoja.innerHTML =
+      '<button type="button" class="altavoz" id="anam-altavoz" aria-label="Sonido">' +
+        '<svg id="anam-son-off" width="19" height="19" viewBox="0 0 24 24" fill="none" ' +
+          'stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none">' +
+          '<path d="M11 5 6 9H2v6h4l5 4z"/><line x1="23" y1="9" x2="17" y2="15"/>' +
+          '<line x1="17" y1="9" x2="23" y2="15"/></svg>' +
+        '<svg id="anam-son-on" width="19" height="19" viewBox="0 0 24 24" fill="none" ' +
+          'stroke="currentColor" stroke-width="2" stroke-linecap="round">' +
+          '<path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/>' +
+          '<path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>' +
+      '</button>' +
+      '<button type="button" class="saltar" id="anam-saltar" data-i18n="anam_skip">Skip</button>' +
+      '<video id="anam-video" playsinline preload="auto" aria-hidden="true"></video>' +
+      '<div class="pie">' +
+        '<span class="rotulo" id="anam-rotulo"></span>' +
+        '<p class="frase" id="anam-frase"></p>' +
+      '</div>' +
+      '<div class="barrita"><i id="anam-barrita"></i></div>';
+    document.body.appendChild(hoja);
+    vid = hoja.querySelector('#anam-video');
+
+    hoja.querySelector('#anam-saltar').addEventListener('click', function(){ cierra(true); });
+    hoja.querySelector('#anam-altavoz').addEventListener('click', function(ev){
+      ev.stopPropagation();
+      if (!vid) return;
+      vid.muted = !vid.muted;
+      try { localStorage.setItem(LLAVE_SON, vid.muted ? '0' : '1'); } catch(e){}
+      pintaAltavoz();
+      /* Encender el sonido es un gesto del usuario: aqui iOS si deja sonar. */
+      if (!vid.muted) { try { vid.play().catch(function(){}); } catch(e){} }
+    });
+    vid.addEventListener('ended', function(){ cierra(false); });
+    vid.addEventListener('timeupdate', function(){
+      var b = document.getElementById('anam-barrita');
+      if (b && vid.duration) b.style.width = Math.min(100, (vid.currentTime / vid.duration) * 100) + '%';
+    });
+    return hoja;
+  }
+
+  function pintaAltavoz(){
+    var off = document.getElementById('anam-son-off');
+    var on  = document.getElementById('anam-son-on');
+    if (off) off.style.display = (vid && vid.muted) ? '' : 'none';
+    if (on)  on.style.display  = (vid && vid.muted) ? 'none' : '';
+  }
+
+  function cierra(saltado){
+    clearTimeout(cerrando);
+    if (!hoja) return;
+    var estaba = hoja.classList.contains('on');
+    hoja.classList.remove('on');
+    try { if (vid) { vid.pause(); vid.removeAttribute('src'); vid.load(); } } catch(e){}
+    var pant = document.getElementById(PANT);
+    if (pant) pant.style.overflow = '';
+    /* Devolver al usuario exactamente donde estaba: mismo scroll, mismo campo. */
+    if (estaba && pant) {
+      pant.scrollTop = vuelta.scroll;
+      try { if (vuelta.campo && document.body.contains(vuelta.campo)) vuelta.campo.focus({preventScroll:true}); } catch(e){}
+      vuelta.campo = null;
+    }
+    if (saltado) { try { if (typeof dmVibrar === 'function') dmVibrar('toque'); } catch(e){} }
+    if (estaba) { ultimoCierre = Date.now(); sirve(); }
+  }
+
+  /* Devuelve true si la hoja ha arrancado de verdad. Si no puede (no hay
+     video para ese idioma, o el navegador se niega), devuelve false y el
+     relevo se queda en la linea de la barra: nunca se pierde el mensaje. */
+  function abreHoja(g, fichero){
+    montaHoja();
+    if (!vid) return false;
+    var pant = document.getElementById(PANT);
+    document.getElementById('anam-rotulo').textContent = g.quien;
+    document.getElementById('anam-frase').textContent = g.frase || g.dice;
+    var b = document.getElementById('anam-barrita');
+    if (b) b.style.width = '0%';
+    vid.muted = !sonidoQuerido();
+    vid.volume = 1;
+    pintaAltavoz();
+    vid.src = fichero;
+    /* Se guarda donde estaba y se cierra el teclado: al volver, el formulario
+       aparece exactamente en el mismo sitio y en el mismo campo. */
+    vuelta.scroll = pant ? pant.scrollTop : 0;
+    vuelta.campo = (document.activeElement && pant && pant.contains(document.activeElement))
+                   ? document.activeElement : null;
+    try { if (vuelta.campo) vuelta.campo.blur(); } catch(e){}
+    hoja.classList.add('on');
+    if (pant) pant.style.overflow = 'hidden';
+    try { if (typeof dmVibrar === 'function') dmVibrar(g.vibra || 'confirma'); } catch(e){}
+    var p = null;
+    try { p = vid.play(); } catch(e){ p = null; }
+    if (p && typeof p.catch === 'function') {
+      p.catch(function(){
+        /* iOS no deja sonar sin gesto: se reintenta en silencio, que si deja.
+           El texto sigue leyendose al lado, asi que no se pierde nada. */
+        vid.muted = true; pintaAltavoz();
+        try { vid.play().catch(function(){ cierra(false); }); } catch(e){ cierra(false); }
+      });
+    }
+    /* Red de seguridad: si 'ended' no llega (fichero corrupto, pestaña en
+       segundo plano), la hoja no se queda puesta para siempre. */
+    clearTimeout(cerrando);
+    cerrando = setTimeout(function(){ cierra(false); }, 22000);
+    return true;
+  }
+
+  /* Llamar solo desde sirve(): el "una vez por tramo" lo guarda encola(). */
+  /* ── DOS CANALES SEPARADOS ───────────────────────────────────────────────
+     La LINEA de la barra es continua: sale en los cuatro tramos, siempre, y
+     va con el scroll. Es la que sostiene la funcion discriminativa cuando el
+     video no toca — si adelgazaramos las dos a la vez, cuatro de cada cinco
+     veces el tramo se quedaria sin ED ninguno.
+     El VIDEO es el reforzador y va en razon variable, y se dispara al
+     COMPLETAR el tramo anterior, no al llegar. Esa contingencia es lo que le
+     da la doble funcion: si saliera por posicion de scroll, un usuario que
+     pasa de largo sin escribir lo recibiria igual, y un reforzador entregado
+     sin contingencia deja de reforzar y se devalua tambien como señal. */
+  function lineaBarra(clave){
+    var g = guion(clave);
+    if (!g) return;
+    var caraN = document.getElementById('anam-cara-nombre');
+    var caraR = document.getElementById('anam-cara-relevo');
+    if (!caraN || !caraR) return;
+    document.getElementById('anam-foto').src = g.foto;
+    document.getElementById('anam-quien').textContent = g.quien + ':';
+    document.getElementById('anam-dice').textContent = g.dice;
+    caraN.classList.add('oculta');
+    caraR.classList.remove('oculta');
+    clearTimeout(lineaBarra._t);
+    lineaBarra._t = setTimeout(function(){
+      caraR.classList.add('oculta');
+      caraN.classList.remove('oculta');
+    }, 3400);
+  }
+
+  function relevo(clave){
+    var g = guion(clave);
+    var p = PROGRAMA[clave];
+    if (!g || !p) { sigue(); return; }
+    /* Hoy los tres estan grabados solo en español. En ingles e italiano no se
+       abre nada y el contador ni se toca: queda la linea escrita y ya. */
+    var lang = 'es';
+    try { lang = (window.getCurrentLang ? window.getCurrentLang() : 'es'); } catch(e){}
+    if (lang !== 'es') { sigue(); return; }
+    if (!toca(clave)) { sigue(); return; }
+    if (!abreHoja(g, p.video)) sigue();
+  }
+
+  /* Sin video no hay cierre que empuje la cola: se empuja desde aqui. */
+  function sigue(){
+    ultimoCierre = Date.now() - (SEPARACION - 1200);
+    sirve();
+  }
+
+  /* ── QUE SIGNIFICA "TRAMO COMPLETADO" ────────────────────────────────────
+     Founder, 26-sep: "mas que detectar los campos obligatorios yo marcaria
+     los no obligatorios, que acabamos antes". Asi que aqui TODO campo de la
+     anamnesis cuenta como obligatorio salvo los de esta lista. Un campo
+     escondido (los que solo aparecen si antes has dicho que si) no cuenta
+     mientras este escondido. */
+  var NO_OBLIGATORIOS = {
+    'inp-adopted-time':    1,  /* si es adoptado, cuanto tiempo lleva contigo */
+    'inp-weaning':         1,  /* con cuantos meses salio de la camada: importante,
+                                  pero hay gente que sencillamente no lo sabe */
+    'inp-training-result': 1,  /* ha visitado alguna escuela de educacion canina */
+    'inp-other-problems':  1,  /* que otros problemas de conducta has tenido */
+    'inp-theory':          1,  /* cual crees tu que es la causa */
+    'inp-video':           1,  /* adjuntar video del comportamiento */
+    'inp-video-caption':   1
+  };
+
+  function lleno(e){
+    if (e.type === 'checkbox' || e.type === 'radio') return !!e.checked;
+    return String(e.value || '').trim().length > 0;
+  }
+  function pideRespuesta(e){
+    if (NO_OBLIGATORIOS[e.id]) return false;
+    if (e.type === 'file' || e.type === 'hidden' || e.disabled) return false;
+    if (e.offsetParent === null) return false;      /* escondido / condicional */
+    return true;
+  }
+  /* Un grupo de botones (si/no, dentro/fuera/ambos...) esta contestado cuando
+     alguno de los suyos esta encendido. Se pregunta con isActive(), que es
+     exactamente lo que la app usa al enviar el analisis: una sola fuente de
+     verdad. La primera version de esto comparaba el color a mano y repetia
+     el mismo fallo que acabo de arreglar en isActive. */
+  function grupoContestado(bs){
+    for (var i = 0; i < bs.length; i++) {
+      if (bs[i].offsetParent === null) continue;
+      if (typeof isActive === 'function' && isActive(bs[i].id)) return true;
+    }
+    return false;
+  }
+  function grupoVisible(bs){
+    for (var i = 0; i < bs.length; i++) if (bs[i].offsetParent !== null) return true;
+    return false;
+  }
+
+  function tramoCompleto(i){
+    var piden = (campos[i] || []).filter(pideRespuesta);
+    var gs = grupos[i] || {};
+    var hayGrupo = false;
+    for (var k in gs) {
+      if (!gs.hasOwnProperty(k) || !grupoVisible(gs[k])) continue;
+      hayGrupo = true;
+      if (!grupoContestado(gs[k])) return false;
+    }
+    if (!piden.length && !hayGrupo) return false;
+    return piden.every(lleno);
+  }
+
+  /* Completar el tramo i entrega el Aigent del tramo i+1: es a la vez el
+     reforzador de lo que acabas de rellenar y el discriminativo de lo que
+     viene. La cadena del founder, literal. */
+  function revisaCompletados(){
+    if (!montado) return;
+    for (var i = 0; i < campos.length - 1; i++) {
+      if (completados[i]) continue;
+      if (!tramoCompleto(i)) continue;
+      completados[i] = true;
+      var siguiente = sec[i + 1] && sec[i + 1].getAttribute('data-i18n');
+      if (siguiente && PROGRAMA[siguiente]) encola(siguiente);
+    }
+    sirve();
+  }
+
+  function repinta(){
+    var pant = document.getElementById(PANT);
+    if (!pant || !montado) return;
+    var b0 = document.getElementById('anam-progreso');
+    var corte = pant.getBoundingClientRect().top +
+                ((b0 ? parseInt(b0.style.top, 10) || 0 : 0) + (b0 ? b0.offsetHeight : 0)) + 24;
+    var idx = 0;
+    for (var i = 0; i < sec.length; i++) {
+      if (sec[i].getBoundingClientRect().top <= corte) idx = i;
+    }
+    var marcas = document.querySelectorAll('#anam-progreso .tramos i');
+    for (var k = 0; k < marcas.length; k++) {
+      marcas[k].classList.toggle('hecho', k < idx);
+      marcas[k].classList.toggle('aqui', k === idx);
+    }
+    var nom = document.getElementById('anam-nombre');
+    if (nom) nom.textContent = (sec[idx].textContent || '').trim();
+    var cta = document.getElementById('anam-cuenta');
+    if (cta) cta.textContent = (idx + 1) + '/' + sec.length;
+    /* Solo la LINEA, y de todos los tramos cruzados: con "Entorno familiar"
+       midiendo 202 px de alto y la pantalla 812, un scroll normal se salta
+       uno entero y ese tramo se quedaria sin su rotulo. El video no va por
+       aqui: va por tramo completado. */
+    if (idx !== actual) {
+      if (idx > actual) {
+        for (var t = Math.max(0, actual + 1); t <= idx; t++) {
+          var cl = sec[t].getAttribute('data-i18n');
+          if (!lineaVista[cl]) { lineaVista[cl] = true; lineaBarra(cl); }
+        }
+      }
+      actual = idx;
+    }
+  }
+
+  function arranca(){
+    if (!monta()) return;
+    vistos = {}; actual = -1; cola = []; ultimoCierre = 0;
+    completados = {}; lineaVista = {};
+    clearTimeout(sirviendo);
+    var b = document.getElementById('anam-progreso');
+    if (b) b.classList.add('on');
+    setTimeout(repinta, 140);
+    /* Cecilia abre la cadena: no refuerza nada porque no hay nada detras,
+       ocasiona la conducta mas cara, que es empezar. Por eso va al ENTRAR y
+       va continua. */
+    setTimeout(function(){
+      var c0 = sec[0] && sec[0].getAttribute('data-i18n');
+      if (c0 && PROGRAMA[c0]) { encola(c0); sirve(); }
+    }, 320);
+  }
+
+  var _goTo = window.goTo;
+  if (typeof _goTo === 'function') {
+    window.goTo = function(id){
+      var r = _goTo.apply(this, arguments);
+      try {
+        if (id === PANT) arranca();
+        else {
+          cierra(false);
+          var b = document.getElementById('anam-progreso');
+          if (b) b.classList.remove('on');
+        }
+      } catch(e){}
+      return r;
+    };
+  }
+  var pant0 = document.getElementById(PANT);
+  if (pant0) {
+    pant0.addEventListener('scroll', function(){
+      if (!repinta._p) repinta._p = requestAnimationFrame(function(){ repinta._p = null; repinta(); });
+    }, { passive:true });
+    /* El disparo del video: cada vez que el usuario escribe o elige algo se
+       mira si con eso ha terminado un tramo. 'input' cubre teclado y dictado
+       por voz; 'change' cubre selects y casillas. */
+    var mirar = function(){
+      clearTimeout(revisaCompletados._t);
+      revisaCompletados._t = setTimeout(revisaCompletados, 260);
+    };
+    pant0.addEventListener('input', mirar);
+    pant0.addEventListener('change', mirar);
+    /* Los si/no son <button> y no lanzan 'input' ni 'change': el clic si. */
+    pant0.addEventListener('click', mirar);
+  }
+
+  /* Cebar el sonido con el primer toque del usuario en cualquier sitio.
+     Se monta la hoja ya, sin esperar, para que el elemento <video> exista
+     cuando llegue ese toque. */
+  try { montaHoja(); } catch(e){}
+  ['pointerdown','touchend','click'].forEach(function(ev){
+    document.addEventListener(ev, cebaSonido, { capture:true, passive:true });
+  });
 })();
 </script>
 
@@ -28620,6 +29360,7 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
      necesita un caso en backend CON su plan. Sin caso guardado no hay
      ejercicios, por eso una cosa no va sin la otra. */
   window.dmCZSalvare = async function () {
+    dmVibrar('confirma');
     var md = window._czRelazione || '';
     var boton = document.getElementById('czr-salva');
     if (!md) { try { showToast('Non c\u2019\u00e8 nessuna relazione da salvare.'); } catch (e) {} return; }

@@ -346,6 +346,17 @@ img,button,.btn,nav,header{-webkit-touch-callout:none;-webkit-user-select:none;u
 /* ── GLOBAL NAV ── */
 #global-nav{display:none;position:absolute;bottom:0;left:0;right:0;z-index:50;border-top:1px solid rgba(44,42,36,0.1);background:#faf8f4;padding:8px 8px 12px;}
 #s-refine.active ~ #global-nav, #s-refine.active + #global-nav { display:none !important; }
+/* ── MIENTRAS SE ESCRIBE, LA BARRA DE ABAJO SE QUITA ──────────────────────
+   Founder, 27-sep-2026, con captura: "los botones ocultan el resto de texto y
+   no se puede seguir escribiendo". La barra va absolute a bottom:0, asi que
+   cuando el teclado de iOS sube y la webview encoge, la barra sube CON el
+   teclado y se sienta justo encima del campo que estas rellenando: se ve
+   media linea de lo que escribes y no hay forma de colocar el cursor. De ahi
+   tambien la lupa: intentabas apuntar a un texto medio tapado.
+   Mientras haya un campo de texto con el foco, la barra no se pinta. Vuelve
+   sola al salir del campo. */
+body.dm-escribiendo #global-nav,
+body.dm-escribiendo .bottom-nav { display:none !important; }
 /* La bienvenida es una pantalla a pantalla completa: la barra de abajo se
    comía los botones de decidir y el usuario no podía avanzar (founder, 27-ago). */
 #s-onboarding.active ~ #global-nav, #s-onboarding.active + #global-nav,
@@ -28011,6 +28022,44 @@ function endTourIntro() {
     /* Los si/no son <button> y no lanzan 'input' ni 'change': el clic si. */
     pant0.addEventListener('click', mirar);
   }
+
+  /* ── TECLADO ABIERTO = BARRA DE ABAJO FUERA ─────────────────────────────
+     Ver el comentario de body.dm-escribiendo en el CSS. Va aqui, en un bloque
+     que ya existe, y es global a toda la app: la barra tapa el campo en
+     cualquier formulario, no solo en la anamnesis.
+     Ademas, si al abrirse el teclado el campo enfocado se queda por debajo de
+     lo que se ve, se sube hasta que se lea. visualViewport es quien sabe de
+     verdad cuanto mide la pantalla con el teclado puesto; si no existe, no se
+     hace nada y la barra escondida ya arregla lo gordo. */
+  function _esTexto(el){
+    if (!el || !el.tagName) return false;
+    if (el.tagName === 'TEXTAREA') return true;
+    if (el.tagName !== 'INPUT') return false;
+    return ['button','submit','reset','checkbox','radio','file','range','hidden']
+           .indexOf((el.type || 'text').toLowerCase()) < 0;
+  }
+  function _aLaVista(el){
+    if (!window.visualViewport || !el) return;
+    var alto = window.visualViewport.height;
+    var r = el.getBoundingClientRect();
+    if (r.bottom <= alto - 12) return;          /* ya se ve entero */
+    try { el.scrollIntoView({ block:'center', behavior:'smooth' }); } catch(e){
+      try { el.scrollIntoView(); } catch(e2){}
+    }
+  }
+  document.addEventListener('focusin', function(ev){
+    if (!_esTexto(ev.target)) return;
+    document.body.classList.add('dm-escribiendo');
+    var el = ev.target;
+    setTimeout(function(){ _aLaVista(el); }, 320);   /* tras subir el teclado */
+  });
+  document.addEventListener('focusout', function(){
+    /* Con retraso: al saltar de un campo al siguiente hay un instante sin
+       foco, y sin esta espera la barra parpadearia entre campo y campo. */
+    setTimeout(function(){
+      if (!_esTexto(document.activeElement)) document.body.classList.remove('dm-escribiendo');
+    }, 150);
+  });
 
   /* Cebar el sonido con el primer toque del usuario en cualquier sitio.
      Se monta la hoja ya, sin esperar, para que el elemento <video> exista

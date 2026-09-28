@@ -24074,6 +24074,7 @@ function endTourIntro() {
          olvido de traduccion: no tocarlos. */
       nz_skip:                 'Skip intro',
       anam_skip:               'Skip',
+      anam_continuar:          'Continuar',
       nz_never:                'Don\u2019t show',
       n2_title:                'Conoce a tus Aigents',
       n2_body:                 'Los Aigents son avatars de IA muy especializados. No sirven para generar an\u00e1lisis de conducta pero te ayudan en tu d\u00eda a d\u00eda con tu perro.',
@@ -25340,6 +25341,7 @@ function endTourIntro() {
          olvido de traduccion: no tocarlos. */
       nz_skip:                 'Skip intro',
       anam_skip:               'Skip',
+      anam_continuar:          'Continue',
       nz_never:                'Don\u2019t show',
       n2_title:                'Meet your Aigents',
       n2_body:                 'Aigents are highly specialised AI avatars. They do not generate behavioural analyses, but they help you day to day with your dog.',
@@ -26601,6 +26603,7 @@ function endTourIntro() {
          olvido de traduccion: no tocarlos. */
           nz_skip:                 'Skip intro',
           anam_skip:               'Skip',
+          anam_continuar:          'Continua',
           nz_never:                'Don\u2019t show',
           n2_title:                'Conosci i tuoi Aigents',
           n2_body:                 'Gli Aigents sono avatar di IA molto specializzati. Non servono a generare analisi del comportamento, ma ti aiutano ogni giorno con il tuo cane.',
@@ -27581,6 +27584,35 @@ function endTourIntro() {
   }
   #anam-progreso .dice b{font-weight:700; color:#FFFFFF}
 
+  /* ── BOTON DE CONTINUAR AL FINAL DE CADA TRAMO ───────────────────────────
+     Founder, 28-sep-2026: "al final de esta pagina ya no me deja continuar...
+     deja un boton grande y bien visible que diga continuar. Y al pulsar
+     continuar salta el siguiente Aigent."
+     La anamnesis NO se parte en pantallas: sigue siendo un scroll unico con
+     los mismos campos y en el mismo orden. Lo que se añade es una salida
+     clara al final de cada tramo. */
+  .anam-continuar{
+    display:block; width:100%; margin:26px 0 34px; padding:17px 20px;
+    border:none; border-radius:16px; cursor:pointer; font-family:inherit;
+    font-size:16.5px; font-weight:700; letter-spacing:.2px; color:#08150F;
+    background:linear-gradient(180deg, #7eb86a 0%, #63a24f 100%);
+    box-shadow:0 6px 18px rgba(126,184,106,.22);
+  }
+  .anam-continuar:active{ transform:scale(.99); }
+  .anam-continuar .falta{
+    display:block; margin-top:5px; font-size:12.5px; font-weight:600;
+    color:#08150F; opacity:.72;
+  }
+  /* El ultimo trozo del formulario se quedaba debajo de la barra de abajo,
+     que va anclada al borde inferior. Se le deja sitio. */
+  #s-anamnesis, #s-anamnesis-puppy{
+    padding-bottom:calc(104px + env(safe-area-inset-bottom)) !important;
+  }
+  .campo-falta{
+    border-color:#E2725B !important;
+    box-shadow:0 0 0 2px rgba(226,114,91,.25) !important;
+  }
+
   /* ── El relevo EN VIDEO ───────────────────────────────────────────────────
      Hoja que sube desde abajo, se va sola al acabar el video y trae "Saltar"
      desde el primer fotograma. No esconde nada de forma permanente: aparece,
@@ -27645,6 +27677,7 @@ function endTourIntro() {
   'use strict';
   var PANT = 's-anamnesis';
   var vistos = {}, montado = false, sec = [], actual = -1;
+  var CONTINUAR_ACTIVO = false;
   var campos = [], grupos = [], completados = {}, lineaVista = {}, vuelta = { scroll:0, campo:null };
 
   /* ── PROGRAMA DE REFUERZO ────────────────────────────────────────────────
@@ -27789,6 +27822,34 @@ function endTourIntro() {
     barra.style.setProperty('box-shadow', '0 8px 16px rgba(0,0,0,.28)', 'important');
     barra.style.setProperty('border', 'none', 'important');
     barra.style.setProperty('border-bottom', '1px solid rgba(126,184,106,.22)', 'important');
+
+    /* Una salida clara al final de cada tramo: el boton de Continuar. Se
+       inserta justo antes de la cabecera del tramo siguiente, asi que si el
+       founder añade secciones nuevas aparece solo donde toca. El ultimo tramo
+       no lleva: ahi ya esta el boton de analizar. */
+    /* El boton de Continuar queda APAGADO hasta que tenga diseño propio.
+       El founder lo vio a medias: "se te queda cortada, se nota que no hay
+       diseño... simplemente has cortado una pagina en tres partes". Tiene
+       razon, y no sale a produccion asi. Lo que si sale ya es el hueco de
+       abajo, que es lo que estaba dejando el boton de analizar debajo de la
+       barra y bloqueando la consulta. */
+    for (var t = 0; CONTINUAR_ACTIVO && t < sec.length - 1; t++) {
+      (function(i){
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'anam-continuar';
+        b.setAttribute('data-tramo', i);
+        b.innerHTML = '<span data-i18n="anam_continuar">Continuar</span>' +
+                      '<span class="falta" hidden></span>';
+        b.addEventListener('click', function(){ continuar(i, b); });
+        /* Justo delante del titulo del tramo siguiente, dentro de SU padre.
+           La primera version buscaba el hijo directo de la pantalla y, como
+           las cuatro secciones cuelgan del mismo contenedor, los tres botones
+           salian apilados arriba en vez de al final de cada tramo. */
+        var sig = sec[i + 1];
+        if (sig && sig.parentNode) sig.parentNode.insertBefore(b, sig);
+      })(t);
+    }
 
     var cab = pant.firstElementChild;
     while (cab && cab.tagName === 'IMG') cab = cab.nextElementSibling;
@@ -28085,9 +28146,69 @@ function endTourIntro() {
     return piden.every(lleno);
   }
 
-  /* Completar el tramo i entrega el Aigent del tramo i+1: es a la vez el
-     reforzador de lo que acabas de rellenar y el discriminativo de lo que
-     viene. La cadena del founder, literal. */
+  /* ── CONTINUAR ────────────────────────────────────────────────────────────
+     Pulsar Continuar ES la conducta completada. Ahi es donde entra el Aigent
+     del tramo siguiente: reforzador de lo que acabas de rellenar y, a la vez,
+     discriminativo de lo que viene. Si falta algo, no pasa: lo dice, lo marca
+     y lleva al primer hueco. */
+  function continuar(i, boton){
+    var faltan = queFalta(i);
+    var aviso = boton.querySelector('.falta');
+    if (faltan.length) {
+      if (aviso) {
+        aviso.hidden = false;
+        aviso.textContent = _L3('Falta contestar ' + faltan.length + (faltan.length === 1 ? ' pregunta' : ' preguntas'),
+                                faltan.length + (faltan.length === 1 ? ' question' : ' questions') + ' still to answer',
+                                'Manca ' + faltan.length + (faltan.length === 1 ? ' risposta' : ' risposte'));
+      }
+      try { if (typeof dmVibrar === 'function') dmVibrar('aviso'); } catch(e){}
+      var primero = faltan[0];
+      try {
+        if (primero.classList) primero.classList.add('campo-falta');
+        primero.scrollIntoView({ block:'center', behavior:'smooth' });
+        if (primero.focus && _esCampo(primero)) setTimeout(function(){ try { primero.focus(); } catch(e){} }, 380);
+      } catch(e){}
+      return;
+    }
+    if (aviso) { aviso.hidden = true; aviso.textContent = ''; }
+    completados[i] = true;
+    try { if (typeof dmVibrar === 'function') dmVibrar('confirma'); } catch(e){}
+    var siguiente = sec[i + 1] && sec[i + 1].getAttribute('data-i18n');
+    if (siguiente && PROGRAMA[siguiente]) encola(siguiente);
+    /* Se lleva al tramo siguiente, y el Aigent sale encima. */
+    try { sec[i + 1].scrollIntoView({ block:'start', behavior:'smooth' }); } catch(e){}
+    sirve();
+  }
+
+  function _esCampo(e){
+    return e && (e.tagName === 'INPUT' || e.tagName === 'TEXTAREA' || e.tagName === 'SELECT');
+  }
+
+  /* Lo que queda por contestar en un tramo: campos vacios que no son
+     opcionales, y grupos de botones sin elegir. Devuelve los elementos, para
+     poder llevar al usuario al primero. */
+  function queFalta(i){
+    var fuera = [];
+    var f = (campos[i] || []).filter(pideRespuesta);
+    for (var k = 0; k < f.length; k++) if (!lleno(f[k])) fuera.push(f[k]);
+    var gs = grupos[i] || {};
+    for (var g in gs) {
+      if (!gs.hasOwnProperty(g) || !grupoVisible(gs[g])) continue;
+      if (!grupoContestado(gs[g])) fuera.push(gs[g][0]);
+    }
+    fuera.sort(function(a,b){
+      var ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+      return ra.top - rb.top;
+    });
+    return fuera;
+  }
+
+  /* Al escribir o elegir, se quita la marca roja de ese hueco. */
+  function limpiaMarca(ev){
+    var e = ev.target;
+    if (e && e.classList && e.classList.contains('campo-falta')) e.classList.remove('campo-falta');
+  }
+
   function revisaCompletados(){
     if (!montado) return;
     for (var i = 0; i < campos.length - 1; i++) {
@@ -28171,17 +28292,12 @@ function endTourIntro() {
     pant0.addEventListener('scroll', function(){
       if (!repinta._p) repinta._p = requestAnimationFrame(function(){ repinta._p = null; repinta(); });
     }, { passive:true });
-    /* El disparo del video: cada vez que el usuario escribe o elige algo se
-       mira si con eso ha terminado un tramo. 'input' cubre teclado y dictado
-       por voz; 'change' cubre selects y casillas. */
-    var mirar = function(){
-      clearTimeout(revisaCompletados._t);
-      revisaCompletados._t = setTimeout(revisaCompletados, 260);
-    };
-    pant0.addEventListener('input', mirar);
-    pant0.addEventListener('change', mirar);
-    /* Los si/no son <button> y no lanzan 'input' ni 'change': el clic si. */
-    pant0.addEventListener('click', mirar);
+    /* El Aigent ya no sale al escribir: sale al pulsar Continuar, que es la
+       conducta completada de verdad y ademas lo que el usuario entiende.
+       Aqui solo se limpia la marca roja del hueco que acaba de rellenar. */
+    pant0.addEventListener('input', limpiaMarca);
+    pant0.addEventListener('change', limpiaMarca);
+    pant0.addEventListener('click', limpiaMarca);
   }
 
   /* ── TECLADO ABIERTO = BARRA DE ABAJO FUERA ─────────────────────────────

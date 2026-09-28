@@ -27989,7 +27989,7 @@ function endTourIntro() {
     hoja.classList.remove('on');
     try { if (vid) { vid.pause(); vid.removeAttribute('src'); vid.load(); } } catch(e){}
     var pant = document.getElementById(PANT);
-    if (pant) pant.style.overflow = '';
+    if (pant) pant.style.removeProperty('overflow');
     /* Devolver al usuario exactamente donde estaba: mismo scroll, mismo campo. */
     if (estaba && pant) {
       pant.scrollTop = vuelta.scroll;
@@ -28022,18 +28022,43 @@ function endTourIntro() {
                    ? document.activeElement : null;
     try { if (vuelta.campo) vuelta.campo.blur(); } catch(e){}
     hoja.classList.add('on');
-    if (pant) pant.style.overflow = 'hidden';
+    /* NO se bloquea el scroll del formulario. La hoja ya tapa la pantalla
+       entera, asi que no hace falta, y si algo salia mal —y salia— el
+       formulario se quedaba congelado: el founder no podia mover la anamnesis
+       con el dedo en TestFlight, 28-sep-2026. Nada vuelve a tocar el overflow
+       de la pantalla. */
     try { if (typeof dmVibrar === 'function') dmVibrar(g.vibra || 'confirma'); } catch(e){}
-    var p = null;
-    try { p = vid.play(); } catch(e){ p = null; }
-    if (p && typeof p.catch === 'function') {
-      p.catch(function(){
-        /* iOS no deja sonar sin gesto: se reintenta en silencio, que si deja.
-           El texto sigue leyendose al lado, asi que no se pierde nada. */
-        vid.muted = true; pintaAltavoz();
-        try { vid.play().catch(function(){ cierra(false); }); } catch(e){ cierra(false); }
-      });
-    }
+
+    /* Esperar a que el video pueda sonar antes de darle al play. Este es el
+       mismo fallo que corregi en el tutorial y en las cuatro pantallas de
+       Aigent y que aqui se me quedo sin corregir: llamando a play() justo
+       despues de poner el src, la promesa se aborta porque aun esta cargando.
+       Aqui el respaldo cerraba la hoja, asi que el relevo se abria y se
+       cerraba en milisegundos y NO SE VEIA NINGUN AIGENT. Es exactamente lo
+       que reporto el founder: "no me sale la nueva Cecilia, no me sale la
+       nueva Niaz, ni Ale". */
+    var arranca = function(){
+      var p = null;
+      try { p = vid.play(); } catch(e){ p = null; }
+      if (p && typeof p.catch === 'function') {
+        p.catch(function(){
+          setTimeout(function(){
+            vid.muted = !sonidoQuerido();
+            pintaAltavoz();
+            var q = null;
+            try { q = vid.play(); } catch(e){ q = null; }
+            if (q && q.catch) q.catch(function(){
+              /* Ultimo recurso: en silencio, pero sin cerrarse. La frase se
+                 lee al lado, asi que el mensaje llega igual. */
+              vid.muted = true; pintaAltavoz();
+              try { vid.play().catch(function(){}); } catch(e){}
+            });
+          }, 250);
+        });
+      }
+    };
+    vid.addEventListener('canplay', arranca, { once:true });
+    try { vid.load(); } catch(e){ arranca(); }
     /* Red de seguridad: si 'ended' no llega (fichero corrupto, pestaña en
        segundo plano), la hoja no se queda puesta para siempre. */
     clearTimeout(cerrando);
@@ -28257,6 +28282,11 @@ function endTourIntro() {
 
   function arranca(){
     if (!monta()) return;
+    /* Pase lo que pase, al entrar el formulario se mueve con el dedo. Esta
+       linea es la garantia de que ningun estado raro deje la anamnesis
+       congelada nunca mas. */
+    var _p = document.getElementById(PANT);
+    if (_p) _p.style.removeProperty('overflow');
     vistos = {}; actual = -1; cola = []; ultimoCierre = 0;
     completados = {}; lineaVista = {};
     clearTimeout(sirviendo);

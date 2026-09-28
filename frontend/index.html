@@ -28199,21 +28199,59 @@ function endTourIntro() {
     return ['button','submit','reset','checkbox','radio','file','range','hidden']
            .indexOf((el.type || 'text').toLowerCase()) < 0;
   }
-  function _aLaVista(el){
-    if (!window.visualViewport || !el) return;
-    var alto = window.visualViewport.height;
-    var r = el.getBoundingClientRect();
-    if (r.bottom <= alto - 12) return;          /* ya se ve entero */
-    try { el.scrollIntoView({ block:'center', behavior:'smooth' }); } catch(e){
-      try { el.scrollIntoView(); } catch(e2){}
+  /* ── LA BARRITA DEL TECLADO ───────────────────────────────────────────────
+     Founder, 28-sep-2026: "para seguir tengo que pulsar fuera del teclado".
+     Capacitor ESCONDE por defecto la barra de accesorios de iOS —la de
+     Anterior / Siguiente / Listo—, y sin ella el teclado se queda puesto y
+     tapando: no hay forma de cerrarlo ni de saltar al campo de abajo salvo
+     tocar un hueco vacio. En Safari esa barra si sale, y por eso alli no se
+     notaba. Se enciende al arrancar. */
+  (function(){
+    function enciende(){
+      try {
+        var K = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Keyboard;
+        if (K && K.setAccessoryBarVisible) K.setAccessoryBarVisible({ isVisible: true });
+      } catch(e){}
     }
+    if (document.readyState === 'complete') enciende();
+    else window.addEventListener('load', enciende);
+    document.addEventListener('deviceready', enciende);
+  })();
+
+  function _aLaVista(el){
+    if (!el) return;
+    var alto = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+    var r = el.getBoundingClientRect();
+    if (r.top >= 8 && r.bottom <= alto - 12) return;       /* ya se ve entero */
+    /* Se sube a mano el contenedor de la pantalla en vez de fiarlo a
+       scrollIntoView: dentro de un .screen con scroll propio, y con el
+       teclado encima, el navegador lo deja a medias. */
+    var cont = el.closest ? el.closest('.screen') : null;
+    var margen = Math.max(24, alto * 0.28);
+    try {
+      if (cont && cont.scrollHeight > cont.clientHeight) {
+        cont.scrollTop += (r.top - margen);
+      } else {
+        el.scrollIntoView({ block:'center' });
+      }
+    } catch(e){ try { el.scrollIntoView(); } catch(e2){} }
   }
   document.addEventListener('focusin', function(ev){
     if (!_esTexto(ev.target)) return;
     document.body.classList.add('dm-escribiendo');
     var el = ev.target;
-    setTimeout(function(){ _aLaVista(el); }, 320);   /* tras subir el teclado */
+    /* Dos pasadas: una en cuanto sube el teclado y otra despues, porque iOS
+       reacomoda la pantalla por su cuenta y deshace la primera. */
+    setTimeout(function(){ _aLaVista(el); }, 320);
+    setTimeout(function(){ _aLaVista(el); }, 700);
   });
+  /* Y si el teclado cambia de tamaño (emoji, dictado, idioma), se recoloca. */
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', function(){
+      var a = document.activeElement;
+      if (_esTexto(a)) setTimeout(function(){ _aLaVista(a); }, 120);
+    });
+  }
   document.addEventListener('focusout', function(){
     /* Con retraso: al saltar de un campo al siguiente hay un instante sin
        foco, y sin esta espera la barra parpadearia entre campo y campo. */

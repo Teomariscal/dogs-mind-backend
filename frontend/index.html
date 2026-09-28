@@ -8056,6 +8056,14 @@ button:not(:disabled):active{ transform:scale(0.98); }
               <p class="ti-sig-date" data-i18n="ti_sig_date">Abril 2026</p>
             </div>
           </div>
+          <!-- El hueco que quedaba bajo la firma: el tutorial entero, en el
+               idioma que tenga puesto la app, hablando solo y con subtitulos. -->
+          <button class="ti-tuto-btn" type="button" onclick="dmTutorialAbrir()">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+            <span data-i18n="ti_ver_tutorial">Ver tutorial</span>
+          </button>
         </div>
       </div>
 
@@ -16579,8 +16587,51 @@ function dmVibrar(tipo) {
     }
     if (navigator && typeof navigator.vibrate === 'function') navigator.vibrate(_DM_PATRON[t]);
   } catch (e) { /* nunca romper la pantalla por una vibracion */ }
+  _dmUltimaVibra = Date.now();
 }
 window.dmVibrar = dmVibrar;
+
+/* El boton del altavoz tiene dos iconos y la pantalla nace con el de "sin
+   sonido" a la vista. Ahora los Aigents arrancan hablando, asi que ese icono
+   mentiria. Esto pone el que toca mirando como esta el video de verdad. */
+function dmSyncAltavoz(v) {
+  try {
+    var pant = (v.closest && v.closest('.screen')) || document;
+    var btn = pant.querySelector('.ob-sound');
+    if (!btn) return;
+    var svgs = btn.querySelectorAll('svg');
+    if (svgs.length < 2) return;
+    svgs[0].style.display = v.muted ? '' : 'none';
+    svgs[1].style.display = v.muted ? 'none' : '';
+  } catch (e) {}
+}
+window.dmSyncAltavoz = dmSyncAltavoz;
+
+/* ── UN TOQUE EN CADA BOTON (founder, 28-sep-2026) ────────────────────────────
+   "Cada vez que aprietes un botón, que vibre. Juega con eso, juega con los
+   atractivos sin hacerle una feria." Referencia suya: Air Learn.
+   Va aqui, en un solo sitio, en vez de boton por boton: cualquier <button>,
+   cualquier [role=button] y cualquier pestaña de la barra de abajo. Se escucha
+   en fase de captura para que suene aunque el boton pare el evento.
+   Los toques con significado —guardar, logro, aviso— siguen donde estaban y
+   mandan ellos: si uno acaba de sonar, este generico se calla, para que no
+   salga una vibracion doble en el mismo gesto. */
+var _dmUltimaVibra = 0;
+document.addEventListener('click', function (ev) {
+  if (!DM_VIBRA) return;
+  var el = ev.target && ev.target.closest
+           ? ev.target.closest('button, [role="button"], .nav-item, .ob-btn, .ob-link')
+           : null;
+  if (!el || el.disabled) return;
+  /* Se espera un instante a proposito: el manejador propio del boton corre
+     justo despues de esta captura, y si el pulsa 'confirma' o 'logro' ese es
+     el que debe sonar. Solo si nadie ha vibrado, suena el toque generico. */
+  var marca = _dmUltimaVibra;
+  setTimeout(function () {
+    if (_dmUltimaVibra !== marca) return;
+    dmVibrar('toque');
+  }, 70);
+}, true);
 window.dmIsNativeApp = dmIsNativeApp;
 
 // ════ Configuración remota (banner de avisos + paywall) ═══════════════════════
@@ -18416,7 +18467,33 @@ function getVal(id, fallback) {
          códec que falla), el texto sale igual a los 3 s. Nunca una pantalla
          muda y en blanco. */
       v._esperaTexto = setTimeout(escribir, 3000);
-      try { v.currentTime = 0; if (!repeticion) v.muted = true; v.play().catch(function(){}); } catch (e) {}
+      /* Hablan SOLOS, con sonido, sin que el usuario toque nada (founder,
+         28-sep-2026, senalando Air Learn). Dentro de la app se puede: el
+         binario de Capacitor arranca la webview con
+         mediaTypesRequiringUserActionForPlayback = [] en iOS y
+         setMediaPlaybackRequiresUserGesture(false) en Android, asi que no
+         hace falta ningun gesto previo. Si algun sitio lo rechazara, se
+         reintenta en silencio para que al menos se vea la imagen. */
+      try {
+        v.currentTime = 0;
+        v.muted = false; v.volume = 1;
+        /* Si el primer play() se aborta es porque el video aun esta cargando,
+           no porque iOS lo prohiba: se reintenta CON voz antes de rendirse.
+           Medido el 28-sep: rindiendose a la primera, el video salia mudo. */
+        var _p = v.play();
+        if (_p && _p.catch) _p.catch(function(){
+          setTimeout(function(){
+            v.muted = false;
+            var _q = v.play();
+            if (_q && _q.catch) _q.catch(function(){
+              try { v.muted = true; v.play().catch(function(){}); } catch(e){}
+              dmSyncAltavoz(v);
+            });
+            dmSyncAltavoz(v);
+          }, 250);
+        });
+        dmSyncAltavoz(v);
+      } catch (e) {}
       if (!v._buclePuesto) {
         v._buclePuesto = true;
         v.addEventListener('ended', function () {
@@ -18654,7 +18731,33 @@ function getVal(id, fallback) {
       v._alSonar = function () { clearTimeout(v._esperaTexto); escribir(); };
       v.addEventListener('playing', v._alSonar, { once: true });
       v._esperaTexto = setTimeout(escribir, 3000);
-      try { v.currentTime = 0; if (!repeticion) v.muted = true; v.play().catch(function(){}); } catch (e) {}
+      /* Hablan SOLOS, con sonido, sin que el usuario toque nada (founder,
+         28-sep-2026, senalando Air Learn). Dentro de la app se puede: el
+         binario de Capacitor arranca la webview con
+         mediaTypesRequiringUserActionForPlayback = [] en iOS y
+         setMediaPlaybackRequiresUserGesture(false) en Android, asi que no
+         hace falta ningun gesto previo. Si algun sitio lo rechazara, se
+         reintenta en silencio para que al menos se vea la imagen. */
+      try {
+        v.currentTime = 0;
+        v.muted = false; v.volume = 1;
+        /* Si el primer play() se aborta es porque el video aun esta cargando,
+           no porque iOS lo prohiba: se reintenta CON voz antes de rendirse.
+           Medido el 28-sep: rindiendose a la primera, el video salia mudo. */
+        var _p = v.play();
+        if (_p && _p.catch) _p.catch(function(){
+          setTimeout(function(){
+            v.muted = false;
+            var _q = v.play();
+            if (_q && _q.catch) _q.catch(function(){
+              try { v.muted = true; v.play().catch(function(){}); } catch(e){}
+              dmSyncAltavoz(v);
+            });
+            dmSyncAltavoz(v);
+          }, 250);
+        });
+        dmSyncAltavoz(v);
+      } catch (e) {}
     } else {
       escribir();
     }
@@ -18767,7 +18870,33 @@ function getVal(id, fallback) {
       /* Red de seguridad: si el video no llega a reproducirse, el texto sale
          igual a los 3 s. Nunca una pantalla muda y en blanco. */
       v._esperaTexto = setTimeout(escribir, 3000);
-      try { v.currentTime = 0; if (!repeticion) v.muted = true; v.play().catch(function(){}); } catch (e) {}
+      /* Hablan SOLOS, con sonido, sin que el usuario toque nada (founder,
+         28-sep-2026, senalando Air Learn). Dentro de la app se puede: el
+         binario de Capacitor arranca la webview con
+         mediaTypesRequiringUserActionForPlayback = [] en iOS y
+         setMediaPlaybackRequiresUserGesture(false) en Android, asi que no
+         hace falta ningun gesto previo. Si algun sitio lo rechazara, se
+         reintenta en silencio para que al menos se vea la imagen. */
+      try {
+        v.currentTime = 0;
+        v.muted = false; v.volume = 1;
+        /* Si el primer play() se aborta es porque el video aun esta cargando,
+           no porque iOS lo prohiba: se reintenta CON voz antes de rendirse.
+           Medido el 28-sep: rindiendose a la primera, el video salia mudo. */
+        var _p = v.play();
+        if (_p && _p.catch) _p.catch(function(){
+          setTimeout(function(){
+            v.muted = false;
+            var _q = v.play();
+            if (_q && _q.catch) _q.catch(function(){
+              try { v.muted = true; v.play().catch(function(){}); } catch(e){}
+              dmSyncAltavoz(v);
+            });
+            dmSyncAltavoz(v);
+          }, 250);
+        });
+        dmSyncAltavoz(v);
+      } catch (e) {}
     } else {
       escribir();
     }
@@ -19071,7 +19200,33 @@ function getVal(id, fallback) {
       v._alSonar = function () { clearTimeout(v._esperaTexto); escribir(); };
       v.addEventListener('playing', v._alSonar, { once: true });
       v._esperaTexto = setTimeout(escribir, 3000);
-      try { v.currentTime = 0; if (!repeticion) v.muted = true; v.play().catch(function(){}); } catch (e) {}
+      /* Hablan SOLOS, con sonido, sin que el usuario toque nada (founder,
+         28-sep-2026, senalando Air Learn). Dentro de la app se puede: el
+         binario de Capacitor arranca la webview con
+         mediaTypesRequiringUserActionForPlayback = [] en iOS y
+         setMediaPlaybackRequiresUserGesture(false) en Android, asi que no
+         hace falta ningun gesto previo. Si algun sitio lo rechazara, se
+         reintenta en silencio para que al menos se vea la imagen. */
+      try {
+        v.currentTime = 0;
+        v.muted = false; v.volume = 1;
+        /* Si el primer play() se aborta es porque el video aun esta cargando,
+           no porque iOS lo prohiba: se reintenta CON voz antes de rendirse.
+           Medido el 28-sep: rindiendose a la primera, el video salia mudo. */
+        var _p = v.play();
+        if (_p && _p.catch) _p.catch(function(){
+          setTimeout(function(){
+            v.muted = false;
+            var _q = v.play();
+            if (_q && _q.catch) _q.catch(function(){
+              try { v.muted = true; v.play().catch(function(){}); } catch(e){}
+              dmSyncAltavoz(v);
+            });
+            dmSyncAltavoz(v);
+          }, 250);
+        });
+        dmSyncAltavoz(v);
+      } catch (e) {}
     } else { escribir(); }
 
     t.onclick = function () {
@@ -23668,6 +23823,8 @@ function endTourIntro() {
       chat_intro_cecilia:      'Hola, querida. Soy Cecilia, médico veterinario y etóloga. Cuéntame qué pasa con tu perro y veamos juntos qué dice la teoría del aprendizaje.',
       // Tour intro
       ti_skip:                 'Saltar',
+      ti_ver_tutorial:        'Ver tutorial',
+      ti_cerrar:               'Cerrar',
       ti_letter_1:             'The Dogs’ Mind es producto de más de <em>25 años de experiencia</em> en el campo de la modificación de conducta en más de 15 países donde yo y el resto del equipo que ha construido esta magnífica herramienta han desarrollado su actividad profesional.',
       ti_letter_2:             'Un equipo de especialistas en conducta canina analiza y da soluciones al problema de comportamiento de tu perro.',
       ti_letter_3:             'Te invito a que conozcas The Dogs’ Mind.',
@@ -24933,6 +25090,8 @@ function endTourIntro() {
       chat_intro_cecilia:      'Hello, darling. I\'m Cecilia, veterinarian and ethologist. Tell me what\'s going on with your dog and let\'s see what learning theory says.',
       // Tour intro
       ti_skip:                 'Skip',
+      ti_ver_tutorial:        'Watch the tutorial',
+      ti_cerrar:               'Close',
       ti_letter_1:             'The Dogs’ Mind is the product of more than <em>25 years of experience</em> in behavior modification across over 15 countries where I and the rest of the team that built this magnificent tool have practiced.',
       ti_letter_2:             'A team of canine-behavior specialists analyzes and finds solutions to your dog\'s behavior problem.',
       ti_letter_3:             'I invite you to discover The Dogs’ Mind.',
@@ -26191,6 +26350,8 @@ function endTourIntro() {
           chat_intro_cecilia:      "Ciao, cara. Sono Cecilia, medico veterinario ed etologa. Raccontami cosa succede con il tuo cane e vediamo insieme cosa dice la teoria dell'apprendimento.",
           // Intro tour
           ti_skip:                 'Salta',
+          ti_ver_tutorial:        'Guarda il tutorial',
+          ti_cerrar:               'Chiudi',
           ti_letter_1:             "The Dogs’ Mind è il frutto di oltre <em>25 anni di esperienza</em> nel campo della modificazione del comportamento in più di 15 Paesi dove io e il resto del team che ha costruito questo magnifico strumento abbiamo svolto la nostra attività professionale.",
           ti_letter_2:             'Un team di specialisti in comportamento canino analizza e offre soluzioni al problema comportamentale del tuo cane.',
           ti_letter_3:             'Ti invito a conoscere The Dogs’ Mind.',
@@ -28067,6 +28228,132 @@ function endTourIntro() {
   try { montaHoja(); } catch(e){}
   ['pointerdown','touchend','click'].forEach(function(ev){
     document.addEventListener(ev, cebaSonido, { capture:true, passive:true });
+  });
+})();
+</script>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     EL TUTORIAL ENTERO, DENTRO DEL TOUR  (founder, 28-sep-2026)
+     "En la sección de tour... un botón que ponga Ver tutorial, y ahí abajo
+     que hay una zona vacía. Salta el vídeo y lo ves completo con audio, sin
+     tener por qué apretar el botón de audio, con los subtítulos también. En
+     italiano cuando sea versión italiana, en español cuando española y en
+     inglés cuando inglesa."
+     Arranca HABLANDO: dentro de la app no hace falta ningún gesto previo
+     porque Capacitor levanta la webview con
+     mediaTypesRequiringUserActionForPlayback = [] en iOS y
+     setMediaPlaybackRequiresUserGesture(false) en Android.
+     Los subtítulos salen puestos, no hay que encenderlos.
+     ══════════════════════════════════════════════════════════════════════ -->
+<style>
+  .ti-tuto-btn{
+    margin-top:22px; display:inline-flex; align-items:center; gap:9px;
+    padding:13px 24px; border-radius:100px; cursor:pointer;
+    border:1px solid rgba(214,183,122,.55); background:rgba(214,183,122,.12);
+    color:#E8D5AC; font-family:inherit; font-size:14.5px; font-weight:600;
+    letter-spacing:.3px; align-self:flex-start;
+  }
+  .ti-tuto-btn:active{ transform:scale(.98); }
+  #dm-tutorial{
+    position:fixed; inset:0; z-index:120; display:none;
+    flex-direction:column; align-items:center; justify-content:center;
+    background:#05100C;
+  }
+  #dm-tutorial.on{ display:flex; }
+  #dm-tutorial video{
+    width:100%; height:100%; max-width:640px; object-fit:contain; background:#05100C;
+  }
+  #dm-tutorial video::cue{
+    font-size:15px; line-height:1.35; background:rgba(4,14,10,.78); color:#F2F6F1;
+  }
+  #dm-tutorial .cerrar{
+    position:absolute; top:calc(12px + env(safe-area-inset-top)); right:16px; z-index:2;
+    border:none; border-radius:100px; background:rgba(255,255,255,.12); color:#EAF2EC;
+    font-size:13px; font-weight:600; padding:9px 18px; cursor:pointer; font-family:inherit;
+  }
+</style>
+<div id="dm-tutorial" aria-hidden="true">
+  <button type="button" class="cerrar" id="dm-tutorial-cerrar" data-i18n="ti_cerrar">Cerrar</button>
+  <video id="dm-tutorial-video" playsinline controls preload="none"></video>
+</div>
+<script>
+(function(){
+  'use strict';
+  var TUTO = { es:'tutorial-es', en:'tutorial-en', it:'tutorial-it' };
+
+  function idioma(){
+    var l = 'es';
+    try { l = (window.getCurrentLang ? window.getCurrentLang() : 'es') || 'es'; } catch(e){}
+    l = String(l).slice(0,2).toLowerCase();
+    return TUTO[l] ? l : 'es';
+  }
+
+  window.dmTutorialAbrir = function(){
+    var caja = document.getElementById('dm-tutorial');
+    var v = document.getElementById('dm-tutorial-video');
+    if (!caja || !v) return;
+    var base = TUTO[idioma()];
+    /* Se rehace el contenido cada vez: si cambia el idioma, cambian el video
+       y su pista de subtitulos, y una pista vieja no puede quedarse pegada. */
+    v.innerHTML = '';
+    v.src = base + '.mp4';
+    var pista = document.createElement('track');
+    pista.kind = 'subtitles';
+    pista.srclang = idioma();
+    pista.label = 'Subtítulos';
+    pista.src = base + '.vtt';
+    pista.default = true;
+    v.appendChild(pista);
+    caja.classList.add('on');
+    caja.setAttribute('aria-hidden','false');
+    v.muted = false; v.volume = 1;
+
+    /* Se espera a que el video este listo antes de darle al play.
+       Medido el 28-sep en el simulador: llamando a play() justo despues de
+       poner el src, la promesa se aborta sola —el navegador esta cargando— y
+       el respaldo lo dejaba MUDO. Salia el video sin voz. No era el permiso
+       de iOS: Capacitor levanta la webview con
+       mediaTypesRequiringUserActionForPlayback = [], comprobado en su codigo.
+       Asi que primero cargar, luego sonar, y el silencio solo como ultimo
+       recurso de verdad, tras reintentar con voz. */
+    var arranca = function(){
+      var p;
+      try { p = v.play(); } catch(e){ p = null; }
+      if (p && p.catch) p.catch(function(){
+        setTimeout(function(){
+          v.muted = false;
+          var q;
+          try { q = v.play(); } catch(e){ q = null; }
+          if (q && q.catch) q.catch(function(){
+            try { v.muted = true; v.play().catch(function(){}); } catch(e){}
+          });
+        }, 250);
+      });
+    };
+    v.addEventListener('canplay', arranca, { once:true });
+    try { v.load(); } catch(e){ arranca(); }
+    /* Los subtitulos se encienden cuando la pista ya existe de verdad. */
+    setTimeout(function(){
+      try {
+        for (var i = 0; i < v.textTracks.length; i++) v.textTracks[i].mode = 'showing';
+      } catch(e){}
+    }, 300);
+  };
+
+  window.dmTutorialCerrar = function(){
+    var caja = document.getElementById('dm-tutorial');
+    var v = document.getElementById('dm-tutorial-video');
+    if (!caja) return;
+    caja.classList.remove('on');
+    caja.setAttribute('aria-hidden','true');
+    try { v.pause(); v.removeAttribute('src'); v.innerHTML = ''; v.load(); } catch(e){}
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    var b = document.getElementById('dm-tutorial-cerrar');
+    if (b) b.addEventListener('click', window.dmTutorialCerrar);
+    var v = document.getElementById('dm-tutorial-video');
+    if (v) v.addEventListener('ended', window.dmTutorialCerrar);
   });
 })();
 </script>

@@ -27989,7 +27989,16 @@ function endTourIntro() {
     hoja.classList.remove('on');
     try { if (vid) { vid.pause(); vid.removeAttribute('src'); vid.load(); } } catch(e){}
     var pant = document.getElementById(PANT);
-    if (pant) pant.style.removeProperty('overflow');
+    /* NO se toca 'overflow'. La pantalla scrollea por un estilo EN LINEA del
+       propio div: style="overflow-y:auto". La regla base .screen lleva
+       overflow:hidden, asi que borrar la propiedad corta 'overflow' arrastra
+       tambien 'overflow-y' y deja mandar al hidden: el formulario se queda
+       muerto, sin moverse ni un pixel.
+       Eso es exactamente lo que pasaba en los builds 63, 64, 65 al cerrar el
+       relevo, y en el 66 en cada entrada. Medido el 1-oct-2026 en el motor de
+       iOS: scrollTop=0 de 3396 px, overflow-y computado = hidden.
+       Si hay que asegurar algo, se asegura el valor bueno, no se borra. */
+    if (pant) pant.style.setProperty('overflow-y', 'auto');
     /* Devolver al usuario exactamente donde estaba: mismo scroll, mismo campo. */
     if (estaba && pant) {
       pant.scrollTop = vuelta.scroll;
@@ -28282,11 +28291,11 @@ function endTourIntro() {
 
   function arranca(){
     if (!monta()) return;
-    /* Pase lo que pase, al entrar el formulario se mueve con el dedo. Esta
-       linea es la garantia de que ningun estado raro deje la anamnesis
-       congelada nunca mas. */
+    /* Al entrar, el formulario se mueve con el dedo. Se AFIRMA el valor bueno
+       en vez de borrar la propiedad: borrarla se llevaba por delante el
+       overflow-y:auto del propio div y dejaba la pantalla congelada. */
     var _p = document.getElementById(PANT);
-    if (_p) _p.style.removeProperty('overflow');
+    if (_p) _p.style.setProperty('overflow-y', 'auto');
     vistos = {}; actual = -1; cola = []; ultimoCierre = 0;
     completados = {}; lineaVista = {};
     clearTimeout(sirviendo);

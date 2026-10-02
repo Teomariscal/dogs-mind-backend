@@ -27613,6 +27613,44 @@ function endTourIntro() {
     box-shadow:0 0 0 2px rgba(226,114,91,.25) !important;
   }
 
+  /* ── EL PASO Y SU PIE ─────────────────────────────────────────────────────
+     Un paso cada vez, con su frase de entrada arriba y el boton de pasar
+     siempre a la vista abajo. El pie es OPACO a partir de 26 px: antes el
+     texto del formulario se leia en fantasma por debajo del boton. */
+  #anam-titular-caja{ padding:18px 0 4px; }
+  #anam-titular-caja .tit{
+    font-family:'Cormorant Garamond',Georgia,serif;
+    font-size:19px; line-height:1.3; font-weight:500; color:#EAF2EC; margin:0 0 4px;
+  }
+  #anam-titular-caja .tit em{ color:#7eb86a; font-style:normal; }
+  #anam-titular-caja .ayu{ font-size:13px; line-height:1.45; color:#7D948A; margin:0; }
+
+  #anam-pie{
+    margin:0; padding:14px 16px calc(16px + env(safe-area-inset-bottom));
+    background:linear-gradient(180deg, rgba(11,26,20,0) 0px, #10231C 26px, #10231C 100%);
+    display:flex; flex-direction:column; align-items:center; gap:9px;
+  }
+  #anam-pie .seguir{
+    width:45vw; min-width:150px; max-width:280px; padding:15px 10px;
+    border:1px solid rgba(126,184,106,.42); border-radius:100px; cursor:pointer;
+    font-family:inherit; font-size:15.5px; font-weight:700; letter-spacing:.3px;
+    color:#F2F8F0; background:linear-gradient(180deg,#5d8a4c 0%,#44683a 100%);
+    box-shadow:0 8px 20px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.10);
+  }
+  #anam-pie .seguir:active{ transform:scale(.975); }
+  #anam-pie .seguir:focus{ outline:none; }
+  #anam-pie .seguir:focus-visible{ outline:2px solid #5ec8e6; outline-offset:3px; }
+  /* El aviso lleva fondo propio: suelto sobre el degradado se leia ENCIMA de
+     la pregunta de abajo. */
+  #anam-pie .falta{
+    font-size:12.5px; font-weight:600; color:#E2725B;
+    background:rgba(8,18,14,.94); border:1px solid rgba(226,114,91,.34);
+    padding:7px 14px; border-radius:100px; max-width:92%; text-align:center;
+    opacity:0; transform:translateY(4px); pointer-events:none;
+    transition:opacity 180ms ease, transform 180ms ease;
+  }
+  #anam-pie .falta.ver{ opacity:1; transform:translateY(0); }
+
   /* ── El relevo EN VIDEO ───────────────────────────────────────────────────
      Hoja que sube desde abajo, se va sola al acabar el video y trae "Saltar"
      desde el primer fotograma. No esconde nada de forma permanente: aparece,
@@ -27765,6 +27803,146 @@ function endTourIntro() {
     return G[clave] || null;
   }
 
+  /* ── LA ANAMNESIS EN CUATRO PASOS ────────────────────────────────────────
+     Founder, 28-sep y 1-oct-2026: "haz un frame visible que entre todo sin
+     hacer scroll y boton de pasar", "si has puesto la anamnesis en pasos deja
+     un boton grande y bien visible que diga continuar. Y al pulsar continuar
+     salta el siguiente Aigent".
+     NO SE QUITA NI UN CAMPO. Lo unico que ocurre es que los bloques que ya
+     existen se MUEVEN dentro de cuatro contenedores y se enseña uno cada vez;
+     ni un input se reescribe, asi que el borrador y el envio siguen leyendo
+     exactamente los mismos id.
+     El reparto no es por las cuatro secciones del formulario: medidas el
+     28-sep daban 830 / 203 / 230 / 1693 px, un paso ocho veces otro. Son
+     categorias de contenido, no pasos. Esto los equilibra. */
+  var PASOS = [
+    { nombre:_L3('El perro','The dog','Il cane'),
+      intro:_L3('Empecemos por <em>quién es</em>.','Let’s start with <em>who he is</em>.','Partiamo da <em>chi è</em>.'),
+      ayuda:_L3('Cuanto más preciso seas aquí, mejor será el análisis funcional.',
+                'The more precise you are here, the better the functional analysis.',
+                'Più sei preciso qui, migliore sarà l’analisi funzionale.') },
+    { nombre:_L3('Su mundo','His world','Il suo mondo'),
+      intro:_L3('Ahora, <em>con quién vive</em>.','Now, <em>who he lives with</em>.','Ora, <em>con chi vive</em>.'),
+      ayuda:_L3('El entorno explica buena parte de lo que hace.',
+                'The setting explains a good part of what he does.',
+                'Il contesto spiega buona parte di quello che fa.') },
+    { nombre:_L3('La conducta','The behaviour','Il comportamento'),
+      intro:_L3('Lo importante: <em>qué hace exactamente</em>.','The important part: <em>exactly what he does</em>.','La parte che conta: <em>che cosa fa esattamente</em>.'),
+      ayuda:_L3('Descríbelo como si lo estuvieras viendo, sin interpretarlo.',
+                'Describe it as if you were watching it, without interpreting it.',
+                'Descrivilo come se lo stessi guardando, senza interpretarlo.') },
+    { nombre:_L3('El contexto','The context','Il contesto'),
+      intro:_L3('Y lo que ya <em>has probado</em>.','And what you <em>have already tried</em>.','E quello che hai <em>già provato</em>.'),
+      ayuda:_L3('Saber qué no funcionó me dice qué no repetir.',
+                'Knowing what did not work tells me what not to repeat.',
+                'Sapere cosa non ha funzionato mi dice cosa non ripetere.') }
+  ];
+  var cajas = [], pasoActual = 0, pie = null;
+
+  /* Reparte los bloques que YA ESTAN en el DOM. Nada se crea ni se borra:
+     solo cambian de padre. */
+  function construye(pant){
+    var h = pant.querySelector('[data-i18n="anam_sec_dog"]');
+    if (!h) return false;
+    var cont = h.parentNode.parentNode;              /* el contenedor de todo */
+    var hijos = [].slice.call(cont.children);
+    var bloqueConducta = pant.querySelector('[data-i18n="anam_sec_problem"]').parentNode;
+    var iConducta = hijos.indexOf(bloqueConducta);
+    if (iConducta < 0) return false;
+
+    for (var k = 0; k < 4; k++) {
+      var c = document.createElement('div');
+      c.className = 'anam-paso';
+      c.setAttribute('data-paso', k);
+      cajas.push(c);
+    }
+    /* El bloque de la conducta se parte en dos por dentro: lo que ocurre se
+       queda en el paso 3 y lo que ya se ha probado pasa al 4. Siguen siendo
+       los mismos nodos. */
+    var dentro = [].slice.call(bloqueConducta.children);
+    var alCuatro = dentro.slice(7);                  /* ¿que has intentado? y tu teoria */
+    var sobra = document.createElement('div');
+    for (var d = 0; d < alCuatro.length; d++) sobra.appendChild(alCuatro[d]);
+
+    /* El aviso de borrador se queda ARRIBA del todo y fuera de los pasos:
+       vale para toda la consulta, no para un tramo. */
+    var banner = hijos[0];
+    if (banner.nextSibling) cont.insertBefore(cajas[0], banner.nextSibling);
+    else cont.appendChild(cajas[0]);
+
+    /* A que paso va cada bloque. Se decide por su posicion respecto al bloque
+       de la conducta, que es la unica referencia estable si mañana se añaden
+       secciones nuevas. */
+    var iFamilia = hijos.indexOf(pant.querySelector('[data-i18n="anam_sec_family"]').parentNode);
+    for (var j = 1; j < hijos.length; j++) {
+      var e = hijos[j], destino;
+      if (j < iFamilia)          destino = 0;   /* enfoque, sellos y la ficha del perro */
+      else if (j < iConducta)    destino = 1;   /* entorno familiar e historial */
+      else if (j === iConducta)  destino = 2;   /* que hace, donde, con quien */
+      else                       destino = 3;   /* el resto y el envio */
+      cajas[destino].appendChild(e);
+    }
+    cajas[3].insertBefore(sobra, cajas[3].firstChild);
+    for (var m = 1; m < 4; m++) cont.appendChild(cajas[m]);
+    return true;
+  }
+
+  /* Enseña un paso y esconde los otros. El contenido no se toca: solo se
+     muestra o se oculta su caja. */
+  function muestra(i){
+    if (!cajas.length) return;
+    pasoActual = Math.max(0, Math.min(cajas.length - 1, i));
+    for (var k = 0; k < cajas.length; k++) {
+      cajas[k].style.display = (k === pasoActual) ? '' : 'none';
+    }
+    var P = PASOS[pasoActual] || {};
+    var n1 = document.getElementById('anam-nombre');
+    if (n1) n1.textContent = P.nombre || '';
+    var c1 = document.getElementById('anam-cuenta');
+    if (c1) c1.textContent = (pasoActual + 1) + '/' + cajas.length;
+    var marcas = document.querySelectorAll('#anam-progreso .tramos i');
+    for (var m = 0; m < marcas.length; m++) {
+      marcas[m].classList.toggle('hecho', m < pasoActual);
+      marcas[m].classList.toggle('aqui', m === pasoActual);
+    }
+    var ti = document.getElementById('anam-titular');
+    if (ti) ti.innerHTML = P.intro || '';
+    var ay = document.getElementById('anam-ayuda');
+    if (ay) ay.textContent = P.ayuda || '';
+    var bt = document.getElementById('anam-seguir');
+    if (bt) bt.style.display = (pasoActual === cajas.length - 1) ? 'none' : '';
+    var av = document.getElementById('anam-falta');
+    if (av) { av.textContent = ''; av.classList.remove('ver'); }
+    var pant = document.getElementById(PANT);
+    if (pant) pant.scrollTop = 0;
+  }
+
+  function creaPie(pant){
+    if (pie) return;
+    pie = document.createElement('div');
+    pie.id = 'anam-pie';
+    pie.innerHTML =
+      '<div class="falta" id="anam-falta"></div>' +
+      '<button type="button" class="seguir" id="anam-seguir" data-i18n="anam_continuar">Continuar</button>';
+    pant.appendChild(pie);
+    /* Una regla del tema (#s-anamnesis > div) pone position:relative a los
+       hijos de la pantalla y ganaba: el pie se iba con el scroll y el boton
+       desaparecia. Se fuerza en el propio elemento, que es lo unico que gana.
+       Es el mismo tropiezo que ya tuvo la barra de progreso. */
+    /* FIJO al borde de abajo, no sticky: sticky lo dejaba a media pantalla
+       porque la zona de scroll de la pantalla no llega al borde del movil, y
+       el formulario seguia viendose por debajo del boton. Fijo es ademas lo
+       que ya usa la hoja del Aigent en esta misma app y funciona. */
+    pie.style.setProperty('position', 'fixed', 'important');
+    pie.style.setProperty('left', '0', 'important');
+    pie.style.setProperty('right', '0', 'important');
+    pie.style.setProperty('bottom', '0', 'important');
+    pie.style.setProperty('z-index', '84', 'important');
+    pie.querySelector('#anam-seguir').addEventListener('click', function(){
+      continuar(pasoActual, pie.querySelector('#anam-falta'));
+    });
+  }
+
   function monta(){
     if (montado) return true;
     var pant = document.getElementById(PANT);
@@ -27772,27 +27950,26 @@ function endTourIntro() {
     sec = [].slice.call(pant.querySelectorAll('[data-i18n^="anam_sec_"]'));
     if (!sec.length) return false;
 
-    /* Los campos de cada tramo se leen del DOM en orden de documento, igual
-       que las cabeceras: si el founder añade campos nuevos —y va a añadirlos—
-       esto se entera solo y no hay ninguna lista que mantener. */
-    campos = sec.map(function(){ return []; });
-    grupos = sec.map(function(){ return {}; });
-    var todo = [].slice.call(pant.querySelectorAll(
-      '[data-i18n^="anam_sec_"], input, select, textarea, [data-anam-grupo]'));
-    var cual = -1;
-    for (var q = 0; q < todo.length; q++) {
-      var e = todo[q];
-      if (e.getAttribute && /^anam_sec_/.test(e.getAttribute('data-i18n') || '')) { cual++; continue; }
-      if (cual < 0) continue;
-      var g = e.getAttribute && e.getAttribute('data-anam-grupo');
-      if (g) { (grupos[cual][g] = grupos[cual][g] || []).push(e); }
-      else campos[cual].push(e);
+    if (!construye(pant)) return false;
+
+    /* Los campos y los grupos se agrupan POR PASO, leyendolos de la caja de
+       cada uno. Si mañana se añaden campos, caen solos en el paso donde esten:
+       no hay ninguna lista que mantener. */
+    campos = []; grupos = [];
+    for (var cj = 0; cj < cajas.length; cj++) {
+      campos.push([].slice.call(cajas[cj].querySelectorAll('input, select, textarea')));
+      var gg = {};
+      [].slice.call(cajas[cj].querySelectorAll('[data-anam-grupo]')).forEach(function(b){
+        var nom = b.getAttribute('data-anam-grupo');
+        (gg[nom] = gg[nom] || []).push(b);
+      });
+      grupos.push(gg);
     }
 
     var barra = document.createElement('div');
     barra.id = 'anam-progreso';
     var marcas = '';
-    for (var i = 0; i < sec.length; i++) marcas += '<i></i>';
+    for (var i = 0; i < cajas.length; i++) marcas += '<i></i>';
     barra.innerHTML =
       '<div class="tramos">' + marcas + '</div>' +
       '<div class="linea">' +
@@ -27823,34 +28000,6 @@ function endTourIntro() {
     barra.style.setProperty('border', 'none', 'important');
     barra.style.setProperty('border-bottom', '1px solid rgba(126,184,106,.22)', 'important');
 
-    /* Una salida clara al final de cada tramo: el boton de Continuar. Se
-       inserta justo antes de la cabecera del tramo siguiente, asi que si el
-       founder añade secciones nuevas aparece solo donde toca. El ultimo tramo
-       no lleva: ahi ya esta el boton de analizar. */
-    /* El boton de Continuar queda APAGADO hasta que tenga diseño propio.
-       El founder lo vio a medias: "se te queda cortada, se nota que no hay
-       diseño... simplemente has cortado una pagina en tres partes". Tiene
-       razon, y no sale a produccion asi. Lo que si sale ya es el hueco de
-       abajo, que es lo que estaba dejando el boton de analizar debajo de la
-       barra y bloqueando la consulta. */
-    for (var t = 0; CONTINUAR_ACTIVO && t < sec.length - 1; t++) {
-      (function(i){
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'anam-continuar';
-        b.setAttribute('data-tramo', i);
-        b.innerHTML = '<span data-i18n="anam_continuar">Continuar</span>' +
-                      '<span class="falta" hidden></span>';
-        b.addEventListener('click', function(){ continuar(i, b); });
-        /* Justo delante del titulo del tramo siguiente, dentro de SU padre.
-           La primera version buscaba el hijo directo de la pantalla y, como
-           las cuatro secciones cuelgan del mismo contenedor, los tres botones
-           salian apilados arriba en vez de al final de cada tramo. */
-        var sig = sec[i + 1];
-        if (sig && sig.parentNode) sig.parentNode.insertBefore(b, sig);
-      })(t);
-    }
-
     var cab = pant.firstElementChild;
     while (cab && cab.tagName === 'IMG') cab = cab.nextElementSibling;
     /* La cabecera de la pantalla tambien se queda arriba: si la barra se pega
@@ -27861,6 +28010,14 @@ function endTourIntro() {
     if (cab && cab.nextSibling) pant.insertBefore(barra, cab.nextSibling);
     else pant.appendChild(barra);
     barra.classList.add('on');
+
+    /* El titular del paso: una frase que dice que toca ahora y por que. Es lo
+       mismo que dice el Aigent, escrito, para quien lo salte. */
+    var tit = document.createElement('div');
+    tit.id = 'anam-titular-caja';
+    tit.innerHTML = '<p class="tit" id="anam-titular"></p><p class="ayu" id="anam-ayuda"></p>';
+    if (cajas[0] && cajas[0].parentNode) cajas[0].parentNode.insertBefore(tit, cajas[0]);
+
     montado = true;
     return true;
   }
@@ -28185,15 +28342,16 @@ function endTourIntro() {
      del tramo siguiente: reforzador de lo que acabas de rellenar y, a la vez,
      discriminativo de lo que viene. Si falta algo, no pasa: lo dice, lo marca
      y lleva al primer hueco. */
-  function continuar(i, boton){
+  function continuar(i, aviso){
     var faltan = queFalta(i);
-    var aviso = boton.querySelector('.falta');
     if (faltan.length) {
       if (aviso) {
-        aviso.hidden = false;
-        aviso.textContent = _L3('Falta contestar ' + faltan.length + (faltan.length === 1 ? ' pregunta' : ' preguntas'),
-                                faltan.length + (faltan.length === 1 ? ' question' : ' questions') + ' still to answer',
-                                'Manca ' + faltan.length + (faltan.length === 1 ? ' risposta' : ' risposte'));
+        aviso.textContent = faltan.length === 1
+          ? _L3('Falta 1 respuesta', '1 question still to answer', 'Manca 1 risposta')
+          : _L3('Faltan ' + faltan.length + ' respuestas',
+                faltan.length + ' questions still to answer',
+                'Mancano ' + faltan.length + ' risposte');
+        aviso.classList.add('ver');
       }
       try { if (typeof dmVibrar === 'function') dmVibrar('aviso'); } catch(e){}
       var primero = faltan[0];
@@ -28204,14 +28362,14 @@ function endTourIntro() {
       } catch(e){}
       return;
     }
-    if (aviso) { aviso.hidden = true; aviso.textContent = ''; }
+    if (aviso) { aviso.textContent = ''; aviso.classList.remove('ver'); }
     completados[i] = true;
     try { if (typeof dmVibrar === 'function') dmVibrar('confirma'); } catch(e){}
+    /* Se pasa de paso YA, y el Aigent sale encima: cuando se cierre, el
+       usuario se encuentra el tramo siguiente puesto. */
+    muestra(i + 1);
     var siguiente = sec[i + 1] && sec[i + 1].getAttribute('data-i18n');
-    if (siguiente && PROGRAMA[siguiente]) encola(siguiente);
-    /* Se lleva al tramo siguiente, y el Aigent sale encima. */
-    try { sec[i + 1].scrollIntoView({ block:'start', behavior:'smooth' }); } catch(e){}
-    sirve();
+    if (siguiente && PROGRAMA[siguiente]) { encola(siguiente); sirve(); }
   }
 
   function _esCampo(e){
@@ -28255,39 +28413,10 @@ function endTourIntro() {
     sirve();
   }
 
-  function repinta(){
-    var pant = document.getElementById(PANT);
-    if (!pant || !montado) return;
-    var b0 = document.getElementById('anam-progreso');
-    var corte = pant.getBoundingClientRect().top +
-                ((b0 ? parseInt(b0.style.top, 10) || 0 : 0) + (b0 ? b0.offsetHeight : 0)) + 24;
-    var idx = 0;
-    for (var i = 0; i < sec.length; i++) {
-      if (sec[i].getBoundingClientRect().top <= corte) idx = i;
-    }
-    var marcas = document.querySelectorAll('#anam-progreso .tramos i');
-    for (var k = 0; k < marcas.length; k++) {
-      marcas[k].classList.toggle('hecho', k < idx);
-      marcas[k].classList.toggle('aqui', k === idx);
-    }
-    var nom = document.getElementById('anam-nombre');
-    if (nom) nom.textContent = (sec[idx].textContent || '').trim();
-    var cta = document.getElementById('anam-cuenta');
-    if (cta) cta.textContent = (idx + 1) + '/' + sec.length;
-    /* Solo la LINEA, y de todos los tramos cruzados: con "Entorno familiar"
-       midiendo 202 px de alto y la pantalla 812, un scroll normal se salta
-       uno entero y ese tramo se quedaria sin su rotulo. El video no va por
-       aqui: va por tramo completado. */
-    if (idx !== actual) {
-      if (idx > actual) {
-        for (var t = Math.max(0, actual + 1); t <= idx; t++) {
-          var cl = sec[t].getAttribute('data-i18n');
-          if (!lineaVista[cl]) { lineaVista[cl] = true; lineaBarra(cl); }
-        }
-      }
-      actual = idx;
-    }
-  }
+  /* El progreso ya no se deduce del scroll: lo pinta muestra(), que sabe en
+     que paso esta. Se conserva el nombre porque el vigilante del scroll la
+     llama, y ahi no debe hacer nada. */
+  function repinta(){}
 
   function arranca(){
     if (!monta()) return;
@@ -28301,7 +28430,8 @@ function endTourIntro() {
     clearTimeout(sirviendo);
     var b = document.getElementById('anam-progreso');
     if (b) b.classList.add('on');
-    setTimeout(repinta, 140);
+    creaPie(document.getElementById(PANT));
+    muestra(0);
     /* Cecilia abre la cadena: no refuerza nada porque no hay nada detras,
        ocasiona la conducta mas cara, que es empezar. Por eso va al ENTRAR y
        va continua. */

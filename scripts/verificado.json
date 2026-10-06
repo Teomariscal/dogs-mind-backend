@@ -1,13 +1,7 @@
 {
-  "md5_frontend": "4f2194cb53605cdd4ddd7be62c574257",
-  "verificado_el": "2026-09-14T16:57:33",
+  "md5_frontend": "bb2def182c926d10f11631105e57a71f",
+  "verificado_el": "2026-10-06T11:00:55",
   "pruebas": [
-    "Italia en la lista de paises, comprobado en el binario (country_it presente)",
-    "orden alfabetico por idioma activo, leido en vivo: es Italia entre Estados Unidos y Japon · en Italy entre Colombia y Japan · it Italia entre Giappone y Messico",
-    "el marcador de posicion queda primero y Otro/Other/Altro ultimo en los tres",
-    "se conserva la eleccion al cambiar de idioma: Italia en es sigue siendo Italia en it",
-    "auditoria i18n: 990 claves, 0 huecos",
-    "puerta cognitivista: 3 condiciones y 3 salidas en False, falla cerrada",
-    "sin-fugas.py estatico SIN FUGAS"
+    "iPhone 17 Pro Max (simulador), build 1.0.34 (69): login en ingles, pestana Teo > Mi cuenta > Eliminar mi cuenta, modal legible, borrado completo con confirmacion en ingles y vuelta al inicio; claves del modal en es/en/it; dentro del IPA comprobados cv-acc-row--danger, del_modal_confirm_ph y el sello 1.0.34 (69)"
   ]
 }

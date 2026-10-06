@@ -2697,6 +2697,34 @@ button:not(:disabled):active{ transform:scale(0.98); }
   backdrop-filter: blur(4px);
 }
 
+/* Bloque "Mi cuenta" del perfil (Apple 5.1.1(v)) */
+.cv-acc { display: flex; flex-direction: column; gap: 10px; }
+.cv-acc-row {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: left;
+  font-family: 'Jost', sans-serif;
+  background: rgba(255,250,240,0.05);
+  border: 1px solid rgba(200,169,110,0.22);
+  border-radius: 14px;
+  padding: 13px 15px;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background .2s, border-color .2s;
+}
+.cv-acc-row:hover { background: rgba(255,250,240,0.09); }
+.cv-acc-row .cv-acc-main {
+  font-size: 14px; font-weight: 600; color: rgba(255,250,240,0.92);
+}
+.cv-acc-row .cv-acc-sub {
+  font-size: 11.5px; line-height: 1.45; color: rgba(255,250,240,0.52);
+}
+.cv-acc-row--danger { border-color: rgba(229,115,115,0.38); }
+.cv-acc-row--danger:hover { background: rgba(229,115,115,0.10); }
+.cv-acc-row--danger .cv-acc-main { color: #f0a0a0; }
+
 /* Cards */
 .cv-cards {
   list-style: none;
@@ -4466,6 +4494,21 @@ button:not(:disabled):active{ transform:scale(0.98); }
   background: none;
   border: none;
   letter-spacing: 0.03em;
+}
+
+/* Enlace a la pagina de descarga: SOLO en la web. Dentro de la app ya estas
+   en la app, asi que no se pinta (body.dm-web es el unico gancho). */
+.splash-descargar { display: none; }
+body.dm-web .splash-descargar {
+  display: inline-block;
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  text-align: center;
+  padding: 8px;
+  letter-spacing: 0.03em;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -8023,6 +8066,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
         </div>
       </div>
       <button class="splash-privacy" onclick="goTo('s-privacy')" data-i18n="rc_privacy_link">Política de Privacidad</button>
+      <a class="splash-descargar" href="/descargar.html" data-i18n="splash_descargar">Descargar la app</a>
     </div>
   </div>
 
@@ -8525,6 +8569,27 @@ button:not(:disabled):active{ transform:scale(0.98); }
       </ol>
     </section>
 
+    <!-- ══ Mi cuenta — Apple 5.1.1(v) ══════════════════════════════════════
+         El borrado de cuenta existia desde hace meses, pero vivia al final de
+         la pantalla de Creditos, debajo de los packs. El revisor de Apple no
+         llego y rechazo la 1.0.32 el 1-oct-2026 diciendo que la app no ofrece
+         borrar la cuenta. Se repite aqui, en la pestana que cualquiera abre
+         buscando "su perfil": mismo modal, mismo endpoint, dos toques desde
+         el inicio. NO se quita el de Creditos. -->
+    <section class="cv-section">
+      <p class="cv-section-eyebrow" data-i18n="cv_account_eyebrow">Mi cuenta</p>
+      <div class="cv-acc">
+        <button class="cv-acc-row" type="button" onclick="goTo('s-tokens')">
+          <span class="cv-acc-main" data-i18n="cv_account_manage">Cuenta y privacidad</span>
+          <span class="cv-acc-sub" data-i18n="cv_account_manage_desc">Email, contraseña, descargar mis datos y soporte</span>
+        </button>
+        <button class="cv-acc-row cv-acc-row--danger" type="button" onclick="openDeleteAccountModal()">
+          <span class="cv-acc-main" data-i18n="account_delete_title">Eliminar mi cuenta</span>
+          <span class="cv-acc-sub" data-i18n="account_delete_desc">Borra tu cuenta y todos tus datos personales. No se puede deshacer.</span>
+        </button>
+      </div>
+    </section>
+
     <!-- Sticky CTA -->
     <div class="cv-cta-wrap">
       <button class="cv-cta" onclick="goToConsultType()">
@@ -8856,7 +8921,7 @@ button:not(:disabled):active{ transform:scale(0.98); }
 
   <!-- ══ Modal cambiar contraseña ══ -->
   <div id="change-password-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center;padding:20px;">
-    <div style="background:rgba(255,255,255,0.05);border-radius:16px;max-width:380px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.3);color:#f3f1ea">
+    <div style="background:#16251f;border:1px solid rgba(243,241,234,0.12);border-radius:16px;max-width:380px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.55);color:#f3f1ea">
       <div style="font-size:18px;font-weight:700;color:var(--dark);margin-bottom:8px;" data-i18n="cp_modal_title">Cambiar contraseña</div>
       <div style="font-size:13px;line-height:1.6;color:var(--text2);margin-bottom:16px;" data-i18n="cp_modal_body">Por seguridad, necesitamos verificar tu contraseña actual antes de establecer una nueva.</div>
 
@@ -8880,15 +8945,15 @@ button:not(:disabled):active{ transform:scale(0.98); }
 
   <!-- ══ Modal confirmar eliminación de cuenta ══ -->
   <div id="delete-account-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center;padding:20px;">
-    <div style="background:rgba(255,255,255,0.05);border-radius:16px;max-width:380px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.3);color:#f3f1ea">
+    <div style="background:#16251f;border:1px solid rgba(243,241,234,0.12);border-radius:16px;max-width:380px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.55);color:#f3f1ea">
       <div style="font-size:18px;font-weight:700;color:#dc2626;margin-bottom:8px;" data-i18n="del_modal_title">Eliminar tu cuenta</div>
       <div style="font-size:13px;line-height:1.6;color:var(--text2);margin-bottom:16px;" data-i18n="del_modal_body">
         Tu email, contraseña y teléfono se eliminarán permanentemente. Los registros de pago se conservan anonimizados durante 4 años por requisito fiscal (España). <strong>Esta acción no se puede deshacer.</strong>
       </div>
       <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:6px;" data-i18n="del_modal_pw_label">Confirma tu contraseña actual</label>
-      <div style="position:relative;width:100%;"><input id="del-modal-password" type="password" autocomplete="current-password" style="width:100%;padding-right:42px;padding:12px 14px;border:1.5px solid rgba(0,0,0,0.15);border-radius:10px;font-size:16px;font-family:inherit;margin-bottom:12px;box-sizing:border-box;" /><button type="button" onclick="togglePasswordVisibility('del-modal-password', this)" aria-label="Mostrar contraseña" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);background:transparent;border:none;cursor:pointer;font-size:18px;padding:4px 8px;color:var(--grey);font-family:inherit;line-height:1;" title="Mostrar/ocultar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+      <div style="position:relative;width:100%;"><input id="del-modal-password" type="password" autocomplete="current-password" style="width:100%;padding-right:42px;padding:12px 14px;background:#fff;color:#1d2a20;border:1.5px solid rgba(0,0,0,0.15);border-radius:10px;font-size:16px;font-family:inherit;margin-bottom:12px;box-sizing:border-box;" /><button type="button" onclick="togglePasswordVisibility('del-modal-password', this)" aria-label="Mostrar contraseña" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);background:transparent;border:none;cursor:pointer;font-size:18px;padding:4px 8px;color:var(--grey);font-family:inherit;line-height:1;" title="Mostrar/ocultar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
       <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:6px;" data-i18n="del_modal_confirm_label">Escribe ELIMINAR para confirmar</label>
-      <input id="del-modal-confirm" type="text" placeholder="ELIMINAR" style="width:100%;padding:12px 14px;border:1.5px solid rgba(0,0,0,0.15);border-radius:10px;font-size:16px;font-family:inherit;margin-bottom:18px;box-sizing:border-box;letter-spacing:0.1em;" />
+      <input id="del-modal-confirm" type="text" data-i18n-placeholder="del_modal_confirm_ph" placeholder="ELIMINAR" style="width:100%;padding:12px 14px;background:#fff;color:#1d2a20;border:1.5px solid rgba(0,0,0,0.15);border-radius:10px;font-size:16px;font-family:inherit;margin-bottom:18px;box-sizing:border-box;letter-spacing:0.1em;" />
       <div id="del-modal-error" style="display:none;font-size:12px;color:#dc2626;margin-bottom:12px;padding:8px;background:rgba(220,38,38,0.08);border-radius:8px;"></div>
       <div style="display:flex;gap:10px;">
         <button onclick="closeDeleteAccountModal()" style="flex:1;padding:13px;background:#f5f5ef;color:var(--dark);border:none;border-radius:100px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;" data-i18n="del_modal_cancel">Cancelar</button>
@@ -9096,8 +9161,16 @@ button:not(:disabled):active{ transform:scale(0.98); }
   min-height: 30vh; max-height: 40vh;
   object-fit: cover; object-position: center top; background: #07100c;
 }
+/* El panel se queda con lo que sobra tras el video y scrollea POR DENTRO.
+   Antes era flex:0 0 auto con max-height:70vh: video (hasta 40vh) + panel
+   (hasta 70vh) suman mas de la pantalla, asi que en un iPhone grande los dos
+   enlaces de abajo —"Skip intro" y "Don't show"— quedaban cortados por el
+   overflow:hidden de la pantalla, y el panel no scrolleaba porque su propio
+   contenido SI cabia en sus 70vh. Resultado: la pantalla de Cecilia solo se
+   podia abandonar entrando en una consulta. Comprobado en el simulador de
+   iPhone 17 Pro Max, que es el aparato con el que revisa Apple. */
 .ob-scroll {
-  position: relative; z-index: 2; flex: 0 0 auto;
+  position: relative; z-index: 2; flex: 0 1 auto; min-height: 0;
   max-height: 70vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
 }
 /* Repetir: el vídeo se puede volver a ver cuantas veces haga falta. */
@@ -18035,7 +18108,7 @@ function getVal(id, fallback) {
   function loginUser() {
     var email    = (document.getElementById('login-email').value || '').trim();
     var password = (document.getElementById('login-password').value || '').trim();
-    if (!email || !password) { alert('Introduce email y contraseña.'); return; }
+    if (!email || !password) { alert(_L3('Introduce email y contraseña.', 'Enter your email and password.', 'Inserisci email e password.')); return; }
 
     fetch(API_URL + '/auth/login', {
       method: 'POST',
@@ -18044,7 +18117,12 @@ function getVal(id, fallback) {
     })
     .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
     .then(function(res) {
-      if (!res.ok) { alert(res.data.detail || 'Error al iniciar sesión'); return; }
+      if (!res.ok) {
+        alert(res.ok === false && res.data && res.data.detail && !/incorrect/i.test(res.data.detail) && String(res.data.detail).indexOf('contraseña') === -1
+              ? res.data.detail
+              : _L3('Email o contraseña incorrectos.', 'Invalid email or password.', 'Email o password errati.'));
+        return;
+      }
       setJWT(res.data.token);
       setTokens(res.data.tokens);
       if (res.data.role) localStorage.setItem('dm_role', res.data.role);
@@ -18052,7 +18130,7 @@ function getVal(id, fallback) {
       // Precargar lista de perros tras login exitoso
       if (typeof loadMyDogs === 'function') loadMyDogs();
     if (typeof loadAccountInfo === 'function') loadAccountInfo();
-      showToast('¡Bienvenido!');
+      showToast(_L3('¡Bienvenido!', 'Welcome', 'Benvenuto!'));
       /* Codigo que quedo pendiente al intentar registrarse teniendo ya cuenta:
          se canjea AHORA, que es cuando por fin hay sesion. Falla en silencio a
          proposito —si el codigo esta gastado o caducado, entrar no se rompe—
@@ -19921,9 +19999,10 @@ function getVal(id, fallback) {
     var btn = document.getElementById('del-modal-confirm-btn');
 
     errEl.style.display = 'none';
-    if (!pw) { errEl.textContent = 'Introduce tu contraseña.'; errEl.style.display = 'block'; return; }
-    if (confirm !== 'ELIMINAR' && confirm !== 'DELETE') {
-      errEl.textContent = 'Escribe ELIMINAR (o DELETE) exactamente para confirmar.';
+    if (!pw) { errEl.textContent = _i18nText('del_modal_pw_err', 'Introduce tu contraseña.'); errEl.style.display = 'block'; return; }
+    // ELIMINA entra porque es la palabra que pide la etiqueta italiana.
+    if (confirm !== 'ELIMINAR' && confirm !== 'DELETE' && confirm !== 'ELIMINA') {
+      errEl.textContent = _i18nText('del_modal_confirm_err', 'Escribe ELIMINAR (o DELETE) exactamente para confirmar.');
       errEl.style.display = 'block';
       return;
     }
@@ -19944,7 +20023,7 @@ function getVal(id, fallback) {
         errEl.textContent = detail;
         errEl.style.display = 'block';
         btn.disabled = false;
-        btn.textContent = 'Eliminar';
+        btn.textContent = _i18nText('del_modal_confirm', 'Eliminar');
         return;
       }
       // Cuenta eliminada: limpiar sesión local + redirigir
@@ -19954,14 +20033,16 @@ function getVal(id, fallback) {
       localStorage.removeItem('dm_role');
       localStorage.removeItem('dm_tokens');
       closeDeleteAccountModal();
-      alert('Tu cuenta ha sido eliminada. Los datos fiscales se conservan anonimizados durante 4 años por requisito legal.');
+      alert(_L3('Tu cuenta ha sido eliminada. Los datos fiscales se conservan anonimizados durante 4 años por requisito legal.',
+               'Your account has been deleted. Tax records are kept anonymized for 4 years as required by law.',
+               'Il tuo account è stato eliminato. I dati fiscali restano anonimizzati per 4 anni per obbligo di legge.'));
       goTo('s-splash');
     })
     .catch(function() {
-      errEl.textContent = 'Error de conexión. Inténtalo más tarde.';
+      errEl.textContent = _L3('Error de conexión. Inténtalo más tarde.', 'Connection error. Please try again later.', 'Errore di connessione. Riprova più tardi.');
       errEl.style.display = 'block';
       btn.disabled = false;
-      btn.textContent = 'Eliminar';
+      btn.textContent = _i18nText('del_modal_confirm', 'Eliminar');
     });
   }
 
@@ -23787,6 +23868,9 @@ function endTourIntro() {
       cv_acc_3:                'Instructor de <strong>Unidades de Perros de Asistencia</strong> desde el 2002',
       cv_acc_4:                '<strong>International Mondioring</strong> Decoy Level III',
       cv_career_eyebrow:       'Trayectoria',
+      cv_account_eyebrow:      'Mi cuenta',
+      cv_account_manage:       'Cuenta y privacidad',
+      cv_account_manage_desc:  'Email, contrase\u00f1a, descargar mis datos y soporte',
       cv_tl1_t:                'Fund. Bocalán',
       cv_tl1_m:                'Fundador y Director · 2002 – Actualidad · España',
       cv_tl2_t:                'Docencia Universitaria',
@@ -24523,6 +24607,9 @@ function endTourIntro() {
       del_modal_body:         'Tu email, contraseña y teléfono se eliminarán permanentemente. Los registros de pago se conservan anonimizados durante 4 años por requisito fiscal (España). <strong>Esta acción no se puede deshacer.</strong>',
       del_modal_pw_label:     'Confirma tu contraseña actual',
       del_modal_confirm_label:'Escribe ELIMINAR para confirmar',
+      del_modal_confirm_ph:   'ELIMINAR',
+      del_modal_confirm_err:  'Escribe ELIMINAR exactamente para confirmar.',
+      del_modal_pw_err:       'Introduce tu contrase\u00f1a.',
       del_modal_cancel:       'Cancelar',
       del_modal_confirm:      'Eliminar',
       ask_cecilia_text: '¿Es muy técnico el lenguaje? Si necesitas ayuda, pregunta a Cecilia.',
@@ -24840,6 +24927,7 @@ function endTourIntro() {
       rc_sub_terms:         'Suscripción anual de 19,99 €/año; se renueva automáticamente salvo que la canceles en Ajustes › Apple ID › Suscripciones al menos 24 h antes de la renovación.',
       rc_terms_link:        'Términos de servicio',
       rc_privacy_link:      'Política de privacidad',
+      splash_descargar:     'Descargar la app',
       pa_disclaimer_ios:    'Profesional es una suscripción anual de 19,99 €/año que se renueva automáticamente salvo que la canceles en Ajustes › Apple ID › Suscripciones al menos 24 h antes de la fecha de renovación.',
       pa_disclaimer_android:'Profesional es una suscripción anual de 19,99 €/año que se renueva automáticamente salvo que la canceles en Google Play › Pagos y suscripciones antes de la fecha de renovación.',
       // ABC
@@ -25055,6 +25143,9 @@ function endTourIntro() {
       cv_acc_3:                'Instructor of <strong>Service Dog Units</strong> since 2002',
       cv_acc_4:                '<strong>International Mondioring</strong> Decoy Level III',
       cv_career_eyebrow:       'Career',
+      cv_account_eyebrow:      'My account',
+      cv_account_manage:       'Account and privacy',
+      cv_account_manage_desc:  'Email, password, download my data and support',
       cv_tl1_t:                'Bocalán Foundation',
       cv_tl1_m:                'Founder and Director · 2002 – Present · Spain',
       cv_tl2_t:                'University Teaching',
@@ -25785,6 +25876,9 @@ function endTourIntro() {
       del_modal_body:         'Your email, password and phone will be permanently deleted. Payment records are kept anonymized for 4 years for tax compliance (Spain). <strong>This action cannot be undone.</strong>',
       del_modal_pw_label:     'Confirm your current password',
       del_modal_confirm_label:'Type DELETE to confirm',
+      del_modal_confirm_ph:   'DELETE',
+      del_modal_confirm_err:  'Type DELETE exactly to confirm.',
+      del_modal_pw_err:       'Enter your password.',
       del_modal_cancel:       'Cancel',
       del_modal_confirm:      'Delete',
       ask_cecilia_text: 'Is the language too technical? If you need help, ask Cecilia.',
@@ -26101,6 +26195,7 @@ function endTourIntro() {
       rc_sub_terms:         'Annual subscription of €19.99/year; auto-renews unless cancelled in Settings › Apple ID › Subscriptions at least 24h before the renewal date.',
       rc_terms_link:        'Terms of Service',
       rc_privacy_link:      'Privacy Policy',
+      splash_descargar:     'Download the app',
       pa_disclaimer_ios:    'Professional is an annual subscription of €19.99/year that auto-renews unless you cancel it in Settings › Apple ID › Subscriptions at least 24h before the renewal date.',
       pa_disclaimer_android:'Professional is an annual subscription of €19.99/year that auto-renews unless you cancel it in Google Play › Payments & subscriptions before the renewal date.',
       // ABC
@@ -26316,6 +26411,9 @@ function endTourIntro() {
           cv_acc_3:                'Istruttore di <strong>Unità di Cani di Assistenza</strong> dal 2002',
           cv_acc_4:                '<strong>International Mondioring</strong> Decoy Level III',
           cv_career_eyebrow:       'Percorso',
+          cv_account_eyebrow:      'Il mio account',
+          cv_account_manage:       'Account e privacy',
+          cv_account_manage_desc:  'Email, password, scarica i miei dati e assistenza',
           cv_tl1_t:                'Fond. Bocalán',
           cv_tl1_m:                'Fondatore e Direttore · 2002 – Attuale · Spagna',
           cv_tl2_t:                'Docenza Universitaria',
@@ -27048,6 +27146,9 @@ function endTourIntro() {
           del_modal_body:         'La tua email, password e telefono saranno eliminati definitivamente. I registri di pagamento vengono conservati in forma anonima per 4 anni per obbligo fiscale (Spagna). <strong>Questa azione non può essere annullata.</strong>',
           del_modal_pw_label:     'Conferma la tua password attuale',
           del_modal_confirm_label:'Scrivi ELIMINA per confermare',
+          del_modal_confirm_ph:   'ELIMINA',
+          del_modal_confirm_err:  'Scrivi ELIMINA esattamente per confermare.',
+          del_modal_pw_err:       'Inserisci la tua password.',
           del_modal_cancel:       'Annulla',
           del_modal_confirm:      'Elimina',
           ask_cecilia_text: 'Il linguaggio è troppo tecnico? Se hai bisogno di aiuto, chiedi a Cecilia.',
@@ -27364,6 +27465,7 @@ function endTourIntro() {
           rc_sub_terms:         'Abbonamento annuale di 19,99 €/anno; si rinnova automaticamente salvo che lo annulli in Impostazioni › Apple ID › Abbonamenti almeno 24 h prima del rinnovo.',
           rc_terms_link:        'Termini di servizio',
           rc_privacy_link:      'Informativa sulla privacy',
+          splash_descargar:     'Scarica l\u2019app',
           pa_disclaimer_ios:    'Professionale è un abbonamento annuale di 19,99 €/anno che si rinnova automaticamente salvo che lo annulli in Impostazioni › Apple ID › Abbonamenti almeno 24 h prima della data di rinnovo.',
           pa_disclaimer_android:'Professionale è un abbonamento annuale di 19,99 €/anno che si rinnova automaticamente salvo che lo annulli in Google Play › Pagamenti e abbonamenti prima della data di rinnovo.',
           // ABC
@@ -27925,6 +28027,11 @@ function endTourIntro() {
       '<div class="falta" id="anam-falta"></div>' +
       '<button type="button" class="seguir" id="anam-seguir" data-i18n="anam_continuar">Continuar</button>';
     pant.appendChild(pie);
+    /* El pie se crea DESPUES de que applyLang haya recorrido la pagina, asi que
+       su data-i18n no lo toca nadie y el boton se quedaba en castellano para el
+       ingles y el italiano. Se traduce a mano al nacer. */
+    var _bs = pie.querySelector('#anam-seguir');
+    if (_bs) _bs.textContent = _i18nText('anam_continuar', 'Continuar');
     /* Una regla del tema (#s-anamnesis > div) pone position:relative a los
        hijos de la pantalla y ganaba: el pie se iba con el scroll y el boton
        desaparecia. Se fuerza en el propio elemento, que es lo unico que gana.

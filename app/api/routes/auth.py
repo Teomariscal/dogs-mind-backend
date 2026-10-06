@@ -561,10 +561,15 @@ def delete_account(
         raise HTTPException(status_code=401, detail="Contraseña incorrecta")
 
     # Confirmación textual obligatoria
-    if req.confirm.strip().upper() not in ("DELETE", "ELIMINAR"):
+    # ELIMINA es la palabra que pide la etiqueta italiana ("Scrivi ELIMINA per
+    # confermare"). Faltaba aquí: un italiano escribía exactamente lo que la app
+    # le mandaba escribir y se llevaba un 400. Apple rechazo la 1.0.32 por no
+    # encontrar el borrado de cuenta (5.1.1(v)), asi que la puerta tiene que
+    # abrirse en los tres idiomas.
+    if req.confirm.strip().upper() not in ("DELETE", "ELIMINAR", "ELIMINA"):
         raise HTTPException(
             status_code=400,
-            detail="Confirmación inválida. Escribe 'DELETE' o 'ELIMINAR' para continuar.",
+            detail="Confirmación inválida. Escribe 'DELETE', 'ELIMINAR' o 'ELIMINA' para continuar.",
         )
 
     if current_user.deleted_at is not None:

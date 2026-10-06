@@ -26,15 +26,23 @@ REGISTRO="scripts/verificado.json"
 IPA="${IPA:-/tmp/DMexport/App.ipa}"
 AAB="${AAB:-mobile/android/app/build/outputs/bundle/release/app-release.aab}"
 
+# El sello de version (DM_VERSION_SELLO) lleva el numero de build de CADA
+# tienda, asi que es el unico byte que difiere a proposito. Si no se normaliza,
+# esta puerta da siempre "las dos tiendas llevan cosas distintas" y se convierte
+# en un grito falso que acaba ignorandose. Se normaliza igual que en
+# compilar-apps.sh, para que la comparacion siga siendo byte a byte en el resto.
+sin_sello() { sed -E "s/DM_VERSION_SELLO = '[^']*'/DM_VERSION_SELLO = '__DM_VERSION__'/g"; }
+
 huella_ios() {
   [ -f "$IPA" ] || { echo "SIN_IPA"; return; }
   local d; d=$(mktemp -d)
   ( cd "$d" && unzip -q "$IPA" ) 2>/dev/null || { echo "IPA_ROTA"; return; }
-  md5 -q "$d"/Payload/App.app/public/index.html 2>/dev/null || echo "SIN_INDEX"
+  [ -f "$d"/Payload/App.app/public/index.html ] || { echo "SIN_INDEX"; return; }
+  sin_sello < "$d"/Payload/App.app/public/index.html | md5 -q
 }
 huella_android() {
   [ -f "$AAB" ] || { echo "SIN_AAB"; return; }
-  unzip -p "$AAB" base/assets/public/index.html 2>/dev/null | md5 -q || echo "SIN_INDEX"
+  unzip -p "$AAB" base/assets/public/index.html 2>/dev/null | sin_sello | md5 -q || echo "SIN_INDEX"
 }
 
 case "${1:-comprobar}" in

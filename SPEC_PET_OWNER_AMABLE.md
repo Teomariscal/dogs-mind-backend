@@ -6,7 +6,7 @@ mismo: que el particular salga de la app con ganas de volver.
 1. **Acortar lo que devuelve la app en formato Pet Owner.**
 2. **Celebrar cada seguimiento diario** con Mario y su perro: el perro viene
    corriendo con música triunfal, Mario llega detrás, lo coge en brazos y dice
-   *"¡Qué guay, amigo! Sigue así y conseguirás tus objetivos!!!"*.
+   *"¡Qué guay! Sigue así y conseguirás tus objetivos!!!"*.
 
 Nada de esto está implementado todavía. Esto es la propuesta, para su OK.
 
@@ -89,7 +89,7 @@ visuales no los fabrico yo).
 | Formato | 9:16, 1080×1920, H.264 + AAC, ~1-2 MB |
 | Guion visual | el bulldog entra corriendo de frente hacia cámara (0-2 s) · Mario aparece detrás y lo coge en brazos (2-4 s) · habla a cámara (4-7 s) |
 | Música | triunfal, entra con el perro y baja cuando Mario habla |
-| Frase, literal | **"¡Qué guay, amigo! Sigue así y conseguirás tus objetivos!!!"** |
+| Frase, literal | **"¡Qué guay! Sigue así y conseguirás tus objetivos!!!"** |
 | Idiomas | `celebra-mario-es.mp4` · `-en` · `-it`. Mientras falten EN e IT, cae al ES con el subtítulo traducido, que es lo que ya se hace con los relevos |
 
 Referencia de tamaño de los que ya hay: `aigents-cecilia2.mp4` son 1080×1920 y

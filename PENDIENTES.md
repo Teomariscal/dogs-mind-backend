@@ -16,6 +16,70 @@ desaparece cuando la conversacion se resume.
 | 1-sep-2026 | Al usuario solo se le habla de **creditos**. Los tokens no existen como concepto de cara afuera. |
 
 
+## 6-oct-2026 — EL RECHAZO DE LA 1.0.32 Y COMO SE REENVIA
+
+Apple rechazo la 1.0.32 el 1-oct por **dos cosas de tramite**, ninguna de
+contenido:
+
+- **5.1.1(v)**: no encontro el borrado de cuenta. Existia desde hacia meses
+  —modal propio y `DELETE /auth/me`— pero vivia al final de la pantalla de
+  Creditos, debajo de los packs, y las notas de revision solo decian "credits /
+  account screen". El revisor no llego. **Arreglo: se repite en la pestaña del
+  perfil (Teo), seccion "Mi cuenta", a dos toques del inicio.** El de Creditos
+  no se toca.
+- **2.1**: pedian una cuenta demo **con suscripcion caducada** para poder
+  revisar la compra entera. Creada:
+  `appstore-review-expired@thedogsmind.net` / `DogsMindReview2026`, plan medio
+  con `subscription_status='expired'`, 0 creditos y prueba agotada, para que
+  salte el muro. Se comprueba con `GET /subscription/status`: tiene que decir
+  `allowed:false, reason:needs_subscription`.
+
+### REENVIAR DESPUES DE UN RECHAZO NO ES VOLVER A PULSAR ENVIAR
+
+Esto costo veinte intentos y hay que escribirlo. Mientras el envio rechazado
+siga vivo, el PATCH `submitted:true` contesta **"Version is not ready to be
+submitted yet, please try again later"** — un mensaje que parece transitorio y
+no lo es. El item rechazado tampoco se puede borrar ("Item was already
+submitted"). El camino que funciona es:
+
+    PATCH /v1/reviewSubmissions/<viejo>   {"canceled": true}   -> CANCELING
+    (esperar a COMPLETE)
+    POST  /v1/reviewSubmissions           {app, platform IOS}
+    POST  /v1/reviewSubmissionItems       {reviewSubmission, appStoreVersion}
+    PATCH /v1/reviewSubmissions/<nuevo>   {"submitted": true}  -> WAITING_FOR_REVIEW
+
+Y **Apple no deja crear una version nueva** con otra en ese estado (409
+`You cannot create a new version`): se RENOMBRA la rechazada con PATCH
+`versionString`, que si se puede.
+
+### El video para App Review
+
+Apple pide una grabacion del borrado completo. La de la 1.0.34 esta en
+`https://thedogsmind.net/review/account-deletion.mp4` (76 s, simulador de
+iPhone 17 Pro Max, que es el aparato con el que revisaron). La piden grabada en
+un aparato FISICO; si la rechazan por eso, la graba el founder desde TestFlight.
+El fichero vive en `frontend/review/`, asi que **tambien viaja dentro del
+binario** (2 MB): si alguna vez estorba, se saca de ahi y se sirve de otro modo.
+
+### Lo que salio al recorrer el camino del revisor
+
+Probar en el simulador el recorrido TAL CUAL destapo cuatro cosas que el
+revisor habria visto, y ninguna se veia leyendo el codigo:
+
+| fallo | causa |
+|---|---|
+| El titulo del modal se leia encima del texto de la pantalla de detras | la tarjeta era `rgba(255,255,255,0.05)`, casi transparente, y los dos campos tampoco se veian |
+| Un italiano no podia borrar su cuenta | la etiqueta dice "Scrivi ELIMINA" y ni el frontend ni el backend admitian ELIMINA: 400 |
+| Castellano con la app en ingles | el aviso final del borrado, el error de credenciales y el saludo estaban escritos a pelo |
+| La pantalla de Cecilia no se podia abandonar | `.ob-scroll` con `flex:0 0 auto` + `max-height:70vh`: video y panel sumaban mas de una pantalla y "Skip intro" / "Don't show" quedaban cortados |
+
+### La puerta de envio llevaba desde el 17-sep gritando en falso
+
+`scripts/listo-para-enviar.sh` comparaba los `index.html` en crudo, con el sello
+de version dentro — que es justo el unico byte que difiere a proposito entre las
+dos tiendas. Decia SIEMPRE "las dos tiendas llevan cosas distintas". Ahora
+normaliza el sello, como ya hacia `compilar-apps.sh`.
+
 Lista viva. Se actualiza en cuanto algo entra o sale. Última revisión: 1-sep-2026, 23:05.
 
 ## Estado de las ramas — 5-sep-2026

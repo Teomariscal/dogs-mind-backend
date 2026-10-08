@@ -151,6 +151,14 @@ def subscription_status(
             "expires_at": _iso(state["subscription_expires_at"]),
             "active": subs.subscription_active(current_user),
         },
+        # Créditos sueltos: la app pregunta aquí si puede enseñarlos. Son un
+        # extra de la suscripción, nunca una forma de entrar sin ella
+        # (founder, 6-oct-2026).
+        "packs": {
+            **{"allowed": subs.puede_comprar_packs(current_user)["puede"],
+               "reason": subs.puede_comprar_packs(current_user)["motivo"]},
+            "message": None if subs.puede_comprar_packs(current_user)["puede"] else subs.packs_message(),
+        },
         "partner": _partner_info(current_user),
         "professional": {
             **subs.professional_allowed(current_user),

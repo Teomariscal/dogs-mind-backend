@@ -8699,6 +8699,19 @@ body.dm-web .splash-descargar {
         <div style="font-size:20px;color:#ade3f2;flex-shrink:0;">&#8594;</div>
       </button>
 
+      <!-- ══ Creditos sueltos ══════════════════════════════════════════════
+           Son un EXTRA de la suscripcion, no una forma de entrar sin ella
+           (founder, 6-oct-2026). Quien no tenga suscripcion viva no ve los
+           packs: ve el camino a los planes. Comprar un pack no levanta el
+           muro, asi que vendérselo seria cobrarle por creditos congelados.
+           El backend lo dice en /subscription/status -> packs.allowed. -->
+      <div id="packs-bloqueados" style="display:none;background:#fff;border:1.5px solid rgba(94,200,230,0.35);border-radius:14px;padding:16px;margin-bottom:14px;">
+        <div style="font-size:14px;font-weight:700;color:var(--dark);margin-bottom:6px;" data-i18n="packs_locked_title">Los créditos sueltos van con tu plan</div>
+        <div id="packs-bloqueados-txt" style="font-size:12.5px;line-height:1.5;color:var(--grey);margin-bottom:12px;" data-i18n="packs_locked_body">Los créditos sueltos son un extra de tu suscripción. Elige un plan y podrás comprar los que necesites sin cambiar de plan.</div>
+        <button type="button" onclick="goTo('s-planes')" style="width:100%;padding:13px;border:none;border-radius:100px;background:var(--green);color:#fff;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;" data-i18n="packs_locked_cta">Ver los planes</button>
+      </div>
+
+      <div id="packs-zona">
       <div style="font-size:10px;font-weight:700;color:var(--grey);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;" data-i18n="tokens_recharge">Recargar créditos</div>
 
       <!-- pack 5 -->
@@ -8749,6 +8762,8 @@ body.dm-web .splash-descargar {
           <div style="font-size:17px;font-weight:800;color:var(--dark);">42 €</div>
         </div>
       </div>
+
+      </div><!-- /packs-zona -->
 
       <!-- métodos de pago -->
       <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;padding:12px;background:rgba(255,255,255,0.05);border-radius:12px;border:1px solid rgba(94,200,230,0.18);color:#f3f1ea">
@@ -13261,6 +13276,10 @@ function goTo(id) {
   if (id === 's-cecilia2' && typeof dmCecilia2Arrancar === 'function') dmCecilia2Arrancar();
   if (id === 's-relazione-cz' && typeof dmCZReanudar === 'function') dmCZReanudar();
   if (id === 's-niaz2' && typeof dmN2Arrancar === 'function') dmN2Arrancar();
+  /* Al entrar en Creditos se vuelve a preguntar si puede comprar packs: el
+     estado cambia en cuanto se suscribe, y la pantalla no puede quedarse
+     con la foto del arranque. */
+  if (id === 's-tokens' && typeof window.dmRefrescarCuotaPerros === 'function') window.dmRefrescarCuotaPerros();
   /* La lista de planes y el saldo los pinta dmCargarPlanes(). Antes solo se
      llamaba desde dmAbrirPlanes(), asi que las SEIS entradas que hacian
      goTo('s-planes') a pelo —la barra del inicio, el menu, el boton "Recargar
@@ -20477,6 +20496,26 @@ function getVal(id, fallback) {
       if (!r.ok) return;
       var d = await r.json();
       if (typeof d.max_dogs === 'number') window._dmMaxDogs = d.max_dogs;
+      if (d.packs) window.dmPintarPacks(d.packs);
+    } catch (e) {}
+  };
+
+  /* Creditos sueltos: extra de la suscripcion, nunca puerta de entrada
+     (founder, 6-oct-2026). Quien no tenga suscripcion viva no ve los packs:
+     ve el camino a los planes. Lo decide el backend, no el cliente; si no
+     contesta, se deja como esta y manda el 402 del servidor. */
+  window.dmPintarPacks = function(packs) {
+    try {
+      var zona = document.getElementById('packs-zona');
+      var aviso = document.getElementById('packs-bloqueados');
+      if (!zona || !aviso) return;
+      var puede = !packs || packs.allowed !== false;
+      zona.style.display = puede ? '' : 'none';
+      aviso.style.display = puede ? 'none' : 'block';
+      if (!puede && packs.message) {
+        var t = document.getElementById('packs-bloqueados-txt');
+        if (t) t.textContent = packs.message;
+      }
     } catch (e) {}
   };
   window.dmRefrescarCuotaPerros();
@@ -24608,6 +24647,9 @@ function endTourIntro() {
       del_modal_pw_label:     'Confirma tu contraseña actual',
       del_modal_confirm_label:'Escribe ELIMINAR para confirmar',
       del_modal_confirm_ph:   'ELIMINAR',
+      packs_locked_title:     'Los créditos sueltos van con tu plan',
+      packs_locked_body:      'Los créditos sueltos son un extra de tu suscripción. Elige un plan y podrás comprar los que necesites sin cambiar de plan.',
+      packs_locked_cta:       'Ver los planes',
       del_modal_confirm_err:  'Escribe ELIMINAR exactamente para confirmar.',
       del_modal_pw_err:       'Introduce tu contrase\u00f1a.',
       del_modal_cancel:       'Cancelar',
@@ -25877,6 +25919,9 @@ function endTourIntro() {
       del_modal_pw_label:     'Confirm your current password',
       del_modal_confirm_label:'Type DELETE to confirm',
       del_modal_confirm_ph:   'DELETE',
+      packs_locked_title:     'Top-ups come with your plan',
+      packs_locked_body:      'Credit top-ups are an add-on to your subscription. Choose a plan and you will be able to buy as many as you need without changing tier.',
+      packs_locked_cta:       'See the plans',
       del_modal_confirm_err:  'Type DELETE exactly to confirm.',
       del_modal_pw_err:       'Enter your password.',
       del_modal_cancel:       'Cancel',
@@ -27147,6 +27192,9 @@ function endTourIntro() {
           del_modal_pw_label:     'Conferma la tua password attuale',
           del_modal_confirm_label:'Scrivi ELIMINA per confermare',
           del_modal_confirm_ph:   'ELIMINA',
+          packs_locked_title:     'I crediti extra vanno con il tuo piano',
+          packs_locked_body:      'I crediti extra sono un\u2019aggiunta all\u2019abbonamento. Scegli un piano e potrai comprarne quanti ti servono senza cambiare piano.',
+          packs_locked_cta:       'Vedi i piani',
           del_modal_confirm_err:  'Scrivi ELIMINA esattamente per confermare.',
           del_modal_pw_err:       'Inserisci la tua password.',
           del_modal_cancel:       'Annulla',

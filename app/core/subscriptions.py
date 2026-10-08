@@ -430,6 +430,54 @@ def access_state(user, now: Optional[datetime] = None,
     return out(False, "needs_subscription")
 
 
+def puede_comprar_packs(user, now: Optional[datetime] = None) -> dict:
+    """¿Puede este usuario comprar créditos sueltos?
+
+    Regla del founder (6-oct-2026): **sin suscripción no se está en la app**;
+    con suscripción, a quien se le acaben los créditos puede comprar extras sin
+    subir de plan, porque no todo el mundo quiere cambiar de plan por un trabajo
+    puntual con su perro.
+
+    De ahí sale esto: los packs son un COMPLEMENTO de la suscripción, no una
+    alternativa. Hasta hoy la pantalla de créditos los ofrecía a cualquiera, y
+    comprar un pack no toca `subscription_status`: un usuario posterior al corte
+    podía pagar 16 € y seguir bloqueado, con los créditos nuevos congelados.
+    Dinero cobrado por algo que no se puede usar.
+
+    Pasan: suscripción viva, equipo exento, partner, centro corporativo,
+    invitado mientras dure su invitación (su `subscription_status` es 'active'
+    con fecha) y admin/desarrollo. El heredado NO: gasta el saldo que ya tenía
+    —esa fue la promesa— y cuando se le acabe contrata, que es justo lo que se
+    decidió el 3-sep.
+    """
+    now = now or datetime.utcnow()
+    if not paywall_enabled(user):
+        return {"puede": True, "motivo": "paywall_off"}
+    if (getattr(user, "role", "user") or "user") in ("admin", "developer", "partner"):
+        return {"puede": True, "motivo": "privileged"}
+    if is_exempt(user) or (getattr(user, "email", "") or "").lower() in exemption_codes():
+        return {"puede": True, "motivo": "exempt"}
+    if getattr(user, "corporate_id", None) and \
+       (getattr(user, "corporate_status", "") or "") == "active":
+        return {"puede": True, "motivo": "corporate"}
+    if subscription_active(user, now):
+        return {"puede": True, "motivo": "subscription"}
+    return {"puede": False, "motivo": "needs_subscription"}
+
+
+def packs_message(lang: str = "es") -> str:
+    """Por qué no puede comprar créditos sueltos, en su idioma."""
+    textos = {
+        "es": "Los créditos sueltos son un extra de tu suscripción. Elige un plan y "
+              "podrás comprar los que necesites sin cambiar de plan.",
+        "en": "Credit top-ups are an add-on to your subscription. Choose a plan and "
+              "you will be able to buy as many as you need without changing tier.",
+        "it": "I crediti extra sono un'aggiunta all'abbonamento. Scegli un piano e "
+              "potrai comprarne quanti ti servono senza cambiare piano.",
+    }
+    return textos.get((lang or "es")[:2].lower(), textos["es"])
+
+
 def paywall_message(state: dict, lang: str = "es") -> str:
     """Mensaje humano del 402 (el frontend, además, abre la pantalla de planes)."""
     legacy = state.get("legacy")

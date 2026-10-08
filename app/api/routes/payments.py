@@ -119,6 +119,14 @@ def create_checkout(
     if not pack:
         raise HTTPException(status_code=400, detail="Pack inválido. Elige 5, 20 o 60.")
 
+    # Los créditos sueltos son un EXTRA de la suscripción, no una alternativa
+    # (founder, 6-oct-2026). Sin suscripción viva no se vende el pack: comprarlo
+    # no levanta el muro, así que sería cobrar por créditos congelados.
+    from app.core import subscriptions as _subs
+    _ok = _subs.puede_comprar_packs(current_user)
+    if not _ok["puede"]:
+        raise HTTPException(status_code=402, detail=_subs.packs_message("es"))
+
     if not stripe.api_key:
         raise HTTPException(status_code=500, detail="STRIPE_SECRET_KEY no configurada en el servidor")
 

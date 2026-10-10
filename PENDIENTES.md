@@ -14,6 +14,43 @@ desaparece cuando la conversacion se resume.
 | 1-sep-2026 | Los creditos van por delante de los paseos. |
 | 1-sep-2026 | Ningun build se envia ni se publica sin su OK explicito, y antes de enseñarselo lo compruebo yo paso a paso. |
 | 1-sep-2026 | Al usuario solo se le habla de **creditos**. Los tokens no existen como concepto de cara afuera. |
+| 10-oct-2026 | **Las cuentas del smoke test no cuentan como usuarios.** Palabras del founder: *"no hay manera de saber cuántos usuarios tengo… no hacen más que enturbiar la información"*. Ni se quedan en la tabla ni salen en el panel. |
+
+
+## 10-oct-2026 — LAS CUENTAS DE SMOKE TEST YA NO ENSUCIAN EL CENSO
+
+El smoke test (`tools/smoke-tests/smoke_test.py`, LaunchAgent cada 6 h) da de
+alta **4 cuentas de verdad por pasada** contra produccion: 3 delegaciones al
+azar + 1 embajador. Tienen que ser altas reales —pasan por `/auth/register`— o
+no comprueban nada. El efecto secundario es que se quedaban en la tabla.
+
+**Lo que habia el 10-oct-2026, medido:**
+
+| | |
+|---|---|
+| filas en `users` | 2.088 |
+| de smoke (`@dogsmindsmoke.net`) | **1.646 (79 %)** |
+| borradas (scrub GDPR, `@thedogsmind.deleted`) | 8 |
+| **usuarios reales** | **434** |
+
+El panel decia "2.088 usuarios". Entre junio y octubre se acumulaban ~16 al dia,
+asi que un alta nueva de verdad era invisible.
+
+**Tres cosas, las tres hechas:**
+
+1. **Purga.** Las 1.646 borradas en duro. Antes se comprobo que no tenian nada
+   colgando (0 dogs, 0 cases, 0 payments, 0 usage_log, 0 safety_log: el smoke
+   test solo llama a `/auth/register`) y se guardo copia en CSV.
+2. **Autolimpieza**, `app/core/smoke.py` + `auth.py`. Cada alta de smoke borra
+   las de pasadas anteriores (mas de 1 h). La tabla nunca guarda mas que la
+   pasada en curso. Sin cron, sin credenciales, sin nada que mantener. Solo se
+   dispara desde `@dogsmindsmoke.net`: un alta real no pasa por ahi.
+3. **Panel ciego a lo interno.** `/admin/users` deja fuera smoke y borradas; la
+   cifra grande son usuarios reales y debajo, en gris, cuantas quedan fuera.
+   `?incluir_internos=1` las devuelve todas si hiciera falta mirarlas.
+
+Probado contra la base real antes de desplegar: una fila de smoke antigua cae,
+una recien creada sobrevive, los usuarios reales no se tocan.
 
 
 ## 6-oct-2026 — EL RECHAZO DE LA 1.0.32 Y COMO SE REENVIA

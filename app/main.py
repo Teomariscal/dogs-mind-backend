@@ -681,10 +681,12 @@ function ah() { return { 'Content-Type':'application/json', 'Authorization':'Bea
 
 // ── USERS ────────────────────────────────────────────────────────────────────
 var _allUsers = [];
+var _usersOcultos = { smoke: 0, borrados: 0 };
 async function loadUsers() {
   var res = await fetch('/admin/users', { headers: ah() });
   var data = await res.json();
   _allUsers = data.users || [];
+  _usersOcultos = data.ocultos || { smoke: 0, borrados: 0 };
   renderUsers();
 }
 
@@ -715,7 +717,22 @@ function renderUsers() {
   var empty = q ? 'Sin resultados para “' + q + '”' : 'Sin usuarios';
   document.getElementById('users-tbody').innerHTML = rows || '<tr><td colspan="4" style="color:#aaa;">' + empty + '</td></tr>';
   var cnt = document.getElementById('user-count');
-  if (cnt) cnt.textContent = q ? (list.length + ' de ' + _allUsers.length) : (_allUsers.length + ' usuarios');
+  if (cnt) {
+    // La cifra que se ve es la de usuarios REALES. Las cuentas del smoke test y
+    // las borradas no son usuarios y no se cuentan; se dicen aparte y en gris
+    // para que se sepa que están ahí sin que ensucien el número.
+    var ocultos = (_usersOcultos.smoke || 0) + (_usersOcultos.borrados || 0);
+    var nota = '';
+    if (!q && ocultos) {
+      var partes = [];
+      if (_usersOcultos.smoke)    partes.push(_usersOcultos.smoke + ' de smoke test');
+      if (_usersOcultos.borrados) partes.push(_usersOcultos.borrados + ' borradas');
+      nota = '<br><span style="font-size:11px;color:#aaa;font-weight:400;">+ ' +
+             partes.join(' · ') + ', fuera del censo</span>';
+    }
+    cnt.innerHTML = (q ? (list.length + ' de ' + _allUsers.length)
+                       : (_allUsers.length + ' usuarios')) + nota;
+  }
 }
 
 async function setRole(email) {

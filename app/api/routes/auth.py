@@ -13,6 +13,7 @@ from pydantic import BaseModel, EmailStr
 
 from app.database import get_db
 from app.core.invite_code import normalizar as normalizar_codigo
+from app.core.smoke import es_smoke, purgar_antiguas as purgar_smoke_antiguas
 from app.models.user import User
 from app.models.delegation import Delegation
 from app.models.invite import Invite
@@ -240,6 +241,17 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
         except Exception:
             db.rollback()
             db.refresh(user)
+
+    # ── Autolimpieza de cuentas de smoke test ────────────────────────────────
+    # El smoke test da de alta cuentas de verdad contra producción cada 6 h (4
+    # por pasada) y se quedaban en la tabla: 1.646 filas de 2.088 el 10-oct-2026,
+    # el 79 % del panel de usuarios. Cada alta de smoke se lleva por delante las
+    # de pasadas anteriores, así que la tabla nunca guarda más que la pasada en
+    # curso. Solo se dispara desde el propio dominio de smoke: un registro de
+    # usuario real no pasa por aquí. Ver app/core/smoke.py.
+    if es_smoke(email_norm):
+        purgar_smoke_antiguas(db)
+        db.refresh(user)
 
     return AuthResponse(
         token=create_token(str(user.id)),

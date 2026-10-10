@@ -12,6 +12,7 @@ from app.database import get_db
 from app.models.user import User
 from app.models.payment import Payment
 from app.api.routes.auth import get_current_user
+from app.core.smoke import SMOKE_EMAIL_LIKE, DELETED_EMAIL_LIKE
 
 router = APIRouter(tags=["payments"])
 
@@ -902,14 +903,41 @@ def add_tokens(
 # ── Listar usuarios (solo admin) ─────────────────────────────────────────────
 @router.get("/admin/users")
 def list_users(
+    incluir_internos: bool = False,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    """
+    Censo de usuarios para el panel.
+
+    Por defecto deja fuera lo que no es un usuario: las cuentas del smoke test
+    (@dogsmindsmoke.net) y las cuentas borradas, que el scrub de GDPR conserva
+    como deleted-<id>@thedogsmind.deleted para no romper los registros de pago.
+    Con las de smoke dentro, el 10-oct-2026 el panel decía 2.088 usuarios cuando
+    los reales eran 434: no había forma de ver si había entrado alguien nuevo.
+
+    `?incluir_internos=1` las devuelve todas, para cuando haga falta mirarlas.
+    """
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Acceso restringido.")
-    users = db.query(User).order_by(User.created_at.desc()).all()
-    return {"users": [
-        {"email": u.email, "role": u.role, "tokens": float(u.tokens),
-         "created_at": str(u.created_at)}
-        for u in users
-    ]}
+
+    q = db.query(User)
+    if not incluir_internos:
+        q = q.filter(
+            ~User.email.like(SMOKE_EMAIL_LIKE),
+            ~User.email.like(DELETED_EMAIL_LIKE),
+        )
+    users = q.order_by(User.created_at.desc()).all()
+
+    n_smoke = db.query(User).filter(User.email.like(SMOKE_EMAIL_LIKE)).count()
+    n_borrados = db.query(User).filter(User.email.like(DELETED_EMAIL_LIKE)).count()
+
+    return {
+        "users": [
+            {"email": u.email, "role": u.role, "tokens": float(u.tokens),
+             "created_at": str(u.created_at)}
+            for u in users
+        ],
+        "ocultos": {"smoke": n_smoke, "borrados": n_borrados},
+        "incluir_internos": incluir_internos,
+    }

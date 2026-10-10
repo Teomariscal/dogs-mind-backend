@@ -89,17 +89,31 @@ adivinar.
 | 3 | Alta y baja de token, e interruptor | hecho |
 | 4 | Selección de segmentos y topes de frecuencia | hecho |
 | 5 | Envío contra FCM (sirve para Android **y** para iOS vía APNs) | hecho, a la espera de credencial |
-| 6 | Pasada diaria | hecho (endpoint protegido + disparo horario) |
+| 6 | `POST /push/run`, protegido. **En seco por defecto** | hecho |
+| 7 | **El disparo horario NO está montado.** Se decide cuando haya credencial de FCM: hasta entonces no hay nada que disparar | pendiente |
+
+Comprobado en producción el 10-oct-2026, no deducido: `last_seen_at` llega NULL
+al registrarse y queda sellado tras la primera petición autenticada; el alta de
+dispositivo guarda plataforma, idioma y zona; el interruptor se lee y se cambia;
+las tres guardas contestan 401/401/403 sin credenciales. Y contra la base real:
+los tres segmentos se detectan bien, quien entró hace un día no sale, quien no
+tiene zona horaria tampoco, la segunda pasada seguida da cero por el tope de 3
+días, y apagar el interruptor baja la cuenta.
 
 **App — exige versión nueva en las dos tiendas:**
 
 | | qué | depende de |
 |---|---|---|
-| 7 | `@capacitor/push-notifications`, capacidad en Xcode | — |
-| 8 | **Clave APNs** en Apple Developer | **founder** |
-| 9 | **Proyecto Firebase + `google-services.json`** | **founder** |
-| 10 | Pedir permiso, coger token y mandarlo al backend | 7, 8, 9 |
-| 11 | Interruptor en ajustes | — |
+| 8 | `@capacitor/push-notifications`, capacidad en Xcode | — |
+| 9 | **Clave APNs** en Apple Developer | **founder** |
+| 10 | **Proyecto Firebase + `google-services.json`** | **founder** |
+| 11 | Pedir permiso, coger token y mandarlo al backend | 8, 9, 10 |
+| 12 | Interruptor en ajustes | — |
+
+Dos variables de entorno en Railway cuando lleguen las credenciales:
+`FCM_PROJECT_ID`, `FCM_CREDENTIALS_JSON` (el JSON entero de la cuenta de
+servicio). Y `PUSH_CRON_KEY` para que el disparo horario pueda llamar a
+`/push/run` sin sesión de usuario.
 
 `last_seen_at` es lo que distingue «entró» de «consultó»: `usage_log` solo
 registra llamadas facturables, así que quien abre la app a mirar su plan no

@@ -49,6 +49,23 @@ import logging as _logging
 _log = _logging.getLogger(__name__)
 
 
+def _texto_de(respuesta) -> str:
+    """
+    El texto de una respuesta de Anthropic, venga donde venga en la lista.
+
+    Sustituye a `respuesta.content[0].text`, que daba por hecho que el primer
+    bloque es texto. Dejó de ser cierto al pasar de generación: desde Sonnet 5.5
+    el pensamiento viene encendido por defecto y el primer bloque puede ser un
+    `thinking` con el texto vacío. El fallo no avisa —no revienta, devuelve
+    cadena vacía o el razonamiento en lugar de la respuesta—, así que se busca
+    el primer bloque de tipo `text` y punto.
+    """
+    for bloque in (getattr(respuesta, "content", None) or []):
+        if getattr(bloque, "type", None) == "text":
+            return bloque.text or ""
+    return ""
+
+
 def _strip_markdown(text: str) -> str:
     """Remove markdown symbols from AI replies before sending to client."""
     text = _re.sub(r'\*\*', '', text)                        # **bold**
@@ -509,7 +526,23 @@ def analysis_chat(
         messages.append({"role": m.role, "content": m.content})
 
     client = get_anthropic_client()
-    chat_model = "claude-sonnet-4-5"        # Sonnet 4.5 — fast & high quality for chat
+    # Sonnet 5.5. Sustituye a Sonnet 4.5, que Anthropic retira el 30-oct-2026 y
+    # era el único sitio del backend que lo usaba. Más capaz y además más barato
+    # (2/10 USD por millón frente a 3/15).
+    #
+    # Dos cosas cambian de verdad al saltar de generación, y las dos revientan en
+    # silencio si no se tocan:
+    #
+    #   1. En 5.5 el pensamiento viene ENCENDIDO por defecto. El primer bloque de
+    #      la respuesta deja de ser texto y pasa a ser un bloque `thinking`, así
+    #      que `content[0].text` se rompe. Aquí se apaga con `between_tools` —la
+    #      única forma de apagarlo en 5.5, porque `disabled` devuelve 400— para
+    #      que el chat se comporte exactamente como hoy y no pague tokens de
+    #      razonamiento en cada turno.
+    #   2. `temperature` devuelve 400 en 5.5. Esta llamada nunca la pasó, así que
+    #      no hay nada que quitar, pero conviene saberlo antes de añadirla.
+    chat_model = "claude-sonnet-5-5"
+    chat_thinking = {"type": "between_tools"}
     user_id_for_logs = _extract_user_id(authorization)
     # Inject UI language so Sonnet responds in the right language
     lang = (req.lang or "es").lower()
@@ -529,10 +562,11 @@ def analysis_chat(
         response = client.messages.create(
             model=chat_model,
             max_tokens=8000,
+            thinking=chat_thinking,
             system=system_prompt_localized,
             messages=messages,
         )
-        reply = _strip_markdown(response.content[0].text)
+        reply = _strip_markdown(_texto_de(response))
 
         # Salvaguarda: si aun así llega al tope, se PIDE LA CONTINUACIÓN y se
         # une, en vez de devolver el texto mutilado y que el usuario pague otra
@@ -542,15 +576,16 @@ def analysis_chat(
                 seguimiento = client.messages.create(
                     model=chat_model,
                     max_tokens=8000,
+                    thinking=chat_thinking,
                     system=system_prompt_localized,
                     messages=messages + [
-                        {"role": "assistant", "content": response.content[0].text},
+                        {"role": "assistant", "content": _texto_de(response)},
                         {"role": "user", "content":
                             "Continúa EXACTAMENTE donde lo dejaste, sin repetir nada "
                             "de lo ya escrito y sin introducción."},
                     ],
                 )
-                reply = reply + "\n" + _strip_markdown(seguimiento.content[0].text)
+                reply = reply + "\n" + _strip_markdown(_texto_de(seguimiento))
             except Exception:
                 pass   # si la continuación falla, al menos va lo que había
         # Cost tracking — fire-and-forget

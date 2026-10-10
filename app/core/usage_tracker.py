@@ -26,8 +26,14 @@ logger = logging.getLogger(__name__)
 
 # Precios USD por 1M tokens (revisar trimestralmente)
 _PRICES = {
+    # Generación actual
+    "claude-sonnet-5-5":  {"in": 2.00,  "out": 10.00},   # /analysis/chat desde el 10-oct-2026
+    "claude-haiku-5-5":   {"in": 0.10,  "out": 0.50},
+    "claude-opus-5-5":    {"in": 4.00,  "out": 20.00},
+    # Generación anterior — sigue en uso, y las filas viejas de usage_log se
+    # calcularon con estos precios: no se borran aunque dejemos de llamarlos.
     "claude-sonnet-4-6":  {"in": 3.00,  "out": 15.00},
-    "claude-sonnet-4-5":  {"in": 3.00,  "out": 15.00},   # usado en /analysis/chat
+    "claude-sonnet-4-5":  {"in": 3.00,  "out": 15.00},   # Anthropic lo retira el 30-oct-2026
     "claude-haiku-4-5":   {"in": 1.00,  "out": 5.00},    # corregido: era 0.80/4.00 (precio Haiku 3.5, infravaloraba ~25%)
     "claude-opus-4-8":    {"in": 5.00,  "out": 25.00},   # fallback ante 529 de Sonnet
     "claude-opus-4-7":    {"in": 5.00,  "out": 25.00},

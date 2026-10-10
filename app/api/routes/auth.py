@@ -159,6 +159,13 @@ async def get_current_user(
         raise HTTPException(status_code=401, detail="Usuario no encontrado")
     if user.deleted_at is not None:
         raise HTTPException(status_code=401, detail="Cuenta eliminada")
+    # Sello de "ha estado aquí". Este es el único sitio por el que pasa toda
+    # petición autenticada, así que es el único que distingue de verdad "entró"
+    # de "consultó": usage_log solo registra llamadas facturables y deja fuera a
+    # quien abre la app a mirar su plan o a releer un caso. Escribe como mucho
+    # una vez cada cuarto de hora y nunca lanza — ver app/core/push.py.
+    from app.core.push import marcar_visto
+    marcar_visto(db, user)
     return user
 
 

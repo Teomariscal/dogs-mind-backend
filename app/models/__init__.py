@@ -11,3 +11,4 @@ from app.models.safety_log import SafetyLog
 from app.models.usage_log import UsageLog
 from app.models.dog import Dog
 from app.models.case import Case, CaseEntry, DailyFollowupEntry, CaseDailyTask, TheoryQuestion, DailyTip
+from app.models.push_device import PushDevice, PushLog

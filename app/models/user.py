@@ -25,6 +25,17 @@ class User(Base):
     # GDPR/CCPA: soft-delete con PII scrub. NULL = activo. Timestamp = cuenta eliminada.
     deleted_at     = Column(DateTime, nullable=True, index=True)
 
+    # ── Reactivación por push (10-oct-2026) ──────────────────────────────────
+    # Última petición autenticada. Es lo que distingue "entró" de "consultó":
+    # usage_log solo registra llamadas facturables, así que quien abre la app a
+    # mirar su plan o a releer un caso no aparece ahí y lo daríamos por perdido.
+    # Se escribe en get_current_user, con freno: ver app/core/push.py.
+    last_seen_at   = Column(DateTime, nullable=True, index=True)
+    # Interruptor del usuario. Apple exige poder apagarlas desde dentro de la
+    # app, y apagarlas aquí es más fiable que fiarlo al permiso del sistema:
+    # sobrevive a reinstalaciones y vale para todos sus dispositivos a la vez.
+    push_enabled   = Column(Boolean, nullable=False, default=True)
+
     # ── Perfil de empresa/entidad (solo se rellena si account_type = 'professional') ──
     # Validados en endpoint, NO en modelo. Nullable porque un profesional puede no haber
     # configurado todavía su empresa (slot Entidad vacío en home → primer tap abre form).

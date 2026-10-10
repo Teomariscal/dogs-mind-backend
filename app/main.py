@@ -19,6 +19,7 @@ from app.api.routes import puppy_school as puppy_school_router
 from app.api.routes import walks as walks_router
 from app.api.routes import corporates as corporates_router
 from app.api.routes import invites as invites_router
+from app.api.routes import push as push_router
 from app.api.routes import training as training_router
 from app.api.routes import training_consult as training_consult_router
 from app.api.routes import app_config as app_config_router
@@ -180,6 +181,23 @@ async def lifespan(app: FastAPI):
             # FK opcional de daily_followup_entries.theory_question_id → theory_questions(id).
             # No lo añadimos como FK constraint hard porque queremos preservar entries
             # incluso si se purga la caché (improbable pero defensivo).
+            # ── Push de reactivación (10-oct-2026) ──────────────────────────
+            # last_seen_at: última petición autenticada. Distingue "entró" de
+            # "consultó" — usage_log solo ve llamadas facturables, así que quien
+            # abre la app a mirar su plan no aparece ahí. NULL en los usuarios
+            # anteriores: hasta que no vuelvan no se les puede medir el silencio,
+            # y como además no tienen token de dispositivo, no hay a quién avisar.
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS last_seen_at TIMESTAMP",
+            "CREATE INDEX IF NOT EXISTS ix_users_last_seen_at ON users(last_seen_at)",
+            # Interruptor del usuario. DEFAULT TRUE no manda nada a nadie: sin
+            # token de dispositivo no hay envío posible, y el token solo existe
+            # si la persona concedió el permiso del sistema.
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS push_enabled BOOLEAN NOT NULL DEFAULT TRUE",
+            # push_devices / push_log los crea init_db() con el resto del
+            # metadata; aquí solo garantizamos los índices compuestos por si la
+            # tabla ya existía de un despliegue anterior.
+            "CREATE INDEX IF NOT EXISTS ix_push_devices_user_active ON push_devices(user_id, active)",
+            "CREATE INDEX IF NOT EXISTS ix_push_log_user_sent ON push_log(user_id, sent_at)",
         ]
         for sql in migrations:
             try:
@@ -326,6 +344,7 @@ app.include_router(puppy_school_router.router)
 app.include_router(walks_router.router)
 app.include_router(corporates_router.router)
 app.include_router(invites_router.router)
+app.include_router(push_router.router)
 
 
 @app.get("/", include_in_schema=False)

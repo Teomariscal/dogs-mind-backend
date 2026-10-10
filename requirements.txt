@@ -41,3 +41,8 @@ httpx==0.28.1
 # Text splitting utilities
 tiktoken==0.8.0
 opencv-python==4.10.0.84
+
+# Notificaciones push (FCM v1 — firma de la cuenta de servicio de Firebase).
+# FCM sirve para Android Y para iOS: Google habla con APNs por nosotros, así que
+# una sola credencial cubre las dos tiendas.
+google-auth==2.37.0

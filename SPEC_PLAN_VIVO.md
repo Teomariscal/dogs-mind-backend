@@ -8,6 +8,10 @@ La frase que lo resume, suya: *"no te da un plan y adiós — es un plan vivo co
 que estás interactuando de forma constante"*. Es la queja que el founder oye
 sobre los veterinarios comportamentalistas, y hoy la app hace exactamente eso.
 
+**Maqueta viva:** https://tdm-mockups.netlify.app — el recorrido entero
+(entrega → semana 1 → cuestionario → fase superada → fase 2), con la vibración y
+el sonido funcionando de verdad. Sitio de maquetas, nunca producción.
+
 ---
 
 ## Los números que lo justifican

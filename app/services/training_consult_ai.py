@@ -10,7 +10,7 @@ Pipeline (igual patrón que clinical_ai.py / /analysis ABC):
   4. Devolver TrainingConsultResult con markdown + sources + tokens.
 
 Decisión founder 2026-05-29 (segunda iteración): anclar a RAG clínica
-compartida, estructura ABA formal, tono técnico puro, plan por fases con
+compartida, estructura ABA formal, tono técnico pero sin siglas desnudas (13-oct-2026), plan por fases con
 ejercicios principal + complementarios. Heredando blindaje LIMA literal.
 
 Coste por consulta (con RAG): ~$0.025 (Sonnet 4.6 + chunks RAG en input).

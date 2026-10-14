@@ -16049,10 +16049,24 @@ function anam_step(id, delta) {
   }
 }
 // Toggle con campo condicional visible/oculto
+//
+// OJO con la linea del display, que tenia un fallo que duro meses (founder,
+// 13-oct-2026: "no me dejaba avanzar si en el caso no ponia que habia agresion
+// y la distancia, a pesar de que habia puesto que no habia agresion").
+//
+// Decia `isActive(activeId)`, y `anam_toggle` acababa de poner ESE boton en
+// blanco una linea mas arriba — o sea que la condicion era SIEMPRE cierta.
+// Pulsaras "Si" o pulsaras "No", el campo condicional se abria igual. Afectaba
+// a los tres: dolencia cronica, convivencia con otros perros y agresion. Quien
+// decia que su perro no tiene ninguna dolencia se encontraba igualmente el
+// "¿cual?" delante, y quien decia que no hay agresion, la distancia.
+//
+// El condicional depende de la pregunta, no de que haya respuesta: se abre solo
+// con el "si". La convencion de ids de la anamnesis es <tema>-si / <tema>-no.
 function anam_toggle_cond(activeId, inactiveId, condId) {
   anam_toggle(activeId, inactiveId);
   var condEl = document.getElementById(condId);
-  if (condEl) condEl.style.display = isActive(activeId) ? 'flex' : 'none';
+  if (condEl) condEl.style.display = /-si$/.test(activeId) ? 'flex' : 'none';
 }
 // Counter para paseos (igual que miembros pero para otro ID)
 var _paseos = 1;

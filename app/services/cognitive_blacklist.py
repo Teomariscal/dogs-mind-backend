@@ -85,7 +85,14 @@ _BLACKLIST_PATTERNS = [
     # cuestion de lexico, no puede aparecer en ningun caso.
     (r"\bpunizione\s+(positiva|negativa)\b", "punizione positiva/negativa", None, True),
     # Sin equivalente validado: antes que quedarse vago, termino llano.
-    (r"\bmodellaggio\b", "modellaggio (shaping)", None, False),
+    # OJO con estos dos, que NO son sinonimos (founder, 13-oct-2026):
+    #   modellamento = shaping, reforzar aproximaciones sucesivas  (moldeado)
+    #   modellaggio  = aprender observando a otro                  (modelado)
+    # La etiqueta decia "modellaggio (shaping)" y era el otro. Ninguno de los
+    # dos se persigue —sin equivalente validado no se persigue, regla del
+    # founder del 11-sep— pero que la etiqueta mienta confunde la auditoria.
+    (r"\bmodellamento\b", "modellamento (shaping / moldeado)", None, False),
+    (r"\bmodellaggio\b", "modellaggio (modelado, por observacion)", None, False),
     (r"\bshaping\b", "shaping", None, False),
     (r"\bconcatenamento\b", "concatenamento (chaining)", None, False),
     (r"\bchaining\b", "chaining", None, False),

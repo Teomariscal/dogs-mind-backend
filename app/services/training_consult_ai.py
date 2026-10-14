@@ -26,6 +26,7 @@ from app.core.anthropic_client import get_anthropic_client, create_message_resil
 from app.core.prompts.training_consult import (
     TRAINING_CONSULT_PROMPT_ES,
     TRAINING_CONSULT_PROMPT_EN,
+    TRAINING_CONSULT_PROMPT_IT,
 )
 from app.core.prompts.petowner_training_overlay import PETOWNER_TRAINING_VOICE_OVERLAY
 from app.services.rag import retrieve, build_rag_context_block
@@ -52,10 +53,12 @@ RAG_TOP_K = 5
 _LEVEL_LABELS = {
     "es": {"basico": "Básico", "medio": "Medio", "avanzado": "Avanzado"},
     "en": {"basico": "Basic", "medio": "Intermediate", "avanzado": "Advanced"},
+    "it": {"basico": "Base", "medio": "Medio", "avanzado": "Avanzato"},
 }
 _CONTEXT_LABELS = {
     "es": {"pista": "Pista", "interior": "Interior", "calle": "Calle"},
     "en": {"pista": "Training field", "interior": "Indoor", "calle": "Street"},
+    "it": {"pista": "Campo", "interior": "Interno", "calle": "Strada"},
 }
 
 
@@ -133,9 +136,9 @@ def _build_input_block(
 
     reinforcers_clean = [r for r in (reinforcers or []) if r and str(r).strip()]
     reinforcers_str = ", ".join(reinforcers_clean) if reinforcers_clean else (
-        "no especificado" if lang == "es" else "not specified"
+        "not specified" if lang == "en" else "non specificato" if lang == "it" else "no especificado"
     )
-    clicker_str = ("Sí" if uses_clicker else "No") if lang == "es" else ("Yes" if uses_clicker else "No")
+    clicker_str = ("Yes" if uses_clicker else "No") if lang == "en" else ("Sì" if uses_clicker else "No") if lang == "it" else ("Sí" if uses_clicker else "No")
 
     if lang == "en":
         return (
@@ -154,6 +157,25 @@ def _build_input_block(
             "TARGET EXERCISE:\n"
             f"  - Skill / behavior to teach: {goal}\n"
             f"  - Main training context: {ctx}\n"
+            "</consultation_input>"
+        )
+    if lang == "it":
+        return (
+            "<consultation_input>\n"
+            "SOGGETTO:\n"
+            f"  - Nome: {dog_name}\n"
+            f"  - Tipologia razziale: {breed}\n"
+            f"  - Eta: {age}\n"
+            "\n"
+            "PROFILO:\n"
+            f"  - Livello di addestramento del soggetto: {dlvl}\n"
+            f"  - Livello del conduttore: {hlvl}\n"
+            f"  - Rinforzatori preferiti riportati: {reinforcers_str}\n"
+            f"  - Clicker gia caricato e di uso abituale: {clicker_str}\n"
+            "\n"
+            "ESERCIZIO OBIETTIVO:\n"
+            f"  - Abilita / condotta da insegnare: {goal}\n"
+            f"  - Contesto principale di addestramento: {ctx}\n"
             "</consultation_input>"
         )
     else:
@@ -205,8 +227,12 @@ def generate_training_consult(
     if lang_norm not in ("es", "en", "it"):
         lang_norm = "es"
 
+    # Hasta el 13-oct-2026 esto decia "si es ingles el ingles, si no el español",
+    # asi que un italiano recibia el prompt en CASTELLANO. El italiano es la via
+    # ABA (conductual), NO la cognitivista de Odette: ver la cabecera del prompt.
     system_prompt = (
         TRAINING_CONSULT_PROMPT_EN if lang_norm == "en"
+        else TRAINING_CONSULT_PROMPT_IT if lang_norm == "it"
         else TRAINING_CONSULT_PROMPT_ES
     )
     # Particular (Pet Owner): misma estructura y rigor, VOZ en llano.

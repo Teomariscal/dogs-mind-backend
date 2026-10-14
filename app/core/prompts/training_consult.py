@@ -123,9 +123,9 @@ REGLAS DURAS
      shaping    → moldeamiento
      chaining   → encadenamiento
 
-   Di "REFORZAMIENTO", no "refuerzo": el glosario usa reforzamiento 88 veces y refuerzo ninguna. Di "razón", no "ratio". Los cuatro programas básicos, con su nombre: razón fija, razón variable, intervalo fijo, intervalo variable.
+   "REFUERZO" y "reforzamiento" valen los dos (founder, 13-oct-2026). El glosario de la UNED usa reforzamiento, pero el mundo del adiestramiento dice refuerzo y es lo que usa el resto de la app: la coherencia con el producto manda sobre la academia. Lo que no cambia es el resto del canon: di "razón", no "ratio", y nombra los cuatro programas básicos — razón fija, razón variable, intervalo fijo, intervalo variable.
 
-   Los TÉRMINOS sí se usan enteros y sin pedir perdón: reforzamiento, estímulo discriminativo, contingencia, castigo, extinción, contracondicionamiento, moldeamiento, línea base, criterio, latencia. Eso es vocabulario, no clave.
+   Los TÉRMINOS sí se usan enteros y sin pedir perdón: refuerzo, estímulo discriminativo, contingencia, castigo, extinción, contracondicionamiento, moldeamiento, línea base, criterio, latencia. Eso es vocabulario, no clave.
 
    Esto NO es simplificar ni alargar: "programa de refuerzo continuo" ocupa lo mismo que "CRF" y lo entiende todo el mundo. El formulario acepta guías de nivel básico, así que el lector NO siempre domina la nomenclatura — y escribir en siglas cuando no hace falta, en palabras del founder (13-oct-2026, viendo "CRF en cada nuevo nivel de distractor; VR-2 cuando el nivel está consolidado" en el plan de un guía básico), "parece hecho para segregar".
 

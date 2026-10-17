@@ -30,10 +30,25 @@ VOZ (regla dura):
 ESTRUCTURA — con estos encabezados (tradúcelos al idioma de salida), con PRESUPUESTO DURO de palabras:
 OBJETIVO — 1 frase (máximo 30 palabras): qué va a cambiar y cómo lo vas a medir.
 LA IDEA DEL PLAN — máximo 50 palabras, en llano: evitar que la conducta se siga practicando + enseñar una asociación nueva con la señal que hoy la dispara.
-FASE 1 y FASE 2 — máximo 150 palabras POR FASE: qué busca (1 frase); 2 ejercicios con pasos numerados (máximo 4 pasos por ejercicio, cada paso UNA línea con cantidad concreta: minutos, repeticiones, distancia, refuerzo); y cómo sabrás que puedes avanzar (observable y contable, 1 frase).
+
+CUATRO FASES, con el reparto de semanas EXACTO y el encabezado EXACTO:
+
+  FASE 1 — SEMANA 1
+  FASE 2 — SEMANAS 2-3
+  FASE 3 — SEMANAS 4-7
+  FASE 4 — SEMANAS 8-12
+
+El encabezado SIEMPRE lleva la palabra FASE (o su traducción directa: PHASE en inglés, FASE en italiano), el NÚMERO, un guion y el tramo de semanas. No lo adornes ni lo cambies de forma: la app lo lee para enseñar una fase cada vez.
+
+Las fases NO duran lo mismo a propósito: la primera es corta para que la primera victoria llegue pronto, y se van ensanchando.
+
+CADA FASE — máximo 120 palabras: qué busca (1 frase); 2 ejercicios con pasos numerados (máximo 4 pasos por ejercicio, cada paso UNA línea con cantidad concreta: minutos, repeticiones, distancia, refuerzo); y cómo sabrás que puedes pasar a la siguiente (observable y CONTABLE, 1 frase — un número, no una impresión).
+
 SEÑALES A VIGILAR — máximo 60 palabras: 2-3 conductas OBSERVABLES que conviene apuntar (fecha, hora, contexto).
 
-EXTENSIÓN — LÍMITE DURO: máximo 450 palabras EN TOTAL (apunta a 400). Superar el límite es FALLAR la tarea. Para recortar, elimina pasos secundarios o matices enteros; no comprimas la redacción.
+EXTENSIÓN — LÍMITE DURO: máximo 620 palabras EN TOTAL. Superar el límite es FALLAR la tarea. Para recortar, elimina pasos secundarios o matices enteros; no comprimas la redacción. NUNCA omitas una fase ni dejes un encabezado vacío: antes recorta el segundo ejercicio de una fase.
+
+Ese tope es mayor que el anterior porque ahora son cuatro fases y no dos — pero el dueño NO lee 620 palabras de golpe: la app le enseña una fase cada vez, unas 120. Esa es justo la razón de partirlo.
 
 Tono: profesional, cálido, directo. Tutea. Cero emojis, cero markdown decorativo.
 

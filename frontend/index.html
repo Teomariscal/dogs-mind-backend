@@ -6707,6 +6707,10 @@ body.dm-web .splash-descargar {
   transition:transform .12s, filter .12s;
 }
 .pf-cta:active{ transform:scale(.978); filter:brightness(1.07); }
+.pf-pie{
+  text-align:center; font-size:12px; color:rgba(243,241,234,.45);
+  margin:22px 0 2px; letter-spacing:.02em;
+}
 .pf-link{
   display:block; width:100%; border:0; background:transparent; margin-top:11px;
   color:rgba(243,241,234,.62); font-family:inherit; font-size:13.5px;
@@ -9903,6 +9907,7 @@ body.dm-web .splash-descargar {
         </button>
         <button class="pf-link" type="button" onclick="dmPF.completo()"
                 data-i18n="pf_completo">Ver el plan completo</button>
+        <p class="pf-pie" data-i18n="iv_pie">Plan generado por The Dogs&rsquo; Mind</p>
       </section>
 
     </div>
@@ -21024,6 +21029,17 @@ function getVal(id, fallback) {
   // cognitivista (stance='cognitive') NO se muestra en ningún idioma — el
   // texto suscribe el análisis funcional y contradice ese enfoque. En la vía
   // conductual se muestra localizado (es/en/it).
+  /* Pie del plan. Lo pone la APP, no el modelo (founder 17-oct-2026).
+     Antes lo escribia el modelo por su cuenta y le salia una linea de creditos
+     con el nombre de una persona, la palabra "clinico" y los asteriscos de
+     markdown a la vista. Al prompt se le ha prohibido acreditar; el pie es
+     este, fijo, traducido y sin markdown que se pueda escapar. */
+  function _ivPieHtml() {
+    var t = _i18nText('iv_pie', 'Plan generado por The Dogs\u2019 Mind');
+    return '<p style="margin:18px 0 2px;text-align:center;font-size:12px;' +
+           'color:rgba(243,241,234,0.52);letter-spacing:.02em;">' + t + '</p>';
+  }
+
   function _ivIntroHtml() {
     if ((window._tdmStance || '') === 'cognitive') return '';
     var L = (typeof window.getCurrentLang === 'function') ? window.getCurrentLang() : 'es';
@@ -21060,7 +21076,8 @@ function getVal(id, fallback) {
         _i18nText('plan_acepta_1', 'Si aceptas, tu caso quedará registrado en el registro de datos de conducta. Puedes volver a realizar tantas consultas como quieras sobre el mismo caso.') +
         '<br><br>' +
         _i18nText('plan_acepta_2', 'Nuestro porcentaje de acierto en los análisis funcionales y planes de intervención es muy alto, pero nunca está de más pedir una segunda opinión si algo no te convence.') +
-      '</div>';
+      '</div>' +
+      _ivPieHtml();
 
     if (loading) loading.style.display = 'none';
     if (empty)   empty.style.display   = 'none';
@@ -21182,7 +21199,8 @@ function getVal(id, fallback) {
           'Si aceptas, tu caso quedará registrado en el registro de datos de conducta. Puedes volver a realizar tantas consultas como quieras sobre el mismo caso; cada vez que realices una nueva consulta estarás pidiendo una segunda opinión al equipo de expertos.' +
           '<br><br>' +
           'Nuestro porcentaje de acierto en los análisis funcionales y planes de intervención es muy alto, pero nunca está de más pedir una segunda opinión si algo no te convence.' +
-        '</div>';
+        '</div>' +
+        _ivPieHtml();
 
       var actions = document.getElementById('interv-actions');
       if (loading) loading.style.display = 'none';
@@ -21335,6 +21353,19 @@ async function analyzeWithAI() {
   var dogName     = getVal('inp-dog-name', 'Sin nombre');
   var dogAge      = getVal('inp-dog-age',  'Desconocida');
   var breed       = getVal('inp-breed',    'Mestizo');
+  /* Destete. OJO CON LA UNIDAD POR DEFECTO — aqui habia un fallo que falseaba
+     el analisis (founder, 17-oct-2026, visto en TestFlight: puso 2 y el
+     analisis dijo "destete a las 2 semanas: muy prematuro").
+
+     La pregunta en pantalla es "¿Con cuantos MESES salio de la camada?", pero
+     el codigo asumia SEMANAS cuando el usuario no escribia la unidad. Es decir:
+     quien contestaba la pregunta literalmente —un numero a secas, porque el
+     enunciado ya dice meses— mandaba un dato ocho veces menor, y el motor leia
+     un destete prematuro que no existe y lo metia en las variables
+     disposicionales del caso.
+
+     Ahora manda la pregunta: numero suelto = MESES. Solo se leen semanas si el
+     usuario escribe la palabra, en cualquiera de los tres idiomas. */
   var weaningRaw  = getVal('inp-weaning', '');
   var weaningWeeks = null;
   if (weaningRaw) {
@@ -21342,12 +21373,9 @@ async function analyzeWithAI() {
     if (_wNum) {
       var _n = parseInt(_wNum[0]);
       var _txt = weaningRaw.toLowerCase();
-      // Convertir meses → semanas
-      if (_txt.indexOf('mes') !== -1 || _txt.indexOf('month') !== -1) {
-        weaningWeeks = _n * 4;
-      } else {
-        weaningWeeks = _n; // asume semanas
-      }
+      var _dicenSemanas = (_txt.indexOf('seman') !== -1 || _txt.indexOf('week') !== -1 ||
+                           _txt.indexOf('settiman') !== -1 || /\d\s*s\b/.test(_txt));
+      weaningWeeks = _dicenSemanas ? _n : Math.round(_n * 4.345);
     }
   }
 
@@ -24215,6 +24243,7 @@ function endTourIntro() {
       anam_lbl_where:          '¿Dónde ocurre?',
       anam_lbl_who:            '¿Quién está presente?',
       anam_lbl_freq:           '¿Con qué frecuencia ocurre?',
+      iv_pie: 'Plan generado por The Dogs’ Mind',
       pf_empezar: 'Empezar por la fase 1',
       pf_completo: 'Ver el plan completo',
       pf_fase: 'Fase',
@@ -26303,6 +26332,7 @@ function endTourIntro() {
       ph_since:         'E.g.: 6 months ago, since puppyhood...',
       ph_where:         'E.g.: at home, in the street, at the park...',
       ph_who:           'E.g.: whole family, only me, strangers...',
+      iv_pie: 'Plan generated by The Dogs’ Mind',
       pf_empezar: 'Start with phase 1',
       pf_completo: 'See the full plan',
       pf_fase: 'Phase',
@@ -27587,6 +27617,7 @@ function endTourIntro() {
           ph_since:         'Es: 6 mesi fa, da cucciolo...',
           ph_where:         'Es: a casa, per strada, al parco...',
           ph_who:           'Es: tutta la famiglia, solo io, estranei...',
+          iv_pie: 'Piano generato da The Dogs’ Mind',
           pf_empezar: 'Inizia dalla fase 1',
           pf_completo: 'Vedi il piano completo',
           pf_fase: 'Fase',

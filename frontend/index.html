@@ -21066,7 +21066,21 @@ function getVal(id, fallback) {
     if (empty)   empty.style.display   = 'none';
     if (body)    { body.innerHTML = fullHtml; body.style.display = 'block'; }
     if (actions) actions.style.display = 'flex';
-    goTo('s-tracking');
+
+    /* Mismo criterio que al generarlo: si es un particular y el plan guardado
+       trae las cuatro fases, se lee por fases tambien al REABRIR el caso. Sin
+       esto, el usuario generaba el plan y lo veia por fases, y al volver al dia
+       siguiente se encontraba otra vez el muro de texto.
+       Respeta la regla del 19-sep: se abre con lo que se GUARDO, no con lo que
+       quedo en pantalla — aqui solo cambia como se sirve ese mismo texto. */
+    var _pfOk = false;
+    try {
+      var _acc = window._myAccount || null;
+      if (_acc && _acc.account_type && !dmIsProAccount(_acc) && window.dmPF) {
+        _pfOk = dmPF.abrir(planText || '', dogName);
+      }
+    } catch (e) { _pfOk = false; }
+    if (!_pfOk) goTo('s-tracking');
   }
 
   async function generateInterventionPlan() {
@@ -21184,8 +21198,18 @@ function getVal(id, fallback) {
          lleva ahi. (founder 15-oct-2026) */
       var _pfOk = false;
       try {
-        var _acc = { account_type: (localStorage.getItem('dm_account_type') || '') };
-        if (!dmIsProAccount(_acc) && window.dmPF) {
+        /* La cuenta se lee de window._myAccount, que es la que usa TODO el
+           resto de la app. OJO: 'dm_account_type' en localStorage NO la
+           escribe nadie — solo se lee — asi que fiarse de ella daria
+           "no es profesional" para todo el mundo y el profesional se comeria
+           esta pantalla. Comprobado el 17-oct-2026.
+
+           Y la condicion va al reves de lo intuitivo: hace falta SABER que es
+           particular. Si la cuenta todavia no ha cargado, no se abre y se cae
+           al plan de siempre. Ante la duda, lo de antes. */
+        var _acc = window._myAccount || null;
+        var _esParticular = !!(_acc && _acc.account_type && !dmIsProAccount(_acc));
+        if (_esParticular && window.dmPF) {
           _pfOk = dmPF.abrir(data.plan || '', dogName);
         }
       } catch (e) { _pfOk = false; }

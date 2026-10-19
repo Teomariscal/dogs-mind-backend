@@ -268,8 +268,13 @@ def build_anamnesis_block(anamnesis: dict) -> str:
         f"Involves aggression: {_bool_label(a.get('involves_aggression'))}",
     ]
 
-    if a.get("involves_aggression") and a.get("aggression_distance_cm") is not None:
-        lines.append(f"Aggression onset distance: {a['aggression_distance_cm']} cm")
+    if a.get("involves_aggression"):
+        # Texto nuevo (trae su unidad) o, si viene de un build antiguo, el entero en cm.
+        _dist = (a.get("aggression_distance") or "").strip() or None
+        if _dist is None and a.get("aggression_distance_cm") is not None:
+            _dist = f"{a['aggression_distance_cm']} cm"
+        if _dist:
+            lines.append(f"Aggression onset distance (as the owner wrote it): {_dist}")
 
     lines.append("")
     lines.append("## Owner-provided extra context")

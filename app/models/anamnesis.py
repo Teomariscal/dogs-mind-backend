@@ -83,7 +83,21 @@ class AnamnesisInput(BaseModel):
 
     # Aggression specifics (optional)
     involves_aggression: bool = Field(False)
-    aggression_distance_cm: Optional[int] = Field(None, description="Distance at which aggression starts (cm)")
+    # Texto libre con su unidad dentro: "20 metros", "medio metro", "50 cm".
+    # El formulario ya no impone centimetros (founder, 19-oct-2026): un perro
+    # que reacciona al ver a otro a 20 metros no tiene centimetros que poner.
+    aggression_distance: Optional[str] = Field(None, description="Distance at which aggression starts, as the owner wrote it (with its unit)")
+    # LEGADO: los builds ya instalados (<= 1.0.34) siguen mandando el entero en
+    # centimetros. Se mantiene para no romperlos; los nuevos mandan null aqui.
+    aggression_distance_cm: Optional[int] = Field(None, description="DEPRECATED - distance in cm, sent by builds <= 1.0.34")
+
+    def aggression_distance_text(self) -> Optional[str]:
+        """La distancia tal como haya llegado: texto nuevo, o el entero antiguo rotulado en cm."""
+        if self.aggression_distance:
+            return self.aggression_distance.strip() or None
+        if self.aggression_distance_cm is not None:
+            return f"{self.aggression_distance_cm} cm"
+        return None
 
     # History
     previous_attempts: Optional[str] = Field(None, description="What has the owner tried so far?")

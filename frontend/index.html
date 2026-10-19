@@ -6634,9 +6634,14 @@ body.dm-web .splash-descargar {
 /* ══ PLAN POR FASES (founder 15-oct-2026) ══════════════════════════════════
    Mismos tokens que el resto de la app: verde vibrante de fondo, Cormorant
    para los titulos, Jost para el cuerpo. Nada de crema (regla del founder). */
+/* OJO con el display. Esta regla es un ID (especificidad 1,0,0) y machaca al
+   `.screen{display:none}` de arriba (0,1,0): con `display:flex` aqui, la
+   pantalla se pintaba SIEMPRE, apilada debajo del splash y de cualquier otra.
+   El display lo decide `.screen.active`, no esta regla. (19-oct-2026, visto en
+   el simulador antes de subir el build.) */
 #s-plan-fases{
   background:linear-gradient(180deg,#0e1f1a 0%,#14302a 100%);
-  color:#f3f1ea; display:flex; flex-direction:column; height:100%;
+  color:#f3f1ea; flex-direction:column; height:100%;
 }
 .pf-top{
   flex:0 0 auto; display:flex; align-items:center; gap:14px;
@@ -11437,7 +11442,12 @@ body.dm-web .splash-descargar {
             <button id="agresion-si" data-anam-grupo="agresion" onclick="anam_toggle_cond('agresion-si','agresion-no','agresion-dist-wrap')" data-i18n="btn_yes" style="padding:8px 20px;border-radius:100px;border:1.5px solid rgba(0,0,0,0.15);background:#fff;color:var(--dark);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">S&iacute;</button>
           </div>
           <div id="agresion-dist-wrap" style="display:none;margin-top:8px;">
-            <input id="inp-agresion-dist" type="number" data-i18n-placeholder="ph_agresion_dist" placeholder="Distancia a la que empieza la agresión (cm)" style="width:100%;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;" />
+            <!-- Texto libre a proposito, NO numero ni desplegable (founder,
+                 19-oct-2026): un perro que reacciona al ver a otro a 20 metros
+                 no tiene "centimetros" que poner. El usuario escribe la
+                 cantidad Y la unidad que le salga ("20 metros", "medio metro",
+                 "50 cm"); la unidad la interpreta el motor, no el formulario. -->
+            <input id="inp-agresion-dist" type="text" inputmode="text" data-i18n-placeholder="ph_agresion_dist" placeholder="Distancia a la que empieza la agresión" style="width:100%;padding:10px 12px;border:1.5px solid rgba(94,200,230,0.22);border-radius:10px;font-size:16px;font-family:inherit;background:rgba(255,255,255,0.06);color:var(--dark);box-sizing:border-box;outline:none;" />
           </div>
         </div>
 
@@ -21428,7 +21438,13 @@ async function analyzeWithAI() {
   var whereHappens      = getVal('inp-where',  '') || null;
   var whoPresent        = getVal('inp-who',    '') || null;
   var involvesAggr      = isActive('agresion-si');
-  var aggrDist          = involvesAggr ? (parseInt(getVal('inp-agresion-dist','')) || null) : null;
+  /* Distancia de agresion: texto libre con su unidad dentro ("20 metros",
+     "50 cm"). Antes se hacia parseInt y el backend lo rotulaba como "cm", asi
+     que "20 metros" llegaba al motor como "20 cm" — 2000 veces mas cerca.
+     Viaja tal cual en aggression_distance; aggression_distance_cm se deja a
+     null (sigue existiendo en el modelo porque los builds ya instalados lo
+     mandan). */
+  var aggrDist          = involvesAggr ? (getVal('inp-agresion-dist','').trim() || null) : null;
   var ownerTheory       = getVal('inp-theory', '') || null;
 
   // Frequency
@@ -21505,7 +21521,8 @@ async function analyzeWithAI() {
         where_it_happens:       whereHappens,
         who_is_present:         whoPresent,
         involves_aggression:    involvesAggr,
-        aggression_distance_cm: aggrDist,
+        aggression_distance:    aggrDist,
+        aggression_distance_cm: null,
         previous_attempts:      history,
         owner_theory:           ownerTheory,
         prior_event:            eventoPrevio,
@@ -25060,7 +25077,7 @@ function endTourIntro() {
       ph_since:         'Ej: hace 6 meses, desde cachorro...',
       ph_where:         'Ej: en casa, en la calle, en el parque...',
       ph_who:           'Ej: toda la familia, solo yo, extraños...',
-      ph_agresion_dist: 'Distancia a la que empieza la agresión (cm)',
+      ph_agresion_dist: 'Distancia a la que empieza la agresión',
       ph_history:       'Ej: castigo, ignorar, acudir al veterinario...',
       ph_theory:        'Tu hipótesis sobre por qué ocurre este comportamiento...',
       ph_evento_previo: 'Contesta brevemente (mudanza, llegada de un bebé, fallecimiento, viaje, cambio de horario, etc.)',
@@ -26344,7 +26361,7 @@ function endTourIntro() {
       pf_titulo: 'Your dog’s plan',
       pf_titulo_de: 'The plan for',
       pf_cecilia_script: 'Here is your dog’s plan. It runs for twelve weeks, in four phases, and I am not going to hand it to you all at once: each week you will have in front of you only what is due. Read it calmly — what matters is not rushing.',
-      ph_agresion_dist: 'Distance at which aggression starts (cm)',
+      ph_agresion_dist: 'Distance at which aggression starts',
       ph_history:       'E.g.: punishment, ignore, vet visit...',
       ph_theory:        'Your hypothesis on why this behavior occurs...',
       ph_evento_previo: 'Briefly: moving house, new baby, bereavement, travel, schedule change, etc.',
@@ -27629,7 +27646,7 @@ function endTourIntro() {
           pf_titulo: 'Il piano del tuo cane',
           pf_titulo_de: 'Il piano di',
           pf_cecilia_script: 'Ecco il piano del tuo cane. Dura dodici settimane, in quattro fasi, e non te lo darò tutto insieme: ogni settimana avrai davanti solo quello che tocca. Leggilo con calma, l’importante non è correre.',
-          ph_agresion_dist: 'Distanza a cui inizia l’aggressività (cm)',
+          ph_agresion_dist: 'Distanza a cui inizia l’aggressività',
           ph_history:       'Es: punizione, ignorare, andare dal veterinario...',
           ph_theory:        'La tua ipotesi sul perché si verifica questo comportamento...',
           ph_evento_previo: 'Rispondi brevemente (trasloco, arrivo di un bebè, lutto, viaggio, cambio di orario, ecc.)',

@@ -8293,7 +8293,7 @@ body.dm-web .splash-descargar {
               </div>
               <div class="ti-feature">
                 <div class="ti-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-                <p class="ti-feature-title" data-i18n="ti_f2_title">Historial clínico</p>
+                <p class="ti-feature-title" data-i18n="ti_f2_title">Historial conductual</p>
                 <p class="ti-feature-sub" data-i18n="ti_f2_sub">Todos tus análisis y planes guardados</p>
               </div>
               <div class="ti-feature">
@@ -24290,8 +24290,8 @@ function endTourIntro() {
       pp_l3_4:                 'Enviarte comunicaciones relacionadas con tu cuenta si es necesario.',
       pp_h4:                   '4. Terceros que intervienen',
       pp_l4_1:                 '<strong style="color:var(--text);">Anthropic</strong> (USA) — IA clínica (Claude Sonnet) y avatares (Claude Haiku). Recibe el texto de la anamnesis y las conversaciones para generar respuestas. <a href="https://www.anthropic.com/privacy" target="_blank" style="color:var(--green);">Su política →</a>',
-      pp_l4_2:                 '<strong style="color:var(--text);">Voyage AI</strong> (USA) — embeddings vectoriales para RAG. NO recibe tus datos; sólo procesa el corpus clínico interno. <a href="https://www.voyageai.com/privacy" target="_blank" style="color:var(--green);">Su política →</a>',
-      pp_l4_3:                 '<strong style="color:var(--text);">Qdrant Cloud</strong> (UE) — almacenamiento vectorial del corpus clínico. NO guarda datos de usuarios.',
+      pp_l4_2:                 '<strong style="color:var(--text);">Voyage AI</strong> (USA) — embeddings vectoriales para RAG. NO recibe tus datos; sólo procesa el corpus conductual interno. <a href="https://www.voyageai.com/privacy" target="_blank" style="color:var(--green);">Su política →</a>',
+      pp_l4_3:                 '<strong style="color:var(--text);">Qdrant Cloud</strong> (UE) — almacenamiento vectorial del corpus conductual. NO guarda datos de usuarios.',
       pp_l4_4:                 '<strong style="color:var(--text);">Railway</strong> (UE) — alojamiento del backend y base de datos PostgreSQL donde residen tu cuenta y los registros de pago. <a href="https://railway.com/legal/privacy" target="_blank" style="color:var(--green);">Su política →</a>',
       pp_l4_5:                 '<strong style="color:var(--text);">Netlify</strong> (USA, CDN global) — hosting del frontend. Sirve archivos estáticos; no procesa tus datos personales.',
       pp_l4_6:                 '<strong style="color:var(--text);">Resend</strong> (USA) — email transaccional (recuperación de contraseña). Recibe tu email y el contenido del mensaje. <a href="https://resend.com/legal/privacy-policy" target="_blank" style="color:var(--green);">Su política →</a>',
@@ -24416,7 +24416,7 @@ function endTourIntro() {
       ti_s2_chip3:             '7 personalidades',
       ti_f1_title:             'Seguimiento',
       ti_f1_sub:               'Registra la evolución del comportamiento en el tiempo',
-      ti_f2_title:             'Historial clínico',
+      ti_f2_title:             'Historial conductual',
       ti_f2_sub:               'Todos tus análisis y planes guardados',
       ti_f3_title:             'Varios perros',
       ti_f3_sub:               'Gestiona casos de toda tu familia',
@@ -25568,8 +25568,8 @@ function endTourIntro() {
       pp_l3_4:                 'Send communications related to your account when needed.',
       pp_h4:                   '4. Third parties involved',
       pp_l4_1:                 '<strong style="color:var(--text);">Anthropic</strong> (USA) — clinical AI (Claude Sonnet) and avatars (Claude Haiku). Receives the anamnesis text and conversations to generate responses. <a href="https://www.anthropic.com/privacy" target="_blank" style="color:var(--green);">Their policy →</a>',
-      pp_l4_2:                 '<strong style="color:var(--text);">Voyage AI</strong> (USA) — vector embeddings for RAG. Does NOT receive user data; only processes the internal clinical corpus. <a href="https://www.voyageai.com/privacy" target="_blank" style="color:var(--green);">Their policy →</a>',
-      pp_l4_3:                 '<strong style="color:var(--text);">Qdrant Cloud</strong> (EU) — vector storage of the clinical corpus. Does NOT store user data.',
+      pp_l4_2:                 '<strong style="color:var(--text);">Voyage AI</strong> (USA) — vector embeddings for RAG. Does NOT receive user data; only processes the internal behaviour corpus. <a href="https://www.voyageai.com/privacy" target="_blank" style="color:var(--green);">Their policy →</a>',
+      pp_l4_3:                 '<strong style="color:var(--text);">Qdrant Cloud</strong> (EU) — vector storage of the behaviour corpus. Does NOT store user data.',
       pp_l4_4:                 '<strong style="color:var(--text);">Railway</strong> (EU) — backend hosting and PostgreSQL database that stores your account and payment records. <a href="https://railway.com/legal/privacy" target="_blank" style="color:var(--green);">Their policy →</a>',
       pp_l4_5:                 '<strong style="color:var(--text);">Netlify</strong> (USA, global CDN) — frontend hosting. Serves static files; does not process your personal data.',
       pp_l4_6:                 '<strong style="color:var(--text);">Resend</strong> (USA) — transactional email (password recovery). Receives your email and the message content. <a href="https://resend.com/legal/privacy-policy" target="_blank" style="color:var(--green);">Their policy →</a>',
@@ -25694,7 +25694,7 @@ function endTourIntro() {
       ti_s2_chip3:             '7 personalities',
       ti_f1_title:             'Tracking',
       ti_f1_sub:               'Record behavioral evolution over time',
-      ti_f2_title:             'Clinical history',
+      ti_f2_title:             'Behaviour history',
       ti_f2_sub:               'All your analyses and plans saved',
       ti_f3_title:             'Multiple dogs',
       ti_f3_sub:               'Manage cases for your whole family',
@@ -26851,8 +26851,8 @@ function endTourIntro() {
           pp_l3_4:                 'Inviarti comunicazioni relative al tuo account se necessario.',
           pp_h4:                   '4. Terze parti coinvolte',
           pp_l4_1:                 "<strong style=\"color:var(--text);\">Anthropic</strong> (USA) — IA clinica (Claude Sonnet) e avatar (Claude Haiku). Riceve il testo dell'anamnesi e le conversazioni per generare le risposte. <a href=\"https://www.anthropic.com/privacy\" target=\"_blank\" style=\"color:var(--green);\">La loro informativa →</a>",
-          pp_l4_2:                 '<strong style="color:var(--text);">Voyage AI</strong> (USA) — embedding vettoriali per il RAG. NON riceve i tuoi dati; elabora solo il corpus clinico interno. <a href="https://www.voyageai.com/privacy" target="_blank" style="color:var(--green);">La loro informativa →</a>',
-          pp_l4_3:                 '<strong style="color:var(--text);">Qdrant Cloud</strong> (UE) — archiviazione vettoriale del corpus clinico. NON conserva dati degli utenti.',
+          pp_l4_2:                 '<strong style="color:var(--text);">Voyage AI</strong> (USA) — embedding vettoriali per il RAG. NON riceve i tuoi dati; elabora solo il corpus comportamentale interno. <a href="https://www.voyageai.com/privacy" target="_blank" style="color:var(--green);">La loro informativa →</a>',
+          pp_l4_3:                 '<strong style="color:var(--text);">Qdrant Cloud</strong> (UE) — archiviazione vettoriale del corpus comportamentale. NON conserva dati degli utenti.',
           pp_l4_4:                 '<strong style="color:var(--text);">Railway</strong> (UE) — hosting del backend e database PostgreSQL dove risiedono il tuo account e i registri di pagamento. <a href="https://railway.com/legal/privacy" target="_blank" style="color:var(--green);">La loro informativa →</a>',
           pp_l4_5:                 '<strong style="color:var(--text);">Netlify</strong> (USA, CDN globale) — hosting del frontend. Serve file statici; non elabora i tuoi dati personali.',
           pp_l4_6:                 '<strong style="color:var(--text);">Resend</strong> (USA) — email transazionali (recupero della password). Riceve la tua email e il contenuto del messaggio. <a href="https://resend.com/legal/privacy-policy" target="_blank" style="color:var(--green);">La loro informativa →</a>',
@@ -26977,7 +26977,7 @@ function endTourIntro() {
           ti_s2_chip3:             '7 personalità',
           ti_f1_title:             'Monitoraggio',
           ti_f1_sub:               'Registra l’evoluzione del comportamento nel tempo',
-          ti_f2_title:             'Storia clinica',
+          ti_f2_title:             'Storia comportamentale',
           ti_f2_sub:               'Tutte le tue analisi e i tuoi piani salvati',
           ti_f3_title:             'Più cani',
           ti_f3_sub:               'Gestisci i casi di tutta la tua famiglia',
@@ -29434,8 +29434,8 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
       <h3 style="font-family:var(--ff-serif);font-size:18px;font-weight:600;margin:0 0 10px;" data-i18n="pp_h4">4. Terceros que intervienen</h3>
       <ul style="margin:0 0 20px;padding-left:18px;color:var(--text2);">
         <li style="margin-bottom:8px;" data-i18n="pp_l4_1"><strong style="color:var(--text);">Anthropic</strong> (USA) — IA clínica (Claude Sonnet) y avatares (Claude Haiku). Recibe el texto de la anamnesis y las conversaciones para generar respuestas. <a href="https://www.anthropic.com/privacy" target="_blank" style="color:var(--green);">Su política →</a></li>
-        <li style="margin-bottom:8px;" data-i18n="pp_l4_2"><strong style="color:var(--text);">Voyage AI</strong> (USA) — embeddings vectoriales para RAG. NO recibe tus datos; sólo procesa el corpus clínico interno. <a href="https://www.voyageai.com/privacy" target="_blank" style="color:var(--green);">Su política →</a></li>
-        <li style="margin-bottom:8px;" data-i18n="pp_l4_3"><strong style="color:var(--text);">Qdrant Cloud</strong> (UE) — almacenamiento vectorial del corpus clínico. NO guarda datos de usuarios.</li>
+        <li style="margin-bottom:8px;" data-i18n="pp_l4_2"><strong style="color:var(--text);">Voyage AI</strong> (USA) — embeddings vectoriales para RAG. NO recibe tus datos; sólo procesa el corpus conductual interno. <a href="https://www.voyageai.com/privacy" target="_blank" style="color:var(--green);">Su política →</a></li>
+        <li style="margin-bottom:8px;" data-i18n="pp_l4_3"><strong style="color:var(--text);">Qdrant Cloud</strong> (UE) — almacenamiento vectorial del corpus conductual. NO guarda datos de usuarios.</li>
         <li style="margin-bottom:8px;" data-i18n="pp_l4_4"><strong style="color:var(--text);">Railway</strong> (UE) — alojamiento del backend y base de datos PostgreSQL donde residen tu cuenta y los registros de pago. <a href="https://railway.com/legal/privacy" target="_blank" style="color:var(--green);">Su política →</a></li>
         <li style="margin-bottom:8px;" data-i18n="pp_l4_5"><strong style="color:var(--text);">Netlify</strong> (USA, CDN global) — hosting del frontend. Sirve archivos estáticos; no procesa tus datos personales.</li>
         <li style="margin-bottom:8px;" data-i18n="pp_l4_6"><strong style="color:var(--text);">Resend</strong> (USA) — email transaccional (recuperación de contraseña). Recibe tu email y el contenido del mensaje. <a href="https://resend.com/legal/privacy-policy" target="_blank" style="color:var(--green);">Su política →</a></li>

@@ -12,6 +12,7 @@ from app.api.routes import dogs as dogs_router
 from app.api.routes import cases as cases_router
 from app.api.routes import account as account_router
 from app.api.routes import daily_followup as daily_followup_router
+from app.api.routes import fases as fases_router
 from app.api.routes import daily_tip as daily_tip_router
 from app.api.routes import delegations as delegations_router
 from app.api.routes import subscriptions as subscriptions_router
@@ -341,6 +342,7 @@ app.include_router(dogs_router.router)
 app.include_router(cases_router.router)
 app.include_router(account_router.router)
 app.include_router(daily_followup_router.router)
+app.include_router(fases_router.router)
 app.include_router(daily_tip_router.router)
 app.include_router(delegations_router.router)
 app.include_router(training_router.router)

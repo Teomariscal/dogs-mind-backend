@@ -22370,32 +22370,69 @@ window.dmPF = (function () {
   /* El encabezado va en el idioma de salida, asi que no se puede buscar una
      cadena fija. Lo estable es: la palabra FASE/PHASE, el numero, y el tramo
      de semanas. Es el formato que el prompt obliga a producir. */
-  var RE_FASE = /^[ \t]*(?:FASE|PHASE)[ \t]*([1-4])[ \t]*[—\-–:][ \t]*(.+?)[ \t]*$/im;
-  var RE_FASE_G = /^[ \t]*(?:FASE|PHASE)[ \t]*([1-4])[ \t]*[—\-–:][ \t]*(.+?)[ \t]*$/gim;
-  var RE_SENALES = /^[ \t]*(?:SE(?:Ñ|N)ALES[^\n]*|SIGNS[^\n]*|SEGNALI[^\n]*)$/im;
+  /* GEMELO EXACTO de `app/core/fases.py`. Si los dos dejan de coincidir, el
+     dueño ve una fase en pantalla y el servidor le genera los ejercicios de
+     otra. Cualquier cambio aqui se copia alli, y al reves.
+
+     MEDIDO sobre los 374 planes que habia en produccion el 19-oct-2026, no
+     supuesto. Lo que el motor escribe de verdad:
+
+        ## FASE 1 — Carga emocional positiva de la zona (Semanas 1–3)
+        ### Fase 2 — Construccion de la espera sentado
+        FASE 1 (Semanas 1–3): Construir calma y asociacion positiva
+        ## PHASE 1 — Reinforcer Restoration & Calm Foundation (Weeks 1–2)
+
+     Reparto real: 3 fases en 284 planes, 2 en 55, y CUATRO EN NINGUNO. Con
+     almohadillas en 291 de ellos.
+
+     La version anterior exigia exactamente CUATRO fases y encabezado SIN
+     almohadillas, asi que no reconocia ni un solo plan real: esta pantalla no
+     se abria nunca y el dueño siempre acababa en el muro de texto. */
+  var RE_FASE_G = /^[ \t]*#{0,4}[ \t]*\*{0,2}[ \t]*(?:FASE|PHASE|FASI)[ \t]*(\d{1,2})[ \t]*\*{0,2}(?:[ \t]*[—\-–:.][ \t]*)?(.*?)[ \t]*$/gim;
+  var RE_SENALES = /^[ \t]*#{0,4}[ \t]*\*{0,2}[ \t]*(?:SE(?:Ñ|N)ALES[^\n]*|SIGNS[^\n]*|SEGNALI[^\n]*|CRITERIOS DE[^\n]*|NOTAS[^\n]*|NOTE[^\n]*)$/im;
+
+  /* Una "fase" mas corta que esto es una mencion de pasada ("vuelve al
+     protocolo de la Fase 2"), no un encabezado. */
+  var MIN_CUERPO = 120;
 
   function parsear(txt) {
     if (!txt || typeof txt !== 'string') return null;
-    var marcas = [], m;
+    var crudas = [], m;
     RE_FASE_G.lastIndex = 0;
     while ((m = RE_FASE_G.exec(txt)) !== null) {
-      marcas.push({ n: parseInt(m[1], 10), semanas: m[2], ini: m.index, finCab: m.index + m[0].length });
+      var n = parseInt(m[1], 10);
+      if (!(n >= 1 && n <= 12)) continue;
+      crudas.push({ n: n, titulo: (m[2] || '').replace(/^[\s*#]+|[\s*#]+$/g, ''),
+                    ini: m.index, finCab: m.index + m[0].length });
     }
-    if (marcas.length !== 4) return null;          // sin las cuatro, no se toca nada
+    /* Solo la PRIMERA aparicion de cada numero abre fase, y los numeros tienen
+       que ir subiendo: una referencia a la fase 2 desde dentro de la 3 no abre
+       nada. */
+    var marcas = [];
+    for (var j = 0; j < crudas.length; j++) {
+      if (marcas.length && crudas[j].n <= marcas[marcas.length - 1].n) continue;
+      marcas.push(crudas[j]);
+    }
+    if (marcas.length < 2) return null;   // con una sola fase no hay nada que escalonar
+
     var cab = txt.slice(0, marcas[0].ini).trim();
     var fases = [];
     for (var k = 0; k < marcas.length; k++) {
       var hasta = (k + 1 < marcas.length) ? marcas[k + 1].ini : txt.length;
-      var cuerpo = txt.slice(marcas[k].finCab, hasta);
-      fases.push({ n: marcas[k].n, semanas: marcas[k].semanas, cuerpo: cuerpo.trim() });
+      fases.push({ n: marcas[k].n, semanas: marcas[k].titulo,
+                   cuerpo: txt.slice(marcas[k].finCab, hasta).trim() });
+    }
+    // Si alguna intermedia viene vacia, eran menciones y no encabezados.
+    for (var q = 0; q < fases.length - 1; q++) {
+      if (fases[q].cuerpo.length < MIN_CUERPO) return null;
     }
     // Las señales a vigilar viven al final de la ultima fase: se separan.
-    var ult = fases[3].cuerpo, sen = '';
+    var ult = fases[fases.length - 1].cuerpo, sen = '';
     var ms = ult.match(RE_SENALES);
     if (ms) {
       var corte = ult.indexOf(ms[0]);
-      sen = ult.slice(corte + ms[0].length).trim();
-      fases[3].cuerpo = ult.slice(0, corte).trim();
+      sen = ult.slice(corte).trim();
+      fases[fases.length - 1].cuerpo = ult.slice(0, corte).trim();
     }
     return { cabecera: cab, fases: fases, senales: sen };
   }
@@ -22455,7 +22492,7 @@ window.dmPF = (function () {
     var v = _q('pf-video');
     if (paso === 0) {
       var e0 = _q('pf-step-0'); if (e0) e0.style.display = '';
-    } else if (paso >= 1 && paso <= 4) {
+    } else if (paso >= 1 && paso <= _fases.length) {
       try { if (v) { v.pause(); } } catch (e) {}
       var ef = _q('pf-step-fase'); if (ef) { ef.style.display = ''; _pintarFase(paso); }
     } else {
@@ -22472,8 +22509,8 @@ window.dmPF = (function () {
     var t = _q('pf-typed'), v = _q('pf-video');
     if (!t) return;
     var texto = _i18nText('pf_cecilia_script',
-      'Aquí tienes el plan de tu perro. Son doce semanas, en cuatro fases, y no te lo ' +
-      'voy a dar entero de golpe: cada semana vas a tener delante solo lo que toca. ' +
+      'Aquí tienes el plan de tu perro. Va por fases, y no te lo voy a dar entero de ' +
+      'golpe: cada vez vas a tener delante solo la fase que toca. ' +
       'Léelo con calma, que lo importante no es correr.');
     if (_typedTimer) { clearInterval(_typedTimer); _typedTimer = null; }
     t.textContent = '';
@@ -22522,8 +22559,8 @@ window.dmPF = (function () {
     },
     ir: function (paso) { _vibrar('toque'); _mostrar(paso); },
     siguiente: function () {
-      _vibrar(_i >= 4 ? 'confirma' : 'toque');
-      _mostrar(_i + 1);
+      _vibrar(_i >= _fases.length ? 'confirma' : 'toque');
+      _mostrar(Math.min(_i + 1, _fases.length + 1));
     },
     atras: function () {
       _vibrar('toque');
@@ -22531,7 +22568,25 @@ window.dmPF = (function () {
       _mostrar(_i - 1);
     },
     completo: function () { _vibrar('toque'); goTo('s-tracking'); },
-    aceptar: function () { _vibrar('logro'); goTo('s-tracking'); },
+
+    /* ACEPTAR TIENE QUE SER EL MISMO ACEPTAR DE SIEMPRE.
+       Esto solo navegaba a s-tracking, y ahi se quedaba: el caso no se
+       guardaba en el servidor y, sobre todo, NO se llamaba a
+       /daily-followup/init. Resultado: el dueño aceptaba el plan y se quedaba
+       SIN ejercicios diarios — los habia visto una vez, dentro del plan, y no
+       volvian a aparecer nunca (founder, 19-oct-2026, visto en TestFlight:
+       "los ejercicios diarios que planteaba antes la aplicacion han
+       desaparecido").
+       acceptIntervention() es la unica puerta que guarda el caso, lo migra al
+       backend y activa el seguimiento diario. Antes la pulsaba el usuario en
+       s-tracking; con la pantalla de fases por delante, el boton de aqui es el
+       que tiene que llamarla. */
+    aceptar: function () {
+      _vibrar('logro');
+      if (typeof acceptIntervention === 'function') { acceptIntervention(); return; }
+      if (window.acceptIntervention) { window.acceptIntervention(); return; }
+      goTo('s-tracking');   /* ultimo recurso: ahi sigue estando el boton de siempre */
+    },
     sonido: function () {
       var v = _q('pf-video'); if (!v) return;
       v.muted = !v.muted;
@@ -24271,7 +24326,7 @@ function endTourIntro() {
       pf_aceptar: 'Aceptar el plan',
       pf_titulo: 'El plan de tu perro',
       pf_titulo_de: 'El plan de',
-      pf_cecilia_script: 'Aquí tienes el plan de tu perro. Son doce semanas, en cuatro fases, y no te lo voy a dar entero de golpe: cada semana vas a tener delante solo lo que toca. Léelo con calma, que lo importante no es correr.',
+      pf_cecilia_script: 'Aquí tienes el plan de tu perro. Va por fases, y no te lo voy a dar entero de golpe: cada vez vas a tener delante solo la fase que toca. Léelo con calma, que lo importante no es correr.',
       anam_lbl_aggr:           '¿Implica agresión?',
       anam_lbl_history:        '¿Qué has intentado hasta ahora? (opcional)',
       anam_lbl_theory:         '¿Cuál crees tú que es la causa? (opcional)',
@@ -26360,7 +26415,7 @@ function endTourIntro() {
       pf_aceptar: 'Accept the plan',
       pf_titulo: 'Your dog’s plan',
       pf_titulo_de: 'The plan for',
-      pf_cecilia_script: 'Here is your dog’s plan. It runs for twelve weeks, in four phases, and I am not going to hand it to you all at once: each week you will have in front of you only what is due. Read it calmly — what matters is not rushing.',
+      pf_cecilia_script: 'Here is your dog’s plan. It goes in phases, and I am not going to hand it to you all at once: each time you will have in front of you only the phase that is due. Read it calmly — what matters is not rushing.',
       ph_agresion_dist: 'Distance at which aggression starts',
       ph_history:       'E.g.: punishment, ignore, vet visit...',
       ph_theory:        'Your hypothesis on why this behavior occurs...',
@@ -27645,7 +27700,7 @@ function endTourIntro() {
           pf_aceptar: 'Accetta il piano',
           pf_titulo: 'Il piano del tuo cane',
           pf_titulo_de: 'Il piano di',
-          pf_cecilia_script: 'Ecco il piano del tuo cane. Dura dodici settimane, in quattro fasi, e non te lo darò tutto insieme: ogni settimana avrai davanti solo quello che tocca. Leggilo con calma, l’importante non è correre.',
+          pf_cecilia_script: 'Ecco il piano del tuo cane. Va per fasi, e non te lo darò tutto insieme: ogni volta avrai davanti solo la fase che tocca. Leggilo con calma, l’importante non è correre.',
           ph_agresion_dist: 'Distanza a cui inizia l’aggressività',
           ph_history:       'Es: punizione, ignorare, andare dal veterinario...',
           ph_theory:        'La tua ipotesi sul perché si verifica questo comportamento...',

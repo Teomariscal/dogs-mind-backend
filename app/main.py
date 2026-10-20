@@ -162,6 +162,13 @@ async def lifespan(app: FastAPI):
             # fallback de query-param `?lang=` (cero regresión). Casos creados
             # tras esta migración llevan el lang de UI al crear el caso.
             "ALTER TABLE cases ADD COLUMN IF NOT EXISTS lang VARCHAR(2)",
+            # Fase actual del plan de intervencion (founder 19-oct-2026). Los
+            # ejercicios diarios salen SOLO de esta fase; la 2 no se abre hasta
+            # cerrar la 1. Arranca en 1 para todos: un caso ya en marcha empieza
+            # por el principio del plan, que es lo unico honesto sin preguntar.
+            "ALTER TABLE cases ADD COLUMN IF NOT EXISTS current_phase SMALLINT NOT NULL DEFAULT 1",
+            "ALTER TABLE cases ADD COLUMN IF NOT EXISTS phase_started_at TIMESTAMP",
+            "ALTER TABLE cases ADD COLUMN IF NOT EXISTS phase_total SMALLINT NOT NULL DEFAULT 0",
             # ── Programa de delegaciones (afiliación por país, 2026-05-16) ──
             # init_db() crea la tabla `delegations` via Base.metadata.create_all().
             # Aquí garantizamos índices y FK desde users si la tabla ya existía.

@@ -41,6 +41,7 @@ from app.models.case import (
 from app.api.routes.auth import get_current_user
 from app.config import get_settings
 from app.core.usage_tracker import log_usage
+from app.core.fases import parsear as parsear_fases, texto_de_fase
 from app.services.daily_followup_ai import (
     classify_diagnosis, generate_daily_checkin,
     DailyCheckin, ExerciseSpec, TheoryQuestionSpec,
@@ -172,6 +173,64 @@ def _get_plan_text(case: Case, db: Session) -> str:
         CaseEntry.type == "intervention",
     ).order_by(desc(CaseEntry.created_at)).first()
     return (intv.content or "").strip() if intv else ""
+
+
+def _plan_de_la_fase(case: Case, plan_text: str, db: Session) -> tuple[str, int, int]:
+    """El trozo del plan que toca HOY, no el plan entero.
+
+    Founder, 19-oct-2026: *"los ejercicios que se plantean sean de una fase...
+    la fase 2 no puede llegar antes de terminar la fase 1"*. Antes se le pasaba
+    al coach el plan COMPLETO y por eso los ejercicios salian mezclados de
+    todas las fases, sin orden ni progresion.
+
+    Devuelve (texto, fase_actual, fases_totales). Si el plan no va por fases
+    —33 de cada 374 en produccion no las llevan— devuelve el plan entero y
+    totales 0: ahi el comportamiento es exactamente el de siempre.
+    """
+    p = parsear_fases(plan_text)
+    if p is None:
+        if case.phase_total != 0:
+            case.phase_total = 0
+            db.commit()
+        return plan_text, 0, 0
+
+    total = p.total
+    actual = case.current_phase or 1
+    if actual > total:
+        actual = total          # plan reescrito mas corto: no dejar al dueno fuera
+    if actual < 1:
+        actual = 1
+
+    if case.phase_total != total or case.current_phase != actual:
+        case.phase_total = total
+        case.current_phase = actual
+        if case.phase_started_at is None:
+            case.phase_started_at = datetime.utcnow()
+        db.commit()
+
+    trozo = texto_de_fase(plan_text, actual)
+    if not trozo:
+        return plan_text, actual, total
+
+    # Se le dice al coach, en su idioma, que esto es UNA fase de varias y que
+    # no puede sacar ejercicios de las otras. Sin esta linea el modelo ve un
+    # plan corto y se inventa el resto para "completar" el dia.
+    marco = {
+        "en": (f"This is PHASE {actual} of {total} of the intervention plan. "
+               f"Today's exercises MUST come from this phase only. Do not "
+               f"introduce anything from later phases: the owner has not "
+               f"unlocked them yet."),
+        "it": (f"Questa e la FASE {actual} di {total} del piano di intervento. "
+               f"Gli esercizi di oggi devono uscire SOLO da questa fase. Non "
+               f"introdurre nulla delle fasi successive: il proprietario non "
+               f"le ha ancora sbloccate."),
+    }.get((case.lang or "es"),
+          (f"Esta es la FASE {actual} de {total} del plan de intervencion. "
+           f"Los ejercicios de hoy tienen que salir SOLO de esta fase. No "
+           f"introduzcas nada de las fases siguientes: el dueno todavia no las "
+           f"ha desbloqueado."))
+
+    return f"{marco}\n\n{trozo}", actual, total
 
 
 def _build_history(case_id, db: Session, exclude_today: date) -> list[dict[str, Any]]:
@@ -411,11 +470,14 @@ def get_daily_followup_today(
     # (comportamiento previo, cero regresión).
     effective_lang = case.lang or lang or "es"
 
+    # El coach ve SOLO la fase en la que esta el perro, nunca el plan entero.
+    plan_fase, fase_actual, fases_totales = _plan_de_la_fase(case, plan_text, db)
+
     try:
         checkin = generate_daily_checkin(
             db=db,
             case_id=case.id,
-            plan_text=plan_text,
+            plan_text=plan_fase,
             dog_name=dog_name,
             diagnosis_type=case.diagnosis_type,
             day_index=day_index,

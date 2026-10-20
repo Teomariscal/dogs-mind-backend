@@ -123,6 +123,16 @@ class Case(Base):
     # esta feature no la tienen rellenada.
     diagnosis_type          = Column(String(40), nullable=True, index=True)
 
+    # ── Fase del plan de intervencion (founder 19-oct-2026) ─────────────────
+    # "la fase 2 no puede llegar antes de terminar la fase 1, y es el
+    #  seguimiento el que dicta los ejercicios a realizar".
+    # current_phase: en cual esta el dueño. phase_total: cuantas trae su plan
+    # (0 = plan sin fases; entonces el seguimiento usa el plan entero, como
+    # hasta ahora). phase_started_at: desde cuando, para medir el avance.
+    current_phase           = Column(SmallInteger, nullable=False, default=1)
+    phase_total             = Column(SmallInteger, nullable=False, default=0)
+    phase_started_at        = Column(DateTime, nullable=True)
+
     # ── Idioma fijo del caso (Opción C, decidida 2026-05-16) ──────────────────
     # 'es' | 'en'. Se fija al crear el caso con el idioma de UI del usuario en
     # ese momento. Todos los contenidos clínicos generados (plan, plan-simple,

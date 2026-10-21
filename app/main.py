@@ -167,6 +167,10 @@ async def lifespan(app: FastAPI):
             # ejercicios diarios salen SOLO de esta fase; la 2 no se abre hasta
             # cerrar la 1. Arranca en 1 para todos: un caso ya en marcha empieza
             # por el principio del plan, que es lo unico honesto sin preguntar.
+            # Invitaciones: un codigo personal es de un solo email, y lo que
+            # promete tiene que cuadrar con lo que da (founder 21-oct-2026).
+            "ALTER TABLE invites ADD COLUMN IF NOT EXISTS email_fijo VARCHAR(255)",
+            "ALTER TABLE invites ADD COLUMN IF NOT EXISTS gratuidad_declarada INTEGER",
             "ALTER TABLE cases ADD COLUMN IF NOT EXISTS current_phase SMALLINT NOT NULL DEFAULT 1",
             "ALTER TABLE cases ADD COLUMN IF NOT EXISTS phase_started_at TIMESTAMP",
             "ALTER TABLE cases ADD COLUMN IF NOT EXISTS phase_total SMALLINT NOT NULL DEFAULT 0",

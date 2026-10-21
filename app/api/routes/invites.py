@@ -78,6 +78,22 @@ def canjear_codigo(codigo: str, current_user: User, db: Session):
     # 1-sep-2026). Los normales siguen siendo de un solo uso.
     if getattr(inv, "activo", True) is False:
         raise HTTPException(status_code=410, detail="Ese código ya no está activo.")
+
+    # ── UN CODIGO PERSONAL ES DE UNA PERSONA ────────────────────────────────
+    # Founder, 21-oct-2026: *"los del team solo pueden estar asignados una vez
+    # a un solo mail"* y *"solo los codigos personales del equipo (solo validos
+    # para un email) no caducan"*.
+    #
+    # Los codigos del equipo no caducan NUNCA y dan 9.000 creditos al mes. Si
+    # circulan, cualquiera que los tenga tiene la app gratis de por vida. Por
+    # eso van atados a un email y la base no admite un codigo sin caducidad que
+    # no lo lleve (restriccion `sin_caducidad_solo_equipo`).
+    fijo = (getattr(inv, "email_fijo", None) or "").strip().lower()
+    if fijo and (current_user.email or "").strip().lower() != fijo:
+        _log.warning("invite: %s es personal de %s y lo ha intentado %s",
+                     codigo, fijo, current_user.email)
+        raise HTTPException(status_code=403,
+                            detail="Ese código es personal y no está a tu nombre.")
     if not abierto and inv.used_by_id:
         raise HTTPException(status_code=409, detail="Ese código ya se ha usado.")
     if inv.expires_at and datetime.utcnow() > inv.expires_at:

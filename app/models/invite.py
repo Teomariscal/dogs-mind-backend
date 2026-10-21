@@ -36,6 +36,17 @@ class Invite(Base):
     # a quien ya lo canjeo. Es el freno de mano del codigo TDM-TEAM.
     activo     = Column(Boolean, nullable=False, default=True)
 
+    # Codigo PERSONAL: solo lo puede canjear este email. Los del equipo lo
+    # llevan obligatoriamente, porque no caducan nunca (founder 21-oct-2026) y
+    # un codigo eterno que circula es la app gratis de por vida para cualquiera.
+    # La base lo exige: restriccion `sin_caducidad_solo_equipo`.
+    email_fijo = Column(String(255), nullable=True)
+    # Lo que el codigo PROMETE dar, en dias. None solo si no caduca. Existe para
+    # que se pueda comprobar que lo prometido y lo que hace coinciden: la
+    # restriccion `gratuidad_coherente` lo cruza con days y meses en cada
+    # insert y cada update. Ver app/core/invitaciones.py.
+    gratuidad_declarada = Column(Integer, nullable=True)
+
     used_by_id = Column(UUID(as_uuid=True), nullable=True, index=True)
     used_at    = Column(DateTime, nullable=True)
     expires_at = Column(DateTime, nullable=True)                            # plazo para canjearlo

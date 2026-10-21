@@ -63,6 +63,12 @@ class EstadoFase(BaseModel):
     dias_minimos: int
     puede_pedir_evaluacion: bool
     es_ultima_fase: bool
+    # Para el aviso de dias saltados. Se calcula AQUI y no en el cliente: el
+    # cliente no sabe cuantos dias lleva el caso ni cuando fue el ultimo, y
+    # adivinarlo seria avisar a quien no toca.
+    dias_registrados_total: int = 0
+    dias_desde_ultimo: int = 0
+    avisar_huecos: bool = False
 
 
 class CuestionarioEntrada(BaseModel):
@@ -123,10 +129,12 @@ def _estado(case: Case, db: Session) -> EstadoFase:
     plan = _plan_del_caso(case, db)
     p = parsear_fases(plan)
     if p is None:
+        t0, d0, a0 = _huecos(case, db)
         return EstadoFase(
             tiene_fases=False, fase_actual=0, fases_totales=0, titulo=None,
             dias_reportados_en_fase=0, dias_minimos=MIN_DIAS_PARA_PEDIR,
             puede_pedir_evaluacion=False, es_ultima_fase=False,
+            dias_registrados_total=t0, dias_desde_ultimo=d0, avisar_huecos=a0,
         )
     total = p.total
     actual = min(max(case.current_phase or 1, 1), total)
@@ -134,13 +142,39 @@ def _estado(case: Case, db: Session) -> EstadoFase:
     dias = sum(1 for d in hist if d["is_complete"])
     ultima = actual >= total
     f = p.fase(actual)
+    total_dias, desde_ultimo, avisar = _huecos(case, db)
     return EstadoFase(
         tiene_fases=True, fase_actual=actual, fases_totales=total,
         titulo=(f.titulo if f else None),
         dias_reportados_en_fase=dias, dias_minimos=MIN_DIAS_PARA_PEDIR,
         puede_pedir_evaluacion=(not ultima and dias >= MIN_DIAS_PARA_PEDIR),
         es_ultima_fase=ultima,
+        dias_registrados_total=total_dias, dias_desde_ultimo=desde_ultimo,
+        avisar_huecos=avisar,
     )
+
+
+# Dias seguidos sin anotar a partir de los cuales se avisa.
+HUECO_AVISO = 3
+# Dias ya anotados por debajo de los cuales NO se avisa: founder, 19-oct,
+# *"sin una advertencia de que la cosa no va a funcionar, SI YA TIENES
+# CONSTANCIA"*. A quien nunca ha trabajado no se le riñe por no trabajar.
+CONSTANCIA_MINIMA = 3
+
+
+def _huecos(case: Case, db: Session) -> tuple[int, int, bool]:
+    """(dias anotados en todo el caso, dias desde el ultimo, hay que avisar)."""
+    from app.models.case import DailyFollowupEntry
+    filas = db.query(DailyFollowupEntry).filter(
+        DailyFollowupEntry.case_id == case.id,
+        DailyFollowupEntry.is_complete.is_(True),
+    ).order_by(DailyFollowupEntry.day_local_date.desc()).all()
+    if not filas:
+        return 0, 0, False
+    ultimo = filas[0].day_local_date
+    desde = (date.today() - ultimo).days if ultimo else 0
+    total = len(filas)
+    return total, max(desde, 0), (total >= CONSTANCIA_MINIMA and desde >= HUECO_AVISO)
 
 
 # ── Endpoints ───────────────────────────────────────────────────────────────

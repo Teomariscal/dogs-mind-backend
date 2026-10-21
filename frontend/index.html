@@ -6629,6 +6629,130 @@ body.dm-web .splash-descargar {
   opacity: 0.75;
 }
 
+/* ══ FASE EN CURSO + PUERTA DE FASE (founder 19-oct-2026) ═══════════════════
+   El display NO se declara en reglas de ID: `.screen{display:none}` manda, y
+   un `#s-...{display:flex}` lo machaca por especificidad y deja la pantalla
+   pintada siempre (pasó el 19-oct con #s-plan-fases). */
+
+/* Franja de fase en la hoja diaria */
+.df-fase{
+  background:linear-gradient(135deg,rgba(74,103,65,.10),rgba(94,200,230,.08));
+  border:1px solid rgba(74,103,65,.16); border-radius:14px;
+  padding:12px 14px; margin:0 0 14px;
+}
+.df-fase-linea{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+/* OJO con los colores de texto de aqui abajo. `s-daily-followup` NO tiene
+   fondo propio: hereda el oscuro de la app (comprobado: background-color
+   transparente, y su cabecera usa #f3f1ea). Puse var(--dark) y var(--grey)
+   —que son los tokens del tema CLARO— y el titulo de la fase y el aviso
+   salian negro sobre verde oscuro, ilegibles. Aqui se escribe en claro. */
+.df-fase-tag{
+  font-size:10px; font-weight:700; letter-spacing:.9px; text-transform:uppercase;
+  color:#9fd98a;
+}
+.df-fase-dias{ font-size:11px; color:rgba(243,241,234,.55); }
+.df-fase-titulo{ margin-top:4px; font-size:14px; font-weight:600; color:#f3f1ea; line-height:1.35; }
+.df-fase-barra{
+  margin-top:10px; height:4px; border-radius:3px; background:rgba(243,241,234,.14); overflow:hidden;
+}
+.df-fase-barra > i{ display:block; height:100%; width:0; background:#7eb86a; transition:width .4s ease; }
+
+.df-aviso-huecos{
+  background:rgba(214,158,46,.12); border:1px solid rgba(214,158,46,.34);
+  border-radius:12px; padding:11px 13px; margin:0 0 14px;
+  font-size:13px; line-height:1.55; color:rgba(243,241,234,.88);
+}
+
+/* Pie de la hoja diaria */
+.df-pie{ margin-top:18px; display:flex; flex-direction:column; gap:10px; }
+.df-pie-btn{
+  width:100%; padding:14px 16px; border-radius:100px; cursor:pointer;
+  font-family:inherit; font-size:14px; font-weight:600;
+  border:1.5px solid rgba(243,241,234,.26); background:transparent;
+  color:rgba(243,241,234,.88);
+  transition:background .18s, border-color .18s, transform .1s, opacity .18s;
+}
+.df-pie-btn:hover{ background:rgba(243,241,234,.07); }
+.df-pie-btn:active{ transform:scale(.985); }
+.df-pie-btn--fase{ border-color:#7eb86a; background:#7eb86a; color:#0e1f1a; }
+.df-pie-btn--fase:hover{ background:#8cc478; }
+/* Deshabilitado tiene que LEERSE: es el estado en el que mas texto hay que
+   leer (cuantos dias faltan). Se baja el contraste, no se apaga. */
+.df-pie-btn--fase:disabled{
+  background:transparent; color:rgba(243,241,234,.52);
+  border-color:rgba(243,241,234,.20); cursor:default;
+}
+.df-pie-nota{ font-size:12px; line-height:1.5; color:rgba(243,241,234,.52); text-align:center; padding:0 6px; }
+
+/* Pantalla de la puerta de fase */
+#s-fase-gate{
+  background:linear-gradient(180deg,#0e1f1a 0%,#14302a 100%);
+  color:#f3f1ea; flex-direction:column; height:100%;
+}
+.fg-top{
+  flex:0 0 auto; display:flex; align-items:center; gap:14px;
+  padding:14px 18px 12px; border-bottom:1px solid rgba(243,241,234,.10);
+}
+.fg-back{
+  width:30px;height:30px;border:0;background:transparent;color:rgba(243,241,234,.72);
+  font-size:20px;cursor:pointer;padding:0;flex:0 0 auto;font-family:inherit;
+}
+.fg-top-main{ font-family:'Cormorant Garamond',Georgia,serif; font-size:22px; line-height:1.15; }
+.fg-top-sub{ font-size:11px; letter-spacing:.7px; text-transform:uppercase; color:rgba(243,241,234,.52); margin-top:2px; }
+.fg-scroll{ flex:1 1 auto; overflow-y:auto; padding:18px 18px 34px; min-height:0; }
+.fg-intro{ font-size:14px; line-height:1.6; color:rgba(243,241,234,.80); margin:0 0 20px; }
+.fg-campo{ margin-bottom:17px; }
+.fg-lbl{
+  display:block; font-size:10px; font-weight:700; letter-spacing:.9px;
+  text-transform:uppercase; color:rgba(243,241,234,.62); margin-bottom:7px;
+}
+.fg-area{
+  width:100%; box-sizing:border-box; padding:11px 13px; font-size:16px;
+  font-family:inherit; line-height:1.5; border-radius:11px; resize:vertical;
+  border:1.5px solid rgba(94,200,230,.22); background:rgba(243,241,234,.06);
+  color:#f3f1ea; outline:none;
+}
+.fg-area:focus{ border-color:rgba(94,200,230,.55); }
+.fg-area::placeholder{ color:rgba(243,241,234,.34); }
+.fg-si-no{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.fg-si-no .fg-lbl{ margin-bottom:0; }
+.fg-pills{ display:flex; gap:8px; flex:0 0 auto; }
+.fg-pill{
+  padding:8px 20px; border-radius:100px; cursor:pointer; font-family:inherit;
+  font-size:13px; font-weight:600; border:1.5px solid rgba(243,241,234,.22);
+  background:transparent; color:rgba(243,241,234,.80);
+}
+.fg-pill.on{ background:#7eb86a; border-color:#7eb86a; color:#0e1f1a; }
+.fg-coste{ font-size:11px; color:rgba(243,241,234,.45); text-align:center; margin:16px 0 8px; }
+.fg-cta{
+  width:100%; padding:16px; border:0; border-radius:100px; cursor:pointer;
+  font-family:inherit; font-size:15px; font-weight:700; letter-spacing:.02em;
+  background:#7eb86a; color:#0e1f1a; box-shadow:0 4px 16px rgba(126,184,106,.22);
+}
+.fg-cta:disabled{ opacity:.5; cursor:default; box-shadow:none; }
+.fg-estado{ text-align:center; padding:56px 10px; color:rgba(243,241,234,.72); font-size:14px; }
+.fg-spin{
+  width:34px;height:34px;margin:0 auto 14px;border-radius:50%;
+  border:3px solid rgba(243,241,234,.16); border-top-color:#7eb86a;
+  animation:spin .9s linear infinite;
+}
+.fg-sello{
+  display:inline-block; padding:7px 15px; border-radius:100px; margin-bottom:14px;
+  font-size:11px; font-weight:700; letter-spacing:.9px; text-transform:uppercase;
+}
+.fg-sello--si{ background:rgba(126,184,106,.18); color:#9fd98a; border:1px solid rgba(126,184,106,.40); }
+.fg-sello--no{ background:rgba(214,158,46,.14); color:#e3bd73; border:1px solid rgba(214,158,46,.36); }
+.fg-mensaje{ font-size:15px; line-height:1.65; color:#f3f1ea; margin:0 0 22px; }
+.fg-bloque{ margin-bottom:20px; }
+.fg-bloque-tit{
+  font-size:10px; font-weight:700; letter-spacing:.9px; text-transform:uppercase;
+  color:rgba(243,241,234,.58); margin-bottom:8px;
+}
+.fg-bloque-tit--reg{ color:#e3bd73; }
+.fg-bloque-tit--pro{ color:#9fd98a; }
+.fg-lista{ margin:0; padding-left:18px; }
+.fg-lista li{ font-size:14px; line-height:1.6; color:rgba(243,241,234,.86); margin-bottom:7px; }
+
 /* ── S-DAILY-FOLLOWUP: pantalla del check-in diario (commit B) ───────── */
 
 /* ══ PLAN POR FASES (founder 15-oct-2026) ══════════════════════════════════
@@ -9778,6 +9902,25 @@ body.dm-web .splash-descargar {
     <!-- Content (renderizado dinámico) -->
     <div id="df-content" class="df-content" style="display:none;">
 
+      <!-- ── FASE EN CURSO ────────────────────────────────────────────────
+           El dueño tiene que saber en que fase esta antes de ponerse a
+           hacer los ejercicios: son los ejercicios DE ESA FASE, no del plan
+           entero. Lo rellena dmFase.pintar() con /cases/{id}/fase; si el
+           plan no va por fases, esta franja no aparece y la pantalla queda
+           exactamente como estaba. -->
+      <div id="df-fase" class="df-fase" style="display:none;">
+        <div class="df-fase-linea">
+          <span class="df-fase-tag" id="df-fase-tag"></span>
+          <span class="df-fase-dias" id="df-fase-dias"></span>
+        </div>
+        <div class="df-fase-titulo" id="df-fase-titulo"></div>
+        <div class="df-fase-barra"><i id="df-fase-barra-i"></i></div>
+      </div>
+
+      <!-- Aviso de dias saltados: solo si YA habia constancia. A quien nunca
+           ha trabajado no se le riñe por no haber trabajado. -->
+      <div id="df-aviso-huecos" class="df-aviso-huecos" style="display:none;"></div>
+
       <!-- Recovery banner (commit F) — solo si data.in_recovery=true -->
       <div id="df-recovery-banner" class="df-recovery-banner" style="display:none;">
         <div class="df-recovery-avatar" role="img" aria-label="Katja"></div>
@@ -9808,8 +9951,120 @@ body.dm-web .splash-descargar {
       <!-- Submit / completado -->
       <div id="df-completed-badge" class="df-completed-badge" style="display:none;" data-i18n="df_completed">Ya completaste el seguimiento de hoy</div>
       <button class="df-submit" id="df-submit" type="button" disabled data-i18n="df_save_day">Guarda el día</button>
+
+      <!-- ── PIE DE LA HOJA DIARIA ────────────────────────────────────────
+           Va DESPUES de los ejercicios a proposito: los ejercicios son el
+           material sobre el que se consulta, asi que primero se trabaja y
+           despues se pregunta. -->
+      <div id="df-pie" class="df-pie" style="display:none;">
+        <button class="df-pie-btn" type="button" onclick="dmFase.consultar()">
+          <span data-i18n="df_consultar">Consulta tu evolución con Teo</span>
+        </button>
+        <button class="df-pie-btn df-pie-btn--fase" id="df-btn-fase" type="button"
+                onclick="dmFase.pedirPaso()" style="display:none;">
+          <span id="df-btn-fase-txt" data-i18n="df_pasar_fase">¿Listo para la fase siguiente?</span>
+        </button>
+        <div class="df-pie-nota" id="df-pie-nota" style="display:none;"></div>
+      </div>
     </div>
 
+  </div>
+
+  <!-- ══ S-FASE-GATE: ¿puede pasar a la fase siguiente? ═══════════════════
+       Cuestionario corto + veredicto de Teo. Corto a proposito: el grueso de
+       la evidencia lo pone el historial de ejercicios, que la app ya tiene.
+       Preguntarle al dueño lo que ya sabemos es cobrarle coste de respuesta
+       por nada (founder, 13-oct: el coste de respuesta es conductual). -->
+  <div id="s-fase-gate" class="screen">
+    <div class="fg-top">
+      <button class="fg-back" type="button" onclick="goTo('s-daily-followup')" aria-label="Volver">&#8592;</button>
+      <div class="fg-top-txt">
+        <div class="fg-top-main" id="fg-top-main" data-i18n="fg_title">Paso de fase</div>
+        <div class="fg-top-sub" id="fg-top-sub"></div>
+      </div>
+    </div>
+
+    <div class="fg-scroll" id="fg-scroll">
+
+      <!-- Paso 1: el cuestionario -->
+      <div id="fg-form">
+        <p class="fg-intro" data-i18n="fg_intro">Antes de abrir la fase siguiente miro dos cosas: que no haya nada que haya ido a peor, y que lo de esta fase esté consolidado de verdad. Cuéntame.</p>
+
+        <div class="fg-campo">
+          <label class="fg-lbl" data-i18n="fg_q_crit">¿Qué has medido y cuánto ha cambiado?</label>
+          <textarea id="fg-criterio" class="fg-area" rows="3" maxlength="1500"
+                    data-i18n-placeholder="fg_ph_crit"
+                    placeholder="Ej: antes 6 episodios al día, ahora 1. Mide lo que el plan te pedía medir."></textarea>
+        </div>
+
+        <div class="fg-campo">
+          <label class="fg-lbl" data-i18n="fg_q_peor">¿Algo ha ido a peor o ha reaparecido?</label>
+          <textarea id="fg-peor" class="fg-area" rows="3" maxlength="1500"
+                    data-i18n-placeholder="fg_ph_peor"
+                    placeholder="Si no hay nada, déjalo vacío. Si hay algo, cuéntalo: es lo más importante de esta pantalla."></textarea>
+        </div>
+
+        <div class="fg-campo">
+          <label class="fg-lbl" data-i18n="fg_q_dif">¿Qué te ha costado?</label>
+          <textarea id="fg-dif" class="fg-area" rows="2" maxlength="1500"
+                    data-i18n-placeholder="fg_ph_dif"
+                    placeholder="Lo que no has podido hacer, o no has sabido cómo."></textarea>
+        </div>
+
+        <div class="fg-campo fg-si-no">
+          <span class="fg-lbl" data-i18n="fg_q_todos">¿Has hecho todos los ejercicios de la fase?</span>
+          <div class="fg-pills">
+            <button type="button" id="fg-todos-si" class="fg-pill" onclick="dmFase.pill('todos',true)" data-i18n="btn_yes">Sí</button>
+            <button type="button" id="fg-todos-no" class="fg-pill" onclick="dmFase.pill('todos',false)" data-i18n="btn_no">No</button>
+          </div>
+        </div>
+
+        <div class="fg-campo fg-si-no">
+          <span class="fg-lbl" data-i18n="fg_q_mejor">¿Ves mejoría?</span>
+          <div class="fg-pills">
+            <button type="button" id="fg-mejor-si" class="fg-pill" onclick="dmFase.pill('mejor',true)" data-i18n="btn_yes">Sí</button>
+            <button type="button" id="fg-mejor-no" class="fg-pill" onclick="dmFase.pill('mejor',false)" data-i18n="btn_no">No</button>
+          </div>
+        </div>
+
+        <div class="fg-coste" id="fg-coste"></div>
+        <button class="fg-cta" id="fg-enviar" type="button" onclick="dmFase.enviar()">
+          <span data-i18n="fg_enviar">Preguntar a Teo</span>
+        </button>
+      </div>
+
+      <!-- Paso 2: esperando -->
+      <div id="fg-cargando" class="fg-estado" style="display:none;">
+        <div class="fg-spin"></div>
+        <div data-i18n="fg_cargando">Teo está mirando tu seguimiento…</div>
+      </div>
+
+      <!-- Paso 3: el veredicto -->
+      <div id="fg-veredicto" style="display:none;">
+        <div class="fg-sello" id="fg-sello"></div>
+        <p class="fg-mensaje" id="fg-mensaje"></p>
+
+        <div class="fg-bloque" id="fg-bloque-reg" style="display:none;">
+          <div class="fg-bloque-tit fg-bloque-tit--reg" data-i18n="fg_reg">Lo que me frena</div>
+          <ul class="fg-lista" id="fg-lista-reg"></ul>
+        </div>
+
+        <div class="fg-bloque" id="fg-bloque-pro" style="display:none;">
+          <div class="fg-bloque-tit fg-bloque-tit--pro" data-i18n="fg_pro">Lo que ya está</div>
+          <ul class="fg-lista" id="fg-lista-pro"></ul>
+        </div>
+
+        <div class="fg-bloque" id="fg-bloque-ahora" style="display:none;">
+          <div class="fg-bloque-tit" data-i18n="fg_ahora">Qué hacer ahora</div>
+          <ul class="fg-lista" id="fg-lista-ahora"></ul>
+        </div>
+
+        <button class="fg-cta" type="button" onclick="dmFase.cerrarVeredicto()">
+          <span id="fg-cerrar-txt" data-i18n="fg_volver">Volver al seguimiento</span>
+        </button>
+      </div>
+
+    </div>
   </div>
 
   <!-- ══ S-PLAN-SIMPLE: Plan accesible Pet Owners (Haiku 4.5) ══ -->
@@ -22599,6 +22854,285 @@ window.dmPF = (function () {
   };
 })();
 
+/* ══ dmFase — LA FASE EN CURSO Y LA PUERTA A LA SIGUIENTE ═══════════════════
+   Founder, 19-oct-2026: *"la fase 2 no puede llegar antes de terminar la fase
+   1... una consulta con Teo para ver si puedes pasar a fase 2. Y hay un
+   cuestionario en el que busquemos que no haya ninguna bandera de regresion y
+   que sean banderas de progreso suficientes."*
+
+   LA FASE NO SE MUEVE DESDE AQUI. Este modulo pinta y pregunta; quien decide
+   es POST /cases/{id}/fase/evaluar, en el servidor. Si el cliente pudiera
+   escribir la fase, la puerta no seria una puerta: bastaria con mirar el
+   codigo de la pagina.
+
+   ADITIVO: si el plan no va por fases (35 de cada 375 en produccion), todo
+   esto se queda oculto y la hoja diaria es exactamente la de siempre. */
+window.dmFase = (function () {
+  var API = 'https://dogs-mind-backend-production.up.railway.app';
+  var _e = {};                 // respuestas del cuestionario
+  var _estado = null;          // ultimo GET /fase
+  var _caseId = null;
+  var _enviando = false;
+
+  function _q(id) { return document.getElementById(id); }
+  function _jwt() { try { return localStorage.getItem('dm_jwt') || ''; } catch (e) { return ''; } }
+  function _L(es, en, it) {
+    var l = 'es';
+    try { l = (typeof getCurrentLang === 'function') ? getCurrentLang() : 'es'; } catch (e) {}
+    return l === 'en' ? en : (l === 'it' ? it : es);
+  }
+  function _t(k, def) {
+    try { return (typeof _i18nText === 'function') ? _i18nText(k, def) : def; } catch (e) { return def; }
+  }
+  function _esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+    });
+  }
+  function _vibrar(k) { try { if (window.dmVibrar) dmVibrar(k); } catch (e) {} }
+
+  /* ── Pintar la franja de fase en la hoja diaria ───────────────────────── */
+  async function pintar(caseId) {
+    _caseId = caseId || _caseId || window._dfCaseId || null;
+    var franja = _q('df-fase'), pie = _q('df-pie');
+    if (!_caseId || !_jwt()) { if (franja) franja.style.display = 'none'; if (pie) pie.style.display = 'none'; return; }
+    try {
+      var r = await fetch(API + '/cases/' + encodeURIComponent(_caseId) + '/fase',
+                          { headers: { 'Authorization': 'Bearer ' + _jwt() } });
+      if (!r.ok) throw new Error(r.status);
+      _estado = await r.json();
+    } catch (e) {
+      /* Sin respuesta no se inventa una fase: se deja la pantalla como estaba.
+         Enseñar "FASE 1" por defecto seria decirle al dueño algo que no hemos
+         comprobado. */
+      if (franja) franja.style.display = 'none';
+      if (pie) pie.style.display = 'none';
+      return;
+    }
+
+    if (pie) pie.style.display = '';     // consultar con Teo se puede siempre
+
+    if (!_estado.tiene_fases) {
+      if (franja) franja.style.display = 'none';
+      _pintarBotonFase();
+      avisoHuecos();
+      return;
+    }
+
+    if (franja) franja.style.display = '';
+    var tag = _q('df-fase-tag');
+    if (tag) tag.textContent = _L('Fase ', 'Phase ', 'Fase ') + _estado.fase_actual +
+                               _L(' de ', ' of ', ' di ') + _estado.fases_totales;
+    var tit = _q('df-fase-titulo');
+    if (tit) tit.textContent = _estado.titulo || '';
+    var dias = _q('df-fase-dias');
+    if (dias) {
+      dias.textContent = _estado.dias_reportados_en_fase +
+        (_estado.dias_reportados_en_fase === 1
+          ? _L(' día registrado', ' day logged', ' giorno registrato')
+          : _L(' días registrados', ' days logged', ' giorni registrati'));
+    }
+    var barra = _q('df-fase-barra-i');
+    if (barra) {
+      var pct = Math.min(100, Math.round(100 * (_estado.dias_reportados_en_fase || 0) /
+                                         Math.max(1, _estado.dias_minimos)));
+      barra.style.width = pct + '%';
+    }
+    _pintarBotonFase();
+    avisoHuecos();
+  }
+
+  function _pintarBotonFase() {
+    var btn = _q('df-btn-fase'), nota = _q('df-pie-nota');
+    if (!btn) return;
+    if (!_estado || !_estado.tiene_fases || _estado.es_ultima_fase) {
+      btn.style.display = 'none';
+      if (nota) {
+        if (_estado && _estado.es_ultima_fase) {
+          nota.style.display = '';
+          nota.textContent = _L('Estás en la última fase del plan.',
+                                'You are on the last phase of the plan.',
+                                'Sei nell’ultima fase del piano.');
+        } else { nota.style.display = 'none'; }
+      }
+      return;
+    }
+    var txt = _q('df-btn-fase-txt');
+    if (txt) {
+      txt.textContent = _L('¿Listo para la fase ', 'Ready for phase ', 'Pronto per la fase ') +
+                        (_estado.fase_actual + 1) + '?';
+    }
+    if (_estado.puede_pedir_evaluacion) {
+      btn.style.display = '';
+      btn.disabled = false;
+      if (nota) nota.style.display = 'none';
+    } else {
+      /* Todavia no hay con que decidir. Se dice cuanto falta, no se esconde el
+         boton sin explicacion: un boton que no esta es un boton que el dueño
+         cree que no existe. */
+      btn.style.display = '';
+      btn.disabled = true;
+      var faltan = Math.max(0, (_estado.dias_minimos || 0) - (_estado.dias_reportados_en_fase || 0));
+      if (nota) {
+        nota.style.display = '';
+        nota.textContent = _L(
+          'Para valorar el paso de fase necesito ' + faltan + ' día' + (faltan === 1 ? '' : 's') + ' más de ejercicios anotados.',
+          'To assess the phase change I need ' + faltan + ' more day' + (faltan === 1 ? '' : 's') + ' of logged exercises.',
+          'Per valutare il cambio di fase mi servono ancora ' + faltan + ' giorn' + (faltan === 1 ? 'o' : 'i') + ' di esercizi registrati.');
+      }
+    }
+  }
+
+  /* ── Aviso de dias saltados ───────────────────────────────────────────────
+     Founder: *"No poder saltarte mas de 3 dias seguidos sin una advertencia de
+     que la cosa no va a funcionar, SI YA TIENES CONSTANCIA."* La condicion
+     final es la que importa: a quien nunca ha trabajado no se le riñe por no
+     haber trabajado. Hace falta un historial previo para que el aviso tenga
+     sentido y no sea una regañina de bienvenida. */
+  function avisoHuecos() {
+    var caja = _q('df-aviso-huecos');
+    if (!caja) return;
+    caja.style.display = 'none';
+    /* La decision la toma el servidor (avisar_huecos): es el unico que sabe
+       cuantos dias lleva anotados el caso y cuando fue el ultimo. El cliente
+       adivinandolo avisaria a quien no toca. */
+    if (!_estado || !_estado.avisar_huecos) return;
+    var saltados = _estado.dias_desde_ultimo || 0;
+    caja.style.display = '';
+    caja.textContent = _L(
+      'Llevas ' + saltados + ' días sin anotar. Lo digo porque ya habías cogido el ritmo: esto funciona por repetición, y con huecos largos el perro pierde lo ganado. Retoma hoy por donde lo dejaste, no hace falta recuperar nada.',
+      'You have gone ' + saltados + ' days without logging. I mention it because you had the rhythm: this works through repetition, and long gaps undo what the dog had gained. Pick it up today where you left it — there is nothing to catch up on.',
+      'Sono ' + saltados + ' giorni che non registri. Lo dico perche avevi preso il ritmo: questo funziona per ripetizione, e con vuoti lunghi il cane perde quello che aveva guadagnato. Riprendi oggi da dove eri, non devi recuperare nulla.');
+  }
+
+  /* ── Acciones ─────────────────────────────────────────────────────────── */
+  return {
+    pintar: pintar,
+    avisoHuecos: avisoHuecos,
+    estado: function () { return _estado; },
+
+    consultar: function () {
+      _vibrar('toque');
+      var id = _caseId || window._dfCaseId;
+      if (!id) { try { showToast(_t('seg_no_case', 'Falta identificador del caso.')); } catch (e) {} return; }
+      if (typeof openSeguimiento === 'function') openSeguimiento(id);
+    },
+
+    pedirPaso: function () {
+      if (!_estado || !_estado.puede_pedir_evaluacion) return;
+      _vibrar('toque');
+      _e = {};
+      ['fg-criterio', 'fg-peor', 'fg-dif'].forEach(function (id) { var el = _q(id); if (el) el.value = ''; });
+      ['fg-todos-si', 'fg-todos-no', 'fg-mejor-si', 'fg-mejor-no'].forEach(function (id) {
+        var el = _q(id); if (el) el.classList.remove('on');
+      });
+      var sub = _q('fg-top-sub');
+      if (sub) sub.textContent = _L('Fase ', 'Phase ', 'Fase ') + _estado.fase_actual +
+                                 ' → ' + (_estado.fase_actual + 1);
+      var coste = _q('fg-coste');
+      if (coste) coste.textContent = _L('Esta consulta descuenta 50 créditos.',
+                                        'This consultation uses 50 credits.',
+                                        'Questa consulenza scala 50 crediti.');
+      _q('fg-form').style.display = '';
+      _q('fg-cargando').style.display = 'none';
+      _q('fg-veredicto').style.display = 'none';
+      var sc = _q('fg-scroll'); if (sc) sc.scrollTop = 0;
+      goTo('s-fase-gate');
+    },
+
+    pill: function (grupo, valor) {
+      _vibrar('toque');
+      _e[grupo] = valor;
+      var si = _q('fg-' + grupo + '-si'), no = _q('fg-' + grupo + '-no');
+      if (si) si.classList.toggle('on', valor === true);
+      if (no) no.classList.toggle('on', valor === false);
+    },
+
+    enviar: async function () {
+      if (_enviando || !_estado) return;
+      var id = _caseId || window._dfCaseId;
+      if (!id) return;
+      _enviando = true;
+      _vibrar('confirma');
+      _q('fg-form').style.display = 'none';
+      _q('fg-cargando').style.display = '';
+      _q('fg-veredicto').style.display = 'none';
+
+      var cuerpo = {
+        dias_trabajados: _estado.dias_reportados_en_fase || 0,
+        ejercicios_completos: _e.todos === true,
+        ve_mejoria: _e.mejor === true,
+        criterio_observado: (_q('fg-criterio') || {}).value || null,
+        ha_empeorado_algo: (_q('fg-peor') || {}).value || null,
+        dificultades: (_q('fg-dif') || {}).value || null
+      };
+
+      try {
+        var r = await fetch(API + '/cases/' + encodeURIComponent(id) + '/fase/evaluar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + _jwt() },
+          body: JSON.stringify(cuerpo)
+        });
+        var d = await r.json().catch(function () { return {}; });
+        if (!r.ok) {
+          _q('fg-cargando').style.display = 'none';
+          _q('fg-form').style.display = '';
+          try { showToast(d.detail || _L('No se pudo evaluar ahora.', 'Could not assess right now.', 'Non e stato possibile valutare ora.')); } catch (e) {}
+          _enviando = false;
+          return;
+        }
+        _pintarVeredicto(d);
+      } catch (e) {
+        _q('fg-cargando').style.display = 'none';
+        _q('fg-form').style.display = '';
+        try { showToast(_L('Sin conexión.', 'No connection.', 'Nessuna connessione.')); } catch (_) {}
+      }
+      _enviando = false;
+    },
+
+    cerrarVeredicto: function () {
+      _vibrar('toque');
+      goTo('s-daily-followup');
+      pintar(_caseId);
+      try { if (typeof dfReload === 'function') dfReload(); } catch (e) {}
+    }
+  };
+
+  function _pintarVeredicto(d) {
+    _q('fg-cargando').style.display = 'none';
+    _q('fg-veredicto').style.display = '';
+
+    var sello = _q('fg-sello');
+    if (sello) {
+      sello.className = 'fg-sello ' + (d.avanza ? 'fg-sello--si' : 'fg-sello--no');
+      sello.textContent = d.avanza
+        ? _L('Fase ' + d.fase_actual + ' abierta', 'Phase ' + d.fase_actual + ' unlocked', 'Fase ' + d.fase_actual + ' sbloccata')
+        : _L('Todavía no', 'Not yet', 'Non ancora');
+    }
+    var msg = _q('fg-mensaje'); if (msg) msg.textContent = d.mensaje || '';
+
+    function lista(idBloque, idLista, arr) {
+      var b = _q(idBloque), u = _q(idLista);
+      if (!b || !u) return;
+      if (!arr || !arr.length) { b.style.display = 'none'; return; }
+      b.style.display = '';
+      u.innerHTML = arr.map(function (x) { return '<li>' + _esc(x) + '</li>'; }).join('');
+    }
+    lista('fg-bloque-reg', 'fg-lista-reg', d.banderas_regresion);
+    lista('fg-bloque-pro', 'fg-lista-pro', d.banderas_progreso);
+    lista('fg-bloque-ahora', 'fg-lista-ahora', d.que_hacer_ahora);
+
+    var cerrar = _q('fg-cerrar-txt');
+    if (cerrar) {
+      cerrar.textContent = d.avanza
+        ? _L('Empezar la fase ' + d.fase_actual, 'Start phase ' + d.fase_actual, 'Inizia la fase ' + d.fase_actual)
+        : _L('Volver al seguimiento', 'Back to the follow-up', 'Torna al monitoraggio');
+    }
+    if (d.avanza) _vibrar('logro');
+    var sc = _q('fg-scroll'); if (sc) sc.scrollTop = 0;
+  }
+})();
+
 function dmIsProAccount(acc) {
   /* Partner es OBLIGATORIAMENTE profesional (founder 2026-08-04): aunque su
      account_type se hubiera quedado atrás, el rol manda y ve todo lo pro. */
@@ -24324,6 +24858,25 @@ function endTourIntro() {
       pf_fin_titulo: 'Ya tienes el plan entero',
       pf_fin_cuerpo: 'No hace falta que lo recuerdes: lo tienes guardado y puedes volver cuando quieras. Empieza por la fase 1 y ve a tu ritmo.',
       pf_aceptar: 'Aceptar el plan',
+      // ── Fase en curso y puerta de fase (19-oct-2026) ──
+      df_consultar: 'Consulta tu evolución con Teo',
+      df_pasar_fase: '¿Listo para la fase siguiente?',
+      fg_title: 'Paso de fase',
+      fg_intro: 'Antes de abrir la fase siguiente miro dos cosas: que no haya nada que haya ido a peor, y que lo de esta fase esté consolidado de verdad. Cuéntame.',
+      fg_q_crit: '¿Qué has medido y cuánto ha cambiado?',
+      fg_ph_crit: 'Ej: antes 6 episodios al día, ahora 1. Mide lo que el plan te pedía medir.',
+      fg_q_peor: '¿Algo ha ido a peor o ha reaparecido?',
+      fg_ph_peor: 'Si no hay nada, déjalo vacío. Si hay algo, cuéntalo: es lo más importante de esta pantalla.',
+      fg_q_dif: '¿Qué te ha costado?',
+      fg_ph_dif: 'Lo que no has podido hacer, o no has sabido cómo.',
+      fg_q_todos: '¿Has hecho todos los ejercicios de la fase?',
+      fg_q_mejor: '¿Ves mejoría?',
+      fg_enviar: 'Preguntar a Teo',
+      fg_cargando: 'Teo está mirando tu seguimiento…',
+      fg_reg: 'Lo que me frena',
+      fg_pro: 'Lo que ya está',
+      fg_ahora: 'Qué hacer ahora',
+      fg_volver: 'Volver al seguimiento',
       pf_titulo: 'El plan de tu perro',
       pf_titulo_de: 'El plan de',
       pf_cecilia_script: 'Aquí tienes el plan de tu perro. Va por fases, y no te lo voy a dar entero de golpe: cada vez vas a tener delante solo la fase que toca. Léelo con calma, que lo importante no es correr.',
@@ -26413,6 +26966,25 @@ function endTourIntro() {
       pf_fin_titulo: 'That is the whole plan',
       pf_fin_cuerpo: 'You do not need to remember it: it is saved and you can come back whenever you want. Start with phase 1 and go at your own pace.',
       pf_aceptar: 'Accept the plan',
+      // ── Current phase and phase gate (19-oct-2026) ──
+      df_consultar: 'Check your dog’s progress with Teo',
+      df_pasar_fase: 'Ready for the next phase?',
+      fg_title: 'Phase change',
+      fg_intro: 'Before I open the next phase I look at two things: that nothing has got worse, and that this phase is genuinely consolidated. Tell me.',
+      fg_q_crit: 'What have you measured, and how much has it changed?',
+      fg_ph_crit: 'E.g. 6 episodes a day before, 1 now. Measure what the plan asked you to measure.',
+      fg_q_peor: 'Has anything got worse or come back?',
+      fg_ph_peor: 'If there is nothing, leave it empty. If there is, say so: it is the most important thing on this screen.',
+      fg_q_dif: 'What did you struggle with?',
+      fg_ph_dif: 'What you could not do, or did not know how to do.',
+      fg_q_todos: 'Have you done all the exercises for this phase?',
+      fg_q_mejor: 'Do you see improvement?',
+      fg_enviar: 'Ask Teo',
+      fg_cargando: 'Teo is going through your follow-up…',
+      fg_reg: 'What is holding me back',
+      fg_pro: 'What is already there',
+      fg_ahora: 'What to do now',
+      fg_volver: 'Back to the follow-up',
       pf_titulo: 'Your dog’s plan',
       pf_titulo_de: 'The plan for',
       pf_cecilia_script: 'Here is your dog’s plan. It goes in phases, and I am not going to hand it to you all at once: each time you will have in front of you only the phase that is due. Read it calmly — what matters is not rushing.',
@@ -27698,6 +28270,25 @@ function endTourIntro() {
           pf_fin_titulo: 'Questo è tutto il piano',
           pf_fin_cuerpo: 'Non devi ricordartelo: è salvato e puoi tornarci quando vuoi. Inizia dalla fase 1 e vai al tuo ritmo.',
           pf_aceptar: 'Accetta il piano',
+          // ── Fase in corso e porta di fase (19-oct-2026) ──
+          df_consultar: 'Consulta l’evoluzione con Teo',
+          df_pasar_fase: 'Pronto per la fase successiva?',
+          fg_title: 'Cambio di fase',
+          fg_intro: 'Prima di aprire la fase successiva guardo due cose: che non ci sia nulla peggiorato, e che questa fase sia davvero consolidata. Raccontami.',
+          fg_q_crit: 'Che cosa hai misurato e quanto è cambiato?',
+          fg_ph_crit: 'Es: prima 6 episodi al giorno, ora 1. Misura quello che il piano ti chiedeva di misurare.',
+          fg_q_peor: 'Qualcosa è peggiorato o è ricomparso?',
+          fg_ph_peor: 'Se non c’è nulla, lascia vuoto. Se c’è, dillo: è la cosa più importante di questa schermata.',
+          fg_q_dif: 'Che cosa ti è costato?',
+          fg_ph_dif: 'Quello che non hai potuto fare, o non hai saputo come fare.',
+          fg_q_todos: 'Hai fatto tutti gli esercizi della fase?',
+          fg_q_mejor: 'Vedi miglioramento?',
+          fg_enviar: 'Chiedi a Teo',
+          fg_cargando: 'Teo sta guardando il tuo monitoraggio…',
+          fg_reg: 'Che cosa mi frena',
+          fg_pro: 'Che cosa c’è già',
+          fg_ahora: 'Che cosa fare adesso',
+          fg_volver: 'Torna al monitoraggio',
           pf_titulo: 'Il piano del tuo cane',
           pf_titulo_de: 'Il piano di',
           pf_cecilia_script: 'Ecco il piano del tuo cane. Va per fasi, e non te lo darò tutto insieme: ogni volta avrai davanti solo la fase che tocca. Leggilo con calma, l’importante non è correre.',
@@ -29740,6 +30331,12 @@ if ('serviceWorker' in navigator && !__isCapacitor) {
     _state.revealed = false;
     if (typeof goTo === 'function') goTo('s-daily-followup');
     setTimeout(loadToday, 50);
+    /* La fase va por su cuenta: si /fase falla, los ejercicios del dia se
+       siguen viendo igual. Y al reves. Una no puede tumbar a la otra. */
+    window._dfCaseId = caseId;
+    setTimeout(function () {
+      try { if (window.dmFase) dmFase.pintar(caseId); } catch (e) {}
+    }, 80);
   };
   window.dfReload = loadToday;
 

@@ -69,6 +69,31 @@ PY
 comprobar)
   HI=$(huella_ios); HA=$(huella_android)
   echo "── PUERTA DE ENVÍO ──"
+
+  # ── GUARDIAN DE LAS PUSH (founder, 21-oct-2026) ──────────────────────────
+  # "es alucinante que fallemos en esto que es la clave del proyecto" +
+  # "ponte un sistema que te obligue a enviarlos".
+  #
+  # El motor de push existe desde el 10-oct y NO HA ENVIADO UNA SOLA
+  # notificacion: nadie lo comprobaba, asi que nadie se entero. Esto lo
+  # comprueba, y FALLA CERRADO: si no se puede medir, no pasa.
+  #
+  # Para saltarselo a sabiendas hace falta decirlo en voz alta:
+  #     PUSH_ROTA_LO_SE=1 scripts/listo-para-enviar.sh comprobar
+  if ! scripts/push-vivo.sh; then
+    if [ "${PUSH_ROTA_LO_SE:-0}" = "1" ]; then
+      echo "   ! Sigues con las push rotas porque lo has pedido explicitamente."
+    else
+      echo
+      echo "   ✗ NO SE ENVIA. Las notificaciones push no llegan a nadie."
+      echo "     La app promete avisos que no existen."
+      echo "     Si aun asi hay que enviar, dilo en voz alta:"
+      echo "       PUSH_ROTA_LO_SE=1 scripts/listo-para-enviar.sh comprobar"
+      exit 1
+    fi
+  fi
+  echo
+
   echo "   frontend dentro del IPA : $HI"
   echo "   frontend dentro del AAB : $HA"
   [ "$HI" = "$HA" ] || { echo "   ✗ LAS DOS TIENDAS LLEVAN COSAS DISTINTAS. No se envía."; exit 1; }

@@ -423,8 +423,31 @@ def access_state(user, now: Optional[datetime] = None,
     # poco que le quede, y se encuentra los planes justo al ir a por el
     # análisis. Antes se cortaba en seco por debajo de 3 tk y dejaba a 61
     # personas mirando créditos que ya no podían gastar.
-    if is_legacy(user) and tokens >= (ANALYSIS_TOKENS if amount is None else amount):
+    # EL SALDO HEREDADO ES EL QUE YA TENIA, NO EL QUE LE REGALO UNA INVITACION.
+    #
+    # La promesa a los de antes fue "sigue gastando TU saldo hasta que se te
+    # acabe". Si despues canjea una invitacion, los creditos de la invitacion
+    # caen en el mismo monedero y esta regla los trataba igual: al caducar la
+    # invitacion seguia gastando, indefinidamente, lo que la invitacion le dio.
+    # Es una suscripcion gratis permanente por la puerta de atras.
+    #
+    # Founder, 21-oct-2026: *"cuando pase el tiempo establecido o se acaben los
+    # tokens... no pueden seguir usando la app sin suscripcion mensual"*.
+    #
+    # Medido el 21-oct sobre los 44 invitados: 24 ya estaban bloqueados y solo
+    # 2 pasaban por aqui (uno de ellos cuenta de prueba). Poca gente, pero la
+    # puerta estaba abierta para cualquiera que repitiera el patron.
+    _invitado = (getattr(user, "subscription_store", "") or "") == "invitacion"
+    _invitacion_caducada = bool(
+        _invitado
+        and getattr(user, "subscription_expires_at", None)
+        and user.subscription_expires_at <= now
+    )
+    if is_legacy(user) and not _invitacion_caducada \
+       and tokens >= (ANALYSIS_TOKENS if amount is None else amount):
         return out(True, "legacy_balance")
+    if _invitacion_caducada:
+        return out(False, "invitation_expired")
     if trial["active"]:
         return out(True, "trial")
     return out(False, "needs_subscription")

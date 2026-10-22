@@ -443,9 +443,24 @@ def access_state(user, now: Optional[datetime] = None,
         and getattr(user, "subscription_expires_at", None)
         and user.subscription_expires_at <= now
     )
-    if is_legacy(user) and not _invitacion_caducada \
-       and tokens >= (ANALYSIS_TOKENS if amount is None else amount):
+    # EL ANTERIOR AL 1-SEP MANDA SOBRE TODO LO DEMAS.
+    #
+    # Founder, 21-oct-2026, confirmando una regla vieja: *"todos los que tenian
+    # tokens antes del 1 de septiembre los pueden seguir utilizando. En el
+    # momento en el que esos tokens se acaben, no pueden realizar mas consultas
+    # y NO PUEDEN COMPRAR TOKENS: tienen que primero pagar suscripcion."*
+    #
+    # Asi que la caducidad de una invitacion NO le quita nada a un usuario
+    # anterior al corte. Lo unico que le cierra la puerta es quedarse sin
+    # saldo. Esta linea llego a estar al reves durante unas horas el 21-oct
+    # —bloqueaba al legado por tener una invitacion caducada— y dejaba fuera a
+    # alguien a quien se le habia prometido lo contrario.
+    if is_legacy(user) and tokens >= (ANALYSIS_TOKENS if amount is None else amount):
         return out(True, "legacy_balance")
+
+    # El POSTERIOR al corte, en cambio, solo entra con suscripcion viva o con
+    # una invitacion viva. Si la invitacion caduco, se acabo: no hay saldo
+    # heredado que le ampare, porque nunca lo tuvo.
     if _invitacion_caducada:
         return out(False, "invitation_expired")
     if trial["active"]:

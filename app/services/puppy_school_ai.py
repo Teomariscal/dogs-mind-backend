@@ -62,8 +62,17 @@ def _semanas(edad_semanas: int) -> str:
 
 
 def _build_rag_query(*, breed: str, edad_semanas: int, area: str,
-                     objetivo: str, problema: str, lang: str) -> str:
-    """Query densa para Qdrant: tramo evolutivo + área elegida + problema si lo hay."""
+                     objetivo: str, problema: str, lang: str,
+                     detalle: str = "") -> str:
+    """Query densa para Qdrant: tramo evolutivo + area + lo que el dueño quiere.
+
+    Founder, 22-oct-2026: *"que el dueño especifique mas su objetivo y que la
+    RAG este anclada ahi tambien"*. Antes la busqueda solo veia la etiqueta del
+    area —ocho cajones fijos— asi que dos casos muy distintos dentro del mismo
+    cajon recuperaban exactamente los mismos documentos. Lo que el dueño
+    escribe con sus palabras es mas especifico que cualquier etiqueta nuestra,
+    y por eso entra en la query con peso propio.
+    """
     base_es = [
         "Desarrollo del cachorro, periodo sensible de socializacion, aprendizaje temprano.",
         "Habituacion, desensibilizacion, contracondicionamiento, reforzamiento positivo, LIMA.",
@@ -83,6 +92,13 @@ def _build_rag_query(*, breed: str, edad_semanas: int, area: str,
         f"Area di lavoro: {area}.",
     ]
     partes = {"en": base_en, "it": base_it}.get(lang, base_es)
+    det = (detalle or "").strip()
+    if det:
+        # Delante del resto: es lo mas concreto que tenemos del caso.
+        partes.insert(1, {
+            "en": f"What the owner wants to achieve, in their own words: {det}.",
+            "it": f"Cosa vuole ottenere il proprietario, con parole sue: {det}.",
+        }.get(lang, f"Lo que el dueño quiere conseguir, con sus palabras: {det}."))
     if objetivo == "problema" and problema:
         partes.append(
             {"en": f"Reported problem behaviour: {problema}. Functional analysis, ABC.",
@@ -115,6 +131,9 @@ def _build_input_block(d: dict, lang: str) -> str:
                   "\nWHAT THE OWNER WANTS:\n"
                   f"  - Purpose: {d['objetivo_texto']}\n"
                   f"  - Area to start with: {d['area_texto']}\n")
+        if (d.get("objetivo_detalle") or "").strip():
+            bloque += (f"  - What they want to achieve, in their own words: "
+                       f"{d['objetivo_detalle'].strip()}\n")
         if problema:
             bloque += f"  - Problem behaviour, in the owner's words: {problema}\n"
         return bloque + "</puppy_intake>"
@@ -138,6 +157,9 @@ def _build_input_block(d: dict, lang: str) -> str:
                   "\nCOSA VUOLE IL PROPRIETARIO:\n"
                   f"  - Scopo: {d['objetivo_texto']}\n"
                   f"  - Area da cui iniziare: {d['area_texto']}\n")
+        if (d.get("objetivo_detalle") or "").strip():
+            bloque += (f"  - Cosa vuole ottenere, con parole sue: "
+                       f"{d['objetivo_detalle'].strip()}\n")
         if problema:
             bloque += f"  - Comportamento problema, parole del proprietario: {problema}\n"
         return bloque + "</puppy_intake>"
@@ -160,6 +182,9 @@ def _build_input_block(d: dict, lang: str) -> str:
               "\nQUE BUSCA EL TUTOR:\n"
               f"  - Objetivo: {d['objetivo_texto']}\n"
               f"  - Area por la que empezar: {d['area_texto']}\n")
+    if (d.get("objetivo_detalle") or "").strip():
+        bloque += (f"  - Lo que quiere conseguir, con sus palabras: "
+                   f"{d['objetivo_detalle'].strip()}\n")
     if problema:
         bloque += f"  - Conducta problema, en palabras del tutor: {problema}\n"
     return bloque + "</puppy_intake>"
@@ -196,6 +221,7 @@ def generate_puppy_plan(*, datos: dict, lang: str = "es") -> PuppySchoolResult:
         breed=datos["breed"], edad_semanas=int(datos["edad_semanas"]),
         area=datos["area_texto"], objetivo=datos["objetivo"],
         problema=datos.get("conducta_problema", ""), lang=lang_norm,
+        detalle=datos.get("objetivo_detalle", ""),
     )
     chunks: list[RetrievedChunk] = retrieve(query, top_k=RAG_TOP_K)
     rag_block = build_rag_context_block(chunks)

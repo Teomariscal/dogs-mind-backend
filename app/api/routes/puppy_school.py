@@ -54,6 +54,11 @@ AREAS = {
     "veterinario":       "conducta en la clínica veterinaria",
     "educacion_basica":  "educación básica",
     "altas_capacidades": "escuela de altas capacidades: estimular al máximo su potencial genético",
+    # Founder, 22-oct-2026: *"en las opciones que propone estandar debes poner
+    # un boton de otros"*. Las ocho areas de arriba son las que vemos nosotros;
+    # el dueño llega con la suya. Cuando elige esta, lo que manda es lo que
+    # escriba en `objetivo_detalle`, no esta etiqueta.
+    "otros":             "un objetivo propio que describe el dueño",
 }
 
 
@@ -107,12 +112,27 @@ class PuppySchoolInput(BaseModel):
     area: Literal[
         "esfinteres", "destrozos", "vinculo", "socializacion",
         "otros_perros", "veterinario", "educacion_basica", "altas_capacidades",
+        "otros",
     ]
+    # QUE QUIERE CONSEGUIR, CON SUS PALABRAS (founder 22-oct-2026).
+    # El area es una casilla; esto es el objetivo de verdad, y es lo que ancla
+    # la busqueda en la RAG. Opcional salvo con area="otros", donde es lo
+    # UNICO que dice de que va el caso.
+    objetivo_detalle: str = Field("", max_length=600,
+                                  description="Que quiere conseguir, en sus palabras")
     conducta_problema: str = Field("", max_length=1500,
                                    description="Solo si objetivo = problema")
     vacunacion_completa: bool = Field(
         ..., description="Calendario completo, heptavalente hace más de una semana")
     lang: Literal["es", "en", "it"] = "es"
+
+    @field_validator("objetivo_detalle")
+    @classmethod
+    def detalle_si_otros(cls, v: str, info) -> str:
+        v = (v or "").strip()
+        if info.data.get("area") == "otros" and len(v) < 10:
+            raise ValueError("Cuéntame qué quieres conseguir, con algo más de detalle.")
+        return v
 
     @field_validator("conducta_problema")
     @classmethod
@@ -178,6 +198,7 @@ def create_puppy_plan(
     datos["birth_date"] = payload.birth_date.isoformat()
     datos["origen"] = ("adoptado" if payload.origen == "adoptado" else "de criadero")
     datos["area_texto"] = AREAS[payload.area]
+    datos["objetivo_detalle"] = payload.objetivo_detalle
     datos["donde_duerme_texto"] = DONDE_DUERME[payload.donde_duerme]
     datos["destete_texto"] = DESTETE[payload.destete]
     datos["ninos_texto"] = (

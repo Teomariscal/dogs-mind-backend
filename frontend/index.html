@@ -11395,15 +11395,28 @@ body.dm-web .splash-descargar {
         <label data-i18n="pup_f_area">¿Sobre qué quieres que trabajemos?</label>
         <div style="font-size:12px;color:rgba(232,239,234,0.74);margin:-2px 0 10px;line-height:1.45;" data-i18n="pup_area_hint">Empieza por una y ya trabajaremos las otras.</div>
         <div class="tc-radio-row" role="radiogroup">
-          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="esfinteres" required><span data-i18n="pup_a_toilet">Control de esfínteres, ser limpio</span></label>
-          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="destrozos"><span data-i18n="pup_a_damage">Evitar destrozos por falta de estimulación</span></label>
-          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="vinculo"><span data-i18n="pup_a_bond">Trabajar un vínculo sano</span></label>
-          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="socializacion"><span data-i18n="pup_a_social">Socialización y estimulación sensorial</span></label>
-          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="otros_perros"><span data-i18n="pup_a_dogs">Conducta con otros perros</span></label>
-          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="veterinario"><span data-i18n="pup_a_vet">Conducta en la clínica veterinaria</span></label>
-          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="educacion_basica"><span data-i18n="pup_a_basic">Educación básica</span></label>
-          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="altas_capacidades"><span data-i18n="pup_a_gifted">Escuela de altas capacidades</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="esfinteres" required onchange="pupAreaOtros()"><span data-i18n="pup_a_toilet">Control de esfínteres, ser limpio</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="destrozos" onchange="pupAreaOtros()"><span data-i18n="pup_a_damage">Evitar destrozos por falta de estimulación</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="vinculo" onchange="pupAreaOtros()"><span data-i18n="pup_a_bond">Trabajar un vínculo sano</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="socializacion" onchange="pupAreaOtros()"><span data-i18n="pup_a_social">Socialización y estimulación sensorial</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="otros_perros" onchange="pupAreaOtros()"><span data-i18n="pup_a_dogs">Conducta con otros perros</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="veterinario" onchange="pupAreaOtros()"><span data-i18n="pup_a_vet">Conducta en la clínica veterinaria</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="educacion_basica" onchange="pupAreaOtros()"><span data-i18n="pup_a_basic">Educación básica</span></label>
+          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="altas_capacidades" onchange="pupAreaOtros()"><span data-i18n="pup_a_gifted">Escuela de altas capacidades</span></label>
+          <!-- Founder 22-oct-2026: las ocho de arriba son las areas que vemos
+               nosotros; el dueño llega con la suya. Al elegir esta, lo que
+               manda es lo que escriba abajo. -->
+          <label class="tc-radio-pill"><input type="radio" name="pup-area" value="otros" onchange="pupAreaOtros()"><span data-i18n="pup_a_other">Otros</span></label>
         </div>
+      </div>
+
+      <!-- QUE QUIERE CONSEGUIR, CON SUS PALABRAS (founder 22-oct-2026).
+           El area es una casilla nuestra; esto es el objetivo de verdad, y es
+           lo que ancla la busqueda en la RAG. Con "Otros" es obligatorio,
+           porque entonces es lo UNICO que dice de que va el caso. -->
+      <div class="tc-field" data-guided-step="3">
+        <label for="pup-objetivo" id="pup-objetivo-lbl" data-i18n="pup_f_goal">¿Qué quieres conseguir exactamente? <span class="tc-opt" data-i18n="pup_opt">(opcional, pero ayuda mucho)</span></label>
+        <textarea id="pup-objetivo" rows="3" maxlength="600" data-i18n-placeholder="pup_goal_ph" placeholder="Cuéntamelo con tus palabras: qué te gustaría que pasara, y qué te preocupa que no pase"></textarea>
       </div>
 
       <div class="tc-field" data-guided-step="3" data-guided-cond="1" id="pup-problema-wrap" style="display:none;">
@@ -23133,6 +23146,21 @@ window.dmFase = (function () {
   }
 })();
 
+/* Con "Otros" elegido, el objetivo deja de ser opcional: se dice en la propia
+   etiqueta en vez de dejar que lo descubra al chocar con el error. */
+function pupAreaOtros() {
+  var sel = document.querySelector('input[name="pup-area"]:checked');
+  var otros = !!(sel && sel.value === 'otros');
+  var lbl = document.getElementById('pup-objetivo-lbl');
+  var ta  = document.getElementById('pup-objetivo');
+  if (lbl) {
+    var opt = lbl.querySelector('.tc-opt');
+    if (opt) opt.style.display = otros ? 'none' : '';
+  }
+  if (ta && otros) { try { ta.focus({ preventScroll: true }); } catch (e) {} }
+}
+window.pupAreaOtros = pupAreaOtros;
+
 function dmIsProAccount(acc) {
   /* Partner es OBLIGATORIAMENTE profesional (founder 2026-08-04): aunque su
      account_type se hubiera quedado atrás, el rol manda y ve todo lo pro. */
@@ -23854,6 +23882,7 @@ window.submitPuppySchool = async function() {
     edades_ninos:        conNinos === 'si' ? v('pup-kids-ages') : '',
     objetivo:            quiere,
     area:                rad('pup-area'),
+    objetivo_detalle:    v('pup-objetivo'),
     conducta_problema:   quiere === 'problema' ? v('pup-problema') : '',
     vacunacion_completa: rad('pup-vax') === 'si',
     lang: (typeof getCurrentLang === 'function') ? getCurrentLang() : 'es'
@@ -23877,6 +23906,10 @@ window.submitPuppySchool = async function() {
   if (!quiere)       { err(_i18nText('pup_err_want','Marca qué buscas.')); return; }
   if (!d.area)       { err(_i18nText('pup_err_area','Elige por dónde empezamos.')); return; }
   if (quiere === 'problema' && d.conducta_problema.length < 10) { err(_i18nText('pup_err_problem','Describe la conducta problema con algo más de detalle.')); return; }
+  /* Con area="otros" el objetivo escrito es lo UNICO que describe el caso: sin
+     el, el motor no sabe de que va. Por eso ahi deja de ser opcional. */
+  if (d.area === 'otros' && (d.objetivo_detalle || '').trim().length < 10) {
+    err(_i18nText('pup_err_goal','Cuéntame qué quieres conseguir, con algo más de detalle.')); return; }
   if (!rad('pup-vax')) { err(_i18nText('pup_err_vax','Marca si el calendario de vacunación está completo.')); return; }
 
   var jwt=''; try { jwt = localStorage.getItem('dm_jwt') || ''; } catch(e) {}
@@ -25456,6 +25489,11 @@ function endTourIntro() {
       pup_a_vet:       'Conducta en la clínica veterinaria',
       pup_a_basic:     'Educación básica',
       pup_a_gifted:    'Escuela de altas capacidades',
+      pup_a_other:     'Otros',
+      pup_f_goal:      '¿Qué quieres conseguir exactamente?',
+      pup_opt:         '(opcional, pero ayuda mucho)',
+      pup_goal_ph:     'Cuéntamelo con tus palabras: qué te gustaría que pasara, y qué te preocupa que no pase',
+      pup_err_goal:    'Cuéntame qué quieres conseguir, con algo más de detalle.',
       pup_f_problem:   'Describe la conducta problema lo más precisa y claramente que puedas',
       pup_f_vax:       'Calendario de vacunación completo (heptavalente hace más de una semana)',
       pup_yes:         'Sí',
@@ -26732,6 +26770,11 @@ function endTourIntro() {
       pup_a_vet:       'Behaviour at the vet clinic',
       pup_a_basic:     'Basic education',
       pup_a_gifted:    'Gifted school: maximising genetic potential',
+      pup_a_other:     'Something else',
+      pup_f_goal:      'What exactly do you want to achieve?',
+      pup_opt:         '(optional, but it helps a lot)',
+      pup_goal_ph:     'In your own words: what you would like to happen, and what worries you might not',
+      pup_err_goal:    'Tell me what you want to achieve, with a bit more detail.',
       pup_f_problem:   'Describe the problem behaviour as precisely and clearly as you can',
       pup_f_vax:       'Full vaccination schedule (heptavalent more than a week ago)',
       pup_yes:         'Yes',
@@ -28036,6 +28079,11 @@ function endTourIntro() {
           pup_a_vet:       'Comportamento in clinica veterinaria',
           pup_a_basic:     'Educazione di base',
           pup_a_gifted:    'Scuola di alte capacità',
+          pup_a_other:     'Altro',
+          pup_f_goal:      'Che cosa vuoi ottenere esattamente?',
+          pup_opt:         '(facoltativo, ma aiuta molto)',
+          pup_goal_ph:     'Con parole tue: che cosa vorresti che succedesse, e che cosa temi che non succeda',
+          pup_err_goal:    'Raccontami che cosa vuoi ottenere, con un po\u2019 piu di dettaglio.',
           pup_f_problem:   'Descrivi il comportamento problema nel modo più preciso e chiaro possibile',
           pup_f_vax:       'Calendario vaccinale completo (eptavalente da più di una settimana)',
           pup_yes:         'Sì',

@@ -14,6 +14,7 @@ Spec: memoria project_dogs_mind_puppy_school.md.
 from __future__ import annotations
 
 import logging
+import re
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -59,6 +60,35 @@ def _semanas(edad_semanas: int) -> str:
     if edad_semanas < 16:
         return "ventana de socializacion CERRANDOSE (urgencia alta)"
     return "ventana de socializacion YA CERRADA (exposicion gradual y contracondicionamiento)"
+
+
+# Rangos Unicode de emoji y pictogramas. Deliberadamente NO incluye los signos
+# tipograficos que si se usan: comillas, guiones largos, flechas de texto.
+_RE_EMOJI = re.compile(
+    "[\U0001F000-\U0001FAFF\U00002600-\U000027BF\U0001F1E6-\U0001F1FF"
+    "\U00002B00-\U00002BFF\U0000FE0F\U0001F900-\U0001F9FF]+"
+)
+
+
+def _sin_emojis(texto: str) -> str:
+    """Quita los emojis del plan.
+
+    La regla "cero emojis" ya esta escrita en los seis prompts. No basta:
+    probado contra produccion el 22-oct-2026, la huella seguia saliendo en
+    castellano y en italiano con la regla puesta. Un prompt es una peticion;
+    esto es una garantia.
+
+    Se limpia ADEMAS de pedirlo, no en lugar de pedirlo: el prompt evita que el
+    modelo construya frases alrededor del emoji ("Nube 🐾 esta en..."), y esto
+    se encarga de lo que se escape igual.
+    """
+    if not texto:
+        return texto
+    limpio = _RE_EMOJI.sub("", texto)
+    # El emoji suele ir precedido de un espacio que queda colgando.
+    limpio = re.sub(r"[ \t]{2,}", " ", limpio)
+    limpio = re.sub(r"[ \t]+\n", "\n", limpio)
+    return limpio.rstrip()
 
 
 def _build_rag_query(*, breed: str, edad_semanas: int, area: str,
@@ -295,7 +325,7 @@ def generate_puppy_plan(*, datos: dict, lang: str = "es") -> PuppySchoolResult:
             logger.warning("puppy_school: no se pudo completar el plan truncado")
 
     return PuppySchoolResult(
-        plan_markdown=raw.strip(),
+        plan_markdown=_sin_emojis(raw.strip()),
         sources=chunks,
         input_tokens=response.usage.input_tokens,
         output_tokens=response.usage.output_tokens,

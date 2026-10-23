@@ -29,6 +29,7 @@ from app.models.anamnesis import AnamnesisInput, AnalysisResponse, RetrievedChun
 from app.services.rag import retrieve, build_rag_context_block, build_anamnesis_block
 from app.services.italian_veneer import maybe_apply_italian_veneer
 from app.services.italian_cognitive import cognitive_path_applies, apply_cognitive_reexpression
+from app.core.prompts.terminologia_it import bloque as _termino_it
 
 
 def _build_query_from_anamnesis(anamnesis: AnamnesisInput) -> str:
@@ -158,6 +159,7 @@ def run_clinical_analysis(
             "italiano, INCLUSI i titoli racchiusi tra linee decorative "
             "(es. 'SÍNTESIS ABC' → 'SINTESI ABC', 'SÍNTESIS' → 'SINTESI'). "
             "Non lasciare NESSUNA parola in spagnolo in nessun punto dell'output.\n"
+            + _termino_it()
         )
     else:
         lang_instruction = (

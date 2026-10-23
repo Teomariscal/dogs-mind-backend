@@ -17,6 +17,7 @@ from app.core.prompts.abc_explained import (
     ABC_EXPLAINED_SYSTEM_PROMPT_ES,
     ABC_EXPLAINED_SYSTEM_PROMPT_EN,
 )
+from app.core.prompts.terminologia_it import bloque as _termino_it
 
 
 # Output cap: 4 párrafos × ~90 palabras × ~1.6 tokens/palabra ≈ 580 tokens.
@@ -57,6 +58,7 @@ def run_abc_explained(*, original_abc_text: str, lang: str = "es") -> AbcExplain
             + "\n\n=== OVERRIDE LINGUA (PRIORITÀ MASSIMA) ===\n"
             "Scrivi ASSOLUTAMENTE TUTTO l'output in ITALIANO (mai in spagnolo). Dai del tu al "
             "proprietario. Ignora l'istruzione precedente 'español de España': la lingua è l'ITALIANO."
+            + _termino_it()
         )
     else:
         system_prompt = ABC_EXPLAINED_SYSTEM_PROMPT_ES

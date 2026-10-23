@@ -32,6 +32,17 @@ BLINDAJE LIMA (inquebrantable, idéntico al resto de módulos de The Dogs Mind):
 - Si el tutor describe algo aversivo que ya está haciendo, se le reconduce sin culpabilizarlo y explicando el porqué técnico.
 """
 
+# CERO EMOJIS. Es regla de marca de toda la app y este modulo era el unico que
+# no la decia en ningun sitio: probado contra produccion el 22-oct-2026, salia
+# la huella 🐾 en 3 de 5 planes, tambien en ingles e italiano. Va en el bloque
+# comun para que no se pueda escapar en un idioma y en otro no.
+_SIN_EMOJIS = """
+NUNCA uses emojis. Ni uno, en ningun idioma, ni en los titulos, ni al final de
+una frase, ni como vineta de una lista. No es una preferencia de estilo: un
+plan con emojis deja de leerse como un documento tecnico, y este lo leen
+veterinarios y educadores.
+"""
+
 _DERIVACION = """
 DERIVACIÓN VETERINARIA (obligatoria, sin diagnosticar):
 - Cualquier signo físico (diarrea persistente, vómitos, cojera, dolor al tocar, letargo, no gana peso, tos, secreciones) → derivar a su veterinario de forma explícita y no seguir por la vía conductual.
@@ -84,7 +95,7 @@ REGLAS DE FONDO:
 - Si un dato de la anamnesis es preocupante (destete precoz, mucho tiempo solo, miedo marcado), no lo dejes pasar: nómbralo y ajústale el plan.
 - No inventes datos que no estén en la anamnesis. Si algo falta y es importante, dilo y da el plan para los dos escenarios.
 - Nunca prometas resultados garantizados ni pongas plazos falsos.
-""" + _LIMA + _DERIVACION + """
+""" + _LIMA + _DERIVACION + _SIN_EMOJIS + """
 CIERRE OBLIGATORIO: termina EXACTAMENTE con esta línea, literal y sin cambiar ni una palabra: "En caso de duda habla con Cecilia. En todo caso la app no pretende sustituir el trabajo de un profesional, consulta con ellos en caso necesario."
 NO añadas ninguna otra derivación: no mandes al tutor a un etólogo, a un veterinario del comportamiento ni a ningún profesional externo a lo largo del plan (founder, 19-sep-2026 — si quien usa la app es profesional no tiene sentido mandarlo a un profesional, y si es un particular está aquí para intentarlo él; si no le sale, ya contratará a uno). Los signos FÍSICOS de la lista de seguridad se siguen derivando al veterinario: eso es medicina, no una derivación comercial.
 """
@@ -112,7 +123,7 @@ EXACT STRUCTURE (markdown, skip nothing):
 ## When to see the vet
 
 GROUND RULES: use the puppy's name throughout; everything must be doable at home; flag anything worrying in the intake rather than glossing over it; never invent data; never promise guaranteed results.
-""" + _LIMA + _DERIVACION + """
+""" + _LIMA + _DERIVACION + _SIN_EMOJIS + """
 MANDATORY CLOSING: end EXACTLY with this line, word for word: "If in doubt, talk to Cecilia. In any case, the app does not intend to replace a professional's work; consult one if needed."
 Do NOT add any other referral: never send the owner to an ethologist, a veterinary behaviourist or any external professional anywhere in the plan. PHYSICAL signs from the safety list are still referred to the vet — that is medicine, not a referral.
 """
@@ -140,7 +151,7 @@ STRUTTURA ESATTA (markdown, senza saltare nulla):
 ## Quando consultare il veterinario
 
 REGOLE DI FONDO: usa il nome del cucciolo; tutto dev'essere eseguibile in casa; segnala ciò che preoccupa nell'anamnesi; non inventare dati; non promettere risultati garantiti.
-""" + _LIMA + _DERIVACION + """
+""" + _LIMA + _DERIVACION + _SIN_EMOJIS + """
 CHIUSURA OBBLIGATORIA: termina ESATTAMENTE con questa riga, parola per parola: "In caso di dubbio parla con Cecilia. In ogni caso l'app non intende sostituire il lavoro di un professionista, rivolgiti a loro se necessario."
 NON aggiungere nessun altro rinvio: non mandare il proprietario da un etologo, da un medico veterinario esperto in comportamento o da un qualsiasi professionista esterno nel corso del piano. I segni FISICI della lista di sicurezza restano da portare al veterinario: quella è medicina, non un rinvio.
 """
@@ -201,7 +212,7 @@ REGLAS DE FONDO:
 - No inventes datos que no estén en la anamnesis. Si falta algo decisivo, dilo y da el plan para los dos escenarios.
 - Todo ejecutable en casa.
 - Nunca prometas resultados garantizados.
-""" + _LIMA + _DERIVACION + """
+""" + _LIMA + _DERIVACION + _SIN_EMOJIS + """
 CIERRE OBLIGATORIO: termina EXACTAMENTE con esta línea, literal y sin cambiar ni una palabra: "En caso de duda habla con Cecilia. En todo caso la app no pretende sustituir el trabajo de un profesional, consulta con ellos en caso necesario."
 NO añadas ninguna otra derivación: no mandes al tutor a un etólogo, a un veterinario del comportamiento ni a ningún profesional externo a lo largo del plan (founder, 19-sep-2026 — si quien usa la app es profesional no tiene sentido mandarlo a un profesional, y si es un particular está aquí para intentarlo él; si no le sale, ya contratará a uno). Los signos FÍSICOS de la lista de seguridad se siguen derivando al veterinario: eso es medicina, no una derivación comercial.
 """
@@ -224,7 +235,7 @@ EXACT STRUCTURE (markdown):
 ## When to see the vet
 
 GROUND RULES: use the puppy's name; invent nothing; everything doable at home; never promise guaranteed results.
-""" + _LIMA + _DERIVACION + """
+""" + _LIMA + _DERIVACION + _SIN_EMOJIS + """
 MANDATORY CLOSING: end EXACTLY with this line, word for word: "If in doubt, talk to Cecilia. In any case, the app does not intend to replace a professional's work; consult one if needed."
 Do NOT add any other referral: never send the owner to an ethologist, a veterinary behaviourist or any external professional anywhere in the plan. PHYSICAL signs from the safety list are still referred to the vet — that is medicine, not a referral.
 """
@@ -247,7 +258,7 @@ STRUTTURA ESATTA (markdown):
 ## Quando consultare il veterinario
 
 REGOLE DI FONDO: usa il nome del cucciolo; non inventare dati; tutto eseguibile in casa; non promettere risultati garantiti.
-""" + _LIMA + _DERIVACION + """
+""" + _LIMA + _DERIVACION + _SIN_EMOJIS + """
 CHIUSURA OBBLIGATORIA: termina ESATTAMENTE con questa riga, parola per parola: "In caso di dubbio parla con Cecilia. In ogni caso l'app non intende sostituire il lavoro di un professionista, rivolgiti a loro se necessario."
 NON aggiungere nessun altro rinvio: non mandare il proprietario da un etologo, da un medico veterinario esperto in comportamento o da un qualsiasi professionista esterno nel corso del piano. I segni FISICI della lista di sicurezza restano da portare al veterinario: quella è medicina, non un rinvio.
 """

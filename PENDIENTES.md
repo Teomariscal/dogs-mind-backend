@@ -17,6 +17,36 @@ desaparece cuando la conversacion se resume.
 | 10-oct-2026 | **Las cuentas del smoke test no cuentan como usuarios.** Palabras del founder: *"no hay manera de saber cuántos usuarios tengo… no hacen más que enturbiar la información"*. Ni se quedan en la tabla ni salen en el panel. |
 
 
+## PENDIENTE — TRADUCCION AL ITALIANO, REPASO COMPLETO
+
+Founder, 22-oct-2026: *"luego acuerdate del italiano traduccion"*. Queda
+aparcado por el, no cerrado.
+
+QUE SE HIZO YA (22-oct): `app/core/prompts/terminologia_it.py` reune 30
+equivalencias castellano -> italiano (castigo -> punizione, moldeado ->
+modellamento, etc.) y `colados()` revisa la SALIDA en vez de confiar en que el
+prompt baste. Esta atado SOLO en `clinical_ai` y `abc_explained_ai`, que son
+los dos sitios donde el founder vio el fallo.
+
+QUE FALTA:
+
+1. Atar el glosario en los otros cinco servicios que escriben en italiano:
+   `intervention_ai`, `plan_simple_ai`, `daily_followup_ai`, `daily_tasks_ai`,
+   `puppy_school_ai`. Hoy cada uno lleva su terminologia suelta o ninguna.
+2. Repasar la UI italiana entera, no solo los textos generados por IA. El
+   fallo que reporto ("en italiano castigo es punizione") salio de un texto de
+   IA, pero no se ha auditado la interfaz.
+3. Pasar `colados()` sobre una muestra real de salidas italianas de cada
+   servicio y contar cuantos terminos se escapan, por servicio. Sin ese numero
+   no se sabe si el glosario basta o hace falta filtrar en codigo, como hubo
+   que hacer con los emojis de cachorros.
+
+OJO AL CANAL ESTANCO: el italiano tiene DOS vias, la conductual y la
+cognitivista de Odette, y no se mezclan (decisiones del 4-sep y 6-sep en
+`CLAUDE.md`). El glosario de arriba es vocabulario CONDUCTUAL: no se puede
+aplicar tal cual a la via cognitivista.
+
+
 ## 10-oct-2026 — LAS CUENTAS DE SMOKE TEST YA NO ENSUCIAN EL CENSO
 
 El smoke test (`tools/smoke-tests/smoke_test.py`, LaunchAgent cada 6 h) da de

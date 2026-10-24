@@ -294,6 +294,51 @@ async def lifespan(app: FastAPI):
         ensure_collection()
     except Exception as e:
         print(f"[startup] Could not initialise Qdrant collection: {e}")
+    # ── DISPARADOR DE LAS NOTIFICACIONES (eslabon 4 de 4) ─────────────────
+    # Founder, 21-oct-2026: *"ponte un sistema que te obligue a enviarlos"*.
+    #
+    # El motor de push existia desde el 10-oct y no habia NADA que lo
+    # ejecutara. Un motor que nadie dispara es un motor apagado, y como no
+    # falla de forma visible, nadie se entera: ese fue el fallo.
+    #
+    # Va DENTRO del proceso y no en un servicio aparte a proposito: una pieza
+    # mas que desplegar es una pieza mas que puede quedarse sin arrancar sin
+    # que nadie lo note, que es exactamente lo que acaba de pasar. Aqui vive y
+    # muere con el backend, y el backend se vigila solo.
+    #
+    # Cada hora, porque la seleccion ya mira la hora LOCAL de cada usuario
+    # (solo entre las 10 y las 20 suyas) y los topes por persona —1 cada 3
+    # dias, maximo 2 por semana— los aplica `push_core.pasada`. Pasar mas a
+    # menudo no manda mas avisos, solo gasta.
+    import asyncio
+
+    async def _pasada_push():
+        from app.database import SessionLocal
+        from app.core import push as push_core
+        # Un minuto de gracia al arrancar: que la base y las tablas esten.
+        await asyncio.sleep(60)
+        while True:
+            try:
+                if push_core.FCM_CREDENTIALS and push_core.FCM_PROJECT_ID:
+                    db = SessionLocal()
+                    try:
+                        r = push_core.pasada(db, seco=False, limite=500)
+                        print(f"[push] pasada: {r}")
+                    finally:
+                        db.close()
+                else:
+                    print("[push] sin credenciales FCM: no hay pasada")
+            except Exception as e:
+                # Nunca tumbar el backend por los avisos.
+                print(f"[push] fallo en la pasada: {type(e).__name__}: {e}")
+            await asyncio.sleep(3600)
+
+    try:
+        asyncio.create_task(_pasada_push())
+        print("[startup] disparador de push armado (cada hora)")
+    except Exception as e:
+        print(f"[startup] no se pudo armar el disparador de push: {e}")
+
     yield
 
 

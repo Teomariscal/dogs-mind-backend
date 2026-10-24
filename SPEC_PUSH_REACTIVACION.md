@@ -1,5 +1,61 @@
 # Notificaciones push de reactivación
 
+## ESTADO REAL, 23-oct-2026 — LOS CUATRO ESLABONES
+
+Founder: *"metelo en el siguiente build y lo ponemos en cola y meto mis
+credenciales en firebase pero operar tu con el"*.
+
+Medido, no supuesto. `scripts/push-vivo.sh` comprueba los cuatro en cada envio
+y la puerta de `listo-para-enviar.sh` se niega mientras alguno falle.
+
+| # | eslabon | estado | de quien |
+|---|---|---|---|
+| 1 | la app pide permiso y registra el token | **CODIGO HECHO**, falta build | mio |
+| 2 | los tokens llegan (`push_devices`) | 0 filas, sera consecuencia del 1 | — |
+| 3 | el servidor habla con Apple/Google | **FALTAN CREDENCIALES** | **founder** |
+| 4 | alguien ejecuta la pasada cada hora | no existe | mio |
+
+### Lo hecho el 23-oct
+
+- `@capacitor/push-notifications@8.1.3` instalado. **Android compila con el
+  plugin dentro** — probado, no supuesto: `google-services.json` hace falta en
+  ejecucion, no al compilar, asi que la cadena de build no se rompe mientras
+  llegan las credenciales.
+- `window.dmPush` en el frontend: `pedir()` y `refrescar()`.
+- **El permiso se pide al ACEPTAR UN PLAN**, no al arrancar la app. Pedirlo al
+  abrir es la forma mas rapida de que digan que no para siempre: en iOS la
+  negativa solo se revierte en Ajustes, donde no entra nadie. Al aceptar un
+  plan el usuario acaba de comprometerse a hacer ejercicios cada dia, que es
+  justo lo que el aviso recuerda.
+- `refrescar()` al abrir con sesion y permiso ya dado: **el token de FCM rota
+  solo** (reinstalacion, restauracion desde copia, decision de Google) y un
+  token muerto es un movil al que creemos estar avisando y no lo estamos. El
+  envio no falla de forma visible, asi que nadie se entera: es la misma familia
+  de fallo que todo esto.
+- **PUSH_NOTIFICATIONS activado en el App ID** `net.thedogsmind.app`
+  (`M98KSFJUJU`) por API. Sin esto, añadir el entitlement habria roto el build
+  de iOS. Confirmado leyendo de Apple: `['IN_APP_PURCHASE','PUSH_NOTIFICATIONS']`.
+  Ojo: `GET /bundleIdCapabilities` devuelve lista VACIA aunque esten activadas;
+  hay que leerlo con `?include=bundleIdCapabilities`.
+
+### Lo que falta, y en este orden
+
+1. **Founder** — en Firebase, con `net.thedogsmind.app` en las dos:
+   `google-services.json` (Android) · `GoogleService-Info.plist` (iOS) · la
+   clave APNs `.p8` subida en Cloud Messaging · el JSON de cuenta de servicio.
+2. **Yo** — `FCM_PROJECT_ID` y `FCM_CREDENTIALS_JSON` en Railway, el
+   entitlement `aps-environment` en iOS, y el disparador horario (eslabon 4).
+3. **Build** con todo dentro. En cola a proposito: sin el 1 no hay nada que
+   probar de verdad.
+
+### Y los textos
+
+Los de reactivacion los escribio el founder (abajo). Los de **"se te acabo la
+invitacion, contrata un plan"** NO existen todavia y **los pone el**: no se
+inventan.
+
+
+
 Encargo del founder, 10-oct-2026: que quien lleva tres días sin usar la app
 reciba un aviso en el móvil que le recuerde volver.
 

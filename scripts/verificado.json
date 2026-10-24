@@ -1,7 +1,18 @@
 {
-  "md5_frontend": "bb2def182c926d10f11631105e57a71f",
-  "verificado_el": "2026-10-06T11:00:55",
+  "md5_frontend": "a2f0d95f7d2ef0e83d4db4257978aff5",
+  "verificado_el": "2026-10-24T00:46:56",
   "pruebas": [
-    "iPhone 17 Pro Max (simulador), build 1.0.34 (69): login en ingles, pestana Teo > Mi cuenta > Eliminar mi cuenta, modal legible, borrado completo con confirmacion en ingles y vuelta al inicio; claves del modal en es/en/it; dentro del IPA comprobados cv-acc-row--danger, del_modal_confirm_ph y el sello 1.0.34 (69)"
+    "Dentro del IPA: boton Otros en las areas de Escuela de Cachorros",
+    "Dentro del IPA: campo de objetivo libre y se envia como objetivo_detalle",
+    "Dentro del IPA: con Otros el objetivo pasa a obligatorio",
+    "Dentro del IPA: pup_a_other en ES, EN e IT",
+    "Dentro del IPA: distancia de agresion es texto libre, no centimetros",
+    "Dentro del IPA: s-plan-fases ya no se apila bajo el splash",
+    "Dentro del IPA: pantalla de puerta de fase y franja de fase en la hoja diaria",
+    "Dentro del IPA: aceptar el plan vuelve a llamar a acceptIntervention (ejercicios diarios)",
+    "Dentro del IPA: sello 1.0.37 (71) y service-worker dogs-mind-v336",
+    "Produccion, llamadas reales: cachorros prevenir/OTROS en es, it y en -> OK y SIN emojis",
+    "Produccion: cachorros problema, educacion y entrenamiento (es/it) y ABC (es/it) -> los 5 OK",
+    "iOS y Android con el mismo frontend, md5 a2f0d95f7d2ef0e83d4db4257978aff5"
   ]
 }

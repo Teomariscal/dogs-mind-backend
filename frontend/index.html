@@ -17367,6 +17367,23 @@ function dmInitPaseoNativo() {
 if (document.readyState !== 'loading') { dmInitPaseoNativo(); }
 else { document.addEventListener('DOMContentLoaded', dmInitPaseoNativo); }
 
+/* Al abrir con sesion y con el permiso YA concedido, se vuelve a registrar el
+   token. No pide nada y no molesta: es para refrescarlo.
+
+   Hace falta porque el token de FCM ROTA SOLO —al reinstalar, al restaurar el
+   movil desde copia, o cuando Google lo decide— y el servidor se queda con uno
+   muerto. Un token muerto es un movil al que creemos estar avisando y no lo
+   estamos; y como el envio no falla de forma visible, nadie se entera. Que es
+   exactamente la familia de fallo de la que viene todo esto. */
+function dmInitPush() {
+  try {
+    if (!window.dmPush) return;
+    setTimeout(function () { try { dmPush.refrescar(); } catch (e) {} }, 2500);
+  } catch (e) { /* nunca romper el arranque por los avisos */ }
+}
+if (document.readyState !== 'loading') { dmInitPush(); }
+else { document.addEventListener('DOMContentLoaded', dmInitPush); }
+
 // ════ RevenueCat IAP (iOS) — Fase 2 ════════════════════════════════════════════
 // Cablea los 3 puntos de compra de iOS sobre los guards dmIsIosNative(). INERTE en
 // web/Android: dmRcPlugin() devuelve null (el plugin nativo no existe) y nada se
@@ -21271,6 +21288,14 @@ function getVal(id, fallback) {
       } catch(e) { /* sin red u otro: el caso queda en local, migrable luego */ }
     }
 
+    /* Es AQUI donde se pide el permiso de avisos, y no al arrancar: el usuario
+       acaba de aceptar un plan, o sea que acaba de comprometerse a hacer
+       ejercicios cada dia. Ese es el momento en que un recordatorio diario
+       significa algo. Pedirlo al abrir la app por primera vez es la forma mas
+       rapida de que te digan que no para siempre (en iOS la negativa solo se
+       revierte en Ajustes, donde no entra nadie). */
+    try { if (window.dmPush) dmPush.pedir(); } catch (e) {}
+
     // Activar daily-followup en backend tras aceptar plan (idempotente).
     // No bloquea el flujo: si falla, el usuario podrá pulsar el botón
     // "Seguimiento diario" más tarde y el endpoint /today reintentará.
@@ -23160,6 +23185,99 @@ function pupAreaOtros() {
   if (ta && otros) { try { ta.focus({ preventScroll: true }); } catch (e) {} }
 }
 window.pupAreaOtros = pupAreaOtros;
+
+/* ══ dmPush — REGISTRAR EL MOVIL PARA RECIBIR AVISOS ════════════════════════
+   Founder, 23-oct-2026: *"metelo en el siguiente build y lo ponemos en cola y
+   meto mis credenciales en firebase pero operar tu con el"*.
+
+   ESTE ES EL ESLABON 1 DE CUATRO, y era el que faltaba del lado de la app. El
+   motor de envio existe desde el 10-oct y `push_devices` tenia CERO filas: sin
+   token registrado no hay a quien enviar, por mucha credencial que haya en el
+   servidor.
+
+   CUANDO SE PIDE EL PERMISO, Y POR QUE NO AL ARRANCAR. Pedirlo nada mas abrir
+   la app es la forma mas rapida de que te digan que no para siempre: en iOS la
+   negativa es definitiva y solo se revierte en Ajustes, donde no entra nadie.
+   Se pide cuando el aviso tiene sentido para quien lo lee — al aceptar un plan
+   de intervencion, que es justo cuando empiezan los ejercicios diarios que el
+   aviso recuerda.
+
+   NO ROMPE NADA SI FALTA: si el plugin no esta, si no hay sesion o si el
+   usuario dice que no, esto se calla y la app sigue igual. */
+window.dmPush = (function () {
+  var API = 'https://dogs-mind-backend-production.up.railway.app';
+  var _yaPedido = false;
+
+  function _plugin() {
+    try {
+      if (!window.Capacitor || !Capacitor.isNativePlatform || !Capacitor.isNativePlatform()) return null;
+      return (Capacitor.Plugins && Capacitor.Plugins.PushNotifications) || null;
+    } catch (e) { return null; }
+  }
+  function _jwt() { try { return localStorage.getItem('dm_jwt') || ''; } catch (e) { return ''; } }
+  function _lang() {
+    try { var l = (typeof getCurrentLang === 'function') ? getCurrentLang() : 'es';
+          return (l === 'en' || l === 'it') ? l : 'es'; } catch (e) { return 'es'; }
+  }
+  function _tz() {
+    try { return Intl.DateTimeFormat().resolvedOptions().timeZone || null; } catch (e) { return null; }
+  }
+  function _plataforma() {
+    try { return Capacitor.getPlatform() === 'android' ? 'android' : 'ios'; } catch (e) { return 'ios'; }
+  }
+
+  async function _mandarToken(token) {
+    if (!token || !_jwt()) return;
+    try {
+      await fetch(API + '/push/devices', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + _jwt() },
+        body: JSON.stringify({ token: token, platform: _plataforma(), lang: _lang(), tz: _tz() })
+      });
+      try { localStorage.setItem('dm_push_token', token); } catch (e) {}
+    } catch (e) { /* sin red: se reintenta la proxima vez que abra */ }
+  }
+
+  function _escuchar(P) {
+    try {
+      P.addListener('registration', function (t) { _mandarToken(t && t.value); });
+      P.addListener('registrationError', function () { /* no se molesta al usuario */ });
+    } catch (e) {}
+  }
+
+  return {
+    /* Se llama donde el aviso tiene sentido. Idempotente. */
+    pedir: async function () {
+      var P = _plugin();
+      if (!P || _yaPedido || !_jwt()) return false;
+      _yaPedido = true;
+      try {
+        var p = await P.checkPermissions();
+        if (p.receive === 'prompt' || p.receive === 'prompt-with-rationale') {
+          p = await P.requestPermissions();
+        }
+        if (p.receive !== 'granted') return false;
+        _escuchar(P);
+        await P.register();
+        return true;
+      } catch (e) { return false; }
+    },
+
+    /* Al abrir con sesion: si YA dio permiso, se re-registra y se refresca el
+       token en el servidor. El token de FCM caduca y rota solo; un token viejo
+       es un movil al que creemos estar avisando y no. No pide nada. */
+    refrescar: async function () {
+      var P = _plugin();
+      if (!P || !_jwt()) return;
+      try {
+        var p = await P.checkPermissions();
+        if (p.receive !== 'granted') return;
+        _escuchar(P);
+        await P.register();
+      } catch (e) {}
+    }
+  };
+})();
 
 function dmIsProAccount(acc) {
   /* Partner es OBLIGATORIAMENTE profesional (founder 2026-08-04): aunque su

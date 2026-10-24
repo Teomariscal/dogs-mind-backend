@@ -53,3 +53,18 @@ frontend/*.bak-*.html
 frontend/button-proposals.html
 frontend/design-v2.html
 mobile/android/keystore.properties
+
+# ── CREDENCIALES DE FIREBASE / APNs (23-oct-2026) ────────────────────────────
+# Lo que SI va al repositorio: google-services.json y GoogleService-Info.plist.
+# No son secretos —viajan dentro del binario de la app, al alcance de
+# cualquiera que lo descomprima— y sin ellos el build no funciona.
+#
+# Lo que NUNCA: la cuenta de servicio y la clave .p8 de APNs. Esas SI son
+# secretos y con ellas se puede enviar una notificacion a todos los usuarios
+# en nombre de The Dogs' Mind. Viven en ~/.appstoreconnect/private_keys/ y en
+# las variables de Railway, nunca aqui. Estas lineas son la red por si alguna
+# vez se copian a la carpeta del proyecto sin pensar.
+*firebase-adminsdk*.json
+the-dogs-mind-*.json
+AuthKey_*.p8
+*.p8

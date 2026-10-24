@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "75195615892",
+    "project_id": "the-dogs-mind",
+    "storage_bucket": "the-dogs-mind.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:75195615892:android:f82a74541e956428f10281",
+        "android_client_info": {
+          "package_name": "net.thedogsmind.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwA85ObKN_j5CeK_QYQHarRZ1DrBPVKrw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

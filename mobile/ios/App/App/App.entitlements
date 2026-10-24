@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Notificaciones push. "production" vale tambien en desarrollo y en
+	     TestFlight: el dispositivo elige el entorno segun como este firmada la
+	     app. Poner "development" aqui romperia las notificaciones en la App
+	     Store, que es donde esta el 99% de la gente. -->
+	<key>aps-environment</key>
+	<string>production</string>
+</dict>
+</plist>

@@ -104,14 +104,19 @@ try:
         di("   ✗ 2. CERO DISPOSITIVOS REGISTRADOS: no hay a quien enviar")
         roto.append("cero dispositivos")
 
-    cur.execute("select to_regclass('push_logs')")
+    # OJO con el nombre: la tabla es push_log, SINGULAR (lo dice el modelo,
+    # app/models/push_device.py). Yo puse 'push_logs' aqui de memoria y el
+    # guardian daba una alarma falsa: decia que no existia una tabla que si
+    # estaba. Un guardian que grita por algo que funciona se acaba ignorando,
+    # y entonces deja de guardar.
+    cur.execute("select to_regclass('push_log')")
     if cur.fetchone()[0] is None:
         di("   ✗ 4. la tabla push_logs NO EXISTE: no se ha enviado nunca nada")
         roto.append("nunca se ha enviado una push")
     else:
-        cur.execute("select count(*) from push_logs where sent_at > now() - interval '48 hours'")
+        cur.execute("select count(*) from push_log where sent_at > now() - interval '48 hours'")
         rec = cur.fetchone()[0]
-        cur.execute("select count(*) from push_logs")
+        cur.execute("select count(*) from push_log")
         tot = cur.fetchone()[0]
         if rec > 0:
             di(f"   ✓ 4. {rec} push enviadas en las ultimas 48 h ({tot} en total)")

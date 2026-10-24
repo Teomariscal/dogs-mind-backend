@@ -94,9 +94,9 @@ TEXTOS: dict = {
 #                         dinero y gastar menos por cada token subiendo tu
 #                         nivel de suscripcion."*
 #
-# REDACTADOS A PARTIR DE SUS PALABRAS, no inventados, pero son copy publico y
-# el copy publico lo escribe el founder: estos van a confirmacion antes de
-# salir en un build. Si los cambia, se cambian aqui y no en otro sitio.
+# Redactados a partir de sus palabras y APROBADOS POR EL el 24-oct-2026
+# ("ok a esto"). Son copy publico: si alguna vez hay que cambiarlos, los
+# cambia el, y se cambian AQUI y en ningun otro sitio.
 #
 # "Creditos", nunca "tokens": de cara al usuario los tokens no existen
 # (decision del 1-sep). El founder dice "tokens" porque es como lo piensa

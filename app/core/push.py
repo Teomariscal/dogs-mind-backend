@@ -80,6 +80,51 @@ TEXTOS: dict = {
 }
 
 
+# ── SE TE ACABARON LOS CREDITOS ──────────────────────────────────────────────
+# Founder, 24-oct-2026. SON DOS MENSAJES DISTINTOS, y la diferencia es el
+# dinero: a quien no paga se le pide que empiece a pagar; a quien ya paga se le
+# ofrece gastar mejor.
+#
+#   sin_saldo_sin_sub  — *"se te han acabado los tokens, para poder continuar
+#                         utilizando la aplicacion, elige un tipo de
+#                         suscripcion. Punto."* No puede comprar sueltos: esa
+#                         puerta esta cerrada hasta que se suscriba.
+#   sin_saldo_con_sub  — *"se te han acabado los tokens, puedes elegir: o
+#                         comprar mas tokens sueltos o mejorar, optimizar tu
+#                         dinero y gastar menos por cada token subiendo tu
+#                         nivel de suscripcion."*
+#
+# REDACTADOS A PARTIR DE SUS PALABRAS, no inventados, pero son copy publico y
+# el copy publico lo escribe el founder: estos van a confirmacion antes de
+# salir en un build. Si los cambia, se cambian aqui y no en otro sitio.
+#
+# "Creditos", nunca "tokens": de cara al usuario los tokens no existen
+# (decision del 1-sep). El founder dice "tokens" porque es como lo piensa
+# dentro.
+TEXTOS_SIN_SALDO: dict = {
+    "sin_saldo_sin_sub": {
+        "es": ("Se te han acabado los créditos",
+               "Para seguir usando The Dogs' Mind, elige un plan."),
+        "en": ("You've run out of credits",
+               "To keep using The Dogs' Mind, choose a plan."),
+        "it": ("Hai finito i crediti",
+               "Per continuare a usare The Dogs' Mind, scegli un piano."),
+    },
+    "sin_saldo_con_sub": {
+        "es": ("Se te han acabado los créditos",
+               "Puedes comprar más o subir de plan: cuanto más alto, menos te "
+               "cuesta cada crédito."),
+        "en": ("You've run out of credits",
+               "You can buy more or move up a plan: the higher the plan, the "
+               "less each credit costs you."),
+        "it": ("Hai finito i crediti",
+               "Puoi comprarne altri o passare a un piano superiore: più alto "
+               "è il piano, meno ti costa ogni credito."),
+    },
+}
+TEXTOS.update(TEXTOS_SIN_SALDO)
+
+
 def texto_de(segmento: str, lang: str) -> tuple:
     """El par (titulo, cuerpo). Cae a español si llega un idioma que no tenemos."""
     porSegmento = TEXTOS.get(segmento) or TEXTOS["probo_y_no_siguio"]
@@ -240,7 +285,73 @@ def candidatos(db: Session, limite: int = 500) -> list:
         if len(salida) >= limite:
             break
 
+    # ── Y LOS QUE SE HAN QUEDADO SIN CREDITOS ───────────────────────────────
+    # Van por su cuenta, no por el filtro de inactividad: a este NO se le avisa
+    # por llevar tres dias sin aparecer, se le avisa porque intento usar la app
+    # y no le llegaba. Puede haber entrado hace cinco minutos.
+    #
+    # Los topes por persona (1 cada 3 dias, 2 por semana) SI se le aplican,
+    # igual que a los demas: quedarse a cero no es motivo para machacar a
+    # nadie. Y la ventana de hora local tambien.
+    salida += _candidatos_sin_saldo(db, vistos, limite - len(salida))
     return salida
+
+
+def _candidatos_sin_saldo(db: Session, vistos: set, hueco: int) -> list:
+    """Quien se ha quedado a cero y merece saberlo.
+
+    Dos segmentos distintos segun tenga suscripcion viva o no, porque lo que se
+    le ofrece es distinto: al que no paga se le pide un plan; al que ya paga se
+    le ofrece comprar mas o subir de nivel (founder, 24-oct-2026).
+
+    El equipo, los exentos y los corporativos NO entran: a ellos no se les
+    corta nunca, asi que avisarles seria mentirles.
+    """
+    if hueco <= 0:
+        return []
+    from app.models.user import User
+    from app.models.push_device import PushDevice
+    from app.core.smoke import SMOKE_EMAIL_LIKE, DELETED_EMAIL_LIKE
+    from app.core import subscriptions as subs
+
+    filas = (
+        db.query(User, PushDevice)
+        .join(PushDevice, PushDevice.user_id == User.id)
+        .filter(
+            PushDevice.active == True,          # noqa: E712
+            User.deleted_at.is_(None),
+            User.push_enabled == True,          # noqa: E712
+            ~User.email.like(SMOKE_EMAIL_LIKE),
+            ~User.email.like(DELETED_EMAIL_LIKE),
+            User.tokens < subs.ANALYSIS_TOKENS,
+        )
+        .limit(hueco * 4)
+        .all()
+    )
+
+    fuera = []
+    for user, device in filas:
+        if user.id in vistos:
+            continue
+        estado = subs.access_state(user, amount=subs.ANALYSIS_TOKENS)
+        # Si pasa por una exencion (equipo, admin, partner, corporate) no se le
+        # avisa de nada: a esa gente no se le va a cortar.
+        if estado["reason"] in ("privileged", "exempt", "partner",
+                                "corporate", "paywall_off"):
+            continue
+        h = _hora_local(device.tz)
+        if h is None or not (HORA_LOCAL_DESDE <= h < HORA_LOCAL_HASTA):
+            continue
+        puede, _motivo = _puede_recibir(db, user.id)
+        if not puede:
+            continue
+        con_sub = subs.subscription_active(user)
+        vistos.add(user.id)
+        fuera.append((user, device,
+                      "sin_saldo_con_sub" if con_sub else "sin_saldo_sin_sub"))
+        if len(fuera) >= hueco:
+            break
+    return fuera
 
 
 # ── Envio ────────────────────────────────────────────────────────────────────

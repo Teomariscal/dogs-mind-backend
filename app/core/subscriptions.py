@@ -425,44 +425,32 @@ def access_state(user, now: Optional[datetime] = None,
     # personas mirando créditos que ya no podían gastar.
     # EL SALDO HEREDADO ES EL QUE YA TENIA, NO EL QUE LE REGALO UNA INVITACION.
     #
-    # La promesa a los de antes fue "sigue gastando TU saldo hasta que se te
-    # acabe". Si despues canjea una invitacion, los creditos de la invitacion
-    # caen en el mismo monedero y esta regla los trataba igual: al caducar la
-    # invitacion seguia gastando, indefinidamente, lo que la invitacion le dio.
-    # Es una suscripcion gratis permanente por la puerta de atras.
+    # ── LO QUE CIERRA LA PUERTA ES EL SALDO. NADA MAS. ──────────────────
     #
-    # Founder, 21-oct-2026: *"cuando pase el tiempo establecido o se acaben los
-    # tokens... no pueden seguir usando la app sin suscripcion mensual"*.
+    # Founder, 24-oct-2026: *"a todos los que no tenian suscripcion, que no les
+    # salte notificacion push ni la obligacion de suscribirse hasta que no se
+    # le acaben los tokens"* · *"olvidate de lo del 1 de septiembre que
+    # dijimos"* · *"en cuanto se le acaben los tokens, si, y asi se tiene que
+    # inscribir, a menos que yo le regale tokens nuevos"*.
     #
-    # Medido el 21-oct sobre los 44 invitados: 24 ya estaban bloqueados y solo
-    # 2 pasaban por aqui (uno de ellos cuenta de prueba). Poca gente, pero la
-    # puerta estaba abierta para cualquiera que repitiera el patron.
-    _invitado = (getattr(user, "subscription_store", "") or "") == "invitacion"
-    _invitacion_caducada = bool(
-        _invitado
-        and getattr(user, "subscription_expires_at", None)
-        and user.subscription_expires_at <= now
-    )
-    # EL ANTERIOR AL 1-SEP MANDA SOBRE TODO LO DEMAS.
+    # ANULA las dos reglas que habia aqui el 21-oct:
+    #   · el corte por FECHA (invitacion caducada) -> fuera. Quien tiene
+    #     creditos los gasta, aunque su invitacion venciera hace un mes.
+    #   · la distincion por el corte del 1-sep -> fuera tambien. Daba igual
+    #     cuando se registrara: lo que cuenta es si le queda saldo.
     #
-    # Founder, 21-oct-2026, confirmando una regla vieja: *"todos los que tenian
-    # tokens antes del 1 de septiembre los pueden seguir utilizando. En el
-    # momento en el que esos tokens se acaben, no pueden realizar mas consultas
-    # y NO PUEDEN COMPRAR TOKENS: tienen que primero pagar suscripcion."*
+    # Lo unico que queda es: ¿le llega para lo que esta pidiendo? Si si, pasa.
+    # Si no, se le avisa y contrata (o el founder le regala creditos, que es la
+    # otra salida que el dejo abierta).
     #
-    # Asi que la caducidad de una invitacion NO le quita nada a un usuario
-    # anterior al corte. Lo unico que le cierra la puerta es quedarse sin
-    # saldo. Esta linea llego a estar al reves durante unas horas el 21-oct
-    # —bloqueaba al legado por tener una invitacion caducada— y dejaba fuera a
-    # alguien a quien se le habia prometido lo contrario.
-    if is_legacy(user) and tokens >= (ANALYSIS_TOKENS if amount is None else amount):
-        return out(True, "legacy_balance")
+    # Se mide contra `amount` y no contra un minimo fijo a proposito: asi puede
+    # seguir usando lo barato -el chat, el seguimiento diario- con lo poco que
+    # le quede, y se encuentra la pantalla de planes justo al ir a por un
+    # analisis. Cortar en seco por debajo de 3 tk dejo en su dia a 61 personas
+    # mirando creditos que ya no podian gastar.
+    if tokens >= (ANALYSIS_TOKENS if amount is None else amount):
+        return out(True, "saldo")
 
-    # El POSTERIOR al corte, en cambio, solo entra con suscripcion viva o con
-    # una invitacion viva. Si la invitacion caduco, se acabo: no hay saldo
-    # heredado que le ampare, porque nunca lo tuvo.
-    if _invitacion_caducada:
-        return out(False, "invitation_expired")
     if trial["active"]:
         return out(True, "trial")
     return out(False, "needs_subscription")

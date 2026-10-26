@@ -99,6 +99,36 @@ def canjear_codigo(codigo: str, current_user: User, db: Session):
     if inv.expires_at and datetime.utcnow() > inv.expires_at:
         raise HTTPException(status_code=410, detail="Ese código ha caducado.")
 
+    # ── UN EMAIL, UN CODIGO, UNA VEZ. PUERTA ABSOLUTA ──────────────────────
+    # Founder, 25-oct-2026: *"la persona con el mismo mail no lo puede utilizar
+    # dos veces. Pon una puerta absoluta porque si no nos arruina."*
+    #
+    # El agujero, simulado con este mismo codigo antes de taparlo: el mismo
+    # email metia PRO15, gastaba los 2.160 creditos, y AL MES SIGUIENTE lo
+    # volvia a meter y recibia otros 2.160. Para siempre. Lo unico que lo
+    # contenia era un sello por mes natural. Un codigo repartido a diez
+    # personas eran diez suscripciones gratis indefinidas.
+    #
+    # Se registra ANTES de conceder nada y decide la restriccion UNIQUE de la
+    # base: si ya hay fila, el INSERT revienta y no se concede. Asi dos canjes
+    # simultaneos tampoco cuelan — un `if` en Python se salta con una carrera,
+    # esto no.
+    from app.models.invite_redemption import InviteRedemption
+    from sqlalchemy.exc import IntegrityError
+
+    try:
+        with db.begin_nested():
+            db.add(InviteRedemption(
+                invite_id=inv.id, user_id=current_user.id,
+                code=codigo, email=(current_user.email or "").strip().lower(),
+            ))
+    except IntegrityError:
+        _log.info("invite: %s YA canjeado antes por %s", codigo, current_user.email)
+        raise HTTPException(
+            status_code=409,
+            detail="Ya has usado este código. Cada código vale una sola vez por cuenta.",
+        )
+
     plan = subs.plan_by_id(inv.plan_id)
     if not plan:
         raise HTTPException(status_code=500, detail="El plan del código ya no existe.")

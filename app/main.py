@@ -169,6 +169,21 @@ async def lifespan(app: FastAPI):
             # por el principio del plan, que es lo unico honesto sin preguntar.
             # Invitaciones: un codigo personal es de un solo email, y lo que
             # promete tiene que cuadrar con lo que da (founder 21-oct-2026).
+            # UN EMAIL, UN CODIGO, UNA VEZ (founder 25-oct-2026, "pon una
+            # puerta absoluta porque si no nos arruina"). La UNIQUE la aplica
+            # Postgres en cada INSERT: no depende de que nadie se acuerde de
+            # comprobarlo, ni de que dos canjes simultaneos no se crucen.
+            """CREATE TABLE IF NOT EXISTS invite_redemptions (
+                   id UUID PRIMARY KEY,
+                   invite_id UUID NOT NULL REFERENCES invites(id),
+                   user_id UUID NOT NULL REFERENCES users(id),
+                   code VARCHAR(40) NOT NULL,
+                   email VARCHAR(255) NOT NULL,
+                   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+                   CONSTRAINT un_canje_por_persona UNIQUE (invite_id, user_id)
+               )""",
+            "CREATE INDEX IF NOT EXISTS ix_invredem_code ON invite_redemptions (code)",
+            "CREATE INDEX IF NOT EXISTS ix_invredem_email ON invite_redemptions (email)",
             "ALTER TABLE invites ADD COLUMN IF NOT EXISTS email_fijo VARCHAR(255)",
             "ALTER TABLE invites ADD COLUMN IF NOT EXISTS gratuidad_declarada INTEGER",
             "ALTER TABLE cases ADD COLUMN IF NOT EXISTS current_phase SMALLINT NOT NULL DEFAULT 1",

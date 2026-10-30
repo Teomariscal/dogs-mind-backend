@@ -121,8 +121,35 @@ try:
         if rec > 0:
             di(f"   ✓ 4. {rec} push enviadas en las ultimas 48 h ({tot} en total)")
         else:
-            di(f"   ✗ 4. NINGUNA PUSH EN 48 h (total historico: {tot}): el disparador no corre")
-            roto.append("el disparador no corre")
+            # NO ENVIAR NADA NO ES ESTAR ROTO. El 30-oct este guardian dijo "el
+            # disparador no corre" mientras el log mostraba una pasada cada
+            # hora: lo que pasaba es que no habia a quien enviar — los unicos
+            # dispositivos eran de los revisores de Apple, entrados ese mismo
+            # dia y con creditos de sobra. Confundir "no ha enviado" con "no se
+            # ejecuta" es la segunda alarma falsa de este guardian, y una
+            # alarma falsa se acaba ignorando.
+            #
+            # Lo que SI delata un fallo: que HAYA candidatos ahora mismo y aun
+            # asi no salga nada.
+            try:
+                sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+                os.environ["DATABASE_URL"] = url
+                from app.database import SessionLocal
+                from app.core import push as pcore
+                _db = SessionLocal()
+                n_cand = len(pcore.candidatos(_db, limite=50))
+                _db.close()
+            except Exception:
+                n_cand = None
+
+            if n_cand is None:
+                di(f"   ! 4. 0 push enviadas y no he podido mirar si habia a quien")
+                roto.append("no se si el disparador hace su trabajo")
+            elif n_cand == 0:
+                di(f"   ✓ 4. 0 push enviadas, y 0 personas a las que tocaba: correcto")
+            else:
+                di(f"   ✗ 4. hay {n_cand} personas a las que les tocaba y NO sale nada")
+                roto.append(f"{n_cand} personas esperando un aviso que no sale")
 except Exception as e:
     di(f"   \u2717 NO HE PODIDO MIRAR LA BASE ({type(e).__name__}). Falla cerrado: no afirmo nada.")
     sys.exit(1)
